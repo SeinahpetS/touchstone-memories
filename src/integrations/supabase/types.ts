@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      memories: {
+        Row: {
+          ai_answer: string | null
+          ai_prompt: string | null
+          category: Database["public"]["Enums"]["memory_category"]
+          created_at: string
+          id: string
+          note: string | null
+          photo_url: string | null
+          sentiment: string | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_answer?: string | null
+          ai_prompt?: string | null
+          category: Database["public"]["Enums"]["memory_category"]
+          created_at?: string
+          id?: string
+          note?: string | null
+          photo_url?: string | null
+          sentiment?: string | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_answer?: string | null
+          ai_prompt?: string | null
+          category?: Database["public"]["Enums"]["memory_category"]
+          created_at?: string
+          id?: string
+          note?: string | null
+          photo_url?: string | null
+          sentiment?: string | null
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          name: string | null
+          tier: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          name?: string | null
+          tier?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          tier?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +85,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      memory_category:
+        | "moment"
+        | "person"
+        | "object"
+        | "place"
+        | "food"
+        | "sound"
+        | "imprint"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +219,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      memory_category: [
+        "moment",
+        "person",
+        "object",
+        "place",
+        "food",
+        "sound",
+        "imprint",
+      ],
+    },
   },
 } as const
