@@ -36,7 +36,7 @@ const Archive = () => {
         .order("created_at", { ascending: false });
 
       if (filter !== "all") {
-        query = query.eq("category", filter);
+        query = query.eq("category", filter as any);
       }
 
       const { data } = await query;
