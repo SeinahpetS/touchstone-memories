@@ -1,0 +1,10 @@
+{
+  "name": "Touchstone",
+  "short_name": "Touchstone",
+  "description": "Your living personal archive",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2EEE5",
+  "theme_color": "#F2EEE5",
+  "icons": []
+}
