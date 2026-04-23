@@ -1,19 +1,19 @@
-import { cn } from "@/lib/utils";
+import { CategoryIconCard } from "@/components/CategoryIcon";
+import type { CategoryKey } from "@/components/CategoryIcon";
 
-type Category = {
-  value: string;
-  label: string;
-  color: string;
+type CategoryDef = {
+  value: CategoryKey;
   enabled: boolean;
 };
 
-const CATEGORIES: Category[] = [
-  { value: "moment", label: "Moment", color: "bg-gold", enabled: true },
-  { value: "object", label: "Object", color: "bg-espresso", enabled: true },
-  { value: "person", label: "Person", color: "bg-plum", enabled: true },
-  { value: "place", label: "Place", color: "bg-malachite", enabled: false },
-  { value: "food", label: "Food", color: "bg-terracotta", enabled: false },
-  { value: "sound", label: "Sound", color: "bg-blueprint", enabled: false },
+const CATEGORIES: CategoryDef[] = [
+  { value: "moment", enabled: true },
+  { value: "object", enabled: true },
+  { value: "person", enabled: true },
+  { value: "place", enabled: false },
+  { value: "food", enabled: false },
+  { value: "sound", enabled: false },
+  { value: "imprint", enabled: false },
 ];
 
 interface Props {
@@ -22,26 +22,15 @@ interface Props {
 }
 
 const CategorySelector = ({ value, onChange }: Props) => (
-  <div className="flex flex-wrap gap-2">
+  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
     {CATEGORIES.map((cat) => (
-      <button
+      <CategoryIconCard
         key={cat.value}
-        type="button"
-        disabled={!cat.enabled}
-        onClick={() => cat.enabled && onChange(cat.value)}
-        className={cn(
-          "flex items-center gap-2 rounded-full px-4 py-2 text-base transition-colors",
-          cat.enabled
-            ? value === cat.value
-              ? "bg-foreground text-background"
-              : "bg-card text-foreground hover:bg-border"
-            : "bg-muted text-muted-foreground/50 cursor-not-allowed"
-        )}
-      >
-        <span className={cn("inline-block h-2.5 w-2.5 rounded-full", cat.color)} />
-        {cat.label}
-        {!cat.enabled && <span className="text-xs ml-1">soon</span>}
-      </button>
+        category={cat.value}
+        active={value === cat.value && cat.enabled}
+        comingSoon={!cat.enabled}
+        onClick={() => onChange(cat.value)}
+      />
     ))}
   </div>
 );
