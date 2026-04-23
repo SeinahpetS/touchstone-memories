@@ -14,7 +14,31 @@ export type Database = {
   }
   public: {
     Tables: {
-      memories: {
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          name: string | null
+          tier: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          name?: string | null
+          tier?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          tier?: string
+        }
+        Relationships: []
+      }
+      touchstones: {
         Row: {
           ai_answer: string | null
           ai_prompt: string | null
@@ -50,30 +74,6 @@ export type Database = {
           sentiment?: string | null
           title?: string | null
           user_id?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          id: string
-          name: string | null
-          tier: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          id: string
-          name?: string | null
-          tier?: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          id?: string
-          name?: string | null
-          tier?: string
         }
         Relationships: []
       }
