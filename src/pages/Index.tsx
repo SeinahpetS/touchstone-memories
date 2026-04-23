@@ -3,32 +3,61 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { logEvent } from "@/lib/analytics";
 import Wordmark from "@/components/Wordmark";
 import PromptCard from "@/components/PromptCard";
 import PhotoUpload from "@/components/PhotoUpload";
 import CategorySelector from "@/components/CategorySelector";
+import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import SentimentPill from "@/components/SentimentPill";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import type { CategoryKey } from "@/components/CategoryIcon";
+
+const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
+  moment: "What made this worth keeping?",
+  person: "What made this worth keeping?",
+  object: "What made this worth keeping?",
+  place: "What made this worth keeping?",
+  food: "What made it taste memorable?",
+  sound: "What made this worth keeping?",
+  imprint: "Why did this shape who you are?",
+};
+
+const initialFields: CategoryFieldValues = {
+  locationName: "",
+  venueName: "",
+  relationshipType: "",
+  spotifyId: "",
+  openlibraryId: "",
+  imprintSource: "photo",
+};
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  const [category, setCategory] = useState("moment");
+  const [category, setCategory] = useState<CategoryKey>("moment");
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
   const [sentiment, setSentiment] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [fields, setFields] = useState<CategoryFieldValues>(initialFields);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
   }, [user, loading, navigate]);
+
+  const handleCategoryChange = (next: string) => {
+    const c = next as CategoryKey;
+    setCategory(c);
+    logEvent("capture_started", { category: c });
+  };
 
   const handlePhotoSelect = (file: File | null) => {
     setPhotoFile(file);
@@ -71,12 +100,32 @@ const Index = () => {
           note: note.trim() || null,
           sentiment: sentiment || null,
           photo_url,
+          location_name: fields.locationName.trim() || null,
+          venue_name: fields.venueName.trim() || null,
+          relationship_type:
+            category === "person" && fields.relationshipType
+              ? fields.relationshipType
+              : null,
+          spotify_id:
+            category === "imprint" && fields.imprintSource === "spotify"
+              ? fields.spotifyId.trim() || null
+              : null,
+          openlibrary_id:
+            category === "imprint" && fields.imprintSource === "book"
+              ? fields.openlibraryId.trim() || null
+              : null,
         })
         .select()
         .single();
 
       if (error) throw error;
       setSaved(data);
+      logEvent("capture_completed", {
+        category,
+        has_photo: !!photo_url,
+        has_note: !!note.trim(),
+      });
+      logEvent("artifact_viewed", { memory_id: data.id, category });
     } catch (err: any) {
       toast.error(err.message || "Failed to save touchstone.");
     } finally {
@@ -92,6 +141,7 @@ const Index = () => {
     setSentiment("");
     setPhotoFile(null);
     setPhotoPreview(null);
+    setFields(initialFields);
   };
 
   if (loading) {
@@ -137,7 +187,13 @@ const Index = () => {
               onSelect={handlePhotoSelect}
             />
 
-            <CategorySelector value={category} onChange={setCategory} />
+            <CategorySelector value={category} onChange={handleCategoryChange} />
+
+            <CategoryFields
+              category={category}
+              values={fields}
+              onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
+            />
 
             <Input
               type="text"
@@ -148,7 +204,7 @@ const Index = () => {
             />
 
             <Textarea
-              placeholder="What made this worth keeping?"
+              placeholder={NOTE_PLACEHOLDERS[category]}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="min-h-[120px] text-base bg-card border-0 resize-none"

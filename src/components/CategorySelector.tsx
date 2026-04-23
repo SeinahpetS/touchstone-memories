@@ -8,12 +8,12 @@ type CategoryDef = {
 
 const CATEGORIES: CategoryDef[] = [
   { value: "moment", enabled: true },
-  { value: "object", enabled: true },
   { value: "person", enabled: true },
-  { value: "place", enabled: false },
-  { value: "food", enabled: false },
-  { value: "sound", enabled: false },
-  { value: "imprint", enabled: false },
+  { value: "object", enabled: true },
+  { value: "place", enabled: true },
+  { value: "food", enabled: true },
+  { value: "sound", enabled: true },
+  { value: "imprint", enabled: true },
 ];
 
 interface Props {

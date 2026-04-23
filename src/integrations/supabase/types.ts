@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          created_at: string
+          data: Json
+          event_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          event_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          event_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -21,6 +45,8 @@ export type Database = {
           id: string
           name: string | null
           tier: string
+          trial_ends_at: string | null
+          trial_started_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -28,6 +54,8 @@ export type Database = {
           id: string
           name?: string | null
           tier?: string
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -35,6 +63,8 @@ export type Database = {
           id?: string
           name?: string | null
           tier?: string
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
         }
         Relationships: []
       }
@@ -42,38 +72,65 @@ export type Database = {
         Row: {
           ai_answer: string | null
           ai_prompt: string | null
+          audio_url: string | null
           category: Database["public"]["Enums"]["memory_category"]
           created_at: string
           id: string
+          is_premium_prompt: boolean
+          location_lat: number | null
+          location_lng: number | null
+          location_name: string | null
           note: string | null
+          openlibrary_id: string | null
           photo_url: string | null
+          relationship_type: string | null
           sentiment: string | null
+          spotify_id: string | null
           title: string | null
           user_id: string
+          venue_name: string | null
         }
         Insert: {
           ai_answer?: string | null
           ai_prompt?: string | null
+          audio_url?: string | null
           category: Database["public"]["Enums"]["memory_category"]
           created_at?: string
           id?: string
+          is_premium_prompt?: boolean
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
           note?: string | null
+          openlibrary_id?: string | null
           photo_url?: string | null
+          relationship_type?: string | null
           sentiment?: string | null
+          spotify_id?: string | null
           title?: string | null
           user_id: string
+          venue_name?: string | null
         }
         Update: {
           ai_answer?: string | null
           ai_prompt?: string | null
+          audio_url?: string | null
           category?: Database["public"]["Enums"]["memory_category"]
           created_at?: string
           id?: string
+          is_premium_prompt?: boolean
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
           note?: string | null
+          openlibrary_id?: string | null
           photo_url?: string | null
+          relationship_type?: string | null
           sentiment?: string | null
+          spotify_id?: string | null
           title?: string | null
           user_id?: string
+          venue_name?: string | null
         }
         Relationships: []
       }

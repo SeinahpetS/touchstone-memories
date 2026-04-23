@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         playfair: ['"Playfair Display"', 'Georgia', 'serif'],
         source: ['"Source Sans 3"', 'system-ui', 'sans-serif'],
+        jost: ['"Jost"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
