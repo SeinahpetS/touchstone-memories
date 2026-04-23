@@ -43,7 +43,7 @@ const Index = () => {
   const handleSave = async () => {
     if (!user) return;
     if (!note.trim() && !title.trim() && !photoFile) {
-      toast.error("Add a photo, title, or note to save a memory.");
+      toast.error("Add a photo, title, or note to save a touchstone.");
       return;
     }
 
@@ -62,8 +62,8 @@ const Index = () => {
         photo_url = data.publicUrl;
       }
 
-      const { data, error } = await supabase
-        .from("memories")
+      const { data, error } = await (supabase as any)
+        .from("touchstones")
         .insert({
           user_id: user.id,
           category: category as any,
@@ -78,7 +78,7 @@ const Index = () => {
       if (error) throw error;
       setSaved(data);
     } catch (err: any) {
-      toast.error(err.message || "Failed to save memory.");
+      toast.error(err.message || "Failed to save touchstone.");
     } finally {
       setSaving(false);
     }
@@ -114,7 +114,7 @@ const Index = () => {
             onClick={() => navigate("/archive")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Archive
+            Constellation
           </button>
         </div>
 
@@ -141,14 +141,14 @@ const Index = () => {
 
             <Input
               type="text"
-              placeholder="Give this memory a name (optional)"
+              placeholder="Name this touchstone"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="h-12 text-base bg-card border-0"
             />
 
             <Textarea
-              placeholder="What do you want to remember about this?"
+              placeholder="What made this worth keeping?"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="min-h-[120px] text-base bg-card border-0 resize-none"
@@ -161,7 +161,7 @@ const Index = () => {
               disabled={saving}
               className="w-full h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {saving ? "Saving…" : "Save to archive"}
+              {saving ? "Saving…" : "Save to Constellation"}
             </Button>
           </>
         )}

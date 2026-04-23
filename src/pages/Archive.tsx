@@ -81,7 +81,7 @@ const Archive = () => {
             onClick={() => navigate("/")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            + Capture
+            + Add a Touchstone
           </button>
         </div>
 
@@ -118,16 +118,16 @@ const Archive = () => {
 
         {fetching ? (
           <p className="text-center text-muted-foreground py-12">Loading…</p>
-        ) : memories.length === 0 ? (
+        ) : touchstones.length === 0 ? (
           <div className="text-center py-16 space-y-3">
-            <p className="font-playfair text-lg text-foreground">No memories yet</p>
+            <p className="font-playfair text-lg text-foreground">No touchstones yet</p>
             <p className="text-muted-foreground">
-              Your archive begins with one moment.
+              Your constellation begins with one moment.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            {memories.map((m) => (
+            {touchstones.map((m) => (
               <MemoryCard key={m.id} memory={m} onClick={() => setSelected(m)} />
             ))}
           </div>
