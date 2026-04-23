@@ -5,20 +5,16 @@ import { useAuth } from "@/hooks/useAuth";
 import Wordmark from "@/components/Wordmark";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import { cn } from "@/lib/utils";
 
-const FILTERS = [
-  { value: "all", label: "All" },
-  { value: "moment", label: "Moment" },
-  { value: "object", label: "Object" },
-  { value: "person", label: "Person" },
-];
+const FILTER_CATEGORIES: CategoryKey[] = ["moment", "object", "person"];
 
 const Archive = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [memories, setMemories] = useState<any[]>([]);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState<"all" | CategoryKey>("all");
   const [selected, setSelected] = useState<any>(null);
   const [fetching, setFetching] = useState(true);
 
@@ -89,21 +85,34 @@ const Archive = () => {
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={cn(
-                "whitespace-nowrap rounded-full px-4 py-2 text-sm transition-colors",
-                filter === f.value
-                  ? "bg-foreground text-background"
-                  : "bg-card text-muted-foreground hover:bg-border"
-              )}
-            >
-              {f.label}
-            </button>
+        {/* Filters: All pill + category icon cards */}
+        <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+          <button
+            onClick={() => setFilter("all")}
+            className={cn(
+              "shrink-0 flex flex-col items-center justify-center gap-2 rounded-[10px] bg-[hsl(var(--dark-card))] px-2 pt-4 pb-3 min-w-[84px] transition-colors",
+              filter === "all"
+                ? "border border-[hsl(var(--gold)/0.5)]"
+                : "border border-[hsl(var(--gold)/0.18)] hover:border-[hsl(var(--gold)/0.35)]"
+            )}
+          >
+            <span
+              className="inline-block h-9 w-9 rounded-full border-[1.5px]"
+              style={{ borderColor: "hsl(var(--gold))" }}
+            />
+            <span className="font-sans text-[10px] uppercase tracking-[0.06em] text-[hsl(var(--label-color))]">
+              All
+            </span>
+          </button>
+
+          {FILTER_CATEGORIES.map((c) => (
+            <div key={c} className="shrink-0">
+              <CategoryIconCard
+                category={c}
+                active={filter === c}
+                onClick={() => setFilter(c)}
+              />
+            </div>
           ))}
         </div>
 
