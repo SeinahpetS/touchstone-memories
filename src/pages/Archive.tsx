@@ -77,12 +77,6 @@ const Archive = () => {
       <div className="mx-auto max-w-lg px-5 py-8 space-y-6">
         <div className="flex items-center justify-between">
           <Wordmark />
-          <button
-            onClick={() => navigate("/")}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            + Add a Touchstone
-          </button>
         </div>
 
         {/* Filters: All pill + category icon cards */}
@@ -132,6 +126,13 @@ const Archive = () => {
             ))}
           </div>
         )}
+
+        <button
+          onClick={() => navigate("/")}
+          className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          + Add a Touchstone
+        </button>
       </div>
     </div>
   );
