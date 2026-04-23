@@ -18,7 +18,7 @@ const Auth = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) navigate("/", { replace: true });
+    if (!loading && user) navigate("/archive", { replace: true });
   }, [user, loading, navigate]);
 
   const handleEmail = async (e: React.FormEvent) => {
