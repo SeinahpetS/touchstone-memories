@@ -13,7 +13,7 @@ const FILTER_CATEGORIES: CategoryKey[] = ["moment", "object", "person"];
 const Archive = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [memories, setMemories] = useState<any[]>([]);
+  const [touchstones, setTouchstones] = useState<any[]>([]);
   const [filter, setFilter] = useState<"all" | CategoryKey>("all");
   const [selected, setSelected] = useState<any>(null);
   const [fetching, setFetching] = useState(true);
@@ -24,9 +24,9 @@ const Archive = () => {
 
   useEffect(() => {
     if (!user) return;
-    const fetchMemories = async () => {
-      let query = supabase
-        .from("memories")
+    const fetchTouchstones = async () => {
+      let query = (supabase as any)
+        .from("touchstones")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -36,10 +36,10 @@ const Archive = () => {
       }
 
       const { data } = await query;
-      setMemories(data || []);
+      setTouchstones(data || []);
       setFetching(false);
     };
-    fetchMemories();
+    fetchTouchstones();
   }, [user, filter]);
 
   if (loading || !user) {
@@ -81,7 +81,7 @@ const Archive = () => {
             onClick={() => navigate("/")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            + Capture
+            + Add a Touchstone
           </button>
         </div>
 
@@ -118,16 +118,16 @@ const Archive = () => {
 
         {fetching ? (
           <p className="text-center text-muted-foreground py-12">Loading…</p>
-        ) : memories.length === 0 ? (
+        ) : touchstones.length === 0 ? (
           <div className="text-center py-16 space-y-3">
-            <p className="font-playfair text-lg text-foreground">No memories yet</p>
+            <p className="font-playfair text-lg text-foreground">No touchstones yet</p>
             <p className="text-muted-foreground">
-              Your archive begins with one moment.
+              Your constellation begins with one moment.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            {memories.map((m) => (
+            {touchstones.map((m) => (
               <MemoryCard key={m.id} memory={m} onClick={() => setSelected(m)} />
             ))}
           </div>

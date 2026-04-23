@@ -1,0 +1,1 @@
+ALTER TABLE public.memories RENAME TO touchstones;
