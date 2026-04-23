@@ -13,7 +13,7 @@ const FILTER_CATEGORIES: CategoryKey[] = ["moment", "object", "person"];
 const Archive = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [memories, setMemories] = useState<any[]>([]);
+  const [touchstones, setTouchstones] = useState<any[]>([]);
   const [filter, setFilter] = useState<"all" | CategoryKey>("all");
   const [selected, setSelected] = useState<any>(null);
   const [fetching, setFetching] = useState(true);
@@ -24,9 +24,9 @@ const Archive = () => {
 
   useEffect(() => {
     if (!user) return;
-    const fetchMemories = async () => {
-      let query = supabase
-        .from("memories")
+    const fetchTouchstones = async () => {
+      let query = (supabase as any)
+        .from("touchstones")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -36,10 +36,10 @@ const Archive = () => {
       }
 
       const { data } = await query;
-      setMemories(data || []);
+      setTouchstones(data || []);
       setFetching(false);
     };
-    fetchMemories();
+    fetchTouchstones();
   }, [user, filter]);
 
   if (loading || !user) {
