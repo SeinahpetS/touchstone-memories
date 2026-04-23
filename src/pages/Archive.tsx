@@ -8,7 +8,15 @@ import MemoryArtifact from "@/components/MemoryArtifact";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import { cn } from "@/lib/utils";
 
-const FILTER_CATEGORIES: CategoryKey[] = ["moment", "object", "person"];
+const FILTER_CATEGORIES: CategoryKey[] = [
+  "moment",
+  "person",
+  "object",
+  "place",
+  "food",
+  "sound",
+  "imprint",
+];
 
 const Archive = () => {
   const { user, loading } = useAuth();
