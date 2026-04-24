@@ -78,6 +78,7 @@ export type Database = {
           emotional_tone: string | null
           id: string
           is_premium_prompt: boolean
+          is_private: boolean
           location_lat: number | null
           location_lng: number | null
           location_name: string | null
@@ -105,6 +106,7 @@ export type Database = {
           emotional_tone?: string | null
           id?: string
           is_premium_prompt?: boolean
+          is_private?: boolean
           location_lat?: number | null
           location_lng?: number | null
           location_name?: string | null
@@ -132,6 +134,7 @@ export type Database = {
           emotional_tone?: string | null
           id?: string
           is_premium_prompt?: boolean
+          is_private?: boolean
           location_lat?: number | null
           location_lng?: number | null
           location_name?: string | null
