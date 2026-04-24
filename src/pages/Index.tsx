@@ -90,7 +90,7 @@ const Index = () => {
   const [saved, setSaved] = useState<any>(null);
 
   const current = drafts[category] ?? emptyDraft();
-  const { title, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
+  const { title, emotionalTone, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
     setDrafts((prev) => {
@@ -100,6 +100,7 @@ const Index = () => {
   };
 
   const setTitle = (v: string) => updateDraft({ title: v });
+  const setEmotionalTone = (v: string) => updateDraft({ emotionalTone: v.slice(0, 20) });
   const setNote = (v: string) => updateDraft({ note: v });
   const setSentiment = (v: string) => updateDraft({ sentiment: v });
   const setFields = (
