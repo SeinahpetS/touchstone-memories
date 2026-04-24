@@ -123,9 +123,9 @@ const Archive = () => {
           <p className="text-center text-muted-foreground py-12">Loading…</p>
         ) : touchstones.length === 0 ? (
           <div className="text-center py-16 space-y-3">
-            <p className="font-playfair text-lg text-foreground">No touchstones yet</p>
+            <p className="font-playfair text-lg text-foreground">Your constellation awaits.</p>
             <p className="text-muted-foreground">
-              Your constellation begins with one moment.
+              Your constellation begins with one touchstone.
             </p>
           </div>
         ) : (
