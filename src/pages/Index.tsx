@@ -288,6 +288,7 @@ const Index = () => {
     setSaved(null);
     setCategory("moment");
     setDrafts({ moment: emptyDraft() });
+    if (editId) navigate("/archive");
   };
 
   if (loading) {
