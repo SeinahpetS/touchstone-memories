@@ -52,19 +52,51 @@ const initialFields: CategoryFieldValues = {
   imprintType: null,
 };
 
+interface CategoryDraft {
+  title: string;
+  note: string;
+  sentiment: string;
+  photoFile: File | null;
+  photoPreview: string | null;
+  fields: CategoryFieldValues;
+}
+
+const emptyDraft = (): CategoryDraft => ({
+  title: "",
+  note: "",
+  sentiment: "",
+  photoFile: null,
+  photoPreview: null,
+  fields: { ...initialFields },
+});
+
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   const [category, setCategory] = useState<CategoryKey>("moment");
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
-  const [sentiment, setSentiment] = useState("");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [fields, setFields] = useState<CategoryFieldValues>(initialFields);
+  const [drafts, setDrafts] = useState<Partial<Record<CategoryKey, CategoryDraft>>>({
+    moment: emptyDraft(),
+  });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
+
+  const current = drafts[category] ?? emptyDraft();
+  const { title, note, sentiment, photoFile, photoPreview, fields } = current;
+
+  const updateDraft = (patch: Partial<CategoryDraft>) => {
+    setDrafts((prev) => {
+      const existing = prev[category] ?? emptyDraft();
+      return { ...prev, [category]: { ...existing, ...patch } };
+    });
+  };
+
+  const setTitle = (v: string) => updateDraft({ title: v });
+  const setNote = (v: string) => updateDraft({ note: v });
+  const setSentiment = (v: string) => updateDraft({ sentiment: v });
+  const setFields = (
+    updater: (prev: CategoryFieldValues) => CategoryFieldValues
+  ) => updateDraft({ fields: updater(current.fields) });
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
@@ -72,17 +104,17 @@ const Index = () => {
 
   const handleCategoryChange = (next: string) => {
     const c = next as CategoryKey;
+    setDrafts((prev) => (prev[c] ? prev : { ...prev, [c]: emptyDraft() }));
     setCategory(c);
     logEvent("capture_started", { category: c });
   };
 
   const handlePhotoSelect = (file: File | null) => {
-    setPhotoFile(file);
     if (file) {
       const url = URL.createObjectURL(file);
-      setPhotoPreview(url);
+      updateDraft({ photoFile: file, photoPreview: url });
     } else {
-      setPhotoPreview(null);
+      updateDraft({ photoFile: null, photoPreview: null });
     }
   };
 
