@@ -101,18 +101,29 @@ const Archive = () => {
         <div className="grid grid-cols-4 gap-2 sm:gap-3">
           <button
             onClick={() => setFilter("all")}
+            aria-pressed={filter === "all"}
             className={cn(
-              "flex flex-col items-center justify-center gap-2 rounded-[10px] bg-[hsl(var(--dark-card))] px-2 pt-4 pb-3 transition-colors",
+              "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
               filter === "all"
-                ? "border border-[hsl(var(--gold)/0.5)]"
-                : "border border-[hsl(var(--gold)/0.18)] hover:border-[hsl(var(--gold)/0.35)]"
+                ? "bg-[hsl(var(--background))] border-2 border-[hsl(var(--gold))]"
+                : "bg-[hsl(var(--dark-card))] border border-[hsl(var(--gold)/0.18)] hover:border-[hsl(var(--gold)/0.35)]"
             )}
           >
             <span
               className="inline-block h-9 w-9 rounded-full border-[1.5px]"
-              style={{ borderColor: "hsl(var(--gold))" }}
+              style={{
+                borderColor:
+                  filter === "all" ? "hsl(var(--foreground))" : "hsl(var(--gold))",
+              }}
             />
-            <span className="font-sans text-[10px] uppercase tracking-[0.06em] text-[hsl(var(--label-color))]">
+            <span
+              className={cn(
+                "font-sans text-[10px] uppercase tracking-[0.06em]",
+                filter === "all"
+                  ? "text-[hsl(var(--foreground))]"
+                  : "text-[hsl(var(--label-color))]"
+              )}
+            >
               All
             </span>
           </button>
