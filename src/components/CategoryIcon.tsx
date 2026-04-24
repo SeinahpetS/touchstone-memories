@@ -49,7 +49,13 @@ const CategoryIcon = ({
     ),
     person: (
       <svg width={size} height={size} viewBox="0 0 36 36" fill="none" className={className}>
-        <circle cx="18" cy="13" r="5" stroke={color} strokeWidth="1.5" fill="none" />
+        <polygon
+          points="18,7 24,13 18,19 12,13"
+          stroke={color}
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          fill="none"
+        />
         <path
           d="M7,30 C7,23 11,20 18,20 C25,20 29,23 29,30"
           stroke={color}
@@ -74,8 +80,8 @@ const CategoryIcon = ({
     ),
     place: (
       <svg width={size} height={size} viewBox="0 0 36 36" fill="none" className={className}>
-        <circle cx="18" cy="13" r="5" stroke={color} strokeWidth="1.5" />
-        <line x1="18" y1="18" x2="18" y2="31" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <polygon points="18,7 24,13 18,19 12,13" stroke={color} strokeWidth="1.5" strokeLinejoin="round" fill="none" />
+        <line x1="18" y1="19" x2="18" y2="31" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
     food: (
