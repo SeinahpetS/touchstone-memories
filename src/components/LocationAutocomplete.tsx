@@ -41,7 +41,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
   const debounced = useDebounce(query, 250);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Keep input synced if parent resets value
   useEffect(() => {
     setQuery(value);
   }, [value]);
@@ -81,7 +80,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
     };
   }, [debounced, justSelected]);
 
-  // Click-outside to close
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
