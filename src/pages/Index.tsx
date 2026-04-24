@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -81,6 +81,8 @@ const emptyDraft = (): CategoryDraft => ({
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
 
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [drafts, setDrafts] = useState<Partial<Record<CategoryKey, CategoryDraft>>>({
@@ -88,6 +90,7 @@ const Index = () => {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
+  const [editLoading, setEditLoading] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
   const { title, emotionalTone, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
@@ -111,6 +114,58 @@ const Index = () => {
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
   }, [user, loading, navigate]);
+
+  // Hydrate draft from existing touchstone when editing.
+  useEffect(() => {
+    if (!user || !editId) return;
+    let cancelled = false;
+    const load = async () => {
+      setEditLoading(true);
+      const { data, error } = await (supabase as any)
+        .from("touchstones")
+        .select("*")
+        .eq("id", editId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      setEditLoading(false);
+      if (error || !data) {
+        toast.error("Couldn't load that Touchstone for editing.");
+        navigate("/", { replace: true });
+        return;
+      }
+      const cat = data.category as CategoryKey;
+      const draft: CategoryDraft = {
+        title: data.title ?? "",
+        emotionalTone: data.emotional_tone ?? "",
+        note: data.note ?? "",
+        sentiment: data.sentiment ?? "",
+        photoFile: null,
+        photoPreview: data.photo_url ?? null,
+        fields: {
+          ...initialFields,
+          locationName: data.location_name ?? "",
+          locationLat: data.location_lat ?? null,
+          locationLng: data.location_lng ?? null,
+          venueName: data.venue_name ?? "",
+          relationshipType:
+            (data.relationship_type as "personal" | "professional" | "") ?? "",
+        },
+        memoryDate: {
+          season: data.memory_season ?? null,
+          year: data.memory_year ?? null,
+          month: data.memory_month ?? null,
+          day: data.memory_day ?? null,
+        },
+      };
+      setCategory(cat);
+      setDrafts({ [cat]: draft });
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, user, navigate]);
 
   const handleCategoryChange = (next: string) => {
     const c = next as CategoryKey;
@@ -137,7 +192,7 @@ const Index = () => {
 
     setSaving(true);
     try {
-      let photo_url: string | null = null;
+      let photo_url: string | null = editId ? current.photoPreview ?? null : null;
 
       if (photoFile) {
         const ext = photoFile.name.split(".").pop();
@@ -148,7 +203,7 @@ const Index = () => {
         if (uploadErr) throw uploadErr;
         const { data } = supabase.storage.from("memory-photos").getPublicUrl(path);
         photo_url = data.publicUrl;
-      } else if (category === "imprint") {
+      } else if (!editId && category === "imprint") {
         // Fall back to Spotify/Book cover art when no photo is uploaded.
         if (fields.imprintSource === "spotify" && fields.spotifyPick?.image) {
           photo_url = fields.spotifyPick.image;
@@ -167,43 +222,56 @@ const Index = () => {
         }
       }
 
-      const { data, error } = await (supabase as any)
-        .from("touchstones")
-        .insert({
-          user_id: user.id,
-          category: category as any,
-          title: resolvedTitle || null,
-          emotional_tone: emotionalTone.trim() || null,
-          note: note.trim() || null,
-          sentiment: sentiment || null,
-          photo_url,
-          location_name: fields.locationName.trim() || null,
-          location_lat: fields.locationLat,
-          location_lng: fields.locationLng,
-          venue_name: fields.venueName.trim() || null,
-          relationship_type:
-            category === "person" && fields.relationshipType
-              ? fields.relationshipType
-              : null,
-          spotify_id:
-            category === "imprint" && fields.imprintSource === "spotify"
-              ? fields.spotifyPick?.id ?? null
-              : null,
-          openlibrary_id:
-            category === "imprint" && fields.imprintSource === "book"
-              ? fields.bookPick?.id ?? null
-              : null,
-          memory_season: memoryDate.season,
-          memory_year: memoryDate.year,
-          memory_month: memoryDate.month,
-          memory_day: memoryDate.day,
-        })
-        .select()
-        .single();
+      const payload: Record<string, any> = {
+        category: category as any,
+        title: resolvedTitle || null,
+        emotional_tone: emotionalTone.trim() || null,
+        note: note.trim() || null,
+        sentiment: sentiment || null,
+        photo_url,
+        location_name: fields.locationName.trim() || null,
+        location_lat: fields.locationLat,
+        location_lng: fields.locationLng,
+        venue_name: fields.venueName.trim() || null,
+        relationship_type:
+          category === "person" && fields.relationshipType
+            ? fields.relationshipType
+            : null,
+        spotify_id:
+          category === "imprint" && fields.imprintSource === "spotify"
+            ? fields.spotifyPick?.id ?? null
+            : null,
+        openlibrary_id:
+          category === "imprint" && fields.imprintSource === "book"
+            ? fields.bookPick?.id ?? null
+            : null,
+        memory_season: memoryDate.season,
+        memory_year: memoryDate.year,
+        memory_month: memoryDate.month,
+        memory_day: memoryDate.day,
+      };
+
+      let data: any;
+      let error: any;
+      if (editId) {
+        ({ data, error } = await (supabase as any)
+          .from("touchstones")
+          .update(payload)
+          .eq("id", editId)
+          .eq("user_id", user.id)
+          .select()
+          .single());
+      } else {
+        ({ data, error } = await (supabase as any)
+          .from("touchstones")
+          .insert({ ...payload, user_id: user.id })
+          .select()
+          .single());
+      }
 
       if (error) throw error;
       setSaved(data);
-      logEvent("capture_completed", {
+      logEvent(editId ? "memory_updated" : "capture_completed", {
         category,
         has_photo: !!photo_url,
         has_note: !!note.trim(),
@@ -220,9 +288,10 @@ const Index = () => {
     setSaved(null);
     setCategory("moment");
     setDrafts({ moment: emptyDraft() });
+    if (editId) navigate("/archive");
   };
 
-  if (loading) {
+  if (loading || editLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-muted-foreground">Loading…</p>
@@ -242,7 +311,7 @@ const Index = () => {
             onClick={() => navigate("/archive")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Constellation
+            {editId ? "Cancel" : "Constellation"}
           </button>
         </div>
 
@@ -350,7 +419,13 @@ const Index = () => {
               disabled={saving}
               className="w-full h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {saving ? "Saving…" : "Save to Constellation"}
+              {saving
+                ? editId
+                  ? "Updating…"
+                  : "Saving…"
+                : editId
+                ? "Save changes"
+                : "Save to Constellation"}
             </Button>
           </>
         )}
