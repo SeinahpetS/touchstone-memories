@@ -126,7 +126,7 @@ const Index = () => {
   const handleSave = async () => {
     if (!user) return;
     if (!note.trim() && !title.trim() && !photoFile && !fields.spotifyPick && !fields.bookPick) {
-      toast.error("Add a photo, title, or note to save a touchstone.");
+      toast.error("Add a photo, title, or note to save a Touchstone.");
       return;
     }
 
