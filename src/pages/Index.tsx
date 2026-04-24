@@ -247,6 +247,12 @@ const Index = () => {
             title={saved.title}
             note={saved.note}
             createdAt={saved.created_at}
+            memoryDate={{
+              season: saved.memory_season ?? null,
+              year: saved.memory_year ?? null,
+              month: saved.memory_month ?? null,
+              day: saved.memory_day ?? null,
+            }}
             onClose={reset}
           />
         ) : (
