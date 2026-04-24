@@ -192,7 +192,7 @@ const Index = () => {
 
     setSaving(true);
     try {
-      let photo_url: string | null = null;
+      let photo_url: string | null = editId ? current.photoPreview ?? null : null;
 
       if (photoFile) {
         const ext = photoFile.name.split(".").pop();
@@ -203,7 +203,7 @@ const Index = () => {
         if (uploadErr) throw uploadErr;
         const { data } = supabase.storage.from("memory-photos").getPublicUrl(path);
         photo_url = data.publicUrl;
-      } else if (category === "imprint") {
+      } else if (!editId && category === "imprint") {
         // Fall back to Spotify/Book cover art when no photo is uploaded.
         if (fields.imprintSource === "spotify" && fields.spotifyPick?.image) {
           photo_url = fields.spotifyPick.image;
