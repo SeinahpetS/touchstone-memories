@@ -109,6 +109,11 @@ const Index = () => {
 
   const handleCategoryChange = (next: string) => {
     const c = next as CategoryKey;
+    if (category === c) {
+      // Tapping the active category deselects it → collapses photo zone.
+      setCategory(null);
+      return;
+    }
     setDrafts((prev) => (prev[c] ? prev : { ...prev, [c]: emptyDraft() }));
     setCategory(c);
     logEvent("capture_started", { category: c });
