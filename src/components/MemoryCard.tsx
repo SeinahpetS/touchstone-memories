@@ -1,6 +1,6 @@
-import { format } from "date-fns";
 import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
 import { cn } from "@/lib/utils";
+import { formatMemoryDate } from "@/lib/memoryDate";
 
 const CATEGORY_STRIPE: Record<string, string> = {
   moment: "bg-gold",
