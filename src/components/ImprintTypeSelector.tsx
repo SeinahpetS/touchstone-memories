@@ -142,7 +142,7 @@ interface Props {
 }
 
 const ImprintTypeSelector = ({ value, onChange }: Props) => (
-  <div className="flex flex-wrap gap-2">
+  <div className="flex flex-wrap justify-center gap-2">
     {OPTIONS.map(({ value: v, label }) => {
       const active = value === v;
       const IconComp = Icon[v];
@@ -154,22 +154,13 @@ const ImprintTypeSelector = ({ value, onChange }: Props) => (
           aria-pressed={active}
           aria-label={label}
           className={cn(
-            "flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors",
-            active
-              ? "bg-[hsl(var(--background))] border-2 border-[hsl(var(--gold))]"
-              : "bg-[hsl(var(--dark-card))] border border-[hsl(var(--gold)/0.12)] hover:border-[hsl(var(--gold)/0.28)]"
+            "flex items-center gap-1.5 rounded-full border-0 px-3 py-1.5 transition-opacity",
+            active ? "opacity-100" : "opacity-80 hover:opacity-100"
           )}
+          style={{ backgroundColor: "#E8E4D8", color: "#2C3E50" }}
         >
-          <IconComp
-            size={16}
-            color={active ? "hsl(var(--foreground))" : "hsl(var(--gold))"}
-          />
-          <span
-            className={cn(
-              "font-sans text-[10px] uppercase tracking-[0.06em]",
-              active ? "text-[hsl(var(--foreground))]" : "text-[hsl(var(--label-color))]"
-            )}
-          >
+          <IconComp size={16} color="#2C3E50" />
+          <span className="font-jost text-[10px] uppercase tracking-[0.06em]" style={{ color: "#2C3E50" }}>
             {label}
           </span>
         </button>
