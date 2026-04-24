@@ -79,12 +79,31 @@ const Archive = () => {
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-lg px-5 py-8 space-y-6">
-          <button
-            onClick={() => setSelected(null)}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← Back
-          </button>
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setSelected(null)}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              ← Back
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                aria-label="More options"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-[hsl(var(--dark-card))] transition-colors"
+              >
+                <MoreHorizontal className="h-5 w-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => navigate(`/?edit=${selected.id}`)}
+                  className="cursor-pointer"
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <MemoryArtifact
             photoUrl={selected.photo_url}
             category={selected.category}
