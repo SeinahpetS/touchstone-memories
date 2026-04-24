@@ -86,6 +86,7 @@ export type Database = {
           memory_year: number | null
           note: string | null
           openlibrary_id: string | null
+          people: string | null
           photo_url: string | null
           relationship_type: string | null
           sentiment: string | null
@@ -111,6 +112,7 @@ export type Database = {
           memory_year?: number | null
           note?: string | null
           openlibrary_id?: string | null
+          people?: string | null
           photo_url?: string | null
           relationship_type?: string | null
           sentiment?: string | null
@@ -136,6 +138,7 @@ export type Database = {
           memory_year?: number | null
           note?: string | null
           openlibrary_id?: string | null
+          people?: string | null
           photo_url?: string | null
           relationship_type?: string | null
           sentiment?: string | null
