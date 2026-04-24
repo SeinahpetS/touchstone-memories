@@ -81,6 +81,8 @@ const emptyDraft = (): CategoryDraft => ({
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
 
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [drafts, setDrafts] = useState<Partial<Record<CategoryKey, CategoryDraft>>>({
@@ -88,6 +90,7 @@ const Index = () => {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
+  const [editLoading, setEditLoading] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
   const { title, emotionalTone, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
