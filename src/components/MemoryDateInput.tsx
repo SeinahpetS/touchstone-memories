@@ -53,14 +53,11 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-baseline justify-between">
-        <label className="font-jost text-sm font-light text-muted-foreground">
-          When was this?
-        </label>
-        {preview && (
+      {preview && (
+        <div className="flex justify-end">
           <span className="font-jost text-sm text-foreground/80">{preview}</span>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <select
