@@ -122,6 +122,7 @@ const Archive = () => {
             <div key={c} className="flex-1 shrink-0">
               <CategoryIconCard
                 category={c}
+                label={PLURAL_LABELS[c]}
                 active={filter === c}
                 onClick={() => setFilter(c)}
               />
