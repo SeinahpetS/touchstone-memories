@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import SpotifySearch, { type SpotifyPick } from "@/components/SpotifySearch";
 import BookSearch, { type BookPick } from "@/components/BookSearch";
+import ImprintTypeSelector, { type ImprintType } from "@/components/ImprintTypeSelector";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
 export interface CategoryFieldValues {
@@ -13,6 +14,7 @@ export interface CategoryFieldValues {
   spotifyPick: SpotifyPick | null;
   bookPick: BookPick | null;
   imprintSource: "photo" | "spotify" | "book";
+  imprintType: ImprintType | null;
 }
 
 interface Props {
