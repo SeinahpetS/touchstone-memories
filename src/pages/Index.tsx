@@ -232,7 +232,11 @@ const Index = () => {
             />
 
             <Textarea
-              placeholder={NOTE_PLACEHOLDERS[category]}
+              placeholder={
+                category === "imprint" && fields.imprintType
+                  ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
+                  : NOTE_PLACEHOLDERS[category]
+              }
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="min-h-[120px] text-base bg-card border-0 resize-none"
