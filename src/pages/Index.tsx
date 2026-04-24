@@ -28,10 +28,12 @@ const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
 
 const initialFields: CategoryFieldValues = {
   locationName: "",
+  locationLat: null,
+  locationLng: null,
   venueName: "",
   relationshipType: "",
-  spotifyId: "",
-  openlibraryId: "",
+  spotifyPick: null,
+  bookPick: null,
   imprintSource: "photo",
 };
 
