@@ -8,6 +8,8 @@ import Wordmark from "@/components/Wordmark";
 import PhotoUpload from "@/components/PhotoUpload";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
+import MemoryDateInput from "@/components/MemoryDateInput";
+import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +61,7 @@ interface CategoryDraft {
   photoFile: File | null;
   photoPreview: string | null;
   fields: CategoryFieldValues;
+  memoryDate: MemoryDate;
 }
 
 const emptyDraft = (): CategoryDraft => ({
@@ -68,6 +71,7 @@ const emptyDraft = (): CategoryDraft => ({
   photoFile: null,
   photoPreview: null,
   fields: { ...initialFields },
+  memoryDate: emptyMemoryDate(),
 });
 
 const Index = () => {
@@ -82,7 +86,7 @@ const Index = () => {
   const [saved, setSaved] = useState<any>(null);
 
   const current = drafts[category] ?? emptyDraft();
-  const { title, note, sentiment, photoFile, photoPreview, fields } = current;
+  const { title, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
     setDrafts((prev) => {
@@ -97,6 +101,7 @@ const Index = () => {
   const setFields = (
     updater: (prev: CategoryFieldValues) => CategoryFieldValues
   ) => updateDraft({ fields: updater(current.fields) });
+  const setMemoryDate = (next: MemoryDate) => updateDraft({ memoryDate: next });
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
@@ -182,6 +187,10 @@ const Index = () => {
             category === "imprint" && fields.imprintSource === "book"
               ? fields.bookPick?.id ?? null
               : null,
+          memory_season: memoryDate.season,
+          memory_year: memoryDate.year,
+          memory_month: memoryDate.month,
+          memory_day: memoryDate.day,
         })
         .select()
         .single();
@@ -238,6 +247,12 @@ const Index = () => {
             title={saved.title}
             note={saved.note}
             createdAt={saved.created_at}
+            memoryDate={{
+              season: saved.memory_season ?? null,
+              year: saved.memory_year ?? null,
+              month: saved.memory_month ?? null,
+              day: saved.memory_day ?? null,
+            }}
             onClose={reset}
           />
         ) : (
@@ -255,6 +270,8 @@ const Index = () => {
               values={fields}
               onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
             />
+
+            <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
 
             <Input
               type="text"

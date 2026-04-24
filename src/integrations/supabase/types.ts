@@ -80,6 +80,10 @@ export type Database = {
           location_lat: number | null
           location_lng: number | null
           location_name: string | null
+          memory_day: number | null
+          memory_month: number | null
+          memory_season: string | null
+          memory_year: number | null
           note: string | null
           openlibrary_id: string | null
           photo_url: string | null
@@ -101,6 +105,10 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_name?: string | null
+          memory_day?: number | null
+          memory_month?: number | null
+          memory_season?: string | null
+          memory_year?: number | null
           note?: string | null
           openlibrary_id?: string | null
           photo_url?: string | null
@@ -122,6 +130,10 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_name?: string | null
+          memory_day?: number | null
+          memory_month?: number | null
+          memory_season?: string | null
+          memory_year?: number | null
           note?: string | null
           openlibrary_id?: string | null
           photo_url?: string | null
