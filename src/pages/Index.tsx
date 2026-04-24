@@ -8,6 +8,7 @@ import Wordmark from "@/components/Wordmark";
 import PhotoUpload from "@/components/PhotoUpload";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
+import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import MemoryArtifact from "@/components/MemoryArtifact";
@@ -278,6 +279,22 @@ const Index = () => {
                 className="h-12 text-base bg-card border-0"
               />
             </div>
+
+            {/* Imprint sub-type — appears right after Name */}
+            {category === "imprint" && (
+              <ImprintTypeSelector
+                value={fields.imprintType}
+                onChange={(t) => {
+                  const source: CategoryFieldValues["imprintSource"] =
+                    t === "music" ? "spotify" : t === "book" ? "book" : "photo";
+                  setFields((prev) => ({
+                    ...prev,
+                    imprintType: t,
+                    imprintSource: source,
+                  }));
+                }}
+              />
+            )}
 
             {/* Field 2 — Date */}
             <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />

@@ -111,15 +111,6 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
 
       {category === "imprint" && (
         <div className="space-y-4">
-          <ImprintTypeSelector
-            value={values.imprintType}
-            onChange={(t) => {
-              // Map sub-type to the underlying capture source.
-              const source: CategoryFieldValues["imprintSource"] =
-                t === "music" ? "spotify" : t === "book" ? "book" : "photo";
-              onChange({ imprintType: t, imprintSource: source });
-            }}
-          />
           {values.imprintType === "music" && (
             <SpotifySearch
               value={values.spotifyPick}
