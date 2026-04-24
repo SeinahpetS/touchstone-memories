@@ -265,6 +265,8 @@ const Index = () => {
               onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
             />
 
+            <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
+
             <Input
               type="text"
               placeholder="Name this touchstone"
