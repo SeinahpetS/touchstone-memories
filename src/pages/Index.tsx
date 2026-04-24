@@ -243,20 +243,34 @@ const Index = () => {
         </div>
 
         {saved ? (
-          <MemoryArtifact
-            photoUrl={saved.photo_url}
-            category={saved.category}
-            title={saved.title}
-            note={saved.note}
-            createdAt={saved.created_at}
-            memoryDate={{
-              season: saved.memory_season ?? null,
-              year: saved.memory_year ?? null,
-              month: saved.memory_month ?? null,
-              day: saved.memory_day ?? null,
-            }}
-            onClose={reset}
-          />
+          <>
+            <MemoryArtifact
+              photoUrl={saved.photo_url}
+              category={saved.category}
+              title={saved.title}
+              note={saved.note}
+              createdAt={saved.created_at}
+              memoryDate={{
+                season: saved.memory_season ?? null,
+                year: saved.memory_year ?? null,
+                month: saved.memory_month ?? null,
+                day: saved.memory_day ?? null,
+              }}
+              onClose={reset}
+            />
+            <PostSaveNudge
+              memoryId={saved.id}
+              hasDate={Boolean(saved.memory_season || saved.memory_year || saved.memory_month)}
+              hasPeople={Boolean(saved.people && String(saved.people).trim())}
+              initialDate={{
+                season: saved.memory_season ?? null,
+                year: saved.memory_year ?? null,
+                month: saved.memory_month ?? null,
+                day: saved.memory_day ?? null,
+              }}
+              onPatched={(patch) => setSaved((prev: any) => ({ ...prev, ...patch }))}
+            />
+          </>
         ) : (
           <>
             <PhotoUpload
