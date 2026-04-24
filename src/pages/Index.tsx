@@ -15,13 +15,23 @@ import { Textarea } from "@/components/ui/textarea";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
-  moment: "What made this worth keeping?",
-  person: "What made this worth keeping?",
-  object: "What made this worth keeping?",
-  place: "What made this worth keeping?",
+  moment: "What made this moment worth keeping?",
+  person: "What makes this person matter to you?",
+  object: "What story does this object hold?",
+  place: "What makes this place stay with you?",
   food: "What made it taste memorable?",
-  sound: "What made this worth keeping?",
+  sound: "What does this sound bring back?",
   imprint: "Why did this shape who you are?",
+};
+
+const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
+  music: "How did this music shape you?",
+  book: "What did this book leave with you?",
+  film: "What did this film leave with you?",
+  tv: "What did this show mean to you?",
+  art: "What did this artwork stir in you?",
+  quote: "Why does this quote stay with you?",
+  poem: "Why does this poem stay with you?",
 };
 
 const initialFields: CategoryFieldValues = {
