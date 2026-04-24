@@ -75,6 +75,7 @@ export type Database = {
           audio_url: string | null
           category: Database["public"]["Enums"]["memory_category"]
           created_at: string
+          emotional_tone: string | null
           id: string
           is_premium_prompt: boolean
           location_lat: number | null
@@ -101,6 +102,7 @@ export type Database = {
           audio_url?: string | null
           category: Database["public"]["Enums"]["memory_category"]
           created_at?: string
+          emotional_tone?: string | null
           id?: string
           is_premium_prompt?: boolean
           location_lat?: number | null
@@ -127,6 +129,7 @@ export type Database = {
           audio_url?: string | null
           category?: Database["public"]["Enums"]["memory_category"]
           created_at?: string
+          emotional_tone?: string | null
           id?: string
           is_premium_prompt?: boolean
           location_lat?: number | null
