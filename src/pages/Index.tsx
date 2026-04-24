@@ -61,6 +61,7 @@ interface CategoryDraft {
   photoFile: File | null;
   photoPreview: string | null;
   fields: CategoryFieldValues;
+  memoryDate: MemoryDate;
 }
 
 const emptyDraft = (): CategoryDraft => ({
@@ -70,6 +71,7 @@ const emptyDraft = (): CategoryDraft => ({
   photoFile: null,
   photoPreview: null,
   fields: { ...initialFields },
+  memoryDate: emptyMemoryDate(),
 });
 
 const Index = () => {
