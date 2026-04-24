@@ -200,8 +200,6 @@ const Index = () => {
           />
         ) : (
           <>
-            <PromptCard />
-
             <PhotoUpload
               file={photoFile}
               preview={photoPreview}
@@ -230,8 +228,6 @@ const Index = () => {
               onChange={(e) => setNote(e.target.value)}
               className="min-h-[120px] text-base bg-card border-0 resize-none"
             />
-
-            <SentimentPill value={sentiment} onChange={setSentiment} />
 
             <Button
               onClick={handleSave}
