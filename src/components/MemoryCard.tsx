@@ -15,7 +15,7 @@ import { formatMemoryDate } from "@/lib/memoryDate";
 
 const CATEGORY_STRIPE: Record<string, string> = {
   moment: "bg-gold",
-  object: "bg-espresso",
+  object: "bg-pewter",
   person: "bg-plum",
   place: "bg-malachite",
   food: "bg-terracotta",
