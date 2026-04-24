@@ -177,6 +177,8 @@ export const CategoryIconCard = ({
   const displayLabel = label ?? CATEGORY_LABELS[category];
   const isInteractive = !disabled && !comingSoon;
 
+  const borderColor = CATEGORY_BORDER_COLORS[category];
+
   return (
     <button
       type="button"
@@ -184,13 +186,14 @@ export const CategoryIconCard = ({
       disabled={!isInteractive}
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
+      style={{
+        borderColor,
+        borderWidth: active ? "2px" : "1.5px",
+      }}
       className={cn(
         "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
         "min-w-[68px] sm:min-w-[84px]",
-        active
-          ? "bg-[hsl(var(--background))] border-2 border-[hsl(var(--gold))]"
-          : "bg-[hsl(var(--dark-card))] border border-[hsl(var(--gold)/0.18)]",
-        isInteractive && !active && "hover:border-[hsl(var(--gold)/0.35)]",
+        "bg-[hsl(var(--dark-card))] border-solid",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
@@ -198,13 +201,11 @@ export const CategoryIconCard = ({
       <CategoryIcon
         category={category}
         size={size}
-        color={active ? "hsl(var(--foreground))" : "hsl(var(--gold))"}
+        color={borderColor}
       />
       <span
-        className={cn(
-          "font-sans text-[10px] uppercase tracking-[0.06em]",
-          active ? "text-[hsl(var(--foreground))]" : "text-[hsl(var(--label-color))]"
-        )}
+        className="font-sans text-[10px] uppercase tracking-[0.06em]"
+        style={{ color: borderColor }}
       >
         {displayLabel}
       </span>
