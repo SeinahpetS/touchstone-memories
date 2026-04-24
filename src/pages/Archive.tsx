@@ -47,24 +47,26 @@ const Archive = () => {
     if (!loading && !user) navigate("/auth", { replace: true });
   }, [user, loading, navigate]);
 
-  useEffect(() => {
+  const fetchTouchstones = async () => {
     if (!user) return;
-    const fetchTouchstones = async () => {
-      let query = (supabase as any)
-        .from("touchstones")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+    let query = (supabase as any)
+      .from("touchstones")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
 
-      if (filter !== "all") {
-        query = query.eq("category", filter as any);
-      }
+    if (filter !== "all") {
+      query = query.eq("category", filter as any);
+    }
 
-      const { data } = await query;
-      setTouchstones(data || []);
-      setFetching(false);
-    };
+    const { data } = await query;
+    setTouchstones(data || []);
+    setFetching(false);
+  };
+
+  useEffect(() => {
     fetchTouchstones();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, filter]);
 
   if (loading || !user) {
