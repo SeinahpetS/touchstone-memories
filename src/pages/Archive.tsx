@@ -149,17 +149,30 @@ const Archive = () => {
             aria-pressed={filter === "all"}
             style={{
               borderColor: "#B8860B",
-              borderWidth: filter === "all" ? "2.5px" : "1.5px",
+              borderWidth: filter === "all" ? "3.5px" : "2.5px",
               borderStyle: "solid",
+              backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
             }}
-            className="flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors bg-[hsl(var(--dark-card))]"
+            className={cn(
+              "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
+              filter !== "all" && "bg-[hsl(var(--dark-card))]"
+            )}
           >
             <span
               className="inline-block h-7 w-7 rotate-45 border-[1.5px]"
-              style={{ borderColor: "hsl(var(--gold))" }}
+              style={{
+                borderColor: filter === "all" ? "#2C3E50" : "hsl(var(--gold))",
+              }}
             />
-            <span className="font-sans text-[10px] uppercase tracking-[0.06em] text-[hsl(var(--label-color))]">
-              All
+            <span
+              className="font-sans text-[10px] uppercase tracking-[0.06em]"
+              style={{
+                color: filter === "all" ? "#2C3E50" : undefined,
+              }}
+            >
+              <span className={cn(filter !== "all" && "text-[hsl(var(--label-color))]")}>
+                All
+              </span>
             </span>
           </button>
 
