@@ -58,6 +58,7 @@ const initialFields: CategoryFieldValues = {
 
 interface CategoryDraft {
   title: string;
+  emotionalTone: string;
   note: string;
   sentiment: string;
   photoFile: File | null;
@@ -68,6 +69,7 @@ interface CategoryDraft {
 
 const emptyDraft = (): CategoryDraft => ({
   title: "",
+  emotionalTone: "",
   note: "",
   sentiment: "",
   photoFile: null,
@@ -88,7 +90,7 @@ const Index = () => {
   const [saved, setSaved] = useState<any>(null);
 
   const current = drafts[category] ?? emptyDraft();
-  const { title, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
+  const { title, emotionalTone, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
     setDrafts((prev) => {
@@ -98,6 +100,7 @@ const Index = () => {
   };
 
   const setTitle = (v: string) => updateDraft({ title: v });
+  const setEmotionalTone = (v: string) => updateDraft({ emotionalTone: v.slice(0, 20) });
   const setNote = (v: string) => updateDraft({ note: v });
   const setSentiment = (v: string) => updateDraft({ sentiment: v });
   const setFields = (
@@ -170,6 +173,7 @@ const Index = () => {
           user_id: user.id,
           category: category as any,
           title: resolvedTitle || null,
+          emotional_tone: emotionalTone.trim() || null,
           note: note.trim() || null,
           sentiment: sentiment || null,
           photo_url,
@@ -319,6 +323,19 @@ const Index = () => {
               category={category}
               values={fields}
               onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
+            />
+
+            {/* Emotional tone — one-word feeling */}
+            <Input
+              type="text"
+              maxLength={20}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="One word for how this feels."
+              value={emotionalTone}
+              onChange={(e) => setEmotionalTone(e.target.value)}
+              className="h-12 text-base bg-card border-0 font-jost text-[#2C3E50] placeholder:text-[#5B4A3F]/60 placeholder:italic"
             />
 
             {/* Field 4 — Note */}
