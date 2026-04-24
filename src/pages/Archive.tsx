@@ -152,28 +152,13 @@ const Archive = () => {
               borderWidth: filter === "all" ? "2.5px" : "1.5px",
               borderStyle: "solid",
             }}
-            className={cn(
-              "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
-              filter === "all"
-                ? "bg-[hsl(var(--background))]"
-                : "bg-[hsl(var(--dark-card))]"
-            )}
+            className="flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors bg-[hsl(var(--dark-card))]"
           >
             <span
               className="inline-block h-7 w-7 rotate-45 border-[1.5px]"
-              style={{
-                borderColor:
-                  filter === "all" ? "hsl(var(--foreground))" : "hsl(var(--gold))",
-              }}
+              style={{ borderColor: "hsl(var(--gold))" }}
             />
-            <span
-              className={cn(
-                "font-sans text-[10px] uppercase tracking-[0.06em]",
-                filter === "all"
-                  ? "text-[hsl(var(--foreground))]"
-                  : "text-[hsl(var(--label-color))]"
-              )}
-            >
+            <span className="font-sans text-[10px] uppercase tracking-[0.06em] text-[hsl(var(--label-color))]">
               All
             </span>
           </button>
