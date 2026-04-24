@@ -194,9 +194,7 @@ export const CategoryIconCard = ({
       className={cn(
         "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
         "min-w-[68px] sm:min-w-[84px]",
-        active
-          ? "bg-[hsl(var(--background))]"
-          : "bg-[hsl(var(--dark-card))]",
+        "bg-[hsl(var(--dark-card))]",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
@@ -204,13 +202,10 @@ export const CategoryIconCard = ({
       <CategoryIcon
         category={category}
         size={size}
-        color={active ? "hsl(var(--foreground))" : "hsl(var(--gold))"}
+        color="hsl(var(--gold))"
       />
       <span
-        className={cn(
-          "font-sans text-[10px] uppercase tracking-[0.06em]",
-          active ? "text-[hsl(var(--foreground))]" : "text-[hsl(var(--label-color))]"
-        )}
+        className="font-sans text-[10px] uppercase tracking-[0.06em] text-[hsl(var(--label-color))]"
       >
         {displayLabel}
       </span>
