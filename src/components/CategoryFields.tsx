@@ -1,13 +1,17 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
+import SpotifySearch, { type SpotifyPick } from "@/components/SpotifySearch";
+import BookSearch, { type BookPick } from "@/components/BookSearch";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
 export interface CategoryFieldValues {
   locationName: string;
+  locationLat: number | null;
+  locationLng: number | null;
   venueName: string;
   relationshipType: "personal" | "professional" | "";
-  spotifyId: string;
-  openlibraryId: string;
+  spotifyPick: SpotifyPick | null;
+  bookPick: BookPick | null;
   imprintSource: "photo" | "spotify" | "book";
 }
 
@@ -20,15 +24,17 @@ interface Props {
 const inputClass = "h-11 text-base bg-card border-0";
 
 /**
- * Renders the category-specific optional fields per the brief.
- * Place/People/Object/Food show a location input.
- * People adds a relationship-type toggle.
- * Food adds a restaurant name field.
- * Imprints show a source selector (photo / Spotify / Open Library).
- * Sound shows a disabled audio-upload placeholder.
+ * Category-specific optional fields.
+ * Place / People / Object / Food / Moment → location autocomplete (Google Places).
+ * People → relationship type toggle.
+ * Food → restaurant name.
+ * Imprint → source selector + Spotify or Open Library search.
+ * Sound → audio upload placeholder (disabled).
  */
 const CategoryFields = ({ category, values, onChange }: Props) => {
-  const showLocation = ["moment", "person", "object", "place", "food"].includes(category);
+  const showLocation = ["moment", "person", "object", "place", "food"].includes(
+    category
+  );
   const locationLabel =
     category === "person"
       ? "Where did you meet?"
@@ -38,6 +44,9 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
       ? "Place (venue or address)"
       : "Location (optional)";
   const locationRequired = category === "place";
+  const placeholder = locationRequired
+    ? "Venue or address"
+    : locationLabel;
 
   return (
     <div className="space-y-4">
@@ -78,20 +87,18 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
       )}
 
       {showLocation && (
-        <div className="space-y-1.5">
-          {locationRequired && (
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-              {locationLabel}
-            </Label>
-          )}
-          <Input
-            type="text"
-            placeholder={locationRequired ? "Venue or address" : locationLabel}
-            value={values.locationName}
-            onChange={(e) => onChange({ locationName: e.target.value })}
-            className={inputClass}
-          />
-        </div>
+        <LocationAutocomplete
+          value={values.locationName}
+          placeholder={placeholder}
+          label={locationRequired ? locationLabel : undefined}
+          onChange={(loc) =>
+            onChange({
+              locationName: loc.name,
+              locationLat: loc.lat,
+              locationLng: loc.lng,
+            })
+          }
+        />
       )}
 
       {category === "sound" && (
@@ -130,21 +137,15 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
             })}
           </div>
           {values.imprintSource === "spotify" && (
-            <Input
-              type="text"
-              placeholder="Spotify search coming soon — paste track/album link"
-              value={values.spotifyId}
-              onChange={(e) => onChange({ spotifyId: e.target.value })}
-              className={inputClass}
+            <SpotifySearch
+              value={values.spotifyPick}
+              onChange={(pick) => onChange({ spotifyPick: pick })}
             />
           )}
           {values.imprintSource === "book" && (
-            <Input
-              type="text"
-              placeholder="Book search coming soon — type a title"
-              value={values.openlibraryId}
-              onChange={(e) => onChange({ openlibraryId: e.target.value })}
-              className={inputClass}
+            <BookSearch
+              value={values.bookPick}
+              onChange={(pick) => onChange({ bookPick: pick })}
             />
           )}
         </div>

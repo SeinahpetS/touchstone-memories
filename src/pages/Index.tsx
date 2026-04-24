@@ -28,10 +28,12 @@ const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
 
 const initialFields: CategoryFieldValues = {
   locationName: "",
+  locationLat: null,
+  locationLng: null,
   venueName: "",
   relationshipType: "",
-  spotifyId: "",
-  openlibraryId: "",
+  spotifyPick: null,
+  bookPick: null,
   imprintSource: "photo",
 };
 
@@ -71,7 +73,7 @@ const Index = () => {
 
   const handleSave = async () => {
     if (!user) return;
-    if (!note.trim() && !title.trim() && !photoFile) {
+    if (!note.trim() && !title.trim() && !photoFile && !fields.spotifyPick && !fields.bookPick) {
       toast.error("Add a photo, title, or note to save a touchstone.");
       return;
     }
@@ -89,6 +91,23 @@ const Index = () => {
         if (uploadErr) throw uploadErr;
         const { data } = supabase.storage.from("memory-photos").getPublicUrl(path);
         photo_url = data.publicUrl;
+      } else if (category === "imprint") {
+        // Fall back to Spotify/Book cover art when no photo is uploaded.
+        if (fields.imprintSource === "spotify" && fields.spotifyPick?.image) {
+          photo_url = fields.spotifyPick.image;
+        } else if (fields.imprintSource === "book" && fields.bookPick?.coverUrl) {
+          photo_url = fields.bookPick.coverUrl;
+        }
+      }
+
+      // Auto-derive a title for imprints if user left it blank.
+      let resolvedTitle = title.trim();
+      if (!resolvedTitle && category === "imprint") {
+        if (fields.imprintSource === "spotify" && fields.spotifyPick) {
+          resolvedTitle = fields.spotifyPick.title;
+        } else if (fields.imprintSource === "book" && fields.bookPick) {
+          resolvedTitle = fields.bookPick.title;
+        }
       }
 
       const { data, error } = await (supabase as any)
@@ -96,11 +115,13 @@ const Index = () => {
         .insert({
           user_id: user.id,
           category: category as any,
-          title: title.trim() || null,
+          title: resolvedTitle || null,
           note: note.trim() || null,
           sentiment: sentiment || null,
           photo_url,
           location_name: fields.locationName.trim() || null,
+          location_lat: fields.locationLat,
+          location_lng: fields.locationLng,
           venue_name: fields.venueName.trim() || null,
           relationship_type:
             category === "person" && fields.relationshipType
@@ -108,11 +129,11 @@ const Index = () => {
               : null,
           spotify_id:
             category === "imprint" && fields.imprintSource === "spotify"
-              ? fields.spotifyId.trim() || null
+              ? fields.spotifyPick?.id ?? null
               : null,
           openlibrary_id:
             category === "imprint" && fields.imprintSource === "book"
-              ? fields.openlibraryId.trim() || null
+              ? fields.bookPick?.id ?? null
               : null,
         })
         .select()
