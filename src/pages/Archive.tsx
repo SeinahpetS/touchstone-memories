@@ -176,8 +176,8 @@ const Archive = () => {
             onClick={() => setFilter("all")}
             aria-pressed={filter === "all"}
             style={{
-              borderColor: "#B8860B",
-              borderWidth: filter === "all" ? "3.5px" : "2.5px",
+              borderColor: filter === "all" ? "#B8860B" : "#E8E4D8",
+              borderWidth: filter === "all" ? "3.5px" : "1.5px",
               borderStyle: "solid",
               backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
             }}
