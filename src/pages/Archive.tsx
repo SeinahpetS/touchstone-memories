@@ -188,9 +188,7 @@ const Archive = () => {
           >
             <span
               className="inline-block h-7 w-7 rotate-45 border-[1.5px]"
-              style={{
-                borderColor: filter === "all" ? "#2C3E50" : "hsl(var(--gold))",
-              }}
+              style={{ borderColor: "#B8860B" }}
             />
             <span
               className="font-sans text-[10px] uppercase tracking-[0.06em]"
