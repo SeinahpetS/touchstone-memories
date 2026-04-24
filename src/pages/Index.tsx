@@ -78,17 +78,17 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  const [category, setCategory] = useState<CategoryKey | null>(null);
-  const [drafts, setDrafts] = useState<Partial<Record<CategoryKey, CategoryDraft>>>({});
+  const [category, setCategory] = useState<CategoryKey>("moment");
+  const [drafts, setDrafts] = useState<Partial<Record<CategoryKey, CategoryDraft>>>({
+    moment: emptyDraft(),
+  });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
 
-  const current = (category && drafts[category]) || emptyDraft();
+  const current = drafts[category] ?? emptyDraft();
   const { title, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
-  const categorySelected = category !== null;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
-    if (!category) return;
     setDrafts((prev) => {
       const existing = prev[category] ?? emptyDraft();
       return { ...prev, [category]: { ...existing, ...patch } };
@@ -109,11 +109,6 @@ const Index = () => {
 
   const handleCategoryChange = (next: string) => {
     const c = next as CategoryKey;
-    if (category === c) {
-      // Tapping the active category deselects it → collapses photo zone.
-      setCategory(null);
-      return;
-    }
     setDrafts((prev) => (prev[c] ? prev : { ...prev, [c]: emptyDraft() }));
     setCategory(c);
     logEvent("capture_started", { category: c });
@@ -217,8 +212,8 @@ const Index = () => {
 
   const reset = () => {
     setSaved(null);
-    setCategory(null);
-    setDrafts({});
+    setCategory("moment");
+    setDrafts({ moment: emptyDraft() });
   };
 
   if (loading) {
@@ -266,52 +261,44 @@ const Index = () => {
               file={photoFile}
               preview={photoPreview}
               onSelect={handlePhotoSelect}
-              expanded={categorySelected}
             />
 
-            <CategorySelector
-              value={category ?? ""}
-              onChange={handleCategoryChange}
+            <CategorySelector value={category} onChange={handleCategoryChange} />
+
+            <CategoryFields
+              category={category}
+              values={fields}
+              onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
             />
 
-            {categorySelected && category && (
-              <>
-                <CategoryFields
-                  category={category}
-                  values={fields}
-                  onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
-                />
+            <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
 
-                <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
+            <Input
+              type="text"
+              placeholder="Name this Touchstone"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="h-12 text-base bg-card border-0"
+            />
 
-                <Input
-                  type="text"
-                  placeholder="Name this Touchstone"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="h-12 text-base bg-card border-0"
-                />
+            <Textarea
+              placeholder={
+                category === "imprint" && fields.imprintType
+                  ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
+                  : NOTE_PLACEHOLDERS[category]
+              }
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
+            />
 
-                <Textarea
-                  placeholder={
-                    category === "imprint" && fields.imprintType
-                      ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
-                      : NOTE_PLACEHOLDERS[category]
-                  }
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
-                />
-
-                <Button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="w-full h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  {saving ? "Saving…" : "Save to Constellation"}
-                </Button>
-              </>
-            )}
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="w-full h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {saving ? "Saving…" : "Save to Constellation"}
+            </Button>
           </>
         )}
       </div>

@@ -1,14 +1,13 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Camera, X } from "lucide-react";
 
 interface Props {
   file: File | null;
   preview: string | null;
   onSelect: (file: File | null) => void;
-  expanded?: boolean;
 }
 
-const PhotoUpload = ({ file, preview, onSelect, expanded = true }: Props) => {
+const PhotoUpload = ({ file, preview, onSelect }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,33 +35,14 @@ const PhotoUpload = ({ file, preview, onSelect, expanded = true }: Props) => {
     );
   }
 
-  // Collapsed: 44px, non-interactive. Expanded: full height, interactive.
-  // Both states share the same dashed gold border, ivory inset background,
-  // and Old Gold camera + label.
-  const isInteractive = expanded;
-
   return (
     <button
       type="button"
-      aria-disabled={!isInteractive}
-      tabIndex={isInteractive ? 0 : -1}
-      onClick={() => {
-        if (!isInteractive) return;
-        inputRef.current?.click();
-      }}
-      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed overflow-hidden transition-[height,padding] duration-300 ease-in-out"
-      style={{
-        height: expanded ? 128 : 44,
-        borderColor: "#B8860B",
-        backgroundColor: "#E8E4D8",
-        color: "#B8860B",
-        cursor: isInteractive ? "pointer" : "default",
-      }}
+      onClick={() => inputRef.current?.click()}
+      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-card py-8 text-muted-foreground hover:border-foreground/30 transition-colors"
     >
-      <Camera className="h-5 w-5" style={{ color: "#B8860B" }} />
-      <span className="font-jost text-base" style={{ color: "#B8860B" }}>
-        Add a photo
-      </span>
+      <Camera className="h-5 w-5" />
+      <span className="text-base">Add a photo</span>
       <input
         ref={inputRef}
         type="file"
