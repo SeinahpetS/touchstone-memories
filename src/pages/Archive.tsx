@@ -273,7 +273,12 @@ const Archive = () => {
         ) : (
           <div className="grid grid-cols-2 gap-3 mt-2">
             {touchstones.map((m) => (
-              <MemoryCard key={m.id} memory={m} onClick={() => setSelected(m)} />
+              <MemoryCard
+                key={m.id}
+                memory={m}
+                onClick={() => setSelected(m)}
+                onChanged={fetchTouchstones}
+              />
             ))}
           </div>
         )}
