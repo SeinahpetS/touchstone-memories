@@ -186,10 +186,12 @@ const Archive = () => {
               filter !== "all" && "bg-[hsl(var(--dark-card))]"
             )}
           >
-            <span
-              className="inline-block h-7 w-7 rotate-45 border-[1.5px]"
-              style={{ borderColor: "#B8860B" }}
-            />
+            <span className="flex h-9 w-9 items-center justify-center">
+              <span
+                className="inline-block h-[21px] w-[21px] rotate-45 border-[1.5px]"
+                style={{ borderColor: "#B8860B" }}
+              />
+            </span>
             <span
               className="font-sans text-[10px] uppercase tracking-[0.06em]"
               style={{

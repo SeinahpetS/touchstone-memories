@@ -200,11 +200,16 @@ export const CategoryIconCard = ({
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
     >
-      <CategoryIcon
-        category={category}
-        size={size}
-        color="#B8860B"
-      />
+      <span
+        className="flex items-center justify-center"
+        style={{ width: size, height: size }}
+      >
+        <CategoryIcon
+          category={category}
+          size={category === "imprint" ? Math.round(size * 0.75) : size}
+          color="#B8860B"
+        />
+      </span>
       <span
         className="font-sans text-[10px] uppercase tracking-[0.06em]"
         style={{ color: active ? "#2C3E50" : undefined }}
