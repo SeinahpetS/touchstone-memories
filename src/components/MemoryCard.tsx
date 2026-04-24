@@ -20,6 +20,10 @@ interface Props {
     note?: string | null;
     photo_url?: string | null;
     created_at: string;
+    memory_season?: string | null;
+    memory_year?: number | null;
+    memory_month?: number | null;
+    memory_day?: number | null;
   };
   onClick?: () => void;
 }
