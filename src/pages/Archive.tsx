@@ -155,7 +155,7 @@ const Archive = () => {
             )}
           >
             <span
-              className="inline-block h-7 w-7 rotate-45 rounded-[4px] border-[1.5px]"
+              className="inline-block h-7 w-7 rotate-45 border-[1.5px]"
               style={{
                 borderColor:
                   filter === "all" ? "hsl(var(--foreground))" : "hsl(var(--gold))",
