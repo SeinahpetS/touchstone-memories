@@ -5,11 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { logEvent } from "@/lib/analytics";
 import Wordmark from "@/components/Wordmark";
-import PromptCard from "@/components/PromptCard";
 import PhotoUpload from "@/components/PhotoUpload";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
-import SentimentPill from "@/components/SentimentPill";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -200,8 +198,6 @@ const Index = () => {
           />
         ) : (
           <>
-            <PromptCard />
-
             <PhotoUpload
               file={photoFile}
               preview={photoPreview}
@@ -230,8 +226,6 @@ const Index = () => {
               onChange={(e) => setNote(e.target.value)}
               className="min-h-[120px] text-base bg-card border-0 resize-none"
             />
-
-            <SentimentPill value={sentiment} onChange={setSentiment} />
 
             <Button
               onClick={handleSave}
