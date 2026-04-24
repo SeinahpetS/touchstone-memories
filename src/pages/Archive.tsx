@@ -231,7 +231,7 @@ const Archive = () => {
               </svg>
               <div className="relative z-10 text-center space-y-3 px-4">
                 <p className="font-playfair italic text-2xl text-foreground">
-                  Your constellation awaits
+                  Your constellation awaits…
                 </p>
                 <p className="font-sans text-muted-foreground">
                   Every touchstone you add becomes a star in your personal archive.
