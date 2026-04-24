@@ -419,7 +419,13 @@ const Index = () => {
               disabled={saving}
               className="w-full h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {saving ? "Saving…" : "Save to Constellation"}
+              {saving
+                ? editId
+                  ? "Updating…"
+                  : "Saving…"
+                : editId
+                ? "Save changes"
+                : "Save to Constellation"}
             </Button>
           </>
         )}
