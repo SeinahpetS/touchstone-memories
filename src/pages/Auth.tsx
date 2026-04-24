@@ -21,9 +21,8 @@ const Auth = () => {
     if (!loading && user) navigate("/archive", { replace: true });
   }, [user, loading, navigate]);
 
-  // Dev-only: auto-sign-in as dev user so /auth is skipped entirely in development.
+  // Auto-sign-in as dev user so /auth is skipped entirely.
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
     if (loading || user || submitting) return;
     handleDevBypass();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -187,22 +186,17 @@ const Auth = () => {
           </button>
         </p>
 
-        {import.meta.env.DEV && (
-          <div className="border-t border-dashed border-border pt-4">
-            <Button
-              type="button"
-              onClick={handleDevBypass}
-              disabled={submitting}
-              variant="ghost"
-              className="w-full h-10 text-xs uppercase tracking-wide text-muted-foreground hover:text-foreground"
-            >
-              Dev: skip login
-            </Button>
-            <p className="mt-1 text-center text-[11px] text-muted-foreground/70">
-              Visible in development only
-            </p>
-          </div>
-        )}
+        <div className="border-t border-dashed border-border pt-4">
+          <Button
+            type="button"
+            onClick={handleDevBypass}
+            disabled={submitting}
+            variant="ghost"
+            className="w-full h-10 text-xs uppercase tracking-wide text-muted-foreground hover:text-foreground"
+          >
+            Skip login
+          </Button>
+        </div>
       </div>
     </div>
   );
