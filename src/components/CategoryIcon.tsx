@@ -203,7 +203,7 @@ export const CategoryIconCard = ({
       <CategoryIcon
         category={category}
         size={size}
-        color={active ? "#2C3E50" : "hsl(var(--gold))"}
+        color="#B8860B"
       />
       <span
         className="font-sans text-[10px] uppercase tracking-[0.06em]"
