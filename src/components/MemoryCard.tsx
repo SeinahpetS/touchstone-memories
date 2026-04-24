@@ -63,9 +63,19 @@ const MemoryCard = ({ memory, onClick }: Props) => {
             {memory.title}
           </h3>
         )}
-        <p className="text-sm text-muted-foreground">
-          {format(new Date(memory.created_at), "MMM d, yyyy")}
-        </p>
+        {(() => {
+          const memoryDateLabel = formatMemoryDate({
+            season: (memory.memory_season as any) ?? null,
+            year: memory.memory_year ?? null,
+            month: memory.memory_month ?? null,
+            day: memory.memory_day ?? null,
+          });
+          return memoryDateLabel ? (
+            <p className="font-jost text-xs font-light text-[#5B4A3F]/60">
+              {memoryDateLabel}
+            </p>
+          ) : null;
+        })()}
         {memory.note && (
           <p className="text-sm text-muted-foreground line-clamp-2">{memory.note}</p>
         )}
