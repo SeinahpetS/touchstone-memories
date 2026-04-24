@@ -86,7 +86,7 @@ const Index = () => {
   const [saved, setSaved] = useState<any>(null);
 
   const current = drafts[category] ?? emptyDraft();
-  const { title, note, sentiment, photoFile, photoPreview, fields } = current;
+  const { title, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
     setDrafts((prev) => {
@@ -101,6 +101,7 @@ const Index = () => {
   const setFields = (
     updater: (prev: CategoryFieldValues) => CategoryFieldValues
   ) => updateDraft({ fields: updater(current.fields) });
+  const setMemoryDate = (next: MemoryDate) => updateDraft({ memoryDate: next });
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
