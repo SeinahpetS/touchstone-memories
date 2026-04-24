@@ -33,6 +33,7 @@ const initialFields: CategoryFieldValues = {
   spotifyPick: null,
   bookPick: null,
   imprintSource: "photo",
+  imprintType: null,
 };
 
 const Index = () => {
