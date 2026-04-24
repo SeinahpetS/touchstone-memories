@@ -173,6 +173,7 @@ const Index = () => {
           user_id: user.id,
           category: category as any,
           title: resolvedTitle || null,
+          emotional_tone: emotionalTone.trim() || null,
           note: note.trim() || null,
           sentiment: sentiment || null,
           photo_url,
