@@ -280,6 +280,22 @@ const Index = () => {
               />
             </div>
 
+            {/* Imprint sub-type — appears right after Name */}
+            {category === "imprint" && (
+              <ImprintTypeSelector
+                value={fields.imprintType}
+                onChange={(t) => {
+                  const source: CategoryFieldValues["imprintSource"] =
+                    t === "music" ? "spotify" : t === "book" ? "book" : "photo";
+                  setFields((prev) => ({
+                    ...prev,
+                    imprintType: t,
+                    imprintSource: source,
+                  }));
+                }}
+              />
+            )}
+
             {/* Field 2 — Date */}
             <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
 
