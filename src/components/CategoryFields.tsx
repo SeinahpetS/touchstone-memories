@@ -37,18 +37,14 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
   const showLocation = ["moment", "person", "object", "place", "food"].includes(
     category
   );
-  const locationLabel =
+  const locationPlaceholder =
     category === "person"
       ? "Where did you meet?"
       : category === "object"
       ? "Where is this from?"
       : category === "place"
-      ? "Place (venue or address)"
-      : "Location (optional)";
-  const locationRequired = category === "place";
-  const placeholder = locationRequired
-    ? "Venue or address"
-    : locationLabel;
+      ? "Venue or address"
+      : "Add a location";
 
   return (
     <div className="space-y-4">
@@ -89,18 +85,22 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
       )}
 
       {showLocation && (
-        <LocationAutocomplete
-          value={values.locationName}
-          placeholder={placeholder}
-          label={locationRequired ? locationLabel : undefined}
-          onChange={(loc) =>
-            onChange({
-              locationName: loc.name,
-              locationLat: loc.lat,
-              locationLng: loc.lng,
-            })
-          }
-        />
+        <div className="space-y-3">
+          <label className="font-jost text-sm font-light text-muted-foreground">
+            Where was this?
+          </label>
+          <LocationAutocomplete
+            value={values.locationName}
+            placeholder={locationPlaceholder}
+            onChange={(loc) =>
+              onChange({
+                locationName: loc.name,
+                locationLat: loc.lat,
+                locationLng: loc.lng,
+              })
+            }
+          />
+        </div>
       )}
 
       {category === "sound" && (
