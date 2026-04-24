@@ -217,8 +217,8 @@ const Index = () => {
 
   const reset = () => {
     setSaved(null);
-    setCategory("moment");
-    setDrafts({ moment: emptyDraft() });
+    setCategory(null);
+    setDrafts({});
   };
 
   if (loading) {
