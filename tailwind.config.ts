@@ -66,6 +66,7 @@ export default {
         ivory: "hsl(var(--ivory))",
         ink: "hsl(var(--ink))",
         espresso: "hsl(var(--espresso))",
+        pewter: "hsl(var(--pewter))",
         gold: "hsl(var(--gold))",
         plum: "hsl(var(--plum))",
         terracotta: "hsl(var(--terracotta))",
