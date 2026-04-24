@@ -15,23 +15,29 @@ import { Textarea } from "@/components/ui/textarea";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
-  moment: "What made this moment worth keeping?",
-  person: "What makes this person matter to you?",
-  object: "What story does this object hold?",
-  place: "What makes this place stay with you?",
-  food: "What made it taste memorable?",
-  sound: "What does this sound bring back?",
+  moment:
+    "What was happening around you in this moment? What do you want to remember about how it felt?",
+  person:
+    "Who is this person to you? What's something about them you'd want someone to know?",
+  object: "What's the story behind this? Why does it matter to you?",
+  place:
+    "What do you remember feeling when you were here? What does this place mean to you?",
+  food:
+    "What was this dish, and what made it taste memorable? What do you want to remember about it?",
+  sound:
+    "What is this sound, and how does it make you feel? What does it remind you of?",
   imprint: "Why did this shape who you are?",
 };
 
 const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
-  music: "How did this music shape you?",
-  book: "What did this book leave with you?",
-  film: "What did this film leave with you?",
-  tv: "What did this show mean to you?",
-  art: "What did this artwork stir in you?",
-  quote: "Why does this quote stay with you?",
-  poem: "Why does this poem stay with you?",
+  music: "What does this song mean to you? Why does it stay with you?",
+  book: "Why does this book stay with you? What did it change in you?",
+  film: "What moment from this film has never left you? Why did it matter?",
+  tv: "What did this show mean to you at the time? What did it give you?",
+  art:
+    "What do you feel when you look at this? What does it say that you couldn't say yourself?",
+  quote: "Why does this stay with you? When do you come back to it?",
+  poem: "What does this poem make you feel? What line from it lives in you?",
 };
 
 const initialFields: CategoryFieldValues = {
@@ -239,7 +245,7 @@ const Index = () => {
               }
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="min-h-[120px] text-base bg-card border-0 resize-none"
+              className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
             />
 
             <Button
