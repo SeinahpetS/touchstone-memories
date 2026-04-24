@@ -90,15 +90,53 @@ const Archive = () => {
     );
   }
 
+  // Deterministic, irregular star field — small gold dots with a few thin connecting lines.
+  const stars = [
+    { x: 8, y: 12, r: 1.2, o: 0.18 },
+    { x: 22, y: 6, r: 0.9, o: 0.12 },
+    { x: 35, y: 18, r: 1.4, o: 0.2 },
+    { x: 48, y: 9, r: 0.8, o: 0.1 },
+    { x: 61, y: 22, r: 1.1, o: 0.16 },
+    { x: 74, y: 7, r: 1.3, o: 0.18 },
+    { x: 88, y: 15, r: 0.9, o: 0.12 },
+    { x: 14, y: 32, r: 1.0, o: 0.14 },
+    { x: 29, y: 41, r: 1.3, o: 0.2 },
+    { x: 44, y: 36, r: 0.8, o: 0.1 },
+    { x: 57, y: 48, r: 1.2, o: 0.18 },
+    { x: 70, y: 38, r: 0.9, o: 0.12 },
+    { x: 83, y: 45, r: 1.1, o: 0.16 },
+    { x: 6, y: 56, r: 1.0, o: 0.14 },
+    { x: 19, y: 67, r: 1.3, o: 0.2 },
+    { x: 38, y: 62, r: 0.9, o: 0.12 },
+    { x: 52, y: 73, r: 1.2, o: 0.18 },
+    { x: 66, y: 64, r: 0.8, o: 0.1 },
+    { x: 80, y: 71, r: 1.1, o: 0.16 },
+    { x: 92, y: 60, r: 1.0, o: 0.14 },
+    { x: 11, y: 84, r: 1.2, o: 0.18 },
+    { x: 27, y: 91, r: 0.9, o: 0.12 },
+    { x: 43, y: 86, r: 1.1, o: 0.16 },
+    { x: 59, y: 93, r: 1.3, o: 0.2 },
+    { x: 76, y: 88, r: 0.9, o: 0.12 },
+    { x: 90, y: 82, r: 1.0, o: 0.14 },
+  ];
+  const lines = [
+    [0, 2],
+    [4, 5],
+    [8, 11],
+    [14, 16],
+    [18, 19],
+    [21, 23],
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-5 py-8 space-y-6">
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col">
         <div className="flex items-center justify-between">
           <Wordmark />
         </div>
 
-        {/* Filters: 2-row grid of 4 cells each so all 8 are visible without scrolling. */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+        {/* Zone 1 — filter grid */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6">
           <button
             onClick={() => setFilter("all")}
             aria-pressed={filter === "all"}
@@ -142,14 +180,60 @@ const Archive = () => {
         {fetching ? (
           <p className="text-center text-muted-foreground py-12">Loading…</p>
         ) : touchstones.length === 0 ? (
-          <div className="text-center py-16 space-y-3">
-            <p className="font-playfair text-lg text-foreground">Your constellation awaits…</p>
-            <p className="text-muted-foreground">
-              Your constellation grows with every memory you keep.
-            </p>
-          </div>
+          <>
+            {/* Zone 2 — divider with center diamond */}
+            <div className="flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+              <span
+                className="block h-2 w-2 rotate-45 border border-[hsl(var(--gold)/0.5)]"
+              />
+              <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+            </div>
+
+            {/* Zone 3 — empty state with star field */}
+            <div className="relative flex-1 flex items-center justify-center overflow-hidden">
+              <svg
+                className="absolute inset-0 h-full w-full"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                {lines.map(([a, b], i) => (
+                  <line
+                    key={`l-${i}`}
+                    x1={stars[a].x}
+                    y1={stars[a].y}
+                    x2={stars[b].x}
+                    y2={stars[b].y}
+                    stroke="hsl(var(--gold))"
+                    strokeOpacity={0.07}
+                    strokeWidth={0.15}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+                {stars.map((s, i) => (
+                  <circle
+                    key={`s-${i}`}
+                    cx={s.x}
+                    cy={s.y}
+                    r={s.r * 0.35}
+                    fill="hsl(var(--gold))"
+                    fillOpacity={s.o}
+                  />
+                ))}
+              </svg>
+              <div className="relative z-10 text-center space-y-3 px-4">
+                <p className="font-playfair italic text-2xl text-foreground">
+                  Your constellation awaits
+                </p>
+                <p className="font-sans text-muted-foreground">
+                  Every touchstone you add becomes a star in your personal archive.
+                </p>
+              </div>
+            </div>
+          </>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 mt-2">
             {touchstones.map((m) => (
               <MemoryCard key={m.id} memory={m} onClick={() => setSelected(m)} />
             ))}
@@ -158,7 +242,7 @@ const Archive = () => {
 
         <button
           onClick={() => navigate("/")}
-          className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mt-6 mb-8"
         >
           + Add a Touchstone
         </button>
