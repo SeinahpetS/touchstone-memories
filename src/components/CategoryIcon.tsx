@@ -141,6 +141,16 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
   imprint: "Imprint",
 };
 
+export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
+  moment: "#D4A017",
+  person: "#2E7D5E",
+  object: "#B8860B",
+  place: "#C2714F",
+  food: "#A93226",
+  sound: "#4A6B8A",
+  imprint: "#8B3A62",
+};
+
 interface CategoryIconCardProps {
   category: CategoryKey;
   label?: string;
@@ -167,6 +177,8 @@ export const CategoryIconCard = ({
   const displayLabel = label ?? CATEGORY_LABELS[category];
   const isInteractive = !disabled && !comingSoon;
 
+  const borderColor = CATEGORY_BORDER_COLORS[category];
+
   return (
     <button
       type="button"
@@ -174,13 +186,17 @@ export const CategoryIconCard = ({
       disabled={!isInteractive}
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
+      style={{
+        borderColor,
+        borderWidth: active ? "2.5px" : "1.5px",
+        borderStyle: "solid",
+      }}
       className={cn(
         "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
         "min-w-[68px] sm:min-w-[84px]",
         active
-          ? "bg-[hsl(var(--background))] border-2 border-[hsl(var(--gold))]"
-          : "bg-[hsl(var(--dark-card))] border border-[hsl(var(--gold)/0.18)]",
-        isInteractive && !active && "hover:border-[hsl(var(--gold)/0.35)]",
+          ? "bg-[hsl(var(--background))]"
+          : "bg-[hsl(var(--dark-card))]",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}

@@ -147,11 +147,16 @@ const Archive = () => {
           <button
             onClick={() => setFilter("all")}
             aria-pressed={filter === "all"}
+            style={{
+              borderColor: "#B8860B",
+              borderWidth: filter === "all" ? "2.5px" : "1.5px",
+              borderStyle: "solid",
+            }}
             className={cn(
               "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
               filter === "all"
-                ? "bg-[hsl(var(--background))] border-2 border-[hsl(var(--gold))]"
-                : "bg-[hsl(var(--dark-card))] border border-[hsl(var(--gold)/0.18)] hover:border-[hsl(var(--gold)/0.35)]"
+                ? "bg-[hsl(var(--background))]"
+                : "bg-[hsl(var(--dark-card))]"
             )}
           >
             <span
