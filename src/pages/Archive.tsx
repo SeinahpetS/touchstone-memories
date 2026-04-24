@@ -234,7 +234,7 @@ const Archive = () => {
                   Your constellation awaits…
                 </p>
                 <p className="font-sans text-muted-foreground">
-                  Every touchstone you add becomes a star in your personal archive.
+                  Every Touchstone you add becomes a star in your personal archive.
                 </p>
               </div>
             </div>
