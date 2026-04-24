@@ -78,15 +78,14 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  const [category, setCategory] = useState<CategoryKey>("moment");
-  const [drafts, setDrafts] = useState<Partial<Record<CategoryKey, CategoryDraft>>>({
-    moment: emptyDraft(),
-  });
+  const [category, setCategory] = useState<CategoryKey | null>(null);
+  const [drafts, setDrafts] = useState<Partial<Record<CategoryKey, CategoryDraft>>>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
 
-  const current = drafts[category] ?? emptyDraft();
+  const current = (category && drafts[category]) || emptyDraft();
   const { title, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
+  const categorySelected = category !== null;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
     setDrafts((prev) => {
