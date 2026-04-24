@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { MoreHorizontal, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Wordmark from "@/components/Wordmark";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 const FILTER_CATEGORIES: CategoryKey[] = [
