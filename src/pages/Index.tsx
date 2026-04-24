@@ -325,6 +325,19 @@ const Index = () => {
               onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
             />
 
+            {/* Emotional tone — one-word feeling */}
+            <Input
+              type="text"
+              maxLength={20}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="One word for how this feels."
+              value={emotionalTone}
+              onChange={(e) => setEmotionalTone(e.target.value)}
+              className="h-12 text-base bg-card border-0 font-jost text-[#2C3E50] placeholder:text-[#5B4A3F]/60 placeholder:italic"
+            />
+
             {/* Field 4 — Note */}
             <Textarea
               placeholder={
