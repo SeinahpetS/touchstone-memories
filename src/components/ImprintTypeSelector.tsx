@@ -142,7 +142,7 @@ interface Props {
 }
 
 const ImprintTypeSelector = ({ value, onChange }: Props) => (
-  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+  <div className="flex flex-wrap gap-2">
     {OPTIONS.map(({ value: v, label }) => {
       const active = value === v;
       const IconComp = Icon[v];
@@ -154,15 +154,14 @@ const ImprintTypeSelector = ({ value, onChange }: Props) => (
           aria-pressed={active}
           aria-label={label}
           className={cn(
-            "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
-            "min-w-[68px] sm:min-w-[84px]",
+            "flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors",
             active
               ? "bg-[hsl(var(--background))] border-2 border-[hsl(var(--gold))]"
-              : "bg-[hsl(var(--dark-card))] border border-[hsl(var(--gold)/0.18)] hover:border-[hsl(var(--gold)/0.35)]"
+              : "bg-[hsl(var(--dark-card))] border border-[hsl(var(--gold)/0.12)] hover:border-[hsl(var(--gold)/0.28)]"
           )}
         >
           <IconComp
-            size={32}
+            size={16}
             color={active ? "hsl(var(--foreground))" : "hsl(var(--gold))"}
           />
           <span
