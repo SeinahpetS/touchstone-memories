@@ -65,7 +65,7 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
   };
 
   return (
-    <div className="space-y-3 rounded-md bg-[#F2EEE5] p-4">
+    <div className="space-y-3">
       <div className="flex items-baseline justify-between">
         <label className="font-jost text-sm font-light text-muted-foreground">
           When was this?
