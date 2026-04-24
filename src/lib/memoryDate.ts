@@ -65,13 +65,13 @@ export const formatMemoryDate = (d: MemoryDate): string | null => {
     return `${MONTH_NAMES[month - 1]} ${year}`;
   }
   if (year && season) {
-    return `${capitalize(season)} ${year}`;
+    return `${SEASON_LABELS[season]} ${year}`;
   }
   if (year) {
     return String(year);
   }
   if (season) {
-    return capitalize(season);
+    return SEASON_LABELS[season];
   }
   return null;
 };
