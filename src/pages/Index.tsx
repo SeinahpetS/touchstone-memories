@@ -187,6 +187,10 @@ const Index = () => {
             category === "imprint" && fields.imprintSource === "book"
               ? fields.bookPick?.id ?? null
               : null,
+          memory_season: memoryDate.season,
+          memory_year: memoryDate.year,
+          memory_month: memoryDate.month,
+          memory_day: memoryDate.day,
         })
         .select()
         .single();
