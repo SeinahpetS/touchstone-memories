@@ -187,8 +187,8 @@ export const CategoryIconCard = ({
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
-        borderColor,
-        borderWidth: active ? "3.5px" : "2.5px",
+        borderColor: active ? borderColor : "#E8E4D8",
+        borderWidth: active ? "3.5px" : "1.5px",
         borderStyle: "solid",
         backgroundColor: active ? "#F2EEE5" : undefined,
       }}
