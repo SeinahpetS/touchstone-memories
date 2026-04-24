@@ -58,6 +58,7 @@ const initialFields: CategoryFieldValues = {
 
 interface CategoryDraft {
   title: string;
+  emotionalTone: string;
   note: string;
   sentiment: string;
   photoFile: File | null;
@@ -68,6 +69,7 @@ interface CategoryDraft {
 
 const emptyDraft = (): CategoryDraft => ({
   title: "",
+  emotionalTone: "",
   note: "",
   sentiment: "",
   photoFile: null,
