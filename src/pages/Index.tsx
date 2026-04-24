@@ -204,12 +204,7 @@ const Index = () => {
   const reset = () => {
     setSaved(null);
     setCategory("moment");
-    setTitle("");
-    setNote("");
-    setSentiment("");
-    setPhotoFile(null);
-    setPhotoPreview(null);
-    setFields(initialFields);
+    setDrafts({ moment: emptyDraft() });
   };
 
   if (loading) {
