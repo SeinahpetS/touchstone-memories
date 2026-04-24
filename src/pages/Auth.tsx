@@ -59,7 +59,7 @@ const Auth = () => {
   // Dev-only bypass — gated by import.meta.env.DEV so the button and handler
   // are tree-shaken from production builds.
   const DEV_EMAIL = "dev@touchstone.local";
-  const DEV_PASSWORD = "devdevdev";
+  const DEV_PASSWORD = "Dev!Touchstone-2026#Strong";
   const handleDevBypass = async () => {
     setSubmitting(true);
     try {
