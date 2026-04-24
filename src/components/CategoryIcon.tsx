@@ -141,6 +141,16 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
   imprint: "Imprint",
 };
 
+export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
+  moment: "#D4A017",
+  person: "#2E7D5E",
+  object: "#B8860B",
+  place: "#C2714F",
+  food: "#A93226",
+  sound: "#4A6B8A",
+  imprint: "#8B3A62",
+};
+
 interface CategoryIconCardProps {
   category: CategoryKey;
   label?: string;
