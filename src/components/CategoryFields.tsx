@@ -85,22 +85,17 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
       )}
 
       {showLocation && (
-        <div className="space-y-3">
-          <label className="font-jost text-sm font-light text-muted-foreground">
-            Where was this?
-          </label>
-          <LocationAutocomplete
-            value={values.locationName}
-            placeholder={locationPlaceholder}
-            onChange={(loc) =>
-              onChange({
-                locationName: loc.name,
-                locationLat: loc.lat,
-                locationLng: loc.lng,
-              })
-            }
-          />
-        </div>
+        <LocationAutocomplete
+          value={values.locationName}
+          placeholder="Where was this?"
+          onChange={(loc) =>
+            onChange({
+              locationName: loc.name,
+              locationLat: loc.lat,
+              locationLng: loc.lng,
+            })
+          }
+        />
       )}
 
       {category === "sound" && (

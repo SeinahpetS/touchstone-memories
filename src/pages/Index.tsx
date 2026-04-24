@@ -286,18 +286,13 @@ const Index = () => {
             <CategorySelector value={category} onChange={handleCategoryChange} />
 
             {/* Field 1 — Name */}
-            <div className="space-y-3">
-              <label className="font-jost text-sm font-light text-muted-foreground">
-                Name
-              </label>
-              <Input
-                type="text"
-                placeholder="Name this Touchstone"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="h-12 text-base bg-card border-0"
-              />
-            </div>
+            <Input
+              type="text"
+              placeholder="Name this Touchstone"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="h-12 text-base bg-card border-0"
+            />
 
             {/* Imprint sub-type — appears right after Name */}
             {category === "imprint" && (
