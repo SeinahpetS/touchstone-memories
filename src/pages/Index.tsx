@@ -265,22 +265,31 @@ const Index = () => {
 
             <CategorySelector value={category} onChange={handleCategoryChange} />
 
+            {/* Field 1 — Name */}
+            <div className="space-y-3">
+              <label className="font-jost text-sm font-light text-muted-foreground">
+                Name
+              </label>
+              <Input
+                type="text"
+                placeholder="Name this Touchstone"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="h-12 text-base bg-card border-0"
+              />
+            </div>
+
+            {/* Field 2 — Date */}
+            <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
+
+            {/* Field 3 — Location & other category-specific fields */}
             <CategoryFields
               category={category}
               values={fields}
               onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
             />
 
-            <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
-
-            <Input
-              type="text"
-              placeholder="Name this Touchstone"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="h-12 text-base bg-card border-0"
-            />
-
+            {/* Field 4 — Note */}
             <Textarea
               placeholder={
                 category === "imprint" && fields.imprintType
