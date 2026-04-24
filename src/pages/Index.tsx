@@ -204,7 +204,7 @@ const Index = () => {
       });
       logEvent("artifact_viewed", { memory_id: data.id, category });
     } catch (err: any) {
-      toast.error(err.message || "Failed to save touchstone.");
+      toast.error(err.message || "Failed to save Touchstone.");
     } finally {
       setSaving(false);
     }
