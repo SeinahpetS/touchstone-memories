@@ -163,8 +163,8 @@ export const CategoryIconCard = ({
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       className={cn(
-        "flex flex-col items-center justify-center gap-2 rounded-[10px] bg-[hsl(var(--dark-card))] px-2 pt-4 pb-3 transition-colors",
-        "min-w-[84px]",
+        "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] bg-[hsl(var(--dark-card))] px-2 pt-4 pb-3 transition-colors",
+        "min-w-[68px] sm:min-w-[84px]",
         active
           ? "border border-[hsl(var(--gold)/0.5)]"
           : "border border-[hsl(var(--gold)/0.18)]",
