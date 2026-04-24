@@ -87,12 +87,13 @@ const Archive = () => {
           <Wordmark />
         </div>
 
-        {/* Filters: All pill + category icon cards */}
-        <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+        {/* Filters: All pill + category icon cards. Allow horizontal scroll on
+            narrow screens, but expand to fit on wider viewports. */}
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:gap-3">
           <button
             onClick={() => setFilter("all")}
             className={cn(
-              "shrink-0 flex flex-col items-center justify-center gap-2 rounded-[10px] bg-[hsl(var(--dark-card))] px-2 pt-4 pb-3 min-w-[84px] transition-colors",
+              "flex shrink-0 flex-1 min-w-[68px] flex-col items-center justify-center gap-2 rounded-[10px] bg-[hsl(var(--dark-card))] px-2 pt-4 pb-3 transition-colors sm:min-w-[84px]",
               filter === "all"
                 ? "border border-[hsl(var(--gold)/0.5)]"
                 : "border border-[hsl(var(--gold)/0.18)] hover:border-[hsl(var(--gold)/0.35)]"
@@ -108,7 +109,7 @@ const Archive = () => {
           </button>
 
           {FILTER_CATEGORIES.map((c) => (
-            <div key={c} className="shrink-0">
+            <div key={c} className="flex-1 shrink-0">
               <CategoryIconCard
                 category={c}
                 active={filter === c}
