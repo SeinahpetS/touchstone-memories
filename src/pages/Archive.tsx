@@ -135,6 +135,13 @@ const Archive = () => {
           <Wordmark />
         </div>
 
+        {/* Divider between wordmark and filter grid */}
+        <div className="flex items-center gap-3 mt-6" aria-hidden="true">
+          <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+          <span className="block h-2 w-2 rotate-45 border border-[hsl(var(--gold)/0.5)]" />
+          <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+        </div>
+
         {/* Zone 1 — filter grid */}
         <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6">
           <button
@@ -224,7 +231,7 @@ const Archive = () => {
               </svg>
               <div className="relative z-10 text-center space-y-3 px-4">
                 <p className="font-playfair italic text-2xl text-foreground">
-                  Your constellation awaits
+                  Your constellation awaits…
                 </p>
                 <p className="font-sans text-muted-foreground">
                   Every touchstone you add becomes a star in your personal archive.
