@@ -188,13 +188,14 @@ export const CategoryIconCard = ({
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
         borderColor,
-        borderWidth: active ? "2.5px" : "1.5px",
+        borderWidth: active ? "3.5px" : "2.5px",
         borderStyle: "solid",
+        backgroundColor: active ? "#F2EEE5" : undefined,
       }}
       className={cn(
         "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
         "min-w-[68px] sm:min-w-[84px]",
-        "bg-[hsl(var(--dark-card))]",
+        !active && "bg-[hsl(var(--dark-card))]",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
@@ -202,12 +203,15 @@ export const CategoryIconCard = ({
       <CategoryIcon
         category={category}
         size={size}
-        color="hsl(var(--gold))"
+        color={active ? "#2C3E50" : "hsl(var(--gold))"}
       />
       <span
-        className="font-sans text-[10px] uppercase tracking-[0.06em] text-[hsl(var(--label-color))]"
+        className="font-sans text-[10px] uppercase tracking-[0.06em]"
+        style={{ color: active ? "#2C3E50" : undefined }}
       >
-        {displayLabel}
+        <span className={cn(!active && "text-[hsl(var(--label-color))]")}>
+          {displayLabel}
+        </span>
       </span>
       {comingSoon && (
         <span className="text-[9px] uppercase tracking-[0.06em] text-[hsl(var(--label-color)/0.7)]">
