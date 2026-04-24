@@ -27,11 +27,26 @@ export const MONTH_OPTIONS = MONTH_NAMES.map((name, i) => ({
 }));
 
 export const SEASON_OPTIONS: { value: MemorySeason; label: string }[] = [
-  { value: "spring", label: "Spring" },
-  { value: "summer", label: "Summer" },
-  { value: "autumn", label: "Autumn" },
-  { value: "winter", label: "Winter" },
+  { value: "spring", label: "Spring (March – May)" },
+  { value: "summer", label: "Summer (June – August)" },
+  { value: "autumn", label: "Fall (September – November)" },
+  { value: "winter", label: "Winter (December – February)" },
 ];
+
+export const SEASON_LABELS: Record<MemorySeason, string> = {
+  spring: "Spring",
+  summer: "Summer",
+  autumn: "Fall",
+  winter: "Winter",
+};
+
+// Months belonging to each season, in display order (1-12).
+export const SEASON_MONTHS: Record<MemorySeason, number[]> = {
+  spring: [3, 4, 5],
+  summer: [6, 7, 8],
+  autumn: [9, 10, 11],
+  winter: [12, 1, 2],
+};
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
