@@ -222,43 +222,56 @@ const Index = () => {
         }
       }
 
-      const { data, error } = await (supabase as any)
-        .from("touchstones")
-        .insert({
-          user_id: user.id,
-          category: category as any,
-          title: resolvedTitle || null,
-          emotional_tone: emotionalTone.trim() || null,
-          note: note.trim() || null,
-          sentiment: sentiment || null,
-          photo_url,
-          location_name: fields.locationName.trim() || null,
-          location_lat: fields.locationLat,
-          location_lng: fields.locationLng,
-          venue_name: fields.venueName.trim() || null,
-          relationship_type:
-            category === "person" && fields.relationshipType
-              ? fields.relationshipType
-              : null,
-          spotify_id:
-            category === "imprint" && fields.imprintSource === "spotify"
-              ? fields.spotifyPick?.id ?? null
-              : null,
-          openlibrary_id:
-            category === "imprint" && fields.imprintSource === "book"
-              ? fields.bookPick?.id ?? null
-              : null,
-          memory_season: memoryDate.season,
-          memory_year: memoryDate.year,
-          memory_month: memoryDate.month,
-          memory_day: memoryDate.day,
-        })
-        .select()
-        .single();
+      const payload: Record<string, any> = {
+        category: category as any,
+        title: resolvedTitle || null,
+        emotional_tone: emotionalTone.trim() || null,
+        note: note.trim() || null,
+        sentiment: sentiment || null,
+        photo_url,
+        location_name: fields.locationName.trim() || null,
+        location_lat: fields.locationLat,
+        location_lng: fields.locationLng,
+        venue_name: fields.venueName.trim() || null,
+        relationship_type:
+          category === "person" && fields.relationshipType
+            ? fields.relationshipType
+            : null,
+        spotify_id:
+          category === "imprint" && fields.imprintSource === "spotify"
+            ? fields.spotifyPick?.id ?? null
+            : null,
+        openlibrary_id:
+          category === "imprint" && fields.imprintSource === "book"
+            ? fields.bookPick?.id ?? null
+            : null,
+        memory_season: memoryDate.season,
+        memory_year: memoryDate.year,
+        memory_month: memoryDate.month,
+        memory_day: memoryDate.day,
+      };
+
+      let data: any;
+      let error: any;
+      if (editId) {
+        ({ data, error } = await (supabase as any)
+          .from("touchstones")
+          .update(payload)
+          .eq("id", editId)
+          .eq("user_id", user.id)
+          .select()
+          .single());
+      } else {
+        ({ data, error } = await (supabase as any)
+          .from("touchstones")
+          .insert({ ...payload, user_id: user.id })
+          .select()
+          .single());
+      }
 
       if (error) throw error;
       setSaved(data);
-      logEvent("capture_completed", {
+      logEvent(editId ? "memory_updated" : "capture_completed", {
         category,
         has_photo: !!photo_url,
         has_note: !!note.trim(),
