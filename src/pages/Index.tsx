@@ -245,7 +245,7 @@ const Index = () => {
               }
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="min-h-[120px] text-base bg-card border-0 resize-none"
+              className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
             />
 
             <Button
