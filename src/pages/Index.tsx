@@ -88,6 +88,7 @@ const Index = () => {
   const categorySelected = category !== null;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
+    if (!category) return;
     setDrafts((prev) => {
       const existing = prev[category] ?? emptyDraft();
       return { ...prev, [category]: { ...existing, ...patch } };
