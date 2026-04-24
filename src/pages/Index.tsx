@@ -266,44 +266,52 @@ const Index = () => {
               file={photoFile}
               preview={photoPreview}
               onSelect={handlePhotoSelect}
+              expanded={categorySelected}
             />
 
-            <CategorySelector value={category} onChange={handleCategoryChange} />
-
-            <CategoryFields
-              category={category}
-              values={fields}
-              onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
+            <CategorySelector
+              value={category ?? ""}
+              onChange={handleCategoryChange}
             />
 
-            <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
+            {categorySelected && category && (
+              <>
+                <CategoryFields
+                  category={category}
+                  values={fields}
+                  onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
+                />
 
-            <Input
-              type="text"
-              placeholder="Name this Touchstone"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="h-12 text-base bg-card border-0"
-            />
+                <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
 
-            <Textarea
-              placeholder={
-                category === "imprint" && fields.imprintType
-                  ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
-                  : NOTE_PLACEHOLDERS[category]
-              }
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
-            />
+                <Input
+                  type="text"
+                  placeholder="Name this Touchstone"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="h-12 text-base bg-card border-0"
+                />
 
-            <Button
-              onClick={handleSave}
-              disabled={saving}
-              className="w-full h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              {saving ? "Saving…" : "Save to Constellation"}
-            </Button>
+                <Textarea
+                  placeholder={
+                    category === "imprint" && fields.imprintType
+                      ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
+                      : NOTE_PLACEHOLDERS[category]
+                  }
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
+                />
+
+                <Button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full h-14 text-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {saving ? "Saving…" : "Save to Constellation"}
+                </Button>
+              </>
+            )}
           </>
         )}
       </div>
