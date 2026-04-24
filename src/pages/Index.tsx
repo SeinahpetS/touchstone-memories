@@ -8,6 +8,8 @@ import Wordmark from "@/components/Wordmark";
 import PhotoUpload from "@/components/PhotoUpload";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
+import MemoryDateInput from "@/components/MemoryDateInput";
+import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
