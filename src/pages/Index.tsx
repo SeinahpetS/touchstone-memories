@@ -126,7 +126,7 @@ const Index = () => {
   const handleSave = async () => {
     if (!user) return;
     if (!note.trim() && !title.trim() && !photoFile && !fields.spotifyPick && !fields.bookPick) {
-      toast.error("Add a photo, title, or note to save a touchstone.");
+      toast.error("Add a photo, title, or note to save a Touchstone.");
       return;
     }
 
@@ -204,7 +204,7 @@ const Index = () => {
       });
       logEvent("artifact_viewed", { memory_id: data.id, category });
     } catch (err: any) {
-      toast.error(err.message || "Failed to save touchstone.");
+      toast.error(err.message || "Failed to save Touchstone.");
     } finally {
       setSaving(false);
     }
@@ -275,7 +275,7 @@ const Index = () => {
 
             <Input
               type="text"
-              placeholder="Name this touchstone"
+              placeholder="Name this Touchstone"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="h-12 text-base bg-card border-0"
