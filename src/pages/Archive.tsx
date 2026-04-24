@@ -18,6 +18,16 @@ const FILTER_CATEGORIES: CategoryKey[] = [
   "imprint",
 ];
 
+const PLURAL_LABELS: Record<CategoryKey, string> = {
+  moment: "Moments",
+  person: "People",
+  object: "Objects",
+  place: "Places",
+  food: "Foods",
+  sound: "Sounds",
+  imprint: "Imprints",
+};
+
 const Archive = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
