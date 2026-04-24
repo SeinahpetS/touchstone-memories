@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import SpotifySearch, { type SpotifyPick } from "@/components/SpotifySearch";
 import BookSearch, { type BookPick } from "@/components/BookSearch";
+import ImprintTypeSelector, { type ImprintType } from "@/components/ImprintTypeSelector";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
 export interface CategoryFieldValues {
@@ -13,6 +14,7 @@ export interface CategoryFieldValues {
   spotifyPick: SpotifyPick | null;
   bookPick: BookPick | null;
   imprintSource: "photo" | "spotify" | "book";
+  imprintType: ImprintType | null;
 }
 
 interface Props {
@@ -108,41 +110,23 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
       )}
 
       {category === "imprint" && (
-        <div className="space-y-3">
-          <div className="grid grid-cols-3 gap-2">
-            {(
-              [
-                { v: "photo", label: "Photo" },
-                { v: "spotify", label: "Spotify" },
-                { v: "book", label: "Book" },
-              ] as const
-            ).map((opt) => {
-              const active = values.imprintSource === opt.v;
-              return (
-                <button
-                  key={opt.v}
-                  type="button"
-                  onClick={() => onChange({ imprintSource: opt.v })}
-                  className={[
-                    "h-11 rounded-md text-sm transition-colors",
-                    active
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-foreground hover:bg-muted",
-                  ].join(" ")}
-                  aria-pressed={active}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-          {values.imprintSource === "spotify" && (
+        <div className="space-y-4">
+          <ImprintTypeSelector
+            value={values.imprintType}
+            onChange={(t) => {
+              // Map sub-type to the underlying capture source.
+              const source: CategoryFieldValues["imprintSource"] =
+                t === "music" ? "spotify" : t === "book" ? "book" : "photo";
+              onChange({ imprintType: t, imprintSource: source });
+            }}
+          />
+          {values.imprintType === "music" && (
             <SpotifySearch
               value={values.spotifyPick}
               onChange={(pick) => onChange({ spotifyPick: pick })}
             />
           )}
-          {values.imprintSource === "book" && (
+          {values.imprintType === "book" && (
             <BookSearch
               value={values.bookPick}
               onChange={(pick) => onChange({ bookPick: pick })}
