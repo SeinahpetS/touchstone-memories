@@ -311,7 +311,7 @@ const Index = () => {
             onClick={() => navigate("/archive")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Constellation
+            {editId ? "Cancel" : "Constellation"}
           </button>
         </div>
 
