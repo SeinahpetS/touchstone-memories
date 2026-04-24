@@ -56,6 +56,46 @@ const Auth = () => {
     }
   };
 
+  // Dev-only bypass — gated by import.meta.env.DEV so the button and handler
+  // are tree-shaken from production builds.
+  const DEV_EMAIL = "dev@touchstone.local";
+  const DEV_PASSWORD = "devdevdev";
+  const handleDevBypass = async () => {
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: DEV_EMAIL,
+        password: DEV_PASSWORD,
+      });
+      if (error) {
+        // First run on this backend — create the dev user, then sign in.
+        const { error: signUpErr } = await supabase.auth.signUp({
+          email: DEV_EMAIL,
+          password: DEV_PASSWORD,
+          options: {
+            data: { name: "Dev User" },
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (signUpErr) throw signUpErr;
+        const retry = await supabase.auth.signInWithPassword({
+          email: DEV_EMAIL,
+          password: DEV_PASSWORD,
+        });
+        if (retry.error) {
+          throw new Error(
+            "Dev user created but sign-in needs email confirmation. Disable email confirmations in backend auth settings (or confirm dev@touchstone.local once)."
+          );
+        }
+      }
+      toast.success("Signed in as dev user");
+    } catch (err: any) {
+      toast.error(err.message || "Dev bypass failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -138,6 +178,23 @@ const Auth = () => {
             {isSignUp ? "Sign in" : "Create one"}
           </button>
         </p>
+
+        {import.meta.env.DEV && (
+          <div className="border-t border-dashed border-border pt-4">
+            <Button
+              type="button"
+              onClick={handleDevBypass}
+              disabled={submitting}
+              variant="ghost"
+              className="w-full h-10 text-xs uppercase tracking-wide text-muted-foreground hover:text-foreground"
+            >
+              Dev: skip login
+            </Button>
+            <p className="mt-1 text-center text-[11px] text-muted-foreground/70">
+              Visible in development only
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
