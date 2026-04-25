@@ -58,7 +58,7 @@ const CategoryIcon = ({
           fill="none"
         />
         <path
-          d="M7,30 C7,23 11,20 18,20 C25,20 29,23 29,30"
+          d="M8,30 C8,25 12,23 18,23 C24,23 28,25 28,30"
           stroke={color}
           strokeWidth="1.5"
           strokeLinecap="round"
