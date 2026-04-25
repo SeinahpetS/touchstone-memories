@@ -146,6 +146,7 @@ const ImprintTypeSelector = ({ value, onChange }: Props) => (
     {OPTIONS.map(({ value: v, label }) => {
       const active = value === v;
       const IconComp = Icon[v];
+      const fg = active ? "#F5F1E8" : "#2C3E50";
       return (
         <button
           key={v}
@@ -154,13 +155,22 @@ const ImprintTypeSelector = ({ value, onChange }: Props) => (
           aria-pressed={active}
           aria-label={label}
           className={cn(
-            "flex items-center gap-1.5 rounded-full border-0 px-3 py-1.5 transition-opacity",
-            active ? "opacity-100" : "opacity-80 hover:opacity-100"
+            "flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-all duration-200",
+            active
+              ? "ring-2 ring-offset-2 shadow-md scale-[1.03]"
+              : "opacity-80 hover:opacity-100 ring-0"
           )}
-          style={{ backgroundColor: "#E8E4D8", color: "#2C3E50" }}
+          style={{
+            backgroundColor: active ? "#2C3E50" : "#E8E4D8",
+            color: fg,
+            ...({
+              "--tw-ring-color": "#2C3E50",
+              "--tw-ring-offset-color": "#F5F1E8",
+            } as React.CSSProperties),
+          }}
         >
-          <IconComp size={16} color="#2C3E50" />
-          <span className="font-jost text-[10px] uppercase tracking-[0.06em]" style={{ color: "#2C3E50" }}>
+          <IconComp size={16} color={fg} />
+          <span className="font-jost text-[10px] uppercase tracking-[0.06em]" style={{ color: fg }}>
             {label}
           </span>
         </button>
