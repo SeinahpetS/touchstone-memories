@@ -48,16 +48,6 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
       )}
 
       {note && <p className="text-base text-foreground leading-relaxed">{note}</p>}
-
-
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="mt-4 rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          Capture another
-        </button>
-      )}
     </div>
   );
 };
