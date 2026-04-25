@@ -53,6 +53,7 @@ const initialFields: CategoryFieldValues = {
   relationshipType: "",
   spotifyPick: null,
   bookPick: null,
+  tmdbPick: null,
   imprintSource: "photo",
   imprintType: null,
 };
@@ -186,7 +187,7 @@ const Index = () => {
 
   const handleSave = async () => {
     if (!user) return;
-    if (!note.trim() && !title.trim() && !photoFile && !fields.spotifyPick && !fields.bookPick) {
+    if (!note.trim() && !title.trim() && !photoFile && !fields.spotifyPick && !fields.bookPick && !fields.tmdbPick) {
       toast.error("Add a photo, title, or note to save a Touchstone.");
       return;
     }
@@ -205,11 +206,13 @@ const Index = () => {
         const { data } = supabase.storage.from("memory-photos").getPublicUrl(path);
         photo_url = data.publicUrl;
       } else if (!editId && category === "imprint") {
-        // Fall back to Spotify/Book cover art when no photo is uploaded.
+        // Fall back to Spotify/Book/TMDB cover art when no photo is uploaded.
         if (fields.imprintSource === "spotify" && fields.spotifyPick?.image) {
           photo_url = fields.spotifyPick.image;
         } else if (fields.imprintSource === "book" && fields.bookPick?.coverUrl) {
           photo_url = fields.bookPick.coverUrl;
+        } else if (fields.imprintSource === "tmdb" && fields.tmdbPick?.image) {
+          photo_url = fields.tmdbPick.image;
         }
       }
 
@@ -220,8 +223,19 @@ const Index = () => {
           resolvedTitle = fields.spotifyPick.title;
         } else if (fields.imprintSource === "book" && fields.bookPick) {
           resolvedTitle = fields.bookPick.title;
+        } else if (fields.imprintSource === "tmdb" && fields.tmdbPick) {
+          resolvedTitle = fields.tmdbPick.title;
         }
       }
+
+      // Auto-fill the memory year for TMDB picks if the user hasn't set one.
+      const resolvedMemoryYear =
+        memoryDate.year ??
+        (category === "imprint" &&
+        fields.imprintSource === "tmdb" &&
+        fields.tmdbPick?.year
+          ? fields.tmdbPick.year
+          : null);
 
       const payload: Record<string, any> = {
         category: category as any,
@@ -246,8 +260,12 @@ const Index = () => {
           category === "imprint" && fields.imprintSource === "book"
             ? fields.bookPick?.id ?? null
             : null,
+        tmdb_id:
+          category === "imprint" && fields.imprintSource === "tmdb"
+            ? fields.tmdbPick?.id ?? null
+            : null,
         memory_season: memoryDate.season,
-        memory_year: memoryDate.year,
+        memory_year: resolvedMemoryYear,
         memory_month: memoryDate.month,
         memory_day: memoryDate.day,
       };
@@ -394,7 +412,13 @@ const Index = () => {
                 value={fields.imprintType}
                 onChange={(t) => {
                   const source: CategoryFieldValues["imprintSource"] =
-                    t === "music" ? "spotify" : t === "book" ? "book" : "photo";
+                    t === "music"
+                      ? "spotify"
+                      : t === "book"
+                      ? "book"
+                      : t === "film" || t === "tv"
+                      ? "tmdb"
+                      : "photo";
                   setFields((prev) => ({
                     ...prev,
                     imprintType: t,
