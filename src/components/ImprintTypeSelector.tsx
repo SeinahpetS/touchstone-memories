@@ -143,6 +143,7 @@ const OPTIONS: { value: ImprintType; label: string }[] = [
   { value: "art", label: "Art" },
   { value: "quote", label: "Quote" },
   { value: "poem", label: "Poem" },
+  { value: "podcast", label: "Podcast" },
 ];
 
 interface Props {
