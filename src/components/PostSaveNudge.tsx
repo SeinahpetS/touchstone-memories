@@ -96,14 +96,8 @@ const PostSaveNudge = ({
       }
       aria-label="Add more to this memory"
     >
-      <p
-        className="font-jost text-[15px] text-[#5B4A3F]/90"
-        style={{ lineHeight: 1.5 }}
-      >
-        Want to add anything before you go?
-      </p>
-
       <div className="space-y-4">
+
         {showDate && (
           <div>
             {expanded === "date" ? (
