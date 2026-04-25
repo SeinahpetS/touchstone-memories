@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export type ImprintType = "music" | "book" | "film" | "tv" | "art" | "quote" | "poem";
+export type ImprintType = "music" | "book" | "film" | "tv" | "art" | "quote" | "poem" | "podcast";
 
 interface IconProps {
   size?: number;
