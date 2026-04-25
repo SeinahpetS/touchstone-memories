@@ -1,5 +1,5 @@
 // Google Places proxy: keeps GOOGLE_API_KEY server-side.
-// Supports two modes: ?mode=autocomplete&q=... and ?mode=details&place_id=...
+// Uses Places API (New). Supports ?mode=autocomplete&q=... and ?mode=details&place_id=...
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -18,7 +18,6 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    // Auth check — only signed-in users may use this proxy
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return json({ error: "Missing auth" }, 401);
 
@@ -40,24 +39,34 @@ Deno.serve(async (req) => {
       const q = url.searchParams.get("q")?.trim();
       if (!q || q.length < 2) return json({ predictions: [] });
 
-      const placesUrl = new URL(
-        "https://maps.googleapis.com/maps/api/place/autocomplete/json"
-      );
-      placesUrl.searchParams.set("input", q);
-      placesUrl.searchParams.set("key", apiKey);
-
-      const r = await fetch(placesUrl.toString());
+      const r = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": apiKey,
+        },
+        body: JSON.stringify({ input: q }),
+      });
       const data = await r.json();
-      if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
-        return json({ error: data.error_message || data.status }, 502);
+      if (!r.ok) {
+        return json(
+          { error: data.error?.message || `Places API error (${r.status})` },
+          502
+        );
       }
+      const suggestions = data.suggestions ?? [];
       return json({
-        predictions: (data.predictions ?? []).map((p: any) => ({
-          place_id: p.place_id,
-          description: p.description,
-          main_text: p.structured_formatting?.main_text ?? p.description,
-          secondary_text: p.structured_formatting?.secondary_text ?? "",
-        })),
+        predictions: suggestions
+          .filter((s: any) => s.placePrediction)
+          .map((s: any) => {
+            const p = s.placePrediction;
+            return {
+              place_id: p.placeId,
+              description: p.text?.text ?? "",
+              main_text: p.structuredFormat?.mainText?.text ?? p.text?.text ?? "",
+              secondary_text: p.structuredFormat?.secondaryText?.text ?? "",
+            };
+          }),
       });
     }
 
@@ -65,24 +74,27 @@ Deno.serve(async (req) => {
       const placeId = url.searchParams.get("place_id");
       if (!placeId) return json({ error: "Missing place_id" }, 400);
 
-      const detailsUrl = new URL(
-        "https://maps.googleapis.com/maps/api/place/details/json"
+      const r = await fetch(
+        `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`,
+        {
+          headers: {
+            "X-Goog-Api-Key": apiKey,
+            "X-Goog-FieldMask": "id,displayName,formattedAddress,location",
+          },
+        }
       );
-      detailsUrl.searchParams.set("place_id", placeId);
-      detailsUrl.searchParams.set("fields", "name,formatted_address,geometry");
-      detailsUrl.searchParams.set("key", apiKey);
-
-      const r = await fetch(detailsUrl.toString());
       const data = await r.json();
-      if (data.status !== "OK") {
-        return json({ error: data.error_message || data.status }, 502);
+      if (!r.ok) {
+        return json(
+          { error: data.error?.message || `Places API error (${r.status})` },
+          502
+        );
       }
-      const result = data.result;
       return json({
-        name: result.name ?? null,
-        formatted_address: result.formatted_address ?? null,
-        lat: result.geometry?.location?.lat ?? null,
-        lng: result.geometry?.location?.lng ?? null,
+        name: data.displayName?.text ?? null,
+        formatted_address: data.formattedAddress ?? null,
+        lat: data.location?.latitude ?? null,
+        lng: data.location?.longitude ?? null,
       });
     }
 
