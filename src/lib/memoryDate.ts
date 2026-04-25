@@ -27,10 +27,10 @@ export const MONTH_OPTIONS = MONTH_NAMES.map((name, i) => ({
 }));
 
 export const SEASON_OPTIONS: { value: MemorySeason; label: string }[] = [
-  { value: "spring", label: "Spring (March – May)" },
-  { value: "summer", label: "Summer (June – August)" },
-  { value: "autumn", label: "Fall (September – November)" },
-  { value: "winter", label: "Winter (December – February)" },
+  { value: "spring", label: "Spring (Mar – May)" },
+  { value: "summer", label: "Summer (Jun – Aug)" },
+  { value: "autumn", label: "Fall (Sep – Nov)" },
+  { value: "winter", label: "Winter (Dec – Feb)" },
 ];
 
 export const SEASON_LABELS: Record<MemorySeason, string> = {
