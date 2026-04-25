@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export type ImprintType = "music" | "book" | "film" | "tv" | "art" | "quote" | "poem";
+export type ImprintType = "music" | "book" | "film" | "tv" | "art" | "quote" | "poem" | "podcast";
 
 interface IconProps {
   size?: number;
@@ -124,6 +124,15 @@ const Icon = {
       <line x1="9" y1="25" x2="25" y2="25" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
+  podcast: ({ size = 32, color = "currentColor" }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="15" r="4" stroke={color} strokeWidth="1.5" />
+      <rect x="14" y="11" width="8" height="13" rx="4" stroke={color} strokeWidth="1.5" />
+      <path d="M11 17a7 7 0 0 0 14 0" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="18" y1="24" x2="18" y2="29" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="14" y1="29" x2="22" y2="29" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 const OPTIONS: { value: ImprintType; label: string }[] = [
@@ -134,6 +143,7 @@ const OPTIONS: { value: ImprintType; label: string }[] = [
   { value: "art", label: "Art" },
   { value: "quote", label: "Quote" },
   { value: "poem", label: "Poem" },
+  { value: "podcast", label: "Podcast" },
 ];
 
 interface Props {

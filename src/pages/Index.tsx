@@ -42,6 +42,7 @@ const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
     "What do you feel when you look at this? What does it say that you couldn't say yourself?",
   quote: "Why does this stay with you? When do you come back to it?",
   poem: "What does this poem make you feel? What line from it lives in you?",
+  podcast: "What episode or moment stuck with you? What idea did it leave you with?",
 };
 
 const initialFields: CategoryFieldValues = {
