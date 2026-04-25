@@ -49,11 +49,12 @@ const CategoryIcon = ({
     ),
     person: (
       <svg width={size} height={size} viewBox="0 0 36 36" fill="none" className={className}>
-        <path
-          d="M18,8.5 Q18.9,8.5 19.6,9.2 L21.8,11.4 Q22.5,12.1 22.5,13 Q22.5,13.9 21.8,14.6 L19.6,16.8 Q18.9,17.5 18,17.5 Q17.1,17.5 16.4,16.8 L14.2,14.6 Q13.5,13.9 13.5,13 Q13.5,12.1 14.2,11.4 L16.4,9.2 Q17.1,8.5 18,8.5 Z"
+        <circle
+          cx="18"
+          cy="13"
+          r="4.73"
           stroke={color}
           strokeWidth="1.5"
-          strokeLinejoin="round"
           fill="none"
         />
         <path
