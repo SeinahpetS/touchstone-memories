@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import SpotifySearch, { type SpotifyPick } from "@/components/SpotifySearch";
 import BookSearch, { type BookPick } from "@/components/BookSearch";
+import TmdbSearch, { type TmdbPick } from "@/components/TmdbSearch";
 import ImprintTypeSelector, { type ImprintType } from "@/components/ImprintTypeSelector";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
@@ -13,7 +14,8 @@ export interface CategoryFieldValues {
   relationshipType: "personal" | "professional" | "";
   spotifyPick: SpotifyPick | null;
   bookPick: BookPick | null;
-  imprintSource: "photo" | "spotify" | "book";
+  tmdbPick: TmdbPick | null;
+  imprintSource: "photo" | "spotify" | "book" | "tmdb";
   imprintType: ImprintType | null;
 }
 
@@ -116,6 +118,13 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
             <BookSearch
               value={values.bookPick}
               onChange={(pick) => onChange({ bookPick: pick })}
+            />
+          )}
+          {(values.imprintType === "film" || values.imprintType === "tv") && (
+            <TmdbSearch
+              kind={values.imprintType === "film" ? "movie" : "tv"}
+              value={values.tmdbPick}
+              onChange={(pick) => onChange({ tmdbPick: pick })}
             />
           )}
         </div>

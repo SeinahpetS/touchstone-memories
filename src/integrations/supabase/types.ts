@@ -94,6 +94,7 @@ export type Database = {
           sentiment: string | null
           spotify_id: string | null
           title: string | null
+          tmdb_id: string | null
           user_id: string
           venue_name: string | null
         }
@@ -122,6 +123,7 @@ export type Database = {
           sentiment?: string | null
           spotify_id?: string | null
           title?: string | null
+          tmdb_id?: string | null
           user_id: string
           venue_name?: string | null
         }
@@ -150,6 +152,7 @@ export type Database = {
           sentiment?: string | null
           spotify_id?: string | null
           title?: string | null
+          tmdb_id?: string | null
           user_id?: string
           venue_name?: string | null
         }
