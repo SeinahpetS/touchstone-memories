@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Lock, Unlock } from "lucide-react";
+import { MoreHorizontal, Pencil, Lock, Unlock, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,8 +8,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { formatMemoryDate } from "@/lib/memoryDate";
 
@@ -45,6 +56,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
   const cat = memory.category as CategoryKey;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const isPrivate = !!memory.is_private;
 
@@ -60,6 +72,22 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
       return;
     }
     toast.success(isPrivate ? "Made public." : "Made private.");
+    onChanged?.();
+  };
+
+  const handleDelete = async () => {
+    setBusy(true);
+    const { error } = await (supabase as any)
+      .from("touchstones")
+      .delete()
+      .eq("id", memory.id);
+    setBusy(false);
+    setConfirmOpen(false);
+    if (error) {
+      toast.error(error.message || "Couldn't delete that Touchstone.");
+      return;
+    }
+    toast.success("Touchstone deleted.");
     onChanged?.();
   };
 
@@ -167,9 +195,44 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 </>
               )}
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.preventDefault();
+                setConfirmOpen(true);
+              }}
+              disabled={busy}
+              className="cursor-pointer text-destructive focus:text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this Touchstone?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove
+              {memory.title ? ` "${memory.title}"` : " this entry"} from your
+              Constellation. This can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={busy}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
