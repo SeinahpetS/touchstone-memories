@@ -56,6 +56,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
   const cat = memory.category as CategoryKey;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const isPrivate = !!memory.is_private;
 
@@ -71,6 +72,22 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
       return;
     }
     toast.success(isPrivate ? "Made public." : "Made private.");
+    onChanged?.();
+  };
+
+  const handleDelete = async () => {
+    setBusy(true);
+    const { error } = await (supabase as any)
+      .from("touchstones")
+      .delete()
+      .eq("id", memory.id);
+    setBusy(false);
+    setConfirmOpen(false);
+    if (error) {
+      toast.error(error.message || "Couldn't delete that Touchstone.");
+      return;
+    }
+    toast.success("Touchstone deleted.");
     onChanged?.();
   };
 
