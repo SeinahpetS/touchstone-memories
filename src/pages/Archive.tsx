@@ -157,138 +157,147 @@ const Archive = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col">
-        <div className="flex items-center justify-between">
-          <Wordmark />
-        </div>
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col min-h-0">
+        {/* Fixed header zone */}
+        <div className="shrink-0">
+          <div className="flex items-center justify-between">
+            <Wordmark />
+          </div>
 
-        {/* Divider between wordmark and filter grid */}
-        <div className="flex items-center gap-3 mt-6" aria-hidden="true">
-          <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
-          <span className="block h-2 w-2 rotate-45 border border-[hsl(var(--gold)/0.5)]" />
-          <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
-        </div>
+          {/* Divider between wordmark and filter grid */}
+          <div className="flex items-center gap-3 mt-6" aria-hidden="true">
+            <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+            <span className="block h-2 w-2 rotate-45 border border-[hsl(var(--gold)/0.5)]" />
+            <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+          </div>
 
-        {/* Zone 1 — filter grid */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6">
-          <button
-            onClick={() => setFilter("all")}
-            aria-pressed={filter === "all"}
-            style={{
-              borderColor: filter === "all" ? "#B8860B" : "#E8E4D8",
-              borderWidth: filter === "all" ? "3.5px" : "1.5px",
-              borderStyle: "solid",
-              backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
-            }}
-            className={cn(
-              "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
-              filter !== "all" && "bg-[hsl(var(--dark-card))]"
-            )}
-          >
-            <span className="flex h-9 w-9 items-center justify-center">
-              <span
-                className="inline-block h-[21px] w-[21px] rotate-45 border-[1.5px]"
-                style={{ borderColor: "#B8860B" }}
-              />
-            </span>
-            <span
-              className="font-sans text-[10px] uppercase tracking-[0.06em]"
+          {/* Zone 1 — filter grid */}
+          <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6">
+            <button
+              onClick={() => setFilter("all")}
+              aria-pressed={filter === "all"}
               style={{
-                color: filter === "all" ? "#2C3E50" : undefined,
+                borderColor: filter === "all" ? "#B8860B" : "#E8E4D8",
+                borderWidth: filter === "all" ? "3.5px" : "1.5px",
+                borderStyle: "solid",
+                backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
               }}
+              className={cn(
+                "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
+                filter !== "all" && "bg-[hsl(var(--dark-card))]"
+              )}
             >
-              <span className={cn(filter !== "all" && "text-[hsl(var(--label-color))]")}>
-                All
+              <span className="flex h-9 w-9 items-center justify-center">
+                <span
+                  className="inline-block h-[21px] w-[21px] rotate-45 border-[1.5px]"
+                  style={{ borderColor: "#B8860B" }}
+                />
               </span>
-            </span>
-          </button>
-
-          {FILTER_CATEGORIES.map((c) => (
-            <CategoryIconCard
-              key={c}
-              category={c}
-              label={PLURAL_LABELS[c]}
-              active={filter === c}
-              onClick={() => setFilter(c)}
-            />
-          ))}
-        </div>
-
-        {fetching ? (
-          <p className="text-center text-muted-foreground py-12">Loading…</p>
-        ) : touchstones.length === 0 ? (
-          <>
-            {/* Zone 2 — divider with center diamond */}
-            <div className="flex items-center gap-3" aria-hidden="true">
-              <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
               <span
-                className="block h-2 w-2 rotate-45 border border-[hsl(var(--gold)/0.5)]"
-              />
-              <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
-            </div>
-
-            {/* Zone 3 — empty state with star field */}
-            <div className="relative flex-1 flex items-center justify-center overflow-hidden">
-              <svg
-                className="absolute inset-0 h-full w-full"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                aria-hidden="true"
+                className="font-sans text-[10px] uppercase tracking-[0.06em]"
+                style={{
+                  color: filter === "all" ? "#2C3E50" : undefined,
+                }}
               >
-                {lines.map(([a, b], i) => (
-                  <line
-                    key={`l-${i}`}
-                    x1={stars[a].x}
-                    y1={stars[a].y}
-                    x2={stars[b].x}
-                    y2={stars[b].y}
-                    stroke="hsl(var(--gold))"
-                    strokeOpacity={0.07}
-                    strokeWidth={0.15}
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-                {stars.map((s, i) => (
-                  <circle
-                    key={`s-${i}`}
-                    cx={s.x}
-                    cy={s.y}
-                    r={s.r * 0.35}
-                    fill="hsl(var(--gold))"
-                    fillOpacity={s.o}
-                  />
-                ))}
-              </svg>
-              <div className="relative z-10 text-center space-y-3 px-4">
-                <p className="font-playfair italic text-2xl text-foreground">
-                  Your constellation awaits…
-                </p>
-                <p className="font-sans text-muted-foreground">
-                  Every Touchstone you add becomes a star in your personal archive.
-                </p>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="grid grid-cols-2 gap-3 mt-2">
-            {touchstones.map((m) => (
-              <MemoryCard
-                key={m.id}
-                memory={m}
-                onClick={() => setSelected(m)}
-                onChanged={fetchTouchstones}
+                <span className={cn(filter !== "all" && "text-[hsl(var(--label-color))]")}>
+                  All
+                </span>
+              </span>
+            </button>
+
+            {FILTER_CATEGORIES.map((c) => (
+              <CategoryIconCard
+                key={c}
+                category={c}
+                label={PLURAL_LABELS[c]}
+                active={filter === c}
+                onClick={() => setFilter(c)}
               />
             ))}
           </div>
-        )}
+        </div>
 
-        <button
-          onClick={() => navigate("/")}
-          className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mt-6 mb-8"
-        >
-          + Add a Touchstone
-        </button>
+        {/* Scrollable grid / empty-state zone */}
+        <div className="flex-1 min-h-0 overflow-y-auto -mx-5 px-5">
+          {fetching ? (
+            <p className="text-center text-muted-foreground py-12">Loading…</p>
+          ) : touchstones.length === 0 ? (
+            <div className="h-full flex flex-col">
+              {/* Zone 2 — divider with center diamond */}
+              <div className="flex items-center gap-3" aria-hidden="true">
+                <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+                <span
+                  className="block h-2 w-2 rotate-45 border border-[hsl(var(--gold)/0.5)]"
+                />
+                <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+              </div>
+
+              {/* Zone 3 — empty state with star field */}
+              <div className="relative flex-1 flex items-center justify-center overflow-hidden">
+                <svg
+                  className="absolute inset-0 h-full w-full"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  {lines.map(([a, b], i) => (
+                    <line
+                      key={`l-${i}`}
+                      x1={stars[a].x}
+                      y1={stars[a].y}
+                      x2={stars[b].x}
+                      y2={stars[b].y}
+                      stroke="hsl(var(--gold))"
+                      strokeOpacity={0.07}
+                      strokeWidth={0.15}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  ))}
+                  {stars.map((s, i) => (
+                    <circle
+                      key={`s-${i}`}
+                      cx={s.x}
+                      cy={s.y}
+                      r={s.r * 0.35}
+                      fill="hsl(var(--gold))"
+                      fillOpacity={s.o}
+                    />
+                  ))}
+                </svg>
+                <div className="relative z-10 text-center space-y-3 px-4">
+                  <p className="font-playfair italic text-2xl text-foreground">
+                    Your constellation awaits…
+                  </p>
+                  <p className="font-sans text-muted-foreground">
+                    Every Touchstone you add becomes a star in your personal archive.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
+              {touchstones.map((m) => (
+                <MemoryCard
+                  key={m.id}
+                  memory={m}
+                  onClick={() => setSelected(m)}
+                  onChanged={fetchTouchstones}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Pinned action button */}
+        <div className="shrink-0 bg-background pt-4 pb-8">
+          <button
+            onClick={() => navigate("/")}
+            className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            + Add a Touchstone
+          </button>
+        </div>
       </div>
     </div>
   );
