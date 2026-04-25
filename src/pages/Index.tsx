@@ -346,7 +346,7 @@ const Index = () => {
             <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
               <button
                 onClick={() => navigate(`/?edit=${saved.id}`)}
-                className="rounded-full border border-foreground/20 bg-transparent px-6 py-3 text-base text-foreground hover:bg-foreground/5 transition-colors"
+                className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Edit
               </button>
@@ -358,7 +358,7 @@ const Index = () => {
               </button>
               <button
                 onClick={() => navigate("/archive")}
-                className="rounded-full border border-foreground/20 bg-transparent px-6 py-3 text-base text-foreground hover:bg-foreground/5 transition-colors"
+                className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Done
               </button>
