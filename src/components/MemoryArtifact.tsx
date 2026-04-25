@@ -49,7 +49,6 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
 
       {note && <p className="text-base text-foreground leading-relaxed">{note}</p>}
 
-      <p className="font-playfair italic text-muted-foreground">Saved to your archive.</p>
 
       {onClose && (
         <button

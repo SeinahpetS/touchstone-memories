@@ -271,6 +271,7 @@ const Index = () => {
 
       if (error) throw error;
       setSaved(data);
+      toast.success("Touchstone added to your Constellation!");
       logEvent(editId ? "memory_updated" : "capture_completed", {
         category,
         has_photo: !!photo_url,
