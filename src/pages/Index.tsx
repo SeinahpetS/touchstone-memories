@@ -345,7 +345,11 @@ const Index = () => {
             />
             <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
               <button
-                onClick={() => navigate(`/?edit=${saved.id}`)}
+                onClick={() => {
+                  const id = saved.id;
+                  setSaved(null);
+                  navigate(`/?edit=${id}`);
+                }}
                 className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Edit
