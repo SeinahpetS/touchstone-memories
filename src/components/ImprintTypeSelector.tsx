@@ -163,10 +163,10 @@ const ImprintTypeSelector = ({ value, onChange }: Props) => (
           style={{
             backgroundColor: active ? "#2C3E50" : "#E8E4D8",
             color: fg,
-            // @ts-expect-error -- CSS var for ring color
-            "--tw-ring-color": "#2C3E50",
-            // @ts-expect-error -- CSS var for ring offset color
-            "--tw-ring-offset-color": "#F5F1E8",
+            ...({
+              "--tw-ring-color": "#2C3E50",
+              "--tw-ring-offset-color": "#F5F1E8",
+            } as React.CSSProperties),
           }}
         >
           <IconComp size={16} color={fg} />
