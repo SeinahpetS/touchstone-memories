@@ -123,46 +123,26 @@ const PostSaveNudge = ({
           </div>
         )}
 
-        {showPeople && (
-          <div>
-            {expanded === "people" ? (
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  autoFocus
-                  value={people}
-                  onChange={(e) => setPeople(e.target.value)}
-                  placeholder="Who else was there?"
-                  className="h-11 w-full rounded-md bg-[#E8E4D8] border-0 px-3 text-base font-jost text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--gold))] focus:ring-offset-0 transition-shadow"
-                />
-                <button
-                  type="button"
-                  onClick={savePeople}
-                  className="font-jost text-sm text-[#B8860B] hover:opacity-80 transition-opacity"
-                >
-                  Done
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setExpanded("people")}
-                className="font-jost text-[14px] text-[#4A6B8A] hover:opacity-80 transition-opacity text-left"
-              >
-                Anyone else in this memory?
-              </button>
-            )}
+        {showPeople && expanded === "people" && (
+          <div className="space-y-3">
+            <input
+              type="text"
+              autoFocus
+              value={people}
+              onChange={(e) => setPeople(e.target.value)}
+              placeholder="Who else was there?"
+              className="h-11 w-full rounded-md bg-[#E8E4D8] border-0 px-3 text-base font-jost text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--gold))] focus:ring-offset-0 transition-shadow"
+            />
+            <button
+              type="button"
+              onClick={savePeople}
+              className="font-jost text-sm text-[#B8860B] hover:opacity-80 transition-opacity"
+            >
+              Done
+            </button>
           </div>
         )}
       </div>
-
-      <button
-        type="button"
-        onClick={() => setDismissed(true)}
-        className="font-jost text-sm text-[#2C3E50]/70 hover:text-[#2C3E50] transition-colors"
-      >
-        All done
-      </button>
     </section>
   );
 };
