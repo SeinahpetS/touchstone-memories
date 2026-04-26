@@ -1,15 +1,6 @@
 import { format } from "date-fns";
 import { formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
-
-const CATEGORY_COLORS: Record<string, string> = {
-  moment: "bg-gold",
-  object: "bg-pewter",
-  person: "bg-plum",
-  place: "bg-malachite",
-  food: "bg-terracotta",
-  sound: "bg-blueprint",
-  imprint: "bg-ink",
-};
+import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 
 interface Props {
   photoUrl?: string | null;
