@@ -43,10 +43,45 @@ const Archive = () => {
   const [filter, setFilter] = useState<"all" | CategoryKey>("all");
   const [selected, setSelected] = useState<any>(null);
   const [fetching, setFetching] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [lastMemoryAt, setLastMemoryAt] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string>("");
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
   }, [user, loading, navigate]);
+
+  // Fetch profile name (first name only)
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("profiles")
+        .select("name")
+        .eq("id", user.id)
+        .maybeSingle();
+      const full = (data?.name as string | null) ?? "";
+      setFirstName(full.trim().split(/\s+/)[0] ?? "");
+    })();
+  }, [user]);
+
+  // Fetch total count + last memory date (independent of category filter)
+  const fetchHeaderStats = async () => {
+    if (!user) return;
+    const { count } = await (supabase as any)
+      .from("touchstones")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    setTotalCount(count ?? 0);
+
+    const { data: latest } = await (supabase as any)
+      .from("touchstones")
+      .select("created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    setLastMemoryAt(latest?.[0]?.created_at ?? null);
+  };
 
   const fetchTouchstones = async () => {
     if (!user) return;
@@ -63,6 +98,7 @@ const Archive = () => {
     const { data } = await query;
     setTouchstones(data || []);
     setFetching(false);
+    fetchHeaderStats();
   };
 
   useEffect(() => {
