@@ -16,8 +16,12 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
-      {/* Category stripe */}
-      <div className={`h-1.5 w-16 mx-auto rounded-full ${CATEGORY_COLORS[category] || "bg-foreground"}`} />
+      {/* Category icon tile */}
+      <div className="flex justify-center">
+        <div className="w-[84px]">
+          <CategoryIconCard category={category as CategoryKey} />
+        </div>
+      </div>
 
       {photoUrl && (
         <img src={photoUrl} alt={title || "Memory"} className="w-full rounded-lg object-cover max-h-72" />
