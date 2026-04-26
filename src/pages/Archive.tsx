@@ -211,6 +211,100 @@ const Archive = () => {
             <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
           </div>
 
+          {/* Greeting + constellation summary */}
+          {(() => {
+            const hour = new Date().getHours();
+            const greeting =
+              hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+            const name = firstName || "there";
+
+            let reflective = "Something worth keeping happened today.";
+            if (lastMemoryAt) {
+              const diffMs = Date.now() - new Date(lastMemoryAt).getTime();
+              const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+              if (days >= 7) {
+                reflective = "It's been a while. What don't you want to forget?";
+              } else if (days >= 2) {
+                reflective = `It's been ${days} days. What's worth keeping from this week?`;
+              } else {
+                reflective = "Something worth keeping happened today.";
+              }
+            }
+
+            return (
+              <section
+                className="mt-6"
+                style={{ background: "#F2EEE5", padding: "1rem 1.25rem" }}
+              >
+                <p
+                  style={{
+                    fontFamily: "Jost, sans-serif",
+                    fontSize: "11px",
+                    color: "#8A8070",
+                    marginBottom: "6px",
+                  }}
+                >
+                  {greeting}, {name}.
+                </p>
+                <h1
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "26px",
+                    color: "#2C3E50",
+                    fontWeight: 400,
+                    margin: 0,
+                    lineHeight: 1.1,
+                  }}
+                >
+                  My Constellation
+                </h1>
+                <p className="mt-2 flex items-baseline gap-1.5">
+                  <span
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: "21px",
+                      color: "#B8860B",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {totalCount}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "Jost, sans-serif",
+                      fontSize: "12px",
+                      color: "#8A8070",
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {totalCount === 1 ? "touchstone" : "touchstones"}
+                  </span>
+                </p>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    height: "0.5px",
+                    background: "rgba(184,134,11,0.2)",
+                    width: "100%",
+                    marginTop: "12px",
+                  }}
+                />
+                <p
+                  style={{
+                    fontFamily: "Jost, sans-serif",
+                    fontSize: "12px",
+                    fontStyle: "italic",
+                    color: "#8A8070",
+                    lineHeight: 1.6,
+                    marginTop: "10px",
+                  }}
+                >
+                  {reflective}
+                </p>
+              </section>
+            );
+          })()}
+
           {/* Zone 1 — filter grid */}
           <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6">
             <button
