@@ -44,6 +44,7 @@ export type Database = {
           created_at: string
           id: string
           name: string | null
+          notification_preferences: Json
           tier: string
           trial_ends_at: string | null
           trial_started_at: string | null
@@ -53,6 +54,7 @@ export type Database = {
           created_at?: string
           id: string
           name?: string | null
+          notification_preferences?: Json
           tier?: string
           trial_ends_at?: string | null
           trial_started_at?: string | null
@@ -62,6 +64,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string | null
+          notification_preferences?: Json
           tier?: string
           trial_ends_at?: string | null
           trial_started_at?: string | null
