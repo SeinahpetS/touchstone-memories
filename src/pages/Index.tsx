@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { logEvent } from "@/lib/analytics";
 import Wordmark from "@/components/Wordmark";
+import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import PhotoUpload from "@/components/PhotoUpload";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
@@ -325,14 +326,15 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-lg px-5 py-8 space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <Wordmark />
+        <div className="flex items-center justify-between gap-3">
           <button
             onClick={() => navigate("/archive")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             {editId ? "Cancel" : "Constellation"}
           </button>
+          <Wordmark />
+          <ProfileAvatarButton />
         </div>
 
         {saved ? (
