@@ -432,7 +432,7 @@ const Index = () => {
               placeholder="Name this Touchstone"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-12 text-base bg-card border-0"
+              className="h-12 text-base bg-card border-0 placeholder:italic"
             />
 
             {/* Imprint sub-type — appears right after Name */}
