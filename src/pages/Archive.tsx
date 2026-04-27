@@ -46,6 +46,22 @@ const Archive = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [lastMemoryAt, setLastMemoryAt] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>("");
+  const [search, setSearch] = useState("");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // "/" keyboard shortcut to focus search
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (t && t.isContentEditable)) return;
+      e.preventDefault();
+      searchInputRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
