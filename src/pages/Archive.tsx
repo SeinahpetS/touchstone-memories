@@ -488,6 +488,7 @@ const Archive = () => {
                 category={c}
                 label={PLURAL_LABELS[c]}
                 className="w-[110px] h-[75px] !min-w-0"
+                iconSize={26}
                 active={filter === c}
                 onClick={() => setFilter(c)}
               />

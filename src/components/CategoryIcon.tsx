@@ -161,6 +161,7 @@ interface CategoryIconCardProps {
   comingSoon?: boolean;
   onClick?: () => void;
   size?: number;
+  iconSize?: number;
   className?: string;
 }
 
@@ -177,6 +178,7 @@ export const CategoryIconCard = ({
   comingSoon,
   onClick,
   size = 36,
+  iconSize,
   className,
 }: CategoryIconCardProps) => {
   const displayLabel = label ?? CATEGORY_LABELS[category];
@@ -209,16 +211,22 @@ export const CategoryIconCard = ({
         className
       )}
     >
-      <span
-        className="cat-icon flex items-center justify-center transition-opacity"
-        style={{ width: 24, height: 24, opacity: active ? 1 : 0.7 }}
-      >
-        <CategoryIcon
-          category={category}
-          size={category === "imprint" ? 18 : 24}
-          color="#B8860B"
-        />
-      </span>
+      {(() => {
+        const baseIcon = iconSize ?? 24;
+        const renderedIcon = category === "imprint" ? Math.round(baseIcon * 0.75) : baseIcon;
+        return (
+          <span
+            className="cat-icon flex items-center justify-center transition-opacity"
+            style={{ width: baseIcon, height: baseIcon, opacity: active ? 1 : 0.7 }}
+          >
+            <CategoryIcon
+              category={category}
+              size={renderedIcon}
+              color="#B8860B"
+            />
+          </span>
+        );
+      })()}
       <span
         className="cat-label transition-opacity"
         style={{
