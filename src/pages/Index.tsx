@@ -287,6 +287,10 @@ const Index = () => {
         memory_year: resolvedMemoryYear,
         memory_month: memoryDate.month,
         memory_day: memoryDate.day,
+        who_was_there:
+          WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
+            ? whoWasThere.trim()
+            : null,
       };
 
       let data: any;
