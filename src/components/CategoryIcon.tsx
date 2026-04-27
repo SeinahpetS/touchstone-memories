@@ -190,15 +190,17 @@ export const CategoryIconCard = ({
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
-        backgroundColor: "#2C3E50",
-        borderColor: active ? borderColor : "rgba(232,228,216,0.35)",
-        borderWidth: active ? "2px" : "1.5px",
+        backgroundColor: active ? "#F5F0E8" : "#2C3E50",
+        borderColor: active ? borderColor : "transparent",
+        borderWidth: active ? "2px" : "0px",
         borderStyle: "solid",
         boxShadow: active ? `0 0 0 3px ${borderColor}4D` : undefined,
       }}
       className={cn(
-        "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-all",
+        "group flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-all",
         "min-w-[68px] sm:min-w-[84px]",
+        isInteractive && "cursor-pointer",
+        !active && isInteractive && "hover:[&_.cat-icon]:opacity-90 hover:[&_.cat-label]:opacity-90",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
