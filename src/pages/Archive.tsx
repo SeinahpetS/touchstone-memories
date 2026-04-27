@@ -448,8 +448,8 @@ const Archive = () => {
             </span>
           </div>
 
-          {/* Zone 1 — filter grid */}
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 mb-6">
+          {/* Zone 1 — filter bar (horizontal scroll, single row) */}
+          <div className="flex gap-2 sm:gap-3 mt-6 mb-6 overflow-x-auto -mx-4 px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               onClick={() => setFilter("all")}
               aria-pressed={filter === "all"}
@@ -460,7 +460,7 @@ const Archive = () => {
                 backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
               }}
               className={cn(
-                "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors w-[150px] h-[100px]",
+                "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors w-[120px] h-[80px] flex-shrink-0",
                 filter !== "all" && "bg-[hsl(var(--dark-card))]"
               )}
             >
@@ -487,7 +487,7 @@ const Archive = () => {
                 key={c}
                 category={c}
                 label={PLURAL_LABELS[c]}
-                className="w-[150px] h-[100px]"
+                className="w-[120px] h-[80px] flex-shrink-0"
                 active={filter === c}
                 onClick={() => setFilter(c)}
               />
