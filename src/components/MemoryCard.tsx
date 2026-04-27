@@ -116,7 +116,18 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
               }}
             />
           </>
-        ) : null}
+        ) : (
+          <div
+            aria-hidden
+            style={{
+              height: "9px",
+              width: "100%",
+              backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
+              borderTopLeftRadius: "0.5rem",
+              borderTopRightRadius: "0.5rem",
+            }}
+          />
+        )}
 
         <div className="p-4 space-y-2">
           {/* Category icon + label */}
