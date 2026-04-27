@@ -194,7 +194,8 @@ export const CategoryIconCard = ({
         borderColor: active ? borderColor : "transparent",
         borderWidth: active ? "2px" : "0px",
         borderStyle: "solid",
-        boxShadow: active ? `0 0 0 3px ${borderColor}4D` : undefined,
+        boxShadow: "none",
+        outline: "none",
       }}
       className={cn(
         "group flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-all",
