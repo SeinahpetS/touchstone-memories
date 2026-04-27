@@ -110,7 +110,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
             <div
               aria-hidden
               style={{
-                height: "3px",
+                height: "9px",
                 width: "100%",
                 backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
               }}
