@@ -144,13 +144,13 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
 };
 
 export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
-  moment: "#D4A017",
-  person: "#2E7D5E",
-  object: "#7B8FA1",
-  place: "#C2714F",
-  food: "#A93226",
-  sound: "#4A6B8A",
-  imprint: "#8B3A62",
+  moment: "#9E1268",
+  person: "#8B3A62",
+  object: "#4A6B8A",
+  place: "#2E7D5E",
+  food: "#C2714F",
+  sound: "#6B7280",
+  imprint: "#5B4A3F",
 };
 
 interface CategoryIconCardProps {
@@ -164,8 +164,9 @@ interface CategoryIconCardProps {
 }
 
 /**
- * CategoryIconCard — the dark tile presentation used in the capture selector
- * and archive filter bar. Active state shows a brighter gold border.
+ * CategoryIconCard — dark navy tile. Background never changes on selection.
+ * Active state: category-coloured 2px border + matching outer glow,
+ * icon and label at full opacity. Inactive: muted border, reduced opacity.
  */
 export const CategoryIconCard = ({
   category,
@@ -189,21 +190,24 @@ export const CategoryIconCard = ({
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
-        borderColor: active ? borderColor : "#E8E4D8",
-        borderWidth: active ? "3.5px" : "1.5px",
+        backgroundColor: "#2C3E50",
+        borderColor: active ? borderColor : "rgba(232,228,216,0.35)",
+        borderWidth: active ? "2px" : "1.5px",
         borderStyle: "solid",
-        backgroundColor: active ? "#F2EEE5" : undefined,
+        boxShadow: active ? `0 0 0 3px ${borderColor}4D` : undefined,
       }}
       className={cn(
-        "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
+        "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-all",
         "min-w-[68px] sm:min-w-[84px]",
-        !active && "bg-[hsl(var(--dark-card))]",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
     >
       <span
-        className="flex items-center justify-center"
+        className={cn(
+          "flex items-center justify-center transition-opacity",
+          active ? "opacity-100" : "opacity-60"
+        )}
         style={{ width: size, height: size }}
       >
         <CategoryIcon
@@ -213,12 +217,13 @@ export const CategoryIconCard = ({
         />
       </span>
       <span
-        className="font-sans text-[10px] uppercase tracking-[0.06em]"
-        style={{ color: active ? "#2C3E50" : undefined }}
+        className={cn(
+          "font-sans text-[10px] uppercase tracking-[0.06em] transition-opacity",
+          active ? "opacity-100" : "opacity-60"
+        )}
+        style={{ color: "#E8E4D8" }}
       >
-        <span className={cn(!active && "text-[hsl(var(--label-color))]")}>
-          {displayLabel}
-        </span>
+        {displayLabel}
       </span>
       {comingSoon && (
         <span className="text-[9px] uppercase tracking-[0.06em] text-[hsl(var(--label-color)/0.7)]">
