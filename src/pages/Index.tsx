@@ -76,6 +76,7 @@ interface CategoryDraft {
   emotionalTone: string;
   note: string;
   sentiment: string;
+  whoWasThere: string;
   photoFile: File | null;
   photoPreview: string | null;
   fields: CategoryFieldValues;
@@ -87,11 +88,14 @@ const emptyDraft = (): CategoryDraft => ({
   emotionalTone: "",
   note: "",
   sentiment: "",
+  whoWasThere: "",
   photoFile: null,
   photoPreview: null,
   fields: { ...initialFields },
   memoryDate: emptyMemoryDate(),
 });
+
+const WHO_WAS_THERE_CATEGORIES: CategoryKey[] = ["moment", "person", "place", "food", "sound"];
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -108,7 +112,7 @@ const Index = () => {
   const [editLoading, setEditLoading] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
-  const { title, emotionalTone, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
+  const { title, emotionalTone, note, sentiment, whoWasThere, photoFile, photoPreview, fields, memoryDate } = current;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
     setDrafts((prev) => {
@@ -121,6 +125,7 @@ const Index = () => {
   const setEmotionalTone = (v: string) => updateDraft({ emotionalTone: v.slice(0, 20) });
   const setNote = (v: string) => updateDraft({ note: v });
   const setSentiment = (v: string) => updateDraft({ sentiment: v });
+  const setWhoWasThere = (v: string) => updateDraft({ whoWasThere: v });
   const setFields = (
     updater: (prev: CategoryFieldValues) => CategoryFieldValues
   ) => updateDraft({ fields: updater(current.fields) });
@@ -155,6 +160,7 @@ const Index = () => {
         emotionalTone: data.emotional_tone ?? "",
         note: data.note ?? "",
         sentiment: data.sentiment ?? "",
+        whoWasThere: data.who_was_there ?? "",
         photoFile: null,
         photoPreview: data.photo_url ?? null,
         fields: {
@@ -281,6 +287,10 @@ const Index = () => {
         memory_year: resolvedMemoryYear,
         memory_month: memoryDate.month,
         memory_day: memoryDate.day,
+        who_was_there:
+          WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
+            ? whoWasThere.trim()
+            : null,
       };
 
       let data: any;
@@ -456,6 +466,18 @@ const Index = () => {
               values={fields}
               onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
             />
+
+            {/* Who else was there? — for selected categories only */}
+            {WHO_WAS_THERE_CATEGORIES.includes(category) && (
+              <Input
+                type="text"
+                autoComplete="off"
+                placeholder="Who else was there?"
+                value={whoWasThere}
+                onChange={(e) => setWhoWasThere(e.target.value)}
+                className="h-12 text-base bg-card border-0"
+              />
+            )}
 
             {/* Emotional tone — one-word feeling */}
             <Input

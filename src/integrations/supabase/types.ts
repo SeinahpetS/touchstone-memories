@@ -100,6 +100,7 @@ export type Database = {
           tmdb_id: string | null
           user_id: string
           venue_name: string | null
+          who_was_there: string | null
         }
         Insert: {
           ai_answer?: string | null
@@ -129,6 +130,7 @@ export type Database = {
           tmdb_id?: string | null
           user_id: string
           venue_name?: string | null
+          who_was_there?: string | null
         }
         Update: {
           ai_answer?: string | null
@@ -158,6 +160,7 @@ export type Database = {
           tmdb_id?: string | null
           user_id?: string
           venue_name?: string | null
+          who_was_there?: string | null
         }
         Relationships: []
       }

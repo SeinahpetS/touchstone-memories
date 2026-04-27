@@ -1,0 +1,1 @@
+ALTER TABLE public.touchstones ADD COLUMN who_was_there text;
