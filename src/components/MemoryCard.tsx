@@ -100,28 +100,6 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         onClick={onClick}
         className="w-full text-left"
       >
-        {/* Category stripe */}
-        <div className={cn("h-1.5", CATEGORY_STRIPE[memory.category] || "bg-foreground")} />
-
-        {/* Photo frame — 3:4 portrait, anchored top-center.
-            Applies to both with-photo and no-photo states. */}
-        {memory.photo_url ? (
-          <div style={{ aspectRatio: "3 / 4", width: "100%", overflow: "hidden" }}>
-            <img
-              src={memory.photo_url}
-              alt={memory.title || "Memory"}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center top",
-                display: "block",
-              }}
-              loading="lazy"
-            />
-          </div>
-        ) : null}
-
         <div className="p-4 space-y-2">
           {/* Category icon + label */}
           <div className="flex items-center gap-1.5">
@@ -131,9 +109,6 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
             <span className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
               {CATEGORY_LABELS[cat] ?? memory.category}
             </span>
-            {isPrivate && (
-              <Lock className="h-3 w-3 text-muted-foreground" aria-label="Private" />
-            )}
           </div>
 
           {memory.title && (
@@ -154,9 +129,6 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
               </p>
             ) : null;
           })()}
-          {memory.note && (
-            <p className="text-sm text-muted-foreground line-clamp-2">{memory.note}</p>
-          )}
         </div>
       </button>
 
