@@ -99,10 +99,10 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
                 onClick={() => toggleMonth(m)}
                 aria-pressed={selected}
                 className={
-                  "flex-1 h-10 rounded-full font-jost text-sm tracking-wide transition-colors " +
+                  "flex-1 h-10 rounded-[18px] font-jost text-sm tracking-wide transition-colors " +
                   (selected
-                    ? "bg-[#B8860B] text-[#FBF8F1]"
-                    : "bg-[#E8E4D8] text-[#2C3E50] hover:bg-[#ddd6c4]")
+                    ? "bg-[#4A6B8A] text-[#F2EEE5]"
+                    : "bg-[#E8E4D8] text-[#5B4A3F] hover:bg-[#ddd6c4]")
                 }
               >
                 {MONTH_SHORT[m - 1]}
@@ -114,10 +114,10 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
             onClick={() => onChange({ ...value, month: null, day: null })}
             aria-pressed={value.month === null}
             className={
-              "flex-1 h-10 rounded-full font-jost text-sm tracking-wide transition-colors " +
+              "flex-1 h-10 rounded-[18px] font-jost text-sm tracking-wide transition-colors " +
               (value.month === null
-                ? "bg-[#B8860B] text-[#FBF8F1]"
-                : "bg-[#E8E4D8] text-[#2C3E50] hover:bg-[#ddd6c4]")
+                ? "bg-[#4A6B8A] text-[#F2EEE5]"
+                : "bg-[#E8E4D8] text-[#5B4A3F] hover:bg-[#ddd6c4]")
             }
           >
             Not Sure
