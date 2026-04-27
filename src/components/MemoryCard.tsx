@@ -92,20 +92,30 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
       >
         {/* Photo frame — 3:4 portrait, anchored top-center */}
         {memory.photo_url ? (
-          <div style={{ aspectRatio: "3 / 4", width: "100%", overflow: "hidden" }}>
-            <img
-              src={memory.photo_url}
-              alt={memory.title || "Memory"}
+          <>
+            <div style={{ aspectRatio: "3 / 4", width: "100%", overflow: "hidden" }}>
+              <img
+                src={memory.photo_url}
+                alt={memory.title || "Memory"}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  display: "block",
+                }}
+                loading="lazy"
+              />
+            </div>
+            <div
+              aria-hidden
               style={{
+                height: "3px",
                 width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center top",
-                display: "block",
+                backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
               }}
-              loading="lazy"
             />
-          </div>
+          </>
         ) : null}
 
         <div className="p-4 space-y-2">
