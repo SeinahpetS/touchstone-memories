@@ -341,7 +341,7 @@ const Archive = () => {
                 <p
                   style={{
                     fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "23px",
+                    fontSize: "17px",
                     fontStyle: "italic",
                     fontWeight: 300,
                     color: "#8A8070",
