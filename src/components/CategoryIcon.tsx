@@ -190,38 +190,41 @@ export const CategoryIconCard = ({
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
-        backgroundColor: "#2C3E50",
-        borderColor: active ? borderColor : "rgba(232,228,216,0.35)",
-        borderWidth: active ? "2px" : "1.5px",
+        backgroundColor: active ? "#F5F0E8" : "#2C3E50",
+        borderColor: active ? borderColor : "transparent",
+        borderWidth: active ? "2px" : "0px",
         borderStyle: "solid",
         boxShadow: active ? `0 0 0 3px ${borderColor}4D` : undefined,
       }}
       className={cn(
-        "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-all",
+        "group flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-all",
         "min-w-[68px] sm:min-w-[84px]",
+        isInteractive && "cursor-pointer",
+        !active && isInteractive && "hover:[&_.cat-icon]:opacity-90 hover:[&_.cat-label]:opacity-90",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
     >
       <span
-        className={cn(
-          "flex items-center justify-center transition-opacity",
-          active ? "opacity-100" : "opacity-60"
-        )}
-        style={{ width: size, height: size }}
+        className="cat-icon flex items-center justify-center transition-opacity"
+        style={{ width: 24, height: 24, opacity: active ? 1 : 0.7 }}
       >
         <CategoryIcon
           category={category}
-          size={category === "imprint" ? Math.round(size * 0.75) : size}
+          size={category === "imprint" ? 18 : 24}
           color="#B8860B"
         />
       </span>
       <span
-        className={cn(
-          "font-sans text-[10px] uppercase tracking-[0.06em] transition-opacity",
-          active ? "opacity-100" : "opacity-60"
-        )}
-        style={{ color: "#E8E4D8" }}
+        className="cat-label transition-opacity"
+        style={{
+          fontFamily: "Jost, sans-serif",
+          fontSize: "10px",
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          color: active ? "#2C3E50" : "rgba(255,255,255,0.70)",
+          opacity: 1,
+        }}
       >
         {displayLabel}
       </span>
