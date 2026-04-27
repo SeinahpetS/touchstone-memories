@@ -161,6 +161,7 @@ interface CategoryIconCardProps {
   comingSoon?: boolean;
   onClick?: () => void;
   size?: number;
+  className?: string;
 }
 
 /**
