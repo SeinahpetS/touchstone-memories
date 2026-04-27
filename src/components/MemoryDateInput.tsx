@@ -109,6 +109,19 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
               </button>
             );
           })}
+          <button
+            type="button"
+            onClick={() => onChange({ ...value, month: null, day: null })}
+            aria-pressed={value.month === null}
+            className={
+              "flex-1 h-10 rounded-full font-jost text-sm tracking-wide transition-colors " +
+              (value.month === null
+                ? "bg-[#B8860B] text-[#FBF8F1]"
+                : "bg-[#E8E4D8] text-[#2C3E50] hover:bg-[#ddd6c4]")
+            }
+          >
+            Not Sure
+          </button>
         </div>
       )}
     </div>
