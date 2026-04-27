@@ -123,9 +123,14 @@ const MemoryCard = ({ memory, onClick, onChanged, pairedWithPhoto }: Props) => {
             style={{
               aspectRatio: "3 / 4",
               width: "100%",
-              backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
+              backgroundColor: CATEGORY_PLACEHOLDER_COLORS[cat] ?? "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
+          >
+            <CategoryIcon category={cat} size={48} color="#F2EEE5" />
+          </div>
         ) : (
           <div
             aria-hidden
