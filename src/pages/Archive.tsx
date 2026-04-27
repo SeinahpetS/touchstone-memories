@@ -267,7 +267,7 @@ const Archive = () => {
             }
 
             return (
-              <section style={{ padding: "1rem 1.25rem" }}>
+              <section style={{ paddingTop: "1rem", paddingBottom: "1rem" }}>
                 {/* Line 1 — Greeting */}
                 <p
                   style={{
