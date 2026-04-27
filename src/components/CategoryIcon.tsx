@@ -144,13 +144,13 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
 };
 
 export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
-  moment: "#D4A017",
-  person: "#2E7D5E",
-  object: "#7B8FA1",
-  place: "#C2714F",
-  food: "#A93226",
-  sound: "#4A6B8A",
-  imprint: "#8B3A62",
+  moment: "#9E1268",
+  person: "#8B3A62",
+  object: "#4A6B8A",
+  place: "#2E7D5E",
+  food: "#C2714F",
+  sound: "#6B7280",
+  imprint: "#5B4A3F",
 };
 
 interface CategoryIconCardProps {
