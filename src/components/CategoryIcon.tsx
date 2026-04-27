@@ -211,11 +211,11 @@ export const CategoryIconCard = ({
     >
       <span
         className="cat-icon flex items-center justify-center transition-opacity"
-        style={{ width: 24, height: 24, opacity: active ? 1 : 0.7 }}
+        style={{ width: 32, height: 32, opacity: active ? 1 : 0.7 }}
       >
         <CategoryIcon
           category={category}
-          size={category === "imprint" ? 18 : 24}
+          size={32}
           color="#B8860B"
         />
       </span>
@@ -223,7 +223,7 @@ export const CategoryIconCard = ({
         className="cat-label transition-opacity"
         style={{
           fontFamily: "Jost, sans-serif",
-          fontSize: "10px",
+          fontSize: "13px",
           textTransform: "uppercase",
           letterSpacing: "0.12em",
           color: active ? "#2C3E50" : "rgba(255,255,255,0.70)",

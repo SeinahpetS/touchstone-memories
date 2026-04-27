@@ -471,7 +471,7 @@ const Archive = () => {
                 />
               </span>
               <span
-                className="font-sans text-[10px] uppercase tracking-[0.06em]"
+                className="font-sans text-[13px] uppercase tracking-[0.06em]"
                 style={{
                   color: filter === "all" ? "#2C3E50" : undefined,
                 }}
