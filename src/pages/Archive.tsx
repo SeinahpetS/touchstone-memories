@@ -552,9 +552,28 @@ const Archive = () => {
                 </div>
               </div>
             </div>
+          ) : visibleTouchstones.length === 0 && search.trim() ? (
+            <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-12">
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  color: "#5B4A3F",
+                  fontSize: "20px",
+                  fontStyle: "italic",
+                  margin: 0,
+                }}
+              >
+                Nothing found yet.
+              </p>
+              <span
+                aria-hidden="true"
+                className="block h-2 w-2 rotate-45"
+                style={{ backgroundColor: "#B8860B" }}
+              />
+            </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
-              {touchstones.map((m) => (
+              {visibleTouchstones.map((m) => (
                 <MemoryCard
                   key={m.id}
                   memory={m}
