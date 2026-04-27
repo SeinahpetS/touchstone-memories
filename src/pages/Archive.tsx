@@ -122,6 +122,44 @@ const Archive = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, filter]);
 
+  // Fuzzy date helpers — match year, month name, formatted created_at
+  const MONTHS = [
+    "january","february","march","april","may","june",
+    "july","august","september","october","november","december",
+  ];
+  const memoryMatchesSearch = (m: any, q: string) => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return true;
+    const parts: string[] = [];
+    const push = (v: unknown) => { if (v) parts.push(String(v).toLowerCase()); };
+    push(m.title);
+    push(m.note);
+    push(m.ai_answer);
+    push(m.location_name);
+    push(m.venue_name);
+    push(m.people);
+    if (m.created_at) {
+      const d = new Date(m.created_at);
+      if (!isNaN(d.getTime())) {
+        push(d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
+        push(d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }));
+        push(String(d.getFullYear()));
+        push(MONTHS[d.getMonth()]);
+        push(MONTHS[d.getMonth()].slice(0, 3));
+      }
+    }
+    if (m.memory_year) push(String(m.memory_year));
+    if (m.memory_month) push(MONTHS[(m.memory_month - 1) % 12]);
+    if (m.memory_season) push(m.memory_season);
+    return parts.some((s) => s.includes(needle));
+  };
+
+  const visibleTouchstones = useMemo(
+    () => touchstones.filter((m) => memoryMatchesSearch(m, search)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [touchstones, search],
+  );
+
   if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
