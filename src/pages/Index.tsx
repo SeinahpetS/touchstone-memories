@@ -160,6 +160,7 @@ const Index = () => {
         emotionalTone: data.emotional_tone ?? "",
         note: data.note ?? "",
         sentiment: data.sentiment ?? "",
+        whoWasThere: data.who_was_there ?? "",
         photoFile: null,
         photoPreview: data.photo_url ?? null,
         fields: {
