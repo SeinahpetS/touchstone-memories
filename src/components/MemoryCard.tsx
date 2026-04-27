@@ -40,9 +40,10 @@ interface Props {
   };
   onClick?: () => void;
   onChanged?: () => void;
+  pairedWithPhoto?: boolean;
 }
 
-const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
+const MemoryCard = ({ memory, onClick, onChanged, pairedWithPhoto }: Props) => {
   const cat = memory.category as CategoryKey;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,6 +117,15 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
               }}
             />
           </>
+        ) : pairedWithPhoto ? (
+          <div
+            aria-hidden
+            style={{
+              aspectRatio: "3 / 4",
+              width: "100%",
+              backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
+            }}
+          />
         ) : (
           <div
             aria-hidden
