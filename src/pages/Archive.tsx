@@ -198,20 +198,55 @@ const Archive = () => {
       <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col min-h-0">
         {/* Fixed header zone */}
         <div className="shrink-0">
+          {/* Top bar: MY CONSTELLATION title (left) + avatar (right) */}
           <div className="flex items-center justify-between gap-3">
-            <span className="w-9" aria-hidden="true" />
-            <Wordmark />
+            <span
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: "13px",
+                color: "#2C3E50",
+                letterSpacing: "0.25em",
+                fontWeight: 400,
+              }}
+            >
+              MY CONSTELLATION
+            </span>
             <ProfileAvatarButton />
           </div>
 
-          {/* Divider between wordmark and filter grid */}
-          <div className="flex items-center gap-3 mt-6" aria-hidden="true">
-            <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
-            <span className="block h-2 w-2 rotate-45 border border-[hsl(var(--gold)/0.5)]" />
-            <span className="h-px flex-1 bg-[hsl(var(--gold)/0.5)]" />
+          {/* Diamond divider */}
+          <div
+            className="flex items-center mt-4"
+            aria-hidden="true"
+            style={{ width: "100%" }}
+          >
+            <span
+              style={{
+                flex: 1,
+                height: "0.5px",
+                background: "rgba(184,134,11,0.4)",
+              }}
+            />
+            <span
+              style={{
+                color: "#B8860B",
+                fontSize: "9px",
+                padding: "0 8px",
+                lineHeight: 1,
+              }}
+            >
+              ◇
+            </span>
+            <span
+              style={{
+                flex: 1,
+                height: "0.5px",
+                background: "rgba(184,134,11,0.4)",
+              }}
+            />
           </div>
 
-          {/* Greeting + constellation summary */}
+          {/* Header block */}
           {(() => {
             const hour = new Date().getHours();
             const greeting =
@@ -232,37 +267,35 @@ const Archive = () => {
             }
 
             return (
-              <section
-                className="mt-6"
-                style={{ background: "#F2EEE5", padding: "1rem 1.25rem" }}
-              >
+              <section style={{ padding: "1rem 1.25rem" }}>
+                {/* Line 1 — Greeting */}
                 <p
                   style={{
-                    fontFamily: "Jost, sans-serif",
-                    fontSize: "11px",
-                    color: "#8A8070",
-                    marginBottom: "6px",
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "20px",
+                    color: "#2C3E50",
+                    fontWeight: 400,
+                    whiteSpace: "nowrap",
+                    margin: 0,
+                    lineHeight: 1.2,
                   }}
                 >
                   {greeting}, {name}.
                 </p>
-                <h1
+
+                {/* Line 2 — Count row */}
+                <div
                   style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontSize: "26px",
-                    color: "#2C3E50",
-                    fontWeight: 400,
-                    margin: 0,
-                    lineHeight: 1.1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    marginTop: "7px",
                   }}
                 >
-                  My Constellation
-                </h1>
-                <p className="mt-2 flex items-baseline gap-1.5">
                   <span
                     style={{
                       fontFamily: "'Playfair Display', serif",
-                      fontSize: "21px",
+                      fontSize: "28px",
                       color: "#B8860B",
                       lineHeight: 1,
                     }}
@@ -272,14 +305,19 @@ const Archive = () => {
                   <span
                     style={{
                       fontFamily: "Jost, sans-serif",
-                      fontSize: "12px",
+                      fontSize: "10px",
                       color: "#8A8070",
-                      letterSpacing: "0.04em",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      alignSelf: "flex-end",
+                      paddingBottom: "1px",
                     }}
                   >
-                    {totalCount === 1 ? "touchstone" : "touchstones"}
+                    TOUCHSTONES
                   </span>
-                </p>
+                </div>
+
+                {/* Line 3 — Hairline divider */}
                 <div
                   aria-hidden="true"
                   style={{
@@ -289,11 +327,14 @@ const Archive = () => {
                     marginTop: "12px",
                   }}
                 />
+
+                {/* Line 4 — Reflective line */}
                 <p
                   style={{
-                    fontFamily: "Jost, sans-serif",
+                    fontFamily: "'Cormorant Garamond', serif",
                     fontSize: "12px",
                     fontStyle: "italic",
+                    fontWeight: 300,
                     color: "#8A8070",
                     lineHeight: 1.6,
                     marginTop: "10px",
