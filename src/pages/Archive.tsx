@@ -337,13 +337,28 @@ const Archive = () => {
                   {greeting}, {name}.
                 </p>
 
-                {/* Line 2 — Count row */}
+                {/* Line 2 — Reflective line (moved under greeting) */}
+                <p
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "13px",
+                    fontStyle: "italic",
+                    fontWeight: 300,
+                    color: "#8A8070",
+                    lineHeight: 1.6,
+                    marginTop: "6px",
+                  }}
+                >
+                  {reflective}
+                </p>
+
+                {/* Line 3 — Count row */}
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "7px",
-                    marginTop: "7px",
+                    marginTop: "12px",
                   }}
                 >
                   <span
@@ -371,7 +386,7 @@ const Archive = () => {
                   </span>
                 </div>
 
-                {/* Line 3 — Hairline divider */}
+                {/* Line 4 — Hairline divider */}
                 <div
                   aria-hidden="true"
                   style={{
@@ -381,21 +396,6 @@ const Archive = () => {
                     marginTop: "12px",
                   }}
                 />
-
-                {/* Line 4 — Reflective line */}
-                <p
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "13px",
-                    fontStyle: "italic",
-                    fontWeight: 300,
-                    color: "#8A8070",
-                    lineHeight: 1.6,
-                    marginTop: "10px",
-                  }}
-                >
-                  {reflective}
-                </p>
               </section>
             );
           })()}
