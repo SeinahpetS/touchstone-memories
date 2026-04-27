@@ -33,7 +33,7 @@ const CATEGORY_RING_HSL: Record<CategoryKey, string> = {
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   moment:
-    "What was happening around you in this moment? What do you want to remember about how it felt?",
+    "What was happening around you in this moment? What do you want to remember about it?",
   person:
     "Who is this person to you? What's something about them you'd want someone to know?",
   object: "What's the story behind this? Why does it matter to you?",
