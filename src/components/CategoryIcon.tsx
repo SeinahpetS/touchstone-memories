@@ -145,7 +145,7 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
 
 export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
   moment: "#9E1268",
-  person: "#8B3A62",
+  person: "#E6A800",
   object: "#4A6B8A",
   place: "#2E7D5E",
   food: "#C2714F",
