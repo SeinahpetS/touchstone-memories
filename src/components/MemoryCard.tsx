@@ -3,7 +3,7 @@ import { MoreHorizontal, Pencil, Lock, Unlock, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import CategoryIcon, { CATEGORY_LABELS, CATEGORY_COLORS, type CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,8 +90,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         onClick={onClick}
         className="w-full text-left"
       >
-        {/* Photo frame — 3:4 portrait. With photo: image anchored top-center.
-            Without photo: navy field with centred gold category icon. */}
+        {/* Photo frame — 3:4 portrait, anchored top-center */}
         {memory.photo_url ? (
           <div style={{ aspectRatio: "3 / 4", width: "100%", overflow: "hidden" }}>
             <img
@@ -107,20 +106,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
               loading="lazy"
             />
           </div>
-        ) : (
-          <div
-            style={{
-              aspectRatio: "3 / 4",
-              width: "100%",
-              backgroundColor: "#2C3E50",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CategoryIcon category={cat} size={40} color="#B8860B" />
-          </div>
-        )}
+        ) : null}
 
         <div className="p-4 space-y-2">
           {/* Category icon + label */}

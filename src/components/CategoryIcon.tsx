@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type CategoryKey =
@@ -144,23 +143,15 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
   imprint: "Imprint",
 };
 
-/**
- * CATEGORY_COLORS — the single source of truth for category identity colours.
- * Used for memory card backgrounds, the category selection tiles, and any
- * other surface that represents category identity across the app.
- */
-export const CATEGORY_COLORS: Record<CategoryKey, string> = {
-  moment: "#9E1268",
-  person: "#8B3A62",
-  object: "#4A6B8A",
-  place: "#2E7D5E",
-  food: "#C2714F",
-  sound: "#6B7280",
-  imprint: "#5B4A3F",
+export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
+  moment: "#D4A017",
+  person: "#2E7D5E",
+  object: "#7B8FA1",
+  place: "#C2714F",
+  food: "#A93226",
+  sound: "#4A6B8A",
+  imprint: "#8B3A62",
 };
-
-// Legacy alias — kept so existing imports keep compiling. Prefer CATEGORY_COLORS.
-export const CATEGORY_BORDER_COLORS = CATEGORY_COLORS;
 
 interface CategoryIconCardProps {
   category: CategoryKey;
@@ -187,45 +178,47 @@ export const CategoryIconCard = ({
 }: CategoryIconCardProps) => {
   const displayLabel = label ?? CATEGORY_LABELS[category];
   const isInteractive = !disabled && !comingSoon;
-  const [hover, setHover] = useState(false);
 
-  const baseColor = CATEGORY_COLORS[category];
-  // Default 70% opacity; hover 85%; active 100%.
-  const bgOpacity = active ? 1 : hover && isInteractive ? 0.85 : 0.7;
+  const borderColor = CATEGORY_BORDER_COLORS[category];
 
   return (
     <button
       type="button"
       onClick={isInteractive ? onClick : undefined}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
       disabled={!isInteractive}
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
-        backgroundColor: hexToRgba(baseColor, bgOpacity),
-        border: active ? "2px solid #B8860B" : "2px solid transparent",
-        boxShadow: active ? "0 0 0 3px rgba(184,134,11,0.25)" : undefined,
+        borderColor: active ? borderColor : "#E8E4D8",
+        borderWidth: active ? "3.5px" : "1.5px",
+        borderStyle: "solid",
+        backgroundColor: active ? "#F2EEE5" : undefined,
       }}
       className={cn(
-        "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-all",
+        "flex w-full flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
         "min-w-[68px] sm:min-w-[84px]",
-        isInteractive && "cursor-pointer",
+        !active && "bg-[hsl(var(--dark-card))]",
         comingSoon && "opacity-40 cursor-not-allowed",
         disabled && !comingSoon && "opacity-50 cursor-not-allowed"
       )}
     >
       <span
         className="flex items-center justify-center"
-        style={{ width: 24, height: 24 }}
+        style={{ width: size, height: size }}
       >
-        <CategoryIcon category={category} size={24} color="#B8860B" />
+        <CategoryIcon
+          category={category}
+          size={category === "imprint" ? Math.round(size * 0.75) : size}
+          color="#B8860B"
+        />
       </span>
       <span
         className="font-sans text-[10px] uppercase tracking-[0.06em]"
-        style={{ color: active ? "#ffffff" : "rgba(255,255,255,0.70)" }}
+        style={{ color: active ? "#2C3E50" : undefined }}
       >
-        {displayLabel}
+        <span className={cn(!active && "text-[hsl(var(--label-color))]")}>
+          {displayLabel}
+        </span>
       </span>
       {comingSoon && (
         <span className="text-[9px] uppercase tracking-[0.06em] text-[hsl(var(--label-color)/0.7)]">
@@ -235,14 +228,5 @@ export const CategoryIconCard = ({
     </button>
   );
 };
-
-// Convert "#RRGGBB" to "rgba(r,g,b,a)".
-function hexToRgba(hex: string, alpha: number): string {
-  const h = hex.replace("#", "");
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 export default CategoryIcon;
