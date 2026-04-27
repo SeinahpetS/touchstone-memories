@@ -227,7 +227,6 @@ export const CategoryIconCard = ({
           </span>
         );
       })()}
-      </span>
       <span
         className="cat-label transition-opacity"
         style={{
