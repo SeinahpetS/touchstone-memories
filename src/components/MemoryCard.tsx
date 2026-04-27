@@ -4,6 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CategoryIcon, { CATEGORY_LABELS, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
+
+const CATEGORY_PLACEHOLDER_COLORS: Record<CategoryKey, string> = {
+  moment: "#C2714F",
+  person: "#E6A800",
+  object: "#4A6B8A",
+  place: "#5B4A3F",
+  food: "#B8860B",
+  sound: "#8B3A62",
+  imprint: "#8B3A62",
+};
 import {
   DropdownMenu,
   DropdownMenuContent,
