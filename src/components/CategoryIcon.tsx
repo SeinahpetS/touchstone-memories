@@ -177,6 +177,7 @@ export const CategoryIconCard = ({
   comingSoon,
   onClick,
   size = 36,
+  className,
 }: CategoryIconCardProps) => {
   const displayLabel = label ?? CATEGORY_LABELS[category];
   const isInteractive = !disabled && !comingSoon;
