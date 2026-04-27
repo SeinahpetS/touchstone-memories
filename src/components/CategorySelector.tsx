@@ -26,26 +26,26 @@ interface Props {
 
 const CategorySelector = ({ value, onChange }: Props) => (
   <div className="space-y-3">
-    {/* Row 1: 4 tiles across, centered */}
-    <div className="flex justify-center gap-3">
+    {/* Row 1: 4 fixed-size tiles, matching constellation filter sizing */}
+    <div className="grid grid-cols-4 gap-2 sm:gap-3 justify-items-center">
       {ROW_ONE.map((cat) => (
         <CategoryIconCard
           key={cat.value}
           category={cat.value}
-          className="w-[150px] h-[100px]"
+          className="w-[110px] h-[75px] !min-w-0"
           active={value === cat.value && cat.enabled}
           comingSoon={!cat.enabled}
           onClick={() => onChange(cat.value)}
         />
       ))}
     </div>
-    {/* Row 2: 3 tiles centered */}
-    <div className="flex justify-center gap-3">
+    {/* Row 2: 3 tiles, stretched to align with row 1's left/right edges */}
+    <div className="grid grid-cols-3 gap-2 sm:gap-3">
       {ROW_TWO.map((cat) => (
         <CategoryIconCard
           key={cat.value}
           category={cat.value}
-          className="w-[150px] h-[100px]"
+          className="w-full h-[75px] !min-w-0"
           active={value === cat.value && cat.enabled}
           comingSoon={!cat.enabled}
           onClick={() => onChange(cat.value)}
