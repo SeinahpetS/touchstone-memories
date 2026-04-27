@@ -161,6 +161,7 @@ interface CategoryIconCardProps {
   comingSoon?: boolean;
   onClick?: () => void;
   size?: number;
+  className?: string;
 }
 
 /**
@@ -176,6 +177,7 @@ export const CategoryIconCard = ({
   comingSoon,
   onClick,
   size = 36,
+  className,
 }: CategoryIconCardProps) => {
   const displayLabel = label ?? CATEGORY_LABELS[category];
   const isInteractive = !disabled && !comingSoon;
@@ -203,7 +205,8 @@ export const CategoryIconCard = ({
         isInteractive && "cursor-pointer",
         !active && isInteractive && "hover:[&_.cat-icon]:opacity-90 hover:[&_.cat-label]:opacity-90",
         comingSoon && "opacity-40 cursor-not-allowed",
-        disabled && !comingSoon && "opacity-50 cursor-not-allowed"
+        disabled && !comingSoon && "opacity-50 cursor-not-allowed",
+        className
       )}
     >
       <span

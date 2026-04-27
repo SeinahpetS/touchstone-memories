@@ -26,32 +26,30 @@ interface Props {
 
 const CategorySelector = ({ value, onChange }: Props) => (
   <div className="space-y-3">
-    {/* Row 1: 4 tiles across */}
-    <div className="grid grid-cols-4 gap-3">
+    {/* Row 1: 4 tiles across, centered */}
+    <div className="flex justify-center gap-3">
       {ROW_ONE.map((cat) => (
         <CategoryIconCard
           key={cat.value}
           category={cat.value}
+          className="w-[150px] h-[100px]"
           active={value === cat.value && cat.enabled}
           comingSoon={!cat.enabled}
           onClick={() => onChange(cat.value)}
         />
       ))}
     </div>
-    {/* Row 2: 3 tiles centered, same width as row 1 (8 cols, each tile spans 2, offset by 1) */}
-    <div className="grid grid-cols-8 gap-3">
-      {ROW_TWO.map((cat, i) => (
-        <div
+    {/* Row 2: 3 tiles centered */}
+    <div className="flex justify-center gap-3">
+      {ROW_TWO.map((cat) => (
+        <CategoryIconCard
           key={cat.value}
-          className={i === 0 ? "col-span-2 col-start-2" : "col-span-2"}
-        >
-          <CategoryIconCard
-            category={cat.value}
-            active={value === cat.value && cat.enabled}
-            comingSoon={!cat.enabled}
-            onClick={() => onChange(cat.value)}
-          />
-        </div>
+          category={cat.value}
+          className="w-[150px] h-[100px]"
+          active={value === cat.value && cat.enabled}
+          comingSoon={!cat.enabled}
+          onClick={() => onChange(cat.value)}
+        />
       ))}
     </div>
   </div>
