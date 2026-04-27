@@ -400,6 +400,55 @@ const Archive = () => {
             );
           })()}
 
+          {/* Search bar */}
+          <div
+            style={{
+              marginLeft: "18px",
+              marginRight: "18px",
+              marginBottom: "10px",
+              backgroundColor: "#E8E4D8",
+              borderRadius: "10px",
+              padding: "9px 12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <Search size={16} strokeWidth={1.75} color="#B8860B" aria-hidden="true" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search memories, dates, places…"
+              aria-label="Search memories"
+              style={{
+                flex: 1,
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                fontFamily: "'Source Sans 3', sans-serif",
+                fontSize: "14px",
+                color: "#2C3E50",
+              }}
+              className="placeholder:text-[#5B4A3F]/60"
+            />
+            <span
+              aria-hidden="true"
+              style={{
+                backgroundColor: "#F2EEE5",
+                color: "#B8860B",
+                borderRadius: "3px",
+                fontFamily: "'Source Sans 3', sans-serif",
+                fontSize: "11px",
+                lineHeight: 1,
+                padding: "3px 6px",
+              }}
+            >
+              /
+            </span>
+          </div>
+
           {/* Zone 1 — filter grid */}
           <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6">
             <button
