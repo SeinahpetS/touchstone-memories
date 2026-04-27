@@ -90,7 +90,8 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         onClick={onClick}
         className="w-full text-left"
       >
-        {/* Photo frame — 3:4 portrait, anchored top-center */}
+        {/* Photo frame — 3:4 portrait. With photo: image anchored top-center.
+            Without photo: navy field with centred gold category icon. */}
         {memory.photo_url ? (
           <div style={{ aspectRatio: "3 / 4", width: "100%", overflow: "hidden" }}>
             <img
@@ -106,7 +107,20 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
               loading="lazy"
             />
           </div>
-        ) : null}
+        ) : (
+          <div
+            style={{
+              aspectRatio: "3 / 4",
+              width: "100%",
+              backgroundColor: "#2C3E50",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CategoryIcon category={cat} size={40} color="#B8860B" />
+          </div>
+        )}
 
         <div className="p-4 space-y-2">
           {/* Category icon + label */}
