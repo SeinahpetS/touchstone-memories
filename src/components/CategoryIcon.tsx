@@ -205,7 +205,8 @@ export const CategoryIconCard = ({
         isInteractive && "cursor-pointer",
         !active && isInteractive && "hover:[&_.cat-icon]:opacity-90 hover:[&_.cat-label]:opacity-90",
         comingSoon && "opacity-40 cursor-not-allowed",
-        disabled && !comingSoon && "opacity-50 cursor-not-allowed"
+        disabled && !comingSoon && "opacity-50 cursor-not-allowed",
+        className
       )}
     >
       <span
