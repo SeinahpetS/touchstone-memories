@@ -486,7 +486,7 @@ const Index = () => {
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
-              placeholder="One word for how this feels."
+              placeholder="A few words how this feels."
               value={emotionalTone}
               onChange={(e) => setEmotionalTone(e.target.value)}
               className="h-12 text-base bg-card border-0 placeholder:italic"
