@@ -21,7 +21,7 @@ interface Props {
   onChange: (pick: SpotifyPick | null) => void;
 }
 
-const inputClass = "h-11 text-base bg-card border-0";
+const inputClass = "h-11 text-base bg-card border-0 placeholder:italic";
 
 const SpotifySearch = ({ value, onChange }: Props) => {
   const [query, setQuery] = useState("");

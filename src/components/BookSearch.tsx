@@ -15,7 +15,7 @@ interface Props {
   onChange: (pick: BookPick | null) => void;
 }
 
-const inputClass = "h-11 text-base bg-card border-0";
+const inputClass = "h-11 text-base bg-card border-0 placeholder:italic";
 
 /**
  * Open Library book search. No API key required, called directly from the browser.
