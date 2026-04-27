@@ -125,6 +125,7 @@ const Index = () => {
   const setEmotionalTone = (v: string) => updateDraft({ emotionalTone: v.slice(0, 20) });
   const setNote = (v: string) => updateDraft({ note: v });
   const setSentiment = (v: string) => updateDraft({ sentiment: v });
+  const setWhoWasThere = (v: string) => updateDraft({ whoWasThere: v });
   const setFields = (
     updater: (prev: CategoryFieldValues) => CategoryFieldValues
   ) => updateDraft({ fields: updater(current.fields) });
