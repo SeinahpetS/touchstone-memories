@@ -334,8 +334,13 @@ const Index = () => {
 
   if (!user) return null;
 
+  const ringHsl = CATEGORY_RING_HSL[category] ?? "43 88% 38%";
+
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background"
+      style={{ ["--ring" as any]: ringHsl }}
+    >
       <div className="mx-auto max-w-lg px-5 py-8 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
