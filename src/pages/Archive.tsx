@@ -267,7 +267,7 @@ const Archive = () => {
             }
 
             return (
-              <section style={{ padding: "1rem 1.25rem" }}>
+              <section style={{ paddingTop: "1rem", paddingBottom: "1rem" }}>
                 {/* Line 1 — Greeting */}
                 <p
                   style={{
@@ -393,7 +393,7 @@ const Archive = () => {
         </div>
 
         {/* Scrollable grid / empty-state zone */}
-        <div className="flex-1 min-h-0 overflow-y-auto -mx-5 px-5">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {fetching ? (
             <p className="text-center text-muted-foreground py-12">Loading…</p>
           ) : touchstones.length === 0 ? (
