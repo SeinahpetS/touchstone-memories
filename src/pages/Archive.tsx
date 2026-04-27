@@ -449,7 +449,7 @@ const Archive = () => {
           </div>
 
           {/* Zone 1 — filter grid */}
-          <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 mb-6">
             <button
               onClick={() => setFilter("all")}
               aria-pressed={filter === "all"}
@@ -460,7 +460,7 @@ const Archive = () => {
                 backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
               }}
               className={cn(
-                "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors",
+                "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors w-[150px] h-[100px]",
                 filter !== "all" && "bg-[hsl(var(--dark-card))]"
               )}
             >
@@ -487,6 +487,7 @@ const Archive = () => {
                 key={c}
                 category={c}
                 label={PLURAL_LABELS[c]}
+                className="w-[150px] h-[100px]"
                 active={filter === c}
                 onClick={() => setFilter(c)}
               />
