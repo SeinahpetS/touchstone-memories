@@ -40,9 +40,10 @@ interface Props {
   };
   onClick?: () => void;
   onChanged?: () => void;
+  pairedWithPhoto?: boolean;
 }
 
-const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
+const MemoryCard = ({ memory, onClick, onChanged, pairedWithPhoto }: Props) => {
   const cat = memory.category as CategoryKey;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
