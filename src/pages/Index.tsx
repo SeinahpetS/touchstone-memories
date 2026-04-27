@@ -76,6 +76,7 @@ interface CategoryDraft {
   emotionalTone: string;
   note: string;
   sentiment: string;
+  whoWasThere: string;
   photoFile: File | null;
   photoPreview: string | null;
   fields: CategoryFieldValues;
@@ -87,11 +88,14 @@ const emptyDraft = (): CategoryDraft => ({
   emotionalTone: "",
   note: "",
   sentiment: "",
+  whoWasThere: "",
   photoFile: null,
   photoPreview: null,
   fields: { ...initialFields },
   memoryDate: emptyMemoryDate(),
 });
+
+const WHO_WAS_THERE_CATEGORIES: CategoryKey[] = ["moment", "person", "place", "food", "sound"];
 
 const Index = () => {
   const { user, loading } = useAuth();
