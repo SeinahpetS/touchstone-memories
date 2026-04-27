@@ -112,7 +112,7 @@ const Index = () => {
   const [editLoading, setEditLoading] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
-  const { title, emotionalTone, note, sentiment, photoFile, photoPreview, fields, memoryDate } = current;
+  const { title, emotionalTone, note, sentiment, whoWasThere, photoFile, photoPreview, fields, memoryDate } = current;
 
   const updateDraft = (patch: Partial<CategoryDraft>) => {
     setDrafts((prev) => {
