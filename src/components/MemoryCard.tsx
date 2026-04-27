@@ -22,6 +22,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { formatMemoryDate } from "@/lib/memoryDate";
+
+const CATEGORY_STRIPE: Record<string, string> = {
+  moment: "bg-gold",
+  object: "bg-pewter",
+  person: "bg-plum",
+  place: "bg-malachite",
+  food: "bg-terracotta",
+  sound: "bg-blueprint",
+  imprint: "bg-ink",
+};
 
 interface Props {
   memory: {
@@ -40,10 +51,6 @@ interface Props {
   onClick?: () => void;
   onChanged?: () => void;
 }
-
-const MAT_BG = "#F5F0E8";
-const NAVY = "#2C3E50";
-const GOLD = "#B8860B";
 
 const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
   const cat = memory.category as CategoryKey;
@@ -86,108 +93,64 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
 
   return (
     <div
-      className="group relative w-full text-left overflow-hidden"
-      style={{ borderRadius: "12px" }}
+      className="group relative w-full text-left rounded-lg overflow-hidden bg-card transition-colors hover:bg-border"
     >
-      <button type="button" onClick={onClick} className="w-full text-left block">
-        {/* BODY ZONE — cream mat */}
-        <div
-          style={{
-            background: MAT_BG,
-            padding: "10px",
-            borderRadius: "5px",
-            boxShadow: "0 0 0 1px rgba(184, 134, 11, 0.40)",
-          }}
-        >
-          {memory.photo_url ? (
-            <img
-              src={memory.photo_url}
-              alt={memory.title || "Memory"}
-              className="w-full block object-cover"
-              style={{ borderRadius: "2px", aspectRatio: "4 / 3" }}
-              loading="lazy"
-            />
-          ) : (
-            <div
-              className="w-full flex items-center justify-center"
-              style={{
-                background: NAVY,
-                borderRadius: "2px",
-                aspectRatio: "4 / 3",
-              }}
-            >
-              <CategoryIcon
-                category={cat}
-                size={40}
-                color={GOLD}
-                className="[&_*]:[stroke-width:1.2px]"
-              />
-            </div>
-          )}
-        </div>
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full text-left"
+      >
+        {/* Category stripe */}
+        <div className={cn("h-1.5", CATEGORY_STRIPE[memory.category] || "bg-foreground")} />
 
-        {/* FOOTER ZONE */}
-        <div
-          className="relative"
-          style={{
-            background: NAVY,
-            padding: "9px 12px 11px",
-            borderBottomLeftRadius: "12px",
-            borderBottomRightRadius: "12px",
-          }}
-        >
-          <div
-            className="font-jost uppercase"
-            style={{
-              fontSize: "8px",
-              letterSpacing: "0.14em",
-              color: "rgba(255,255,255,0.60)",
-            }}
-          >
-            {CATEGORY_LABELS[cat] ?? memory.category}
+        {memory.photo_url && (
+          <img
+            src={memory.photo_url}
+            alt={memory.title || "Memory"}
+            className="w-full h-32 object-cover"
+            loading="lazy"
+          />
+        )}
+
+        <div className="p-4 space-y-2">
+          {/* Category icon + label */}
+          <div className="flex items-center gap-1.5">
+            <span className="inline-flex items-center justify-center rounded-md bg-[hsl(var(--dark-card))] p-1">
+              <CategoryIcon category={cat} size={16} />
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+              {CATEGORY_LABELS[cat] ?? memory.category}
+            </span>
+            {isPrivate && (
+              <Lock className="h-3 w-3 text-muted-foreground" aria-label="Private" />
+            )}
           </div>
+
           {memory.title && (
-            <h3
-              className="font-playfair font-semibold"
-              style={{
-                fontSize: "12px",
-                color: "#ffffff",
-                lineHeight: 1.3,
-                paddingRight: "24px",
-                marginTop: "2px",
-              }}
-            >
+            <h3 className="font-playfair text-base font-semibold text-foreground line-clamp-1">
               {memory.title}
             </h3>
           )}
-          <span
-            style={{
-              position: "absolute",
-              bottom: "10px",
-              right: "10px",
-              opacity: 0.75,
-              display: "inline-flex",
-            }}
-          >
-            <CategoryIcon
-              category={cat}
-              size={20}
-              color={GOLD}
-              className="[&_*]:[stroke-width:1.4px]"
-            />
-          </span>
-          {isPrivate && (
-            <Lock
-              className="absolute"
-              style={{ top: "9px", right: "10px", color: "rgba(255,255,255,0.55)" }}
-              size={10}
-              aria-label="Private"
-            />
+          {(() => {
+            const memoryDateLabel = formatMemoryDate({
+              season: (memory.memory_season as any) ?? null,
+              year: memory.memory_year ?? null,
+              month: memory.memory_month ?? null,
+              day: memory.memory_day ?? null,
+            });
+            return memoryDateLabel ? (
+              <p className="font-jost text-xs font-light text-[#5B4A3F]/60">
+                {memoryDateLabel}
+              </p>
+            ) : null;
+          })()}
+          {memory.note && (
+            <p className="text-sm text-muted-foreground line-clamp-2">{memory.note}</p>
           )}
         </div>
       </button>
 
-      {/* Hover-state action menu */}
+      {/* Hover-state action menu — visible on hover, focus-within, or when open */}
       <div
         className={cn(
           "absolute top-2 right-2 transition-opacity",
@@ -204,7 +167,10 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
           >
             <MoreHorizontal className="h-4 w-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+          <DropdownMenuContent
+            align="end"
+            onClick={(e) => e.stopPropagation()}
+          >
             <DropdownMenuItem
               onClick={() => navigate(`/?edit=${memory.id}`)}
               className="cursor-pointer"
