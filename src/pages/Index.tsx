@@ -475,7 +475,7 @@ const Index = () => {
                 placeholder="Who else was there?"
                 value={whoWasThere}
                 onChange={(e) => setWhoWasThere(e.target.value)}
-                className="h-12 text-base bg-card border-0"
+                className="h-12 text-base bg-card border-0 placeholder:italic"
               />
             )}
 
