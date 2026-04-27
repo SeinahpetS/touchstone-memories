@@ -206,24 +206,25 @@ export const CategoryIconCard = ({
       )}
     >
       <span
-        className={cn(
-          "flex items-center justify-center transition-opacity",
-          active ? "opacity-100" : "opacity-60"
-        )}
-        style={{ width: size, height: size }}
+        className="cat-icon flex items-center justify-center transition-opacity"
+        style={{ width: 24, height: 24, opacity: active ? 1 : 0.7 }}
       >
         <CategoryIcon
           category={category}
-          size={category === "imprint" ? Math.round(size * 0.75) : size}
+          size={category === "imprint" ? 18 : 24}
           color="#B8860B"
         />
       </span>
       <span
-        className={cn(
-          "font-sans text-[10px] uppercase tracking-[0.06em] transition-opacity",
-          active ? "opacity-100" : "opacity-60"
-        )}
-        style={{ color: "#E8E4D8" }}
+        className="cat-label transition-opacity"
+        style={{
+          fontFamily: "Jost, sans-serif",
+          fontSize: "10px",
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          color: active ? "#2C3E50" : "rgba(255,255,255,0.70)",
+          opacity: 1,
+        }}
       >
         {displayLabel}
       </span>
