@@ -24,16 +24,6 @@ import {
 import { cn } from "@/lib/utils";
 import { formatMemoryDate } from "@/lib/memoryDate";
 
-const CATEGORY_STRIPE: Record<string, string> = {
-  moment: "bg-gold",
-  object: "bg-pewter",
-  person: "bg-plum",
-  place: "bg-malachite",
-  food: "bg-terracotta",
-  sound: "bg-blueprint",
-  imprint: "bg-ink",
-};
-
 interface Props {
   memory: {
     id: string;
