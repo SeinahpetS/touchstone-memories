@@ -203,7 +203,7 @@ const Archive = () => {
             <span
               style={{
                 fontFamily: "'Playfair Display', serif",
-                fontSize: "13px",
+                fontSize: "14px",
                 color: "#2C3E50",
                 letterSpacing: "0.25em",
                 fontWeight: 400,
@@ -230,7 +230,7 @@ const Archive = () => {
             <span
               style={{
                 color: "#B8860B",
-                fontSize: "9px",
+                fontSize: "10px",
                 padding: "0 8px",
                 lineHeight: 1,
               }}
@@ -272,7 +272,7 @@ const Archive = () => {
                 <p
                   style={{
                     fontFamily: "'Playfair Display', serif",
-                    fontSize: "20px",
+                    fontSize: "22px",
                     color: "#2C3E50",
                     fontWeight: 400,
                     whiteSpace: "nowrap",
@@ -295,7 +295,7 @@ const Archive = () => {
                   <span
                     style={{
                       fontFamily: "'Playfair Display', serif",
-                      fontSize: "28px",
+                      fontSize: "31px",
                       color: "#B8860B",
                       lineHeight: 1,
                     }}
@@ -305,7 +305,7 @@ const Archive = () => {
                   <span
                     style={{
                       fontFamily: "Jost, sans-serif",
-                      fontSize: "10px",
+                      fontSize: "11px",
                       color: "#8A8070",
                       letterSpacing: "0.12em",
                       textTransform: "uppercase",
@@ -332,7 +332,7 @@ const Archive = () => {
                 <p
                   style={{
                     fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "12px",
+                    fontSize: "13px",
                     fontStyle: "italic",
                     fontWeight: 300,
                     color: "#8A8070",
