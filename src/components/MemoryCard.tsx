@@ -90,6 +90,24 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         onClick={onClick}
         className="w-full text-left"
       >
+        {/* Photo frame — 3:4 portrait, anchored top-center */}
+        {memory.photo_url ? (
+          <div style={{ aspectRatio: "3 / 4", width: "100%", overflow: "hidden" }}>
+            <img
+              src={memory.photo_url}
+              alt={memory.title || "Memory"}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center top",
+                display: "block",
+              }}
+              loading="lazy"
+            />
+          </div>
+        ) : null}
+
         <div className="p-4 space-y-2">
           {/* Category icon + label */}
           <div className="flex items-center gap-1.5">
