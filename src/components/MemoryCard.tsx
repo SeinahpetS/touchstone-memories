@@ -3,7 +3,7 @@ import { MoreHorizontal, Pencil, Lock, Unlock, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CATEGORY_LABELS, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 import {
   DropdownMenu,
   DropdownMenuContent,
