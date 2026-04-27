@@ -35,6 +35,7 @@ const CategorySelector = ({ value, onChange }: Props) => (
           key={cat.value}
           category={cat.value}
           className="w-[110px] h-[75px] !min-w-0"
+          iconSize={33}
           active={value === cat.value && cat.enabled}
           comingSoon={!cat.enabled}
           onClick={() => onChange(cat.value)}
@@ -51,6 +52,7 @@ const CategorySelector = ({ value, onChange }: Props) => (
           key={cat.value}
           category={cat.value}
           className="w-full h-[75px] !min-w-0"
+          iconSize={33}
           active={value === cat.value && cat.enabled}
           comingSoon={!cat.enabled}
           onClick={() => onChange(cat.value)}
