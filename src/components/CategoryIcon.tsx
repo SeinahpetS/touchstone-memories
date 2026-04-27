@@ -194,7 +194,7 @@ export const CategoryIconCard = ({
       style={{
         backgroundColor: active ? "#F5F0E8" : "#2C3E50",
         borderColor: active ? borderColor : "transparent",
-        borderWidth: active ? "2px" : "0px",
+        borderWidth: active ? "3px" : "0px",
         borderStyle: "solid",
         boxShadow: "none",
         outline: "none",
