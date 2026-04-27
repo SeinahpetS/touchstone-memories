@@ -25,7 +25,7 @@ interface Props {
   label?: string;
 }
 
-const inputClass = "h-11 text-base bg-card border-0";
+const inputClass = "h-11 text-base bg-card border-0 placeholder:italic";
 
 /**
  * Google Places autocomplete input.

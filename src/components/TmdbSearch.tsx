@@ -21,7 +21,7 @@ interface Props {
   onChange: (pick: TmdbPick | null) => void;
 }
 
-const inputClass = "h-11 text-base bg-card border-0";
+const inputClass = "h-11 text-base bg-card border-0 placeholder:italic";
 
 const TmdbSearch = ({ kind, value, onChange }: Props) => {
   const [query, setQuery] = useState("");
