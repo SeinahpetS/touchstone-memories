@@ -117,6 +117,15 @@ const MemoryCard = ({ memory, onClick, onChanged, pairedWithPhoto }: Props) => {
               }}
             />
           </>
+        ) : pairedWithPhoto ? (
+          <div
+            aria-hidden
+            style={{
+              aspectRatio: "3 / 4",
+              width: "100%",
+              backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
+            }}
+          />
         ) : (
           <div
             aria-hidden
