@@ -574,14 +574,22 @@ const Archive = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
-              {visibleTouchstones.map((m) => (
-                <MemoryCard
-                  key={m.id}
-                  memory={m}
-                  onClick={() => setSelected(m)}
-                  onChanged={fetchTouchstones}
-                />
-              ))}
+              {visibleTouchstones.map((m, i) => {
+                const rowStart = i - (i % 2);
+                const partner = visibleTouchstones[rowStart === i ? i + 1 : rowStart];
+                const hasPhoto = !!m.photo_url;
+                const partnerHasPhoto = !!partner?.photo_url;
+                const pairedWithPhoto = !hasPhoto && partnerHasPhoto;
+                return (
+                  <MemoryCard
+                    key={m.id}
+                    memory={m}
+                    pairedWithPhoto={pairedWithPhoto}
+                    onClick={() => setSelected(m)}
+                    onChanged={fetchTouchstones}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
