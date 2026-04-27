@@ -24,28 +24,33 @@ interface Props {
   onChange: (value: string) => void;
 }
 
+// Row 1: 4 tiles × 110px + 3 gaps × 12px = 476px total width.
+// Row 2: same 476px width split across 3 tiles + 2 gaps = (476 - 24) / 3 ≈ 150.67px per tile.
 const CategorySelector = ({ value, onChange }: Props) => (
-  <div className="space-y-3">
-    {/* Row 1: 4 tiles across, centered */}
+  <div className="flex flex-col items-center gap-3">
+    {/* Row 1: 4 fixed-size tiles, matching constellation filter sizing */}
     <div className="flex justify-center gap-3">
       {ROW_ONE.map((cat) => (
         <CategoryIconCard
           key={cat.value}
           category={cat.value}
-          className="w-[150px] h-[100px]"
+          className="w-[110px] h-[75px] !min-w-0"
           active={value === cat.value && cat.enabled}
           comingSoon={!cat.enabled}
           onClick={() => onChange(cat.value)}
         />
       ))}
     </div>
-    {/* Row 2: 3 tiles centered */}
-    <div className="flex justify-center gap-3">
+    {/* Row 2: 3 tiles, stretched so the row spans the same width as row 1 */}
+    <div
+      className="grid grid-cols-3 gap-3"
+      style={{ width: "476px", maxWidth: "100%" }}
+    >
       {ROW_TWO.map((cat) => (
         <CategoryIconCard
           key={cat.value}
           category={cat.value}
-          className="w-[150px] h-[100px]"
+          className="w-full h-[75px] !min-w-0"
           active={value === cat.value && cat.enabled}
           comingSoon={!cat.enabled}
           onClick={() => onChange(cat.value)}
