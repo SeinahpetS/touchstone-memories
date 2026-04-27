@@ -18,7 +18,7 @@ const MONTH_SHORT = [
 
 const fieldClass =
   "h-11 w-full rounded-md bg-[#E8E4D8] border-0 px-3 text-base font-jost text-foreground " +
-  "placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--gold))] " +
+  "placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] " +
   "focus:ring-offset-0 transition-shadow";
 
 /**

@@ -19,6 +19,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
+// HSL values for each category color (matches CATEGORY_BORDER_COLORS in CategoryIcon.tsx).
+// Used to drive the active focus-ring color on the capture form.
+const CATEGORY_RING_HSL: Record<CategoryKey, string> = {
+  moment: "326 80% 35%",   // #9E1268
+  person: "44 100% 45%",   // #E6A800
+  object: "211 31% 42%",   // #4A6B8A
+  place: "152 46% 33%",    // #2E7D5E
+  food: "17 49% 53%",      // #C2714F
+  sound: "220 9% 46%",     // #6B7280
+  imprint: "25 18% 30%",   // #5B4A3F
+};
+
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   moment:
     "What was happening around you in this moment? What do you want to remember about how it felt?",
@@ -322,8 +334,13 @@ const Index = () => {
 
   if (!user) return null;
 
+  const ringHsl = CATEGORY_RING_HSL[category] ?? "43 88% 38%";
+
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background"
+      style={{ ["--ring" as any]: ringHsl }}
+    >
       <div className="mx-auto max-w-lg px-5 py-8 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
