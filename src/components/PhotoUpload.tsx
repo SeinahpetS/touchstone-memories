@@ -67,11 +67,17 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
           inputRef.current?.click();
         }
       }}
-      className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed py-8 transition-colors ${
+      className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-8 transition-colors ${
         isDragging
-          ? "border-foreground/60 bg-foreground/5 text-foreground"
-          : "border-border bg-card text-muted-foreground hover:border-foreground/30"
+          ? "bg-foreground/5 text-foreground"
+          : "bg-card text-muted-foreground"
       }`}
+      style={{
+        // Custom dashed border: 4px stroke, generous dash + gap spacing.
+        backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'><rect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='${
+          isDragging ? "%23000000" : "%23B8860B"
+        }' stroke-opacity='${isDragging ? "0.6" : "0.55"}' stroke-width='4' stroke-dasharray='14 10'/></svg>")`,
+      }}
     >
       <Camera className="h-5 w-5" />
       <span className="text-base">
