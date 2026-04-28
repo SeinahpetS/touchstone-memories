@@ -113,6 +113,7 @@ const Archive = () => {
     const t = e.touches[0];
     touchStartX.current = t.clientX;
     touchStartY.current = t.clientY;
+    if (timelineUnlocked) flashDots();
   };
 
   const onTouchEnd = (e: React.TouchEvent) => {
