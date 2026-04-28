@@ -744,10 +744,11 @@ const Archive = () => {
           <div
             className="text-center max-w-md"
             style={{
-              backgroundColor: "#F2EEE5",
+              backgroundColor: "#2C3E50",
               padding: "32px 28px",
               borderRadius: 14,
-              boxShadow: "0 18px 48px rgba(0,0,0,0.18)",
+              boxShadow: "0 18px 48px rgba(0,0,0,0.32)",
+              border: "1px solid rgba(184,134,11,0.4)",
             }}
           >
             <span
@@ -761,7 +762,7 @@ const Archive = () => {
                 fontStyle: "italic",
                 fontSize: 22,
                 lineHeight: 1.4,
-                color: "#2C3E50",
+                color: "#B8860B",
                 margin: 0,
               }}
             >
