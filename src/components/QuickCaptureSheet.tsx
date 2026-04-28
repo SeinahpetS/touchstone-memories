@@ -251,7 +251,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       onSaved?.();
       window.setTimeout(() => {
         onClose();
-      }, 1800);
+      }, 2000);
     } catch (e) {
       setError("Couldn't save right now. Try again.");
     } finally {
@@ -269,12 +269,37 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      style={{ backgroundColor: "rgba(44,62,80,0.55)" }}
+      style={{ backgroundColor: confirmed ? "rgba(20,18,16,0.92)" : "rgba(44,62,80,0.55)" }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Add a Touchstone"
     >
+      {confirmed ? (
+        <div
+          className="animate-fade-in flex flex-col items-center text-center px-8"
+          onClick={(e) => e.stopPropagation()}
+          role="status"
+          aria-live="polite"
+        >
+          <span
+            aria-hidden
+            className="inline-block h-3 w-3 rotate-45 mb-5"
+            style={{ backgroundColor: "#B8860B" }}
+          />
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#B8860B",
+              fontSize: 26,
+              lineHeight: 1.35,
+              letterSpacing: "0.01em",
+            }}
+          >
+            {CONFIRMATION}
+          </p>
+        </div>
+      ) : (
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[92vh] overflow-y-auto"
@@ -285,26 +310,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           border: "1px solid rgba(184,134,11,0.25)",
         }}
       >
-        {confirmed ? (
-          <div className="py-10 flex flex-col items-center text-center">
-            <span
-              aria-hidden
-              className="inline-block h-3 w-3 rotate-45 mb-5"
-              style={{ backgroundColor: "#B8860B" }}
-            />
-            <p
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                color: "#2C3E50",
-                fontSize: 22,
-                lineHeight: 1.35,
-              }}
-            >
-              {CONFIRMATION}
-            </p>
-          </div>
-        ) : (
-          <>
+        <>
             <div className="flex items-center justify-between mb-4">
               <h2
                 style={{
@@ -458,8 +464,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               {saving ? "Saving…" : "Save"}
             </button>
           </>
-        )}
       </div>
+      )}
     </div>
   );
 };
