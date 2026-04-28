@@ -133,6 +133,7 @@ const Archive = () => {
     pointerStartX.current = e.clientX;
     pointerStartY.current = e.clientY;
     pointerActive.current = true;
+    if (timelineUnlocked) flashDots();
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
