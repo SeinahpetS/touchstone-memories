@@ -786,9 +786,8 @@ const Archive = () => {
         <div className="shrink-0 bg-background pt-4 pb-8">
           {timelineUnlocked && (
             <div
-              aria-hidden={!dotsVisible}
-              className="flex items-center justify-center gap-2 mb-2 transition-opacity duration-500"
-              style={{ opacity: dotsVisible ? 1 : 0, height: 8 }}
+              className="flex items-center justify-center gap-2 mb-2"
+              style={{ height: 8 }}
             >
               {(["grid", "timeline"] as const).map((v) => {
                 const active = view === v;
