@@ -250,17 +250,17 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
             : null,
       };
 
-      const { error: insertErr } = await (supabase as any)
+      const { data: inserted, error: insertErr } = await (supabase as any)
         .from("touchstones")
-        .insert(payload);
+        .insert(payload)
+        .select("id")
+        .single();
       if (insertErr) throw insertErr;
 
+      setSavedId(inserted?.id ?? null);
       setConfirmed(true);
       playSaveFeedback();
       onSaved?.();
-      window.setTimeout(() => {
-        onClose();
-      }, 3000);
     } catch (e) {
       setError("Couldn't save right now. Try again.");
     } finally {
