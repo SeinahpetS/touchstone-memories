@@ -136,7 +136,7 @@ const Auth = () => {
             onClick={() => setIsSignUp(!isSignUp)}
             className="text-foreground underline underline-offset-4"
           >
-            {isSignUp ? "Sign in" : "Create one"}
+            {isSignUp ? "Sign in" : "Create Account"}
           </button>
         </p>
 
