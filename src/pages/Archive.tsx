@@ -373,64 +373,68 @@ const Archive = () => {
       <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col min-h-0">
         {/* Fixed header zone */}
         <div className="shrink-0">
-          {/* Top bar: MY CONSTELLATION title (left) + avatar (right) */}
-          <div className="flex items-center justify-between gap-3">
-            <span
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: "14px",
-                color: "#2C3E50",
-                letterSpacing: "0.25em",
-                fontWeight: 400,
-              }}
-            >
-              MY CONSTELLATION
-            </span>
-            <ProfileAvatarButton />
-          </div>
+          {/* Header block: greeting + count (left) | avatar (right) */}
+          {(() => {
+            const hour = new Date().getHours();
+            const greeting =
+              hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+            const name = firstName || "there";
 
-          {/* View switching: horizontal swipe / drag / trackpad — plus a small pill toggle once unlocked */}
-          {timelineUnlocked && (
-            <div className="mt-3 flex items-center">
-              <div
-                role="tablist"
-                aria-label="Switch view"
-                style={{
-                  display: "inline-flex",
-                  padding: 3,
-                  borderRadius: 999,
-                  backgroundColor: "#E8E4D8",
-                  gap: 2,
-                }}
-              >
-                {(["grid", "timeline"] as const).map((v) => {
-                  const active = view === v;
-                  return (
-                    <button
-                      key={v}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => switchView(v)}
+            return (
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  {/* Greeting */}
+                  <p
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: "26px",
+                      color: "#2C3E50",
+                      fontWeight: 400,
+                      fontStyle: "italic",
+                      whiteSpace: "nowrap",
+                      margin: 0,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {greeting}, {name}.
+                  </p>
+
+                  {/* Count row */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: "7px",
+                      marginTop: "6px",
+                    }}
+                  >
+                    <span
                       style={{
-                        padding: "6px 14px",
-                        borderRadius: 999,
-                        fontFamily: "Jost, sans-serif",
-                        fontSize: 11,
-                        letterSpacing: "0.14em",
-                        textTransform: "uppercase",
-                        color: active ? "#F2EEE5" : "#5B4A3F",
-                        backgroundColor: active ? "#2C3E50" : "transparent",
-                        transition: "all 0.2s ease",
+                        fontFamily: "'Playfair Display', serif",
+                        fontSize: "26px",
+                        color: "#B8860B",
+                        lineHeight: 1,
                       }}
                     >
-                      {v === "grid" ? "Grid" : "Timeline"}
-                    </button>
-                  );
-                })}
+                      {totalCount}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: "10px",
+                        color: "#9E9585",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      TOUCHSTONES
+                    </span>
+                  </div>
+                </div>
+                <ProfileAvatarButton />
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Diamond divider */}
           <div
@@ -463,107 +467,6 @@ const Archive = () => {
               }}
             />
           </div>
-
-          {/* Header block */}
-          {(() => {
-            const hour = new Date().getHours();
-            const greeting =
-              hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-            const name = firstName || "there";
-
-            let reflective = "Something worth keeping happened today.";
-            if (lastMemoryAt) {
-              const diffMs = Date.now() - new Date(lastMemoryAt).getTime();
-              const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-              if (days >= 7) {
-                reflective = "It's been a while. What don't you want to forget?";
-              } else if (days >= 2) {
-                reflective = `It's been ${days} days. What's worth keeping from this week?`;
-              } else {
-                reflective = "Something worth keeping happened today.";
-              }
-            }
-
-            return (
-              <section style={{ paddingTop: "1rem", paddingBottom: "1rem" }}>
-                {/* Line 1 — Greeting */}
-                <p
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontSize: "22px",
-                    color: "#2C3E50",
-                    fontWeight: 400,
-                    fontStyle: "italic",
-                    whiteSpace: "nowrap",
-                    margin: 0,
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {greeting}, {name}.
-                </p>
-
-                {/* Line 2 — Reflective line (moved under greeting) */}
-                <p
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "17px",
-                    fontStyle: "italic",
-                    fontWeight: 300,
-                    color: "#8A8070",
-                    lineHeight: 1.6,
-                    marginTop: "6px",
-                  }}
-                >
-                  {reflective}
-                </p>
-
-                {/* Line 3 — Count row */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "7px",
-                    marginTop: "12px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "'Playfair Display', serif",
-                      fontSize: "31px",
-                      color: "#B8860B",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {totalCount}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "Jost, sans-serif",
-                      fontSize: "11px",
-                      color: "#8A8070",
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      alignSelf: "flex-end",
-                      paddingBottom: "1px",
-                    }}
-                  >
-                    TOUCHSTONES
-                  </span>
-                </div>
-
-                {/* Line 4 — Hairline divider */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    height: "0.5px",
-                    background: "rgba(184,134,11,0.2)",
-                    width: "100%",
-                    marginTop: "12px",
-                  }}
-                />
-              </section>
-            );
-          })()}
 
           {/* Search bar */}
           <div
