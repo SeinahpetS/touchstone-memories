@@ -21,13 +21,6 @@ const Auth = () => {
     if (!loading && user) navigate("/archive", { replace: true });
   }, [user, loading, navigate]);
 
-  // Auto-sign-in as dev user so /auth is skipped entirely.
-  useEffect(() => {
-    if (loading || user || submitting) return;
-    handleDevBypass();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, user]);
-
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -63,45 +56,6 @@ const Auth = () => {
     }
   };
 
-  // Dev-only bypass — gated by import.meta.env.DEV so the button and handler
-  // are tree-shaken from production builds.
-  const DEV_EMAIL = "dev@touchstone.local";
-  const DEV_PASSWORD = "Dev!Touchstone-2026#Strong";
-  const handleDevBypass = async () => {
-    setSubmitting(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: DEV_EMAIL,
-        password: DEV_PASSWORD,
-      });
-      if (error) {
-        // First run on this backend — create the dev user, then sign in.
-        const { error: signUpErr } = await supabase.auth.signUp({
-          email: DEV_EMAIL,
-          password: DEV_PASSWORD,
-          options: {
-            data: { name: "Dev User" },
-            emailRedirectTo: window.location.origin,
-          },
-        });
-        if (signUpErr) throw signUpErr;
-        const retry = await supabase.auth.signInWithPassword({
-          email: DEV_EMAIL,
-          password: DEV_PASSWORD,
-        });
-        if (retry.error) {
-          throw new Error(
-            "Dev user created but sign-in needs email confirmation. Disable email confirmations in backend auth settings (or confirm dev@touchstone.local once)."
-          );
-        }
-      }
-      toast.success("Signed in as dev user");
-    } catch (err: any) {
-      toast.error(err.message || "Dev bypass failed");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -186,17 +140,6 @@ const Auth = () => {
           </button>
         </p>
 
-        <div className="border-t border-dashed border-border pt-4">
-          <Button
-            type="button"
-            onClick={handleDevBypass}
-            disabled={submitting}
-            variant="ghost"
-            className="w-full h-10 text-xs uppercase tracking-wide text-muted-foreground hover:text-foreground"
-          >
-            Skip login
-          </Button>
-        </div>
       </div>
     </div>
   );
