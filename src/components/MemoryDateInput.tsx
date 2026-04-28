@@ -23,8 +23,10 @@ const fieldClass =
 
 /**
  * Optional, progressively-revealed memory date.
- * Season + Year always visible. When a season is picked, the three
- * months for that season appear inline as pills. Month is optional.
+ * Season + Year always visible. Year accepts ANY freeform text
+ * (e.g. "1987", "late 80s") and is saved as when_text.
+ * When a season is picked, the three months for that season + a
+ * "Not Sure" pill appear inline.
  */
 const MemoryDateInput = ({ value, onChange }: Props) => {
   const preview = formatMemoryDate(value);
@@ -34,14 +36,15 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
     onChange({ ...value, season, month: null, day: null });
   };
 
-  const setYear = (raw: string) => {
-    const digits = raw.replace(/\D/g, "").slice(0, 4);
-    const year = digits ? parseInt(digits, 10) : null;
-    onChange(
-      year === null
-        ? { ...value, year: null, month: null, day: null }
-        : { ...value, year }
-    );
+  const setYearText = (raw: string) => {
+    // Try to parse a 4-digit numeric year as a fallback for backward-compat,
+    // but the freeform string is the source of truth.
+    const numericMatch = raw.match(/\b(\d{4})\b/);
+    onChange({
+      ...value,
+      yearText: raw,
+      year: numericMatch ? parseInt(numericMatch[1], 10) : null,
+    });
   };
 
   const toggleMonth = (month: number) => {
@@ -50,6 +53,7 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
   };
 
   const months = value.season ? SEASON_MONTHS[value.season] : [];
+  const yearValue = value.yearText ?? (value.year ? String(value.year) : "");
 
   return (
     <div className="space-y-3">
@@ -78,18 +82,16 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
 
         <input
           type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
           aria-label="Year"
           placeholder="Year"
-          value={value.year ?? ""}
-          onChange={(e) => setYear(e.target.value)}
+          value={yearValue}
+          onChange={(e) => setYearText(e.target.value)}
           className={fieldClass}
         />
       </div>
 
       {value.season && (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {months.map((m) => {
             const selected = value.month === m;
             return (
@@ -99,10 +101,10 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
                 onClick={() => toggleMonth(m)}
                 aria-pressed={selected}
                 className={
-                  "flex-1 h-10 rounded-[18px] font-jost text-sm tracking-wide transition-colors " +
+                  "flex-1 min-w-[80px] h-10 rounded-[18px] font-jost text-sm tracking-wide transition-colors " +
                   (selected
                     ? "bg-[#4A6B8A] text-[#F2EEE5]"
-                    : "bg-[#E8E4D8] text-[#5B4A3F] hover:bg-[#ddd6c4]")
+                    : "bg-[#4A6B8A]/15 text-[#4A6B8A] hover:bg-[#4A6B8A]/25")
                 }
               >
                 {MONTH_SHORT[m - 1]}
@@ -114,10 +116,10 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
             onClick={() => onChange({ ...value, month: null, day: null })}
             aria-pressed={value.month === null}
             className={
-              "flex-1 h-10 rounded-[18px] font-jost text-sm tracking-wide transition-colors " +
+              "flex-1 min-w-[80px] h-10 rounded-[18px] font-jost text-sm tracking-wide transition-colors " +
               (value.month === null
                 ? "bg-[#4A6B8A] text-[#F2EEE5]"
-                : "bg-[#E8E4D8] text-[#5B4A3F] hover:bg-[#ddd6c4]")
+                : "bg-[#4A6B8A]/15 text-[#4A6B8A] hover:bg-[#4A6B8A]/25")
             }
           >
             Not Sure
