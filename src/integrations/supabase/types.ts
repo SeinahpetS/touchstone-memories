@@ -100,6 +100,7 @@ export type Database = {
           tmdb_id: string | null
           user_id: string
           venue_name: string | null
+          when_text: string | null
           who_was_there: string | null
         }
         Insert: {
@@ -130,6 +131,7 @@ export type Database = {
           tmdb_id?: string | null
           user_id: string
           venue_name?: string | null
+          when_text?: string | null
           who_was_there?: string | null
         }
         Update: {
@@ -160,6 +162,7 @@ export type Database = {
           tmdb_id?: string | null
           user_id?: string
           venue_name?: string | null
+          when_text?: string | null
           who_was_there?: string | null
         }
         Relationships: []
