@@ -113,6 +113,7 @@ const Archive = () => {
     const t = e.touches[0];
     touchStartX.current = t.clientX;
     touchStartY.current = t.clientY;
+    if (timelineUnlocked) flashDots();
   };
 
   const onTouchEnd = (e: React.TouchEvent) => {
@@ -132,6 +133,7 @@ const Archive = () => {
     pointerStartX.current = e.clientX;
     pointerStartY.current = e.clientY;
     pointerActive.current = true;
+    if (timelineUnlocked) flashDots();
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
@@ -373,64 +375,68 @@ const Archive = () => {
       <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col min-h-0">
         {/* Fixed header zone */}
         <div className="shrink-0">
-          {/* Top bar: MY CONSTELLATION title (left) + avatar (right) */}
-          <div className="flex items-center justify-between gap-3">
-            <span
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: "14px",
-                color: "#2C3E50",
-                letterSpacing: "0.25em",
-                fontWeight: 400,
-              }}
-            >
-              MY CONSTELLATION
-            </span>
-            <ProfileAvatarButton />
-          </div>
+          {/* Header block: greeting + count (left) | avatar (right) */}
+          {(() => {
+            const hour = new Date().getHours();
+            const greeting =
+              hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+            const name = firstName || "there";
 
-          {/* View switching: horizontal swipe / drag / trackpad — plus a small pill toggle once unlocked */}
-          {timelineUnlocked && (
-            <div className="mt-3 flex items-center">
-              <div
-                role="tablist"
-                aria-label="Switch view"
-                style={{
-                  display: "inline-flex",
-                  padding: 3,
-                  borderRadius: 999,
-                  backgroundColor: "#E8E4D8",
-                  gap: 2,
-                }}
-              >
-                {(["grid", "timeline"] as const).map((v) => {
-                  const active = view === v;
-                  return (
-                    <button
-                      key={v}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => switchView(v)}
+            return (
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  {/* Greeting */}
+                  <p
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: "26px",
+                      color: "#2C3E50",
+                      fontWeight: 400,
+                      fontStyle: "italic",
+                      whiteSpace: "nowrap",
+                      margin: 0,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {greeting}, {name}.
+                  </p>
+
+                  {/* Count row */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: "7px",
+                      marginTop: "6px",
+                    }}
+                  >
+                    <span
                       style={{
-                        padding: "6px 14px",
-                        borderRadius: 999,
-                        fontFamily: "Jost, sans-serif",
-                        fontSize: 11,
-                        letterSpacing: "0.14em",
-                        textTransform: "uppercase",
-                        color: active ? "#F2EEE5" : "#5B4A3F",
-                        backgroundColor: active ? "#2C3E50" : "transparent",
-                        transition: "all 0.2s ease",
+                        fontFamily: "'Playfair Display', serif",
+                        fontSize: "26px",
+                        color: "#B8860B",
+                        lineHeight: 1,
                       }}
                     >
-                      {v === "grid" ? "Grid" : "Timeline"}
-                    </button>
-                  );
-                })}
+                      {totalCount}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: "10px",
+                        color: "#9E9585",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      TOUCHSTONES
+                    </span>
+                  </div>
+                </div>
+                <ProfileAvatarButton />
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Diamond divider */}
           <div
@@ -464,111 +470,10 @@ const Archive = () => {
             />
           </div>
 
-          {/* Header block */}
-          {(() => {
-            const hour = new Date().getHours();
-            const greeting =
-              hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-            const name = firstName || "there";
-
-            let reflective = "Something worth keeping happened today.";
-            if (lastMemoryAt) {
-              const diffMs = Date.now() - new Date(lastMemoryAt).getTime();
-              const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-              if (days >= 7) {
-                reflective = "It's been a while. What don't you want to forget?";
-              } else if (days >= 2) {
-                reflective = `It's been ${days} days. What's worth keeping from this week?`;
-              } else {
-                reflective = "Something worth keeping happened today.";
-              }
-            }
-
-            return (
-              <section style={{ paddingTop: "1rem", paddingBottom: "1rem" }}>
-                {/* Line 1 — Greeting */}
-                <p
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontSize: "22px",
-                    color: "#2C3E50",
-                    fontWeight: 400,
-                    fontStyle: "italic",
-                    whiteSpace: "nowrap",
-                    margin: 0,
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {greeting}, {name}.
-                </p>
-
-                {/* Line 2 — Reflective line (moved under greeting) */}
-                <p
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "17px",
-                    fontStyle: "italic",
-                    fontWeight: 300,
-                    color: "#8A8070",
-                    lineHeight: 1.6,
-                    marginTop: "6px",
-                  }}
-                >
-                  {reflective}
-                </p>
-
-                {/* Line 3 — Count row */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "7px",
-                    marginTop: "12px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "'Playfair Display', serif",
-                      fontSize: "31px",
-                      color: "#B8860B",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {totalCount}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "Jost, sans-serif",
-                      fontSize: "11px",
-                      color: "#8A8070",
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      alignSelf: "flex-end",
-                      paddingBottom: "1px",
-                    }}
-                  >
-                    TOUCHSTONES
-                  </span>
-                </div>
-
-                {/* Line 4 — Hairline divider */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    height: "0.5px",
-                    background: "rgba(184,134,11,0.2)",
-                    width: "100%",
-                    marginTop: "12px",
-                  }}
-                />
-              </section>
-            );
-          })()}
-
           {/* Search bar */}
           <div
             style={{
-              marginTop: "10px",
+              marginTop: "14px",
               marginBottom: "10px",
               backgroundColor: "#E8E4D8",
               borderRadius: "10px",
@@ -613,8 +518,11 @@ const Archive = () => {
             </span>
           </div>
 
-          {/* Zone 1 — filter grid: 4 tiles per row, 2 rows */}
-          <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6 justify-items-center">
+          {/* Zone 1 — filter grid: compact 4x2 */}
+          <div
+            className="grid grid-cols-4 mt-4 mb-4 justify-items-stretch"
+            style={{ gap: "6px" }}
+          >
             <button
               onClick={() => setFilter("all")}
               aria-pressed={filter === "all"}
@@ -623,21 +531,23 @@ const Archive = () => {
                 borderWidth: filter === "all" ? "3.5px" : "1.5px",
                 borderStyle: "solid",
                 backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
+                padding: "10px 6px",
               }}
               className={cn(
-                "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors w-[110px] h-[75px]",
+                "flex flex-col items-center justify-center gap-1 rounded-[10px] transition-colors w-full",
                 filter !== "all" && "bg-[hsl(var(--dark-card))]"
               )}
             >
-              <span className="flex h-9 w-9 items-center justify-center">
+              <span className="flex items-center justify-center" style={{ height: 18 }}>
                 <span
-                  className="inline-block h-[21px] w-[21px] rotate-45 border-[1.5px]"
-                  style={{ borderColor: "#B8860B" }}
+                  className="inline-block rotate-45 border-[1.5px]"
+                  style={{ borderColor: "#B8860B", height: 14, width: 14 }}
                 />
               </span>
               <span
-                className="font-sans text-[10px] uppercase tracking-[0.06em]"
+                className="font-sans uppercase tracking-[0.06em]"
                 style={{
+                  fontSize: "8px",
                   color: filter === "all" ? "#2C3E50" : undefined,
                 }}
               >
@@ -652,8 +562,9 @@ const Archive = () => {
                 key={c}
                 category={c}
                 label={PLURAL_LABELS[c]}
-                className="w-[110px] h-[75px] !min-w-0"
-                iconSize={33}
+                className="w-full !min-w-0 !px-[6px] !py-[10px] !gap-1"
+                iconSize={18}
+                labelSize={8}
                 active={filter === c}
                 onClick={() => setFilter(c)}
               />
@@ -788,7 +699,12 @@ const Archive = () => {
           {timelineUnlocked && (
             <div
               className="flex items-center justify-center gap-2 mb-2"
-              style={{ height: 8 }}
+              style={{
+                height: 8,
+                opacity: dotsVisible ? 1 : 0,
+                transition: "opacity 0.3s ease",
+              }}
+              aria-hidden={!dotsVisible}
             >
               {(["grid", "timeline"] as const).map((v) => {
                 const active = view === v;
@@ -828,10 +744,11 @@ const Archive = () => {
           <div
             className="text-center max-w-md"
             style={{
-              backgroundColor: "#F2EEE5",
+              backgroundColor: "#2C3E50",
               padding: "32px 28px",
               borderRadius: 14,
-              boxShadow: "0 18px 48px rgba(0,0,0,0.18)",
+              boxShadow: "0 18px 48px rgba(0,0,0,0.32)",
+              border: "1px solid rgba(184,134,11,0.4)",
             }}
           >
             <span
@@ -845,7 +762,7 @@ const Archive = () => {
                 fontStyle: "italic",
                 fontSize: 22,
                 lineHeight: 1.4,
-                color: "#2C3E50",
+                color: "#B8860B",
                 margin: 0,
               }}
             >
@@ -859,7 +776,7 @@ const Archive = () => {
                 fontSize: 11,
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: "#B8860B",
+                color: "rgba(184,134,11,0.7)",
               }}
             >
               Tap to continue

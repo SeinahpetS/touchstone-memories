@@ -164,6 +164,7 @@ interface CategoryIconCardProps {
   onClick?: () => void;
   size?: number;
   iconSize?: number;
+  labelSize?: number;
   className?: string;
 }
 
@@ -181,6 +182,7 @@ export const CategoryIconCard = ({
   onClick,
   size = 36,
   iconSize,
+  labelSize,
   className,
 }: CategoryIconCardProps) => {
   const displayLabel = label ?? CATEGORY_LABELS[category];
@@ -233,7 +235,7 @@ export const CategoryIconCard = ({
         className="cat-label transition-opacity"
         style={{
           fontFamily: "Jost, sans-serif",
-          fontSize: "10px",
+          fontSize: `${labelSize ?? 10}px`,
           textTransform: "uppercase",
           letterSpacing: "0.12em",
           color: active ? "#2C3E50" : "rgba(255,255,255,0.70)",
