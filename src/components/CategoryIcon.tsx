@@ -182,6 +182,7 @@ export const CategoryIconCard = ({
   onClick,
   size = 36,
   iconSize,
+  labelSize,
   className,
 }: CategoryIconCardProps) => {
   const displayLabel = label ?? CATEGORY_LABELS[category];
