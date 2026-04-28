@@ -9,6 +9,7 @@ import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import TimelineView from "@/components/TimelineView";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
