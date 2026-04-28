@@ -163,7 +163,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         <div
           aria-hidden
           style={{
-            height: 3,
+            height: 9,
             width: "100%",
             backgroundColor: barColor,
           }}
