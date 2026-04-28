@@ -501,7 +501,22 @@ const Archive = () => {
                   {greeting}, {name}.
                 </p>
 
-                {/* Line 2 — Count row */}
+                {/* Line 2 — Reflective line (moved under greeting) */}
+                <p
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "17px",
+                    fontStyle: "italic",
+                    fontWeight: 300,
+                    color: "#8A8070",
+                    lineHeight: 1.6,
+                    marginTop: "6px",
+                  }}
+                >
+                  {reflective}
+                </p>
+
+                {/* Line 3 — Count row */}
                 <div
                   style={{
                     display: "flex",
