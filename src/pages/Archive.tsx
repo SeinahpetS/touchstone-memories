@@ -776,7 +776,7 @@ const Archive = () => {
                 fontSize: 11,
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: "#B8860B",
+                color: "rgba(184,134,11,0.7)",
               }}
             >
               Tap to continue
