@@ -181,6 +181,7 @@ const Index = () => {
           year: data.memory_year ?? null,
           month: data.memory_month ?? null,
           day: data.memory_day ?? null,
+          yearText: data.when_text ?? (data.memory_year ? String(data.memory_year) : null),
         },
       };
       setCategory(cat);
@@ -291,6 +292,9 @@ const Index = () => {
         memory_year: resolvedMemoryYear,
         memory_month: memoryDate.month,
         memory_day: memoryDate.day,
+        when_text: memoryDate.yearText && memoryDate.yearText.trim()
+          ? memoryDate.yearText.trim()
+          : null,
         who_was_there:
           WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
             ? whoWasThere.trim()
