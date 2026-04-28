@@ -3,6 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import PhotoUpload from "@/components/PhotoUpload";
+import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
+import ImprintTypeSelector from "@/components/ImprintTypeSelector";
+import MemoryDateInput from "@/components/MemoryDateInput";
+import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES: CategoryKey[] = [
@@ -25,8 +31,51 @@ const PLURAL_LABELS: Record<CategoryKey, string> = {
   imprint: "Imprints",
 };
 
+const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
+  moment:
+    "What was happening around you in this moment? What do you want to remember about it?",
+  person: "Who were they to you? What do you want to remember about them?",
+  object: "Where did this come from? What does it mean to you?",
+  place: "What brought you here? What do you want to remember about it?",
+  food: "What tastes stood out to you? What do you want to remember about the meal?",
+  sound: "What makes this sound memorable? What does it remind you of?",
+  imprint: "What does this remind you of? Why has it stayed with you?",
+};
+
+const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
+  music: "What does this song mean to you? Why does it stay with you?",
+  book: "Why does this book stay with you? What did it change in you?",
+  film: "What moment from this film has never left you? Why did it matter?",
+  tv: "What did this show mean to you at the time? What did it give you?",
+  art: "What do you feel when you look at this? What does it say that you couldn't say yourself?",
+  quote: "Why does this stay with you? When do you come back to it?",
+  poem: "What does this poem make you feel? What line from it lives in you?",
+  podcast: "What episode or moment stuck with you? What idea did it leave you with?",
+};
+
 const PROMPT = "Who else would remember this?";
 const CONFIRMATION = "Saved. Part of your story now.";
+
+const WHO_WAS_THERE_CATEGORIES: CategoryKey[] = [
+  "moment",
+  "person",
+  "place",
+  "food",
+  "sound",
+];
+
+const initialFields: CategoryFieldValues = {
+  locationName: "",
+  locationLat: null,
+  locationLng: null,
+  venueName: "",
+  relationshipType: "",
+  spotifyPick: null,
+  bookPick: null,
+  tmdbPick: null,
+  imprintSource: "photo",
+  imprintType: null,
+};
 
 interface Props {
   open: boolean;
@@ -38,7 +87,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const { user } = useAuth();
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [title, setTitle] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [note, setNote] = useState("");
+  const [emotionalTone, setEmotionalTone] = useState("");
+  const [whoWasThere, setWhoWasThere] = useState("");
+  const [memoryDate, setMemoryDate] = useState<MemoryDate>(emptyMemoryDate());
+  const [fields, setFields] = useState<CategoryFieldValues>({ ...initialFields });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -49,7 +102,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
     if (open) {
       setCategory("moment");
       setTitle("");
-      setAnswer("");
+      setNote("");
+      setEmotionalTone("");
+      setWhoWasThere("");
+      setMemoryDate(emptyMemoryDate());
+      setFields({ ...initialFields });
       setPhotoFile(null);
       setPhotoPreview(null);
       setSaving(false);
@@ -80,7 +137,12 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   }, [open, onClose]);
 
   const canSave =
-    !!photoFile || title.trim().length > 0 || answer.trim().length > 0;
+    !!photoFile ||
+    title.trim().length > 0 ||
+    note.trim().length > 0 ||
+    !!fields.spotifyPick ||
+    !!fields.bookPick ||
+    !!fields.tmdbPick;
 
   const handleSave = async () => {
     if (!user) return;
@@ -104,19 +166,82 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           .from("memory-photos")
           .getPublicUrl(path);
         photo_url = data.publicUrl;
+      } else if (category === "imprint") {
+        if (fields.imprintSource === "spotify" && fields.spotifyPick?.image) {
+          photo_url = fields.spotifyPick.image;
+        } else if (fields.imprintSource === "book" && fields.bookPick?.coverUrl) {
+          photo_url = fields.bookPick.coverUrl;
+        } else if (fields.imprintSource === "tmdb" && fields.tmdbPick?.image) {
+          photo_url = fields.tmdbPick.image;
+        }
       }
 
-      const trimmedTitle = title.trim();
-      const trimmedAnswer = answer.trim();
+      // Auto-derive title for imprints if blank
+      let resolvedTitle = title.trim();
+      if (!resolvedTitle && category === "imprint") {
+        if (fields.imprintSource === "spotify" && fields.spotifyPick) {
+          resolvedTitle = fields.spotifyPick.title;
+        } else if (fields.imprintSource === "book" && fields.bookPick) {
+          resolvedTitle = fields.bookPick.title;
+        } else if (fields.imprintSource === "tmdb" && fields.tmdbPick) {
+          resolvedTitle = fields.tmdbPick.title;
+        }
+      }
 
-      const { error: insertErr } = await supabase.from("touchstones").insert({
+      const resolvedMemoryYear =
+        memoryDate.year ??
+        (category === "imprint" &&
+        fields.imprintSource === "tmdb" &&
+        fields.tmdbPick?.year
+          ? fields.tmdbPick.year
+          : null);
+
+      const payload: Record<string, any> = {
         user_id: user.id,
         category: category as any,
-        title: trimmedTitle || null,
+        title: resolvedTitle || null,
+        emotional_tone: emotionalTone.trim() || null,
+        note: note.trim() || null,
         ai_prompt: PROMPT,
-        ai_answer: trimmedAnswer || null,
+        ai_answer: whoWasThere.trim() || null,
         photo_url,
-      });
+        location_name: fields.locationName.trim() || null,
+        location_lat: fields.locationLat,
+        location_lng: fields.locationLng,
+        venue_name: fields.venueName.trim() || null,
+        relationship_type:
+          category === "person" && fields.relationshipType
+            ? fields.relationshipType
+            : null,
+        spotify_id:
+          category === "imprint" && fields.imprintSource === "spotify"
+            ? fields.spotifyPick?.id ?? null
+            : null,
+        openlibrary_id:
+          category === "imprint" && fields.imprintSource === "book"
+            ? fields.bookPick?.id ?? null
+            : null,
+        tmdb_id:
+          category === "imprint" && fields.imprintSource === "tmdb"
+            ? fields.tmdbPick?.id ?? null
+            : null,
+        memory_season: memoryDate.season,
+        memory_year: resolvedMemoryYear,
+        memory_month: memoryDate.month,
+        memory_day: memoryDate.day,
+        when_text:
+          memoryDate.yearText && memoryDate.yearText.trim()
+            ? memoryDate.yearText.trim()
+            : null,
+        who_was_there:
+          WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
+            ? whoWasThere.trim()
+            : null,
+      };
+
+      const { error: insertErr } = await (supabase as any)
+        .from("touchstones")
+        .insert(payload);
       if (insertErr) throw insertErr;
 
       setConfirmed(true);
@@ -132,6 +257,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   };
 
   if (!open) return null;
+
+  const notePlaceholder =
+    category === "imprint" && fields.imprintType
+      ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
+      : NOTE_PLACEHOLDERS[category];
 
   return (
     <div
@@ -218,23 +348,75 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
             </div>
 
             {/* 3. Title */}
-            <input
+            <Input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={120}
-              placeholder="Title"
-              className="w-full rounded-lg p-3 outline-none mb-5"
-              style={{
-                backgroundColor: "#E8E4D8",
-                border: "1px solid rgba(184,134,11,0.3)",
-                color: "#2C3E50",
-                fontFamily: "'Source Sans 3', sans-serif",
-                fontSize: 16,
-              }}
+              placeholder="Name this Touchstone"
+              className="h-12 text-base bg-card border-0 placeholder:italic mb-4"
             />
 
-            {/* 4. Prompt + answer */}
+            {/* Imprint sub-type */}
+            {category === "imprint" && (
+              <div className="mb-4">
+                <ImprintTypeSelector
+                  value={fields.imprintType}
+                  onChange={(t) => {
+                    const source: CategoryFieldValues["imprintSource"] =
+                      t === "music"
+                        ? "spotify"
+                        : t === "book"
+                        ? "book"
+                        : t === "film" || t === "tv"
+                        ? "tmdb"
+                        : "photo";
+                    setFields((prev) => ({
+                      ...prev,
+                      imprintType: t,
+                      imprintSource: source,
+                    }));
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Date */}
+            <div className="mb-4">
+              <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
+            </div>
+
+            {/* Category-specific fields (location, relationship, restaurant, imprint search) */}
+            <div className="mb-4">
+              <CategoryFields
+                category={category}
+                values={fields}
+                onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
+              />
+            </div>
+
+            {/* Emotional tone */}
+            <Input
+              type="text"
+              maxLength={20}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="A few words how this feels."
+              value={emotionalTone}
+              onChange={(e) => setEmotionalTone(e.target.value.slice(0, 20))}
+              className="h-12 text-base bg-card border-0 placeholder:italic mb-4"
+            />
+
+            {/* Note — category-specific placeholder */}
+            <Textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder={notePlaceholder}
+              className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic mb-5"
+            />
+
+            {/* Prompt — "Who else would remember this?" */}
             <p
               style={{
                 fontFamily: "'Playfair Display', serif",
@@ -247,32 +429,28 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               {PROMPT}
             </p>
 
-            <textarea
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              maxLength={1000}
-              rows={4}
+            <Input
+              type="text"
+              autoComplete="off"
+              value={whoWasThere}
+              onChange={(e) => setWhoWasThere(e.target.value)}
               placeholder="A name, a face, a feeling…"
-              className="w-full rounded-lg p-3 outline-none resize-none"
-              style={{
-                backgroundColor: "#E8E4D8",
-                border: "1px solid rgba(184,134,11,0.3)",
-                color: "#2C3E50",
-                fontFamily: "'Source Sans 3', sans-serif",
-                fontSize: 16,
-              }}
+              className="h-12 text-base bg-card border-0 placeholder:italic"
             />
 
             {error && (
               <p
                 className="mt-2 text-sm"
-                style={{ color: "#E07A5F", fontFamily: "'Source Sans 3', sans-serif" }}
+                style={{
+                  color: "#E07A5F",
+                  fontFamily: "'Source Sans 3', sans-serif",
+                }}
               >
                 {error}
               </p>
             )}
 
-            {/* 5. Save */}
+            {/* Save */}
             <button
               onClick={handleSave}
               disabled={saving || !canSave}
