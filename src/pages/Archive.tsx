@@ -103,6 +103,12 @@ const Archive = () => {
     setShowTimelineTooltip(false);
   };
 
+  const tryHorizontalSwipe = (dx: number, dy: number) => {
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx < 0 && view === "grid" && timelineUnlocked) switchView("timeline");
+    else if (dx > 0 && view === "timeline") switchView("grid");
+  };
+
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
     touchStartX.current = t.clientX;
@@ -116,9 +122,49 @@ const Archive = () => {
     const dy = t.clientY - touchStartY.current;
     touchStartX.current = null;
     touchStartY.current = null;
-    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
-    if (dx < 0 && view === "grid" && timelineUnlocked) switchView("timeline");
-    else if (dx > 0 && view === "timeline") switchView("grid");
+    tryHorizontalSwipe(dx, dy);
+  };
+
+  // Pointer (mouse / pen / trackpad press) drag — enables swipe on desktop
+  const onPointerDown = (e: React.PointerEvent) => {
+    // Only respond to primary button (mouse) or touch/pen
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    pointerStartX.current = e.clientX;
+    pointerStartY.current = e.clientY;
+    pointerActive.current = true;
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!pointerActive.current || pointerStartX.current === null || pointerStartY.current === null) return;
+    const dx = e.clientX - pointerStartX.current;
+    const dy = e.clientY - pointerStartY.current;
+    pointerActive.current = false;
+    pointerStartX.current = null;
+    pointerStartY.current = null;
+    tryHorizontalSwipe(dx, dy);
+  };
+
+  const onPointerCancel = () => {
+    pointerActive.current = false;
+    pointerStartX.current = null;
+    pointerStartY.current = null;
+  };
+
+  // Trackpad horizontal scroll → switch views
+  const onWheel = (e: React.WheelEvent) => {
+    if (wheelLockRef.current) return;
+    const dx = e.deltaX;
+    const dy = e.deltaY;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx > 0 && view === "grid" && timelineUnlocked) {
+      wheelLockRef.current = true;
+      switchView("timeline");
+      window.setTimeout(() => { wheelLockRef.current = false; }, 600);
+    } else if (dx < 0 && view === "timeline") {
+      wheelLockRef.current = true;
+      switchView("grid");
+      window.setTimeout(() => { wheelLockRef.current = false; }, 600);
+    }
   };
 
   // "/" keyboard shortcut to focus search
