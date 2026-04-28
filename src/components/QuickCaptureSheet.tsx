@@ -11,6 +11,7 @@ import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { playSaveFeedback } from "@/lib/saveFeedback";
 
 const CATEGORIES: CategoryKey[] = [
   "moment",
@@ -246,6 +247,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       if (insertErr) throw insertErr;
 
       setConfirmed(true);
+      playSaveFeedback();
       onSaved?.();
       window.setTimeout(() => {
         onClose();
