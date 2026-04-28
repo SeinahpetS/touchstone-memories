@@ -622,11 +622,16 @@ const Archive = () => {
         {/* Scrollable grid / timeline / empty-state zone (swipe-aware) */}
         <div
           className={cn(
-            "flex-1 min-h-0 overflow-y-auto",
+            "flex-1 min-h-0 overflow-y-auto select-none",
             bouncing && "animate-timeline-bounce"
           )}
+          style={{ touchAction: "pan-y" }}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          onWheel={onWheel}
         >
           {fetching ? (
             <p className="text-center text-muted-foreground py-12">Loading…</p>
