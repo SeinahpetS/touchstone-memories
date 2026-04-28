@@ -471,7 +471,7 @@ const Archive = () => {
           {/* Search bar */}
           <div
             style={{
-              marginTop: "10px",
+              marginTop: "14px",
               marginBottom: "10px",
               backgroundColor: "#E8E4D8",
               borderRadius: "10px",
