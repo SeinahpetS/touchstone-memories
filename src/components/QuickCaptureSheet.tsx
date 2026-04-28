@@ -256,7 +256,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       onSaved?.();
       window.setTimeout(() => {
         onClose();
-      }, 2000);
+      }, 3000);
     } catch (e) {
       setError("Couldn't save right now. Try again.");
     } finally {
