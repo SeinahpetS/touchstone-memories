@@ -389,7 +389,48 @@ const Archive = () => {
             <ProfileAvatarButton />
           </div>
 
-          {/* View switching is now via horizontal swipe (see scrollable area below) */}
+          {/* View switching: horizontal swipe / drag / trackpad — plus a small pill toggle once unlocked */}
+          {timelineUnlocked && (
+            <div className="mt-3 flex items-center">
+              <div
+                role="tablist"
+                aria-label="Switch view"
+                style={{
+                  display: "inline-flex",
+                  padding: 3,
+                  borderRadius: 999,
+                  backgroundColor: "#E8E4D8",
+                  gap: 2,
+                }}
+              >
+                {(["grid", "timeline"] as const).map((v) => {
+                  const active = view === v;
+                  return (
+                    <button
+                      key={v}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => switchView(v)}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: 999,
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: 11,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        color: active ? "#F2EEE5" : "#5B4A3F",
+                        backgroundColor: active ? "#2C3E50" : "transparent",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      {v === "grid" ? "Grid" : "Timeline"}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Diamond divider */}
           <div
