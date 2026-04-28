@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import PhotoUpload from "@/components/PhotoUpload";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES: CategoryKey[] = [
@@ -36,7 +37,10 @@ interface Props {
 const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const { user } = useAuth();
   const [category, setCategory] = useState<CategoryKey>("moment");
+  const [title, setTitle] = useState("");
   const [answer, setAnswer] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,12 +48,26 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   useEffect(() => {
     if (open) {
       setCategory("moment");
+      setTitle("");
       setAnswer("");
+      setPhotoFile(null);
+      setPhotoPreview(null);
       setSaving(false);
       setConfirmed(false);
       setError(null);
     }
   }, [open]);
+
+  // Manage object URL for preview
+  useEffect(() => {
+    if (!photoFile) {
+      setPhotoPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(photoFile);
+    setPhotoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photoFile]);
 
   // ESC to close
   useEffect(() => {
@@ -61,32 +79,56 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  const canSave =
+    !!photoFile || title.trim().length > 0 || answer.trim().length > 0;
+
   const handleSave = async () => {
     if (!user) return;
-    const trimmed = answer.trim();
-    if (!trimmed || trimmed.length > 1000) {
-      setError("Add a short note before saving.");
+    if (!canSave) {
+      setError("Add a photo, title, or answer before saving.");
       return;
     }
     setSaving(true);
     setError(null);
-    const { error: insertErr } = await supabase.from("touchstones").insert({
-      user_id: user.id,
-      category: category as any,
-      ai_prompt: PROMPT,
-      ai_answer: trimmed,
-      note: trimmed,
-    });
-    setSaving(false);
-    if (insertErr) {
+
+    try {
+      let photo_url: string | null = null;
+      if (photoFile) {
+        const ext = photoFile.name.split(".").pop();
+        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage
+          .from("memory-photos")
+          .upload(path, photoFile);
+        if (uploadErr) throw uploadErr;
+        const { data } = supabase.storage
+          .from("memory-photos")
+          .getPublicUrl(path);
+        photo_url = data.publicUrl;
+      }
+
+      const trimmedTitle = title.trim();
+      const trimmedAnswer = answer.trim();
+
+      const { error: insertErr } = await supabase.from("touchstones").insert({
+        user_id: user.id,
+        category: category as any,
+        title: trimmedTitle || null,
+        ai_prompt: PROMPT,
+        ai_answer: trimmedAnswer || null,
+        photo_url,
+      });
+      if (insertErr) throw insertErr;
+
+      setConfirmed(true);
+      onSaved?.();
+      window.setTimeout(() => {
+        onClose();
+      }, 1800);
+    } catch (e) {
       setError("Couldn't save right now. Try again.");
-      return;
+    } finally {
+      setSaving(false);
     }
-    setConfirmed(true);
-    onSaved?.();
-    window.setTimeout(() => {
-      onClose();
-    }, 1800);
   };
 
   if (!open) return null;
@@ -98,11 +140,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Quick capture"
+      aria-label="Add a Touchstone"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl"
+        className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[92vh] overflow-y-auto"
         style={{
           backgroundColor: "#F2EEE5",
           padding: "24px 22px 28px",
@@ -138,7 +180,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                   fontSize: 20,
                 }}
               >
-                Hold a moment
+                Add a Touchstone
               </h2>
               <button
                 onClick={onClose}
@@ -150,7 +192,16 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               </button>
             </div>
 
-            {/* Category grid 4x2 */}
+            {/* 1. Photo upload */}
+            <div className="mb-5">
+              <PhotoUpload
+                file={photoFile}
+                preview={photoPreview}
+                onSelect={setPhotoFile}
+              />
+            </div>
+
+            {/* 2. Category grid */}
             <div className="grid grid-cols-4 gap-2 mb-5">
               {CATEGORIES.map((c) => (
                 <CategoryIconCard
@@ -166,7 +217,24 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               ))}
             </div>
 
-            {/* Prompt */}
+            {/* 3. Title */}
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={120}
+              placeholder="Title"
+              className="w-full rounded-lg p-3 outline-none mb-5"
+              style={{
+                backgroundColor: "#E8E4D8",
+                border: "1px solid rgba(184,134,11,0.3)",
+                color: "#2C3E50",
+                fontFamily: "'Source Sans 3', sans-serif",
+                fontSize: 16,
+              }}
+            />
+
+            {/* 4. Prompt + answer */}
             <p
               style={{
                 fontFamily: "'Playfair Display', serif",
@@ -184,7 +252,6 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               onChange={(e) => setAnswer(e.target.value)}
               maxLength={1000}
               rows={4}
-              autoFocus
               placeholder="A name, a face, a feeling…"
               className="w-full rounded-lg p-3 outline-none resize-none"
               style={{
@@ -205,13 +272,14 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               </p>
             )}
 
+            {/* 5. Save */}
             <button
               onClick={handleSave}
-              disabled={saving || !answer.trim()}
+              disabled={saving || !canSave}
               className={cn(
                 "mt-5 w-full h-12 rounded-md transition-colors text-base",
                 "bg-primary text-primary-foreground hover:bg-primary/90",
-                (saving || !answer.trim()) && "opacity-60 cursor-not-allowed"
+                (saving || !canSave) && "opacity-60 cursor-not-allowed"
               )}
               style={{ fontFamily: "Jost, sans-serif", letterSpacing: "0.04em" }}
             >
