@@ -9,6 +9,7 @@ import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import TimelineView from "@/components/TimelineView";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +51,7 @@ const Archive = () => {
   const [search, setSearch] = useState("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [view, setView] = useState<"grid" | "timeline">("grid");
+  const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
   const [bouncing, setBouncing] = useState(false);
   const [showTimelineTooltip, setShowTimelineTooltip] = useState(false);
   const [dotsVisible, setDotsVisible] = useState(false);
@@ -725,11 +727,20 @@ const Archive = () => {
             </div>
           )}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => setQuickCaptureOpen(true)}
             className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             + Add a Touchstone
           </button>
+
+          <QuickCaptureSheet
+            open={quickCaptureOpen}
+            onClose={() => setQuickCaptureOpen(false)}
+            onSaved={() => {
+              fetchTouchstones();
+              fetchHeaderStats();
+            }}
+          />
         </div>
       </div>
 
