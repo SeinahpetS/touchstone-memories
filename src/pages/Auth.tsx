@@ -21,13 +21,6 @@ const Auth = () => {
     if (!loading && user) navigate("/archive", { replace: true });
   }, [user, loading, navigate]);
 
-  // Auto-sign-in as dev user so /auth is skipped entirely.
-  useEffect(() => {
-    if (loading || user || submitting) return;
-    handleDevBypass();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, user]);
-
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
