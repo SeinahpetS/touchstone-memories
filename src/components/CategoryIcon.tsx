@@ -164,6 +164,7 @@ interface CategoryIconCardProps {
   onClick?: () => void;
   size?: number;
   iconSize?: number;
+  labelSize?: number;
   className?: string;
 }
 
