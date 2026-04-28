@@ -464,8 +464,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               {saving ? "Saving…" : "Save"}
             </button>
           </>
-        )}
       </div>
+      )}
     </div>
   );
 };
