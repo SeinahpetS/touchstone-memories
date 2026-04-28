@@ -531,23 +531,23 @@ const Archive = () => {
                 borderWidth: filter === "all" ? "3.5px" : "1.5px",
                 borderStyle: "solid",
                 backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
-                padding: "10px 6px",
+                padding: "14px 8px",
               }}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 rounded-[10px] transition-colors w-full",
+                "flex flex-col items-center justify-center gap-1.5 rounded-[10px] transition-colors w-full",
                 filter !== "all" && "bg-[hsl(var(--dark-card))]"
               )}
             >
-              <span className="flex items-center justify-center" style={{ height: 18 }}>
+              <span className="flex items-center justify-center" style={{ height: 26 }}>
                 <span
                   className="inline-block rotate-45 border-[1.5px]"
-                  style={{ borderColor: "#B8860B", height: 14, width: 14 }}
+                  style={{ borderColor: "#B8860B", height: 20, width: 20 }}
                 />
               </span>
               <span
                 className="font-sans uppercase tracking-[0.06em]"
                 style={{
-                  fontSize: "8px",
+                  fontSize: "10px",
                   color: filter === "all" ? "#2C3E50" : undefined,
                 }}
               >
@@ -562,9 +562,9 @@ const Archive = () => {
                 key={c}
                 category={c}
                 label={PLURAL_LABELS[c]}
-                className="w-full !min-w-0 !px-[6px] !py-[10px] !gap-1"
-                iconSize={18}
-                labelSize={8}
+                className="w-full !min-w-0 !px-[8px] !py-[14px] !gap-1.5"
+                iconSize={26}
+                labelSize={10}
                 active={filter === c}
                 onClick={() => setFilter(c)}
               />
