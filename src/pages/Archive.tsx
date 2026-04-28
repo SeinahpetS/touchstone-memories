@@ -569,8 +569,15 @@ const Archive = () => {
           </div>
         </div>
 
-        {/* Scrollable grid / empty-state zone */}
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* Scrollable grid / timeline / empty-state zone (swipe-aware) */}
+        <div
+          className={cn(
+            "flex-1 min-h-0 overflow-y-auto",
+            bouncing && "animate-timeline-bounce"
+          )}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
           {fetching ? (
             <p className="text-center text-muted-foreground py-12">Loading…</p>
           ) : touchstones.length === 0 ? (
@@ -667,28 +674,44 @@ const Archive = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
-              {visibleTouchstones.map((m, i) => {
-                const rowStart = i - (i % 2);
-                const partner = visibleTouchstones[rowStart === i ? i + 1 : rowStart];
-                const hasPhoto = !!m.photo_url;
-                const partnerHasPhoto = !!partner?.photo_url;
-                const pairedWithPhoto = !hasPhoto && partnerHasPhoto;
+              {visibleTouchstones.map((m) => (
+                <MemoryCard
+                  key={m.id}
+                  memory={m}
+                  onClick={() => setSelected(m)}
+                  onChanged={fetchTouchstones}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Pinned action button + view-indicator dots */}
+        <div className="shrink-0 bg-background pt-4 pb-8">
+          {timelineUnlocked && (
+            <div
+              aria-hidden={!dotsVisible}
+              className="flex items-center justify-center gap-2 mb-2 transition-opacity duration-500"
+              style={{ opacity: dotsVisible ? 1 : 0, height: 8 }}
+            >
+              {(["grid", "timeline"] as const).map((v) => {
+                const active = view === v;
                 return (
-                  <MemoryCard
-                    key={m.id}
-                    memory={m}
-                    pairedWithPhoto={pairedWithPhoto}
-                    onClick={() => setSelected(m)}
-                    onChanged={fetchTouchstones}
+                  <span
+                    key={v}
+                    style={{
+                      display: "inline-block",
+                      width: active ? 18 : 6,
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: active ? "#2C3E50" : "#C8C2B4",
+                      transition: "all 0.25s ease",
+                    }}
                   />
                 );
               })}
             </div>
           )}
-        </div>
-
-        {/* Pinned action button */}
-        <div className="shrink-0 bg-background pt-4 pb-8">
           <button
             onClick={() => navigate("/")}
             className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -698,35 +721,44 @@ const Archive = () => {
         </div>
       </div>
 
-      {showUnlockReveal && (
+      {showTimelineTooltip && (
         <button
           type="button"
-          onClick={dismissUnlockReveal}
+          onClick={dismissTimelineTooltip}
           className="fixed inset-0 z-50 flex items-center justify-center px-8"
-          style={{ backgroundColor: "#F2EEE5" }}
-          aria-label="Enter your timeline"
+          style={{ backgroundColor: "rgba(44,62,80,0.55)" }}
+          aria-label="Dismiss timeline tooltip"
         >
-          <div className="text-center max-w-md">
+          <div
+            className="text-center max-w-md"
+            style={{
+              backgroundColor: "#F2EEE5",
+              padding: "32px 28px",
+              borderRadius: 14,
+              boxShadow: "0 18px 48px rgba(0,0,0,0.18)",
+            }}
+          >
             <span
               aria-hidden
-              className="inline-block h-3 w-3 rotate-45 mb-6"
+              className="inline-block h-3 w-3 rotate-45 mb-5"
               style={{ backgroundColor: "#B8860B" }}
             />
             <p
               style={{
                 fontFamily: "'Playfair Display', serif",
                 fontStyle: "italic",
-                fontSize: 26,
+                fontSize: 22,
                 lineHeight: 1.4,
                 color: "#2C3E50",
                 margin: 0,
               }}
             >
               Your archive has grown deep enough to see the shape of your life.
+              Swipe to explore your Timeline.
             </p>
             <p
               style={{
-                marginTop: 24,
+                marginTop: 20,
                 fontFamily: "Jost, sans-serif",
                 fontSize: 11,
                 letterSpacing: "0.18em",
