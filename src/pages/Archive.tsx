@@ -56,6 +56,10 @@ const Archive = () => {
   const dotsTimer = useRef<number | null>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const pointerStartX = useRef<number | null>(null);
+  const pointerStartY = useRef<number | null>(null);
+  const pointerActive = useRef(false);
+  const wheelLockRef = useRef(false);
 
   const TIMELINE_THRESHOLD = 20;
   const timelineUnlocked = totalCount >= TIMELINE_THRESHOLD;
