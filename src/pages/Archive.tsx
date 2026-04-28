@@ -697,7 +697,12 @@ const Archive = () => {
           {timelineUnlocked && (
             <div
               className="flex items-center justify-center gap-2 mb-2"
-              style={{ height: 8 }}
+              style={{
+                height: 8,
+                opacity: dotsVisible ? 1 : 0,
+                transition: "opacity 0.3s ease",
+              }}
+              aria-hidden={!dotsVisible}
             >
               {(["grid", "timeline"] as const).map((v) => {
                 const active = view === v;
