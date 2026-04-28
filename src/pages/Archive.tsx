@@ -179,23 +179,26 @@ const Archive = () => {
             >
               ← Back
             </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                aria-label="More options"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-[hsl(var(--dark-card))] transition-colors"
-              >
-                <MoreHorizontal className="h-5 w-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => navigate(`/?edit=${selected.id}`)}
-                  className="cursor-pointer"
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  aria-label="More options"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-[hsl(var(--dark-card))] transition-colors"
                 >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Edit
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <MoreHorizontal className="h-5 w-5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => navigate(`/?edit=${selected.id}`)}
+                    className="cursor-pointer"
+                  >
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ProfileAvatarButton />
+            </div>
           </div>
           <MemoryArtifact
             photoUrl={selected.photo_url}
