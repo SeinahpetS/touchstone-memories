@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import TimelineView from "@/components/TimelineView";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import {
   DropdownMenu,
@@ -48,6 +49,28 @@ const Archive = () => {
   const [firstName, setFirstName] = useState<string>("");
   const [search, setSearch] = useState("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const [view, setView] = useState<"grid" | "timeline">("grid");
+  const [showUnlockReveal, setShowUnlockReveal] = useState(false);
+
+  const TIMELINE_THRESHOLD = 15;
+  const timelineUnlocked = totalCount >= TIMELINE_THRESHOLD;
+
+  // First-time reveal when crossing threshold
+  useEffect(() => {
+    if (!user || !timelineUnlocked) return;
+    const key = `touchstone:timeline-revealed:${user.id}`;
+    if (!localStorage.getItem(key)) {
+      setShowUnlockReveal(true);
+    }
+  }, [user, timelineUnlocked]);
+
+  const dismissUnlockReveal = () => {
+    if (user) {
+      localStorage.setItem(`touchstone:timeline-revealed:${user.id}`, "1");
+    }
+    setShowUnlockReveal(false);
+    setView("timeline");
+  };
 
   // "/" keyboard shortcut to focus search
   useEffect(() => {
@@ -270,6 +293,49 @@ const Archive = () => {
             </span>
             <ProfileAvatarButton />
           </div>
+
+          {/* Grid / Timeline toggle — only after unlock */}
+          {timelineUnlocked && (
+            <div className="mt-3 flex justify-start">
+              <div
+                role="tablist"
+                aria-label="Archive view"
+                style={{
+                  display: "inline-flex",
+                  backgroundColor: "#E8E4D8",
+                  borderRadius: 999,
+                  padding: 3,
+                  gap: 2,
+                }}
+              >
+                {(["grid", "timeline"] as const).map((v) => {
+                  const active = view === v;
+                  return (
+                    <button
+                      key={v}
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setView(v)}
+                      style={{
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: 11,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        padding: "5px 12px",
+                        borderRadius: 999,
+                        backgroundColor: active ? "#F2EEE5" : "transparent",
+                        color: active ? "#2C3E50" : "#8A8070",
+                        border: active ? "1px solid #B8860B" : "1px solid transparent",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {v}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Diamond divider */}
           <div
@@ -575,6 +641,26 @@ const Archive = () => {
                 style={{ backgroundColor: "#B8860B" }}
               />
             </div>
+          ) : view === "timeline" ? (
+            <div className="mt-2">
+              <h1
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 26,
+                  color: "#2C3E50",
+                  fontWeight: 400,
+                  margin: "0 0 4px 0",
+                  lineHeight: 1.2,
+                }}
+              >
+                Your timeline.
+              </h1>
+              <TimelineView
+                memories={visibleTouchstones}
+                onSelect={(m) => setSelected(m)}
+                onChanged={fetchTouchstones}
+              />
+            </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
               {visibleTouchstones.map((m, i) => {
@@ -607,6 +693,48 @@ const Archive = () => {
           </button>
         </div>
       </div>
+
+      {showUnlockReveal && (
+        <button
+          type="button"
+          onClick={dismissUnlockReveal}
+          className="fixed inset-0 z-50 flex items-center justify-center px-8"
+          style={{ backgroundColor: "#F2EEE5" }}
+          aria-label="Enter your timeline"
+        >
+          <div className="text-center max-w-md">
+            <span
+              aria-hidden
+              className="inline-block h-3 w-3 rotate-45 mb-6"
+              style={{ backgroundColor: "#B8860B" }}
+            />
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontSize: 26,
+                lineHeight: 1.4,
+                color: "#2C3E50",
+                margin: 0,
+              }}
+            >
+              Your archive has grown deep enough to see the shape of your life.
+            </p>
+            <p
+              style={{
+                marginTop: 24,
+                fontFamily: "Jost, sans-serif",
+                fontSize: 11,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#B8860B",
+              }}
+            >
+              Tap to continue
+            </p>
+          </div>
+        </button>
+      )}
     </div>
   );
 };
