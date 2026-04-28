@@ -609,9 +609,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               )}
             </div>
 
-            {/* 2. Category grid */}
-            <div className="grid grid-cols-4 gap-2 mb-5">
-              {CATEGORIES.map((c) => (
+            {/* 2. Category grid — top row of 4, bottom row of 3 centered */}
+            {(() => {
+              const topRow = CATEGORIES.slice(0, 4);
+              const bottomRow = CATEGORIES.slice(4);
+              const renderCard = (c: CategoryKey) => (
                 <CategoryIconCard
                   key={c}
                   category={c}
@@ -622,8 +624,32 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                   active={category === c}
                   onClick={() => setCategory(c)}
                 />
-              ))}
-            </div>
+              );
+              return (
+                <div className="mb-5 space-y-2">
+                  <div className="grid grid-cols-4 gap-2">
+                    {topRow.map(renderCard)}
+                  </div>
+                  <div
+                    className="grid gap-2"
+                    style={{
+                      gridTemplateColumns: "repeat(8, minmax(0, 1fr))",
+                    }}
+                  >
+                    {bottomRow.map((c, i) => (
+                      <div
+                        key={c}
+                        style={{
+                          gridColumn: `${i * 2 + 2} / span 2`,
+                        }}
+                      >
+                        {renderCard(c)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* 3. Title */}
             <Input
