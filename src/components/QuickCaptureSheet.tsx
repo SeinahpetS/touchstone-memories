@@ -93,6 +93,7 @@ interface Props {
 
 const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
@@ -104,6 +105,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
