@@ -516,8 +516,11 @@ const Archive = () => {
             </span>
           </div>
 
-          {/* Zone 1 — filter grid: 4 tiles per row, 2 rows */}
-          <div className="grid grid-cols-4 gap-2 sm:gap-3 mt-6 mb-6 justify-items-center">
+          {/* Zone 1 — filter grid: compact 4x2 */}
+          <div
+            className="grid grid-cols-4 mt-4 mb-4 justify-items-stretch"
+            style={{ gap: "6px" }}
+          >
             <button
               onClick={() => setFilter("all")}
               aria-pressed={filter === "all"}
@@ -526,21 +529,23 @@ const Archive = () => {
                 borderWidth: filter === "all" ? "3.5px" : "1.5px",
                 borderStyle: "solid",
                 backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
+                padding: "10px 6px",
               }}
               className={cn(
-                "flex flex-col items-center justify-center gap-2 rounded-[10px] px-2 pt-4 pb-3 transition-colors w-[110px] h-[75px]",
+                "flex flex-col items-center justify-center gap-1 rounded-[10px] transition-colors w-full",
                 filter !== "all" && "bg-[hsl(var(--dark-card))]"
               )}
             >
-              <span className="flex h-9 w-9 items-center justify-center">
+              <span className="flex items-center justify-center" style={{ height: 18 }}>
                 <span
-                  className="inline-block h-[21px] w-[21px] rotate-45 border-[1.5px]"
-                  style={{ borderColor: "#B8860B" }}
+                  className="inline-block rotate-45 border-[1.5px]"
+                  style={{ borderColor: "#B8860B", height: 14, width: 14 }}
                 />
               </span>
               <span
-                className="font-sans text-[10px] uppercase tracking-[0.06em]"
+                className="font-sans uppercase tracking-[0.06em]"
                 style={{
+                  fontSize: "8px",
                   color: filter === "all" ? "#2C3E50" : undefined,
                 }}
               >
@@ -555,8 +560,9 @@ const Archive = () => {
                 key={c}
                 category={c}
                 label={PLURAL_LABELS[c]}
-                className="w-[110px] h-[75px] !min-w-0"
-                iconSize={33}
+                className="w-full !min-w-0 !px-[6px] !py-[10px] !gap-1"
+                iconSize={18}
+                labelSize={8}
                 active={filter === c}
                 onClick={() => setFilter(c)}
               />
