@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import TimelineView from "@/components/TimelineView";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import {
   DropdownMenu,
