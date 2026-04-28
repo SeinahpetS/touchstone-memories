@@ -294,6 +294,49 @@ const Archive = () => {
             <ProfileAvatarButton />
           </div>
 
+          {/* Grid / Timeline toggle — only after unlock */}
+          {timelineUnlocked && (
+            <div className="mt-3 flex justify-start">
+              <div
+                role="tablist"
+                aria-label="Archive view"
+                style={{
+                  display: "inline-flex",
+                  backgroundColor: "#E8E4D8",
+                  borderRadius: 999,
+                  padding: 3,
+                  gap: 2,
+                }}
+              >
+                {(["grid", "timeline"] as const).map((v) => {
+                  const active = view === v;
+                  return (
+                    <button
+                      key={v}
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setView(v)}
+                      style={{
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: 11,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        padding: "5px 12px",
+                        borderRadius: 999,
+                        backgroundColor: active ? "#F2EEE5" : "transparent",
+                        color: active ? "#2C3E50" : "#8A8070",
+                        border: active ? "1px solid #B8860B" : "1px solid transparent",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {v}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Diamond divider */}
           <div
             className="flex items-center mt-4"
