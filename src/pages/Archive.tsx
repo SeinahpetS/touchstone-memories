@@ -56,6 +56,10 @@ const Archive = () => {
   const dotsTimer = useRef<number | null>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const pointerStartX = useRef<number | null>(null);
+  const pointerStartY = useRef<number | null>(null);
+  const pointerActive = useRef(false);
+  const wheelLockRef = useRef(false);
 
   const TIMELINE_THRESHOLD = 20;
   const timelineUnlocked = totalCount >= TIMELINE_THRESHOLD;
@@ -99,6 +103,12 @@ const Archive = () => {
     setShowTimelineTooltip(false);
   };
 
+  const tryHorizontalSwipe = (dx: number, dy: number) => {
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx < 0 && view === "grid" && timelineUnlocked) switchView("timeline");
+    else if (dx > 0 && view === "timeline") switchView("grid");
+  };
+
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
     touchStartX.current = t.clientX;
@@ -112,9 +122,49 @@ const Archive = () => {
     const dy = t.clientY - touchStartY.current;
     touchStartX.current = null;
     touchStartY.current = null;
-    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
-    if (dx < 0 && view === "grid" && timelineUnlocked) switchView("timeline");
-    else if (dx > 0 && view === "timeline") switchView("grid");
+    tryHorizontalSwipe(dx, dy);
+  };
+
+  // Pointer (mouse / pen / trackpad press) drag — enables swipe on desktop
+  const onPointerDown = (e: React.PointerEvent) => {
+    // Only respond to primary button (mouse) or touch/pen
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    pointerStartX.current = e.clientX;
+    pointerStartY.current = e.clientY;
+    pointerActive.current = true;
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!pointerActive.current || pointerStartX.current === null || pointerStartY.current === null) return;
+    const dx = e.clientX - pointerStartX.current;
+    const dy = e.clientY - pointerStartY.current;
+    pointerActive.current = false;
+    pointerStartX.current = null;
+    pointerStartY.current = null;
+    tryHorizontalSwipe(dx, dy);
+  };
+
+  const onPointerCancel = () => {
+    pointerActive.current = false;
+    pointerStartX.current = null;
+    pointerStartY.current = null;
+  };
+
+  // Trackpad horizontal scroll → switch views
+  const onWheel = (e: React.WheelEvent) => {
+    if (wheelLockRef.current) return;
+    const dx = e.deltaX;
+    const dy = e.deltaY;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx > 0 && view === "grid" && timelineUnlocked) {
+      wheelLockRef.current = true;
+      switchView("timeline");
+      window.setTimeout(() => { wheelLockRef.current = false; }, 600);
+    } else if (dx < 0 && view === "timeline") {
+      wheelLockRef.current = true;
+      switchView("grid");
+      window.setTimeout(() => { wheelLockRef.current = false; }, 600);
+    }
   };
 
   // "/" keyboard shortcut to focus search
@@ -339,7 +389,48 @@ const Archive = () => {
             <ProfileAvatarButton />
           </div>
 
-          {/* View switching is now via horizontal swipe (see scrollable area below) */}
+          {/* View switching: horizontal swipe / drag / trackpad — plus a small pill toggle once unlocked */}
+          {timelineUnlocked && (
+            <div className="mt-3 flex items-center">
+              <div
+                role="tablist"
+                aria-label="Switch view"
+                style={{
+                  display: "inline-flex",
+                  padding: 3,
+                  borderRadius: 999,
+                  backgroundColor: "#E8E4D8",
+                  gap: 2,
+                }}
+              >
+                {(["grid", "timeline"] as const).map((v) => {
+                  const active = view === v;
+                  return (
+                    <button
+                      key={v}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => switchView(v)}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: 999,
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: 11,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        color: active ? "#F2EEE5" : "#5B4A3F",
+                        backgroundColor: active ? "#2C3E50" : "transparent",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      {v === "grid" ? "Grid" : "Timeline"}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Diamond divider */}
           <div
@@ -572,11 +663,16 @@ const Archive = () => {
         {/* Scrollable grid / timeline / empty-state zone (swipe-aware) */}
         <div
           className={cn(
-            "flex-1 min-h-0 overflow-y-auto",
+            "flex-1 min-h-0 overflow-y-auto select-none",
             bouncing && "animate-timeline-bounce"
           )}
+          style={{ touchAction: "pan-y" }}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          onWheel={onWheel}
         >
           {fetching ? (
             <p className="text-center text-muted-foreground py-12">Loading…</p>
