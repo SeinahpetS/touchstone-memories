@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import {
+  CategoryIconCard,
+  CATEGORY_BORDER_COLORS,
+  CATEGORY_LABELS,
+  type CategoryKey,
+} from "@/components/CategoryIcon";
 import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
