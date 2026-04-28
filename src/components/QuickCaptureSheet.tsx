@@ -271,39 +271,215 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
       : NOTE_PLACEHOLDERS[category];
 
+  // Build values for confirmation card
+  const cardCategoryColor = CATEGORY_BORDER_COLORS[category] ?? "#B8860B";
+  const cardCategoryLabel = CATEGORY_LABELS[category] ?? category;
+  const cardDateLabel =
+    (memoryDate.yearText && memoryDate.yearText.trim()) ||
+    formatMemoryDate(memoryDate) ||
+    "";
+  const cardTitle =
+    title.trim() ||
+    (category === "imprint"
+      ? fields.spotifyPick?.title ||
+        fields.bookPick?.title ||
+        fields.tmdbPick?.title ||
+        ""
+      : "");
+  const cardAnswer = whoWasThere.trim();
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      style={{ backgroundColor: confirmed ? "rgba(20,18,16,0.92)" : "rgba(44,62,80,0.55)" }}
-      onClick={onClose}
+      style={{
+        backgroundColor: confirmed
+          ? "rgba(28,22,14,0.65)"
+          : "rgba(44,62,80,0.55)",
+        transition: "background-color 0.2s ease-out",
+      }}
+      onClick={confirmed ? undefined : onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Add a Touchstone"
     >
       {confirmed ? (
-        <div
-          className="animate-fade-in flex flex-col items-center text-center px-8"
-          onClick={(e) => e.stopPropagation()}
-          role="status"
-          aria-live="polite"
-        >
-          <span
-            aria-hidden
-            className="inline-block h-3 w-3 rotate-45 mb-5"
-            style={{ backgroundColor: "#B8860B" }}
-          />
-          <p
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              color: "#B8860B",
-              fontSize: 26,
-              lineHeight: 1.35,
-              letterSpacing: "0.01em",
-            }}
+        <>
+          <style>{`
+            @keyframes ts-fadeInUp {
+              from { opacity: 0; transform: translateY(8px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes ts-cardIn {
+              from { opacity: 0; transform: scale(0.95); }
+              to { opacity: 1; transform: scale(1); }
+            }
+            @keyframes ts-goldPulse {
+              0%   { box-shadow: 0 0 0 0 rgba(184,134,11,0); border-color: rgba(184,134,11,0.15); }
+              35%  { box-shadow: 0 0 28px 6px rgba(184,134,11,0.55); border-color: rgba(184,134,11,1); }
+              100% { box-shadow: 0 0 0 0 rgba(184,134,11,0); border-color: rgba(184,134,11,0.45); }
+            }
+            @keyframes ts-fadeOut {
+              from { opacity: 1; }
+              to   { opacity: 0; }
+            }
+            .ts-confirm-wrap { animation: ts-fadeOut 0.5s ease-in 2.5s forwards; }
+            .ts-confirm-text { animation: ts-fadeInUp 0.4s ease-out 0.35s both; }
+            .ts-confirm-card {
+              animation: ts-cardIn 0.3s ease-out both, ts-goldPulse 2.4s ease-out 0.3s 1 both;
+              border: 1px solid rgba(184,134,11,0.45);
+            }
+          `}</style>
+          <div
+            className="ts-confirm-wrap flex flex-col items-center justify-center w-full px-6"
+            onClick={(e) => e.stopPropagation()}
+            role="status"
+            aria-live="polite"
           >
-            {CONFIRMATION}
-          </p>
-        </div>
+            {/* Confirmation text + diamond above the card */}
+            <div className="ts-confirm-text flex flex-col items-center text-center mb-4">
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: "italic",
+                  color: "#B8860B",
+                  fontSize: 22,
+                  lineHeight: 1.35,
+                  letterSpacing: "0.01em",
+                  margin: 0,
+                }}
+              >
+                {CONFIRMATION}
+              </p>
+              <span
+                aria-hidden
+                style={{
+                  color: "#B8860B",
+                  fontSize: 14,
+                  marginTop: 10,
+                  lineHeight: 1,
+                }}
+              >
+                ◆
+              </span>
+            </div>
+
+            {/* Memory artifact card */}
+            <div
+              className="ts-confirm-card w-full sm:max-w-sm overflow-hidden"
+              style={{
+                backgroundColor: cardCategoryColor,
+                borderRadius: 14,
+                padding: 14,
+              }}
+            >
+              {photoPreview && category !== "sound" && (
+                <div
+                  style={{
+                    border: "3px solid #F2EEE5",
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    aspectRatio: "1 / 1",
+                    width: "100%",
+                    marginBottom: 14,
+                  }}
+                >
+                  <img
+                    src={photoPreview}
+                    alt={cardTitle || "Memory"}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Category label */}
+              <p
+                style={{
+                  fontFamily: "Jost, sans-serif",
+                  fontSize: 10,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "rgba(242,238,229,0.6)",
+                  margin: 0,
+                }}
+              >
+                {cardCategoryLabel}
+              </p>
+
+              {/* Title */}
+              {cardTitle && (
+                <h3
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: "#F2EEE5",
+                    margin: "4px 0 2px",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {cardTitle}
+                </h3>
+              )}
+
+              {/* Date */}
+              {cardDateLabel && (
+                <p
+                  style={{
+                    fontFamily: "Jost, sans-serif",
+                    fontSize: 12,
+                    color: "rgba(242,238,229,0.5)",
+                    margin: 0,
+                  }}
+                >
+                  {cardDateLabel}
+                </p>
+              )}
+
+              {/* Divider + answer */}
+              {cardAnswer && (
+                <>
+                  <div
+                    aria-hidden
+                    style={{
+                      height: 1,
+                      width: "100%",
+                      backgroundColor: "rgba(242,238,229,0.2)",
+                      margin: "12px 0 10px",
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontStyle: "italic",
+                      fontSize: 12,
+                      color: "rgba(242,238,229,0.55)",
+                      margin: "0 0 6px",
+                    }}
+                  >
+                    {PROMPT}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "Jost, sans-serif",
+                      fontSize: 14,
+                      lineHeight: 1.5,
+                      color: "rgba(242,238,229,0.8)",
+                      margin: 0,
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {cardAnswer}
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        </>
       ) : (
       <div
         onClick={(e) => e.stopPropagation()}
