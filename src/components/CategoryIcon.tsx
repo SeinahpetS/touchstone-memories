@@ -143,14 +143,16 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
   imprint: "Imprint",
 };
 
+// Category bar / accent stripe colors used across MemoryCard, archive, timeline.
+// Per spec — Imprint uses Old Gold for the bar.
 export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
-  moment: "#9E1268",
-  person: "#E6A800",
-  object: "#4A6B8A",
-  place: "#2E7D5E",
+  moment: "#4A6B8A",
+  person: "#2E7D5E",
+  object: "#8B3A62",
+  place: "#C2714F",
   food: "#C2714F",
-  sound: "#6B7280",
-  imprint: "#5B4A3F",
+  sound: "#5B4A3F",
+  imprint: "#B8860B",
 };
 
 interface CategoryIconCardProps {
