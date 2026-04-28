@@ -50,26 +50,71 @@ const Archive = () => {
   const [search, setSearch] = useState("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [view, setView] = useState<"grid" | "timeline">("grid");
-  const [showUnlockReveal, setShowUnlockReveal] = useState(false);
+  const [bouncing, setBouncing] = useState(false);
+  const [showTimelineTooltip, setShowTimelineTooltip] = useState(false);
+  const [dotsVisible, setDotsVisible] = useState(false);
+  const dotsTimer = useRef<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
-  const TIMELINE_THRESHOLD = 15;
+  const TIMELINE_THRESHOLD = 20;
   const timelineUnlocked = totalCount >= TIMELINE_THRESHOLD;
 
-  // First-time reveal when crossing threshold
+  // Two-bounce hint animation on first unlock
   useEffect(() => {
     if (!user || !timelineUnlocked) return;
-    const key = `touchstone:timeline-revealed:${user.id}`;
+    const key = `touchstone:timeline-bounced:${user.id}`;
     if (!localStorage.getItem(key)) {
-      setShowUnlockReveal(true);
+      setBouncing(true);
+      localStorage.setItem(key, "1");
+      const t = window.setTimeout(() => setBouncing(false), 1700);
+      return () => window.clearTimeout(t);
     }
   }, [user, timelineUnlocked]);
 
-  const dismissUnlockReveal = () => {
-    if (user) {
-      localStorage.setItem(`touchstone:timeline-revealed:${user.id}`, "1");
+  // Show the dot indicators briefly, then fade
+  const flashDots = () => {
+    setDotsVisible(true);
+    if (dotsTimer.current) window.clearTimeout(dotsTimer.current);
+    dotsTimer.current = window.setTimeout(() => setDotsVisible(false), 2000);
+  };
+
+  const switchView = (next: "grid" | "timeline") => {
+    if (next === view) return;
+    if (next === "timeline" && !timelineUnlocked) return;
+    setView(next);
+    flashDots();
+    if (next === "timeline" && user) {
+      const seenKey = `touchstone:timeline-tooltip-seen:${user.id}`;
+      if (!localStorage.getItem(seenKey)) {
+        setShowTimelineTooltip(true);
+      }
     }
-    setShowUnlockReveal(false);
-    setView("timeline");
+  };
+
+  const dismissTimelineTooltip = () => {
+    if (user) {
+      localStorage.setItem(`touchstone:timeline-tooltip-seen:${user.id}`, "1");
+    }
+    setShowTimelineTooltip(false);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStartX.current = t.clientX;
+    touchStartY.current = t.clientY;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX.current;
+    const dy = t.clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx < 0 && view === "grid" && timelineUnlocked) switchView("timeline");
+    else if (dx > 0 && view === "timeline") switchView("grid");
   };
 
   // "/" keyboard shortcut to focus search
@@ -294,48 +339,7 @@ const Archive = () => {
             <ProfileAvatarButton />
           </div>
 
-          {/* Grid / Timeline toggle — only after unlock */}
-          {timelineUnlocked && (
-            <div className="mt-3 flex justify-start">
-              <div
-                role="tablist"
-                aria-label="Archive view"
-                style={{
-                  display: "inline-flex",
-                  backgroundColor: "#E8E4D8",
-                  borderRadius: 999,
-                  padding: 3,
-                  gap: 2,
-                }}
-              >
-                {(["grid", "timeline"] as const).map((v) => {
-                  const active = view === v;
-                  return (
-                    <button
-                      key={v}
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => setView(v)}
-                      style={{
-                        fontFamily: "Jost, sans-serif",
-                        fontSize: 11,
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        padding: "5px 12px",
-                        borderRadius: 999,
-                        backgroundColor: active ? "#F2EEE5" : "transparent",
-                        color: active ? "#2C3E50" : "#8A8070",
-                        border: active ? "1px solid #B8860B" : "1px solid transparent",
-                        transition: "all 0.15s ease",
-                      }}
-                    >
-                      {v}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {/* View switching is now via horizontal swipe (see scrollable area below) */}
 
           {/* Diamond divider */}
           <div
@@ -565,8 +569,15 @@ const Archive = () => {
           </div>
         </div>
 
-        {/* Scrollable grid / empty-state zone */}
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* Scrollable grid / timeline / empty-state zone (swipe-aware) */}
+        <div
+          className={cn(
+            "flex-1 min-h-0 overflow-y-auto",
+            bouncing && "animate-timeline-bounce"
+          )}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
           {fetching ? (
             <p className="text-center text-muted-foreground py-12">Loading…</p>
           ) : touchstones.length === 0 ? (
@@ -663,28 +674,44 @@ const Archive = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
-              {visibleTouchstones.map((m, i) => {
-                const rowStart = i - (i % 2);
-                const partner = visibleTouchstones[rowStart === i ? i + 1 : rowStart];
-                const hasPhoto = !!m.photo_url;
-                const partnerHasPhoto = !!partner?.photo_url;
-                const pairedWithPhoto = !hasPhoto && partnerHasPhoto;
+              {visibleTouchstones.map((m) => (
+                <MemoryCard
+                  key={m.id}
+                  memory={m}
+                  onClick={() => setSelected(m)}
+                  onChanged={fetchTouchstones}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Pinned action button + view-indicator dots */}
+        <div className="shrink-0 bg-background pt-4 pb-8">
+          {timelineUnlocked && (
+            <div
+              aria-hidden={!dotsVisible}
+              className="flex items-center justify-center gap-2 mb-2 transition-opacity duration-500"
+              style={{ opacity: dotsVisible ? 1 : 0, height: 8 }}
+            >
+              {(["grid", "timeline"] as const).map((v) => {
+                const active = view === v;
                 return (
-                  <MemoryCard
-                    key={m.id}
-                    memory={m}
-                    pairedWithPhoto={pairedWithPhoto}
-                    onClick={() => setSelected(m)}
-                    onChanged={fetchTouchstones}
+                  <span
+                    key={v}
+                    style={{
+                      display: "inline-block",
+                      width: active ? 18 : 6,
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: active ? "#2C3E50" : "#C8C2B4",
+                      transition: "all 0.25s ease",
+                    }}
                   />
                 );
               })}
             </div>
           )}
-        </div>
-
-        {/* Pinned action button */}
-        <div className="shrink-0 bg-background pt-4 pb-8">
           <button
             onClick={() => navigate("/")}
             className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -694,35 +721,44 @@ const Archive = () => {
         </div>
       </div>
 
-      {showUnlockReveal && (
+      {showTimelineTooltip && (
         <button
           type="button"
-          onClick={dismissUnlockReveal}
+          onClick={dismissTimelineTooltip}
           className="fixed inset-0 z-50 flex items-center justify-center px-8"
-          style={{ backgroundColor: "#F2EEE5" }}
-          aria-label="Enter your timeline"
+          style={{ backgroundColor: "rgba(44,62,80,0.55)" }}
+          aria-label="Dismiss timeline tooltip"
         >
-          <div className="text-center max-w-md">
+          <div
+            className="text-center max-w-md"
+            style={{
+              backgroundColor: "#F2EEE5",
+              padding: "32px 28px",
+              borderRadius: 14,
+              boxShadow: "0 18px 48px rgba(0,0,0,0.18)",
+            }}
+          >
             <span
               aria-hidden
-              className="inline-block h-3 w-3 rotate-45 mb-6"
+              className="inline-block h-3 w-3 rotate-45 mb-5"
               style={{ backgroundColor: "#B8860B" }}
             />
             <p
               style={{
                 fontFamily: "'Playfair Display', serif",
                 fontStyle: "italic",
-                fontSize: 26,
+                fontSize: 22,
                 lineHeight: 1.4,
                 color: "#2C3E50",
                 margin: 0,
               }}
             >
               Your archive has grown deep enough to see the shape of your life.
+              Swipe to explore your Timeline.
             </p>
             <p
               style={{
-                marginTop: 24,
+                marginTop: 20,
                 fontFamily: "Jost, sans-serif",
                 fontSize: 11,
                 letterSpacing: "0.18em",

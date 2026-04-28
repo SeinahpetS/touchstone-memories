@@ -7,6 +7,8 @@ export interface MemoryDate {
   year: number | null;
   month: number | null; // 1-12
   day: number | null;   // 1-31
+  /** Freeform year text — accepts any string ("1987", "late 80s"). */
+  yearText?: string | null;
 }
 
 export const emptyMemoryDate = (): MemoryDate => ({
@@ -14,6 +16,7 @@ export const emptyMemoryDate = (): MemoryDate => ({
   year: null,
   month: null,
   day: null,
+  yearText: null,
 });
 
 const MONTH_NAMES = [
@@ -29,14 +32,14 @@ export const MONTH_OPTIONS = MONTH_NAMES.map((name, i) => ({
 export const SEASON_OPTIONS: { value: MemorySeason; label: string }[] = [
   { value: "spring", label: "Spring (Mar – May)" },
   { value: "summer", label: "Summer (Jun – Aug)" },
-  { value: "autumn", label: "Fall (Sep – Nov)" },
+  { value: "autumn", label: "Autumn (Sep – Nov)" },
   { value: "winter", label: "Winter (Dec – Feb)" },
 ];
 
 export const SEASON_LABELS: Record<MemorySeason, string> = {
   spring: "Spring",
   summer: "Summer",
-  autumn: "Fall",
+  autumn: "Autumn",
   winter: "Winter",
 };
 
@@ -48,30 +51,37 @@ export const SEASON_MONTHS: Record<MemorySeason, number[]> = {
   winter: [12, 1, 2],
 };
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 /**
  * Render the human-readable date string from whatever subset of fields
  * the user provided. If both season and month are present, month wins
  * (it's more specific). Returns null when nothing meaningful is set.
+ *
+ * yearText (freeform) takes precedence over numeric year for display.
  */
 export const formatMemoryDate = (d: MemoryDate): string | null => {
-  const { season, year, month, day } = d;
+  const { season, year, month, day, yearText } = d;
+  const yearStr = (yearText && yearText.trim()) || (year ? String(year) : "");
 
-  if (year && month && day) {
-    return `${MONTH_NAMES[month - 1]} ${day}, ${year}`;
+  if (yearStr && month && day) {
+    return `${MONTH_NAMES[month - 1]} ${day}, ${yearStr}`;
   }
-  if (year && month) {
-    return `${MONTH_NAMES[month - 1]} ${year}`;
+  if (yearStr && month) {
+    return `${MONTH_NAMES[month - 1]} ${yearStr}`;
   }
-  if (year && season) {
-    return `${SEASON_LABELS[season]} ${year}`;
+  if (yearStr && season) {
+    return `${SEASON_LABELS[season]} ${yearStr}`;
   }
-  if (year) {
-    return String(year);
+  if (yearStr) {
+    return yearStr;
+  }
+  if (season && month) {
+    return MONTH_NAMES[month - 1];
   }
   if (season) {
     return SEASON_LABELS[season];
+  }
+  if (month) {
+    return MONTH_NAMES[month - 1];
   }
   return null;
 };

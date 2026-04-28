@@ -19,31 +19,35 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
-// HSL values for each category color (matches CATEGORY_BORDER_COLORS in CategoryIcon.tsx).
-// Used to drive the active focus-ring color on the capture form.
+// HSL values for each category color, used to drive the active focus-ring color
+// on the capture form. Falls back to Old Gold when no category is selected.
+// Spec colors: Moment #4A6B8A, People #2E7D5E, Object #8B3A62, Place #C2714F,
+// Food #C2714F, Sound #5B4A3F, Imprint #2C3E50.
 const CATEGORY_RING_HSL: Record<CategoryKey, string> = {
-  moment: "326 80% 35%",   // #9E1268
-  person: "44 100% 45%",   // #E6A800
-  object: "211 31% 42%",   // #4A6B8A
-  place: "152 46% 33%",    // #2E7D5E
-  food: "17 49% 53%",      // #C2714F
-  sound: "220 9% 46%",     // #6B7280
-  imprint: "25 18% 30%",   // #5B4A3F
+  moment: "211 31% 42%",   // #4A6B8A Blueprint
+  person: "152 46% 33%",   // #2E7D5E Malachite
+  object: "326 41% 38%",   // #8B3A62 Plum
+  place: "17 49% 53%",     // #C2714F Coral
+  food: "17 49% 53%",      // #C2714F Coral
+  sound: "25 18% 30%",     // #5B4A3F Walnut
+  imprint: "210 30% 22%",  // #2C3E50 Ink
 };
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   moment:
     "What was happening around you in this moment? What do you want to remember about it?",
   person:
-    "Who is this person to you? What's something about them you'd want someone to know?",
-  object: "What's the story behind this? Why does it matter to you?",
+    "Who were they to you? What do you want to remember about them?",
+  object:
+    "Where did this come from? What does it mean to you?",
   place:
-    "What do you remember feeling when you were here? What does this place mean to you?",
+    "What brought you here? What do you want to remember about it?",
   food:
-    "What was this dish, and what made it taste memorable? What do you want to remember about it?",
+    "What tastes stood out to you? What do you want to remember about the meal?",
   sound:
-    "What is this sound, and how does it make you feel? What does it remind you of?",
-  imprint: "Why did this shape who you are?",
+    "What makes this sound memorable? What does it remind you of?",
+  imprint:
+    "What does this remind you of? Why has it stayed with you?",
 };
 
 const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
@@ -177,6 +181,7 @@ const Index = () => {
           year: data.memory_year ?? null,
           month: data.memory_month ?? null,
           day: data.memory_day ?? null,
+          yearText: data.when_text ?? (data.memory_year ? String(data.memory_year) : null),
         },
       };
       setCategory(cat);
@@ -287,6 +292,9 @@ const Index = () => {
         memory_year: resolvedMemoryYear,
         memory_month: memoryDate.month,
         memory_day: memoryDate.day,
+        when_text: memoryDate.yearText && memoryDate.yearText.trim()
+          ? memoryDate.yearText.trim()
+          : null,
         who_was_there:
           WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
             ? whoWasThere.trim()

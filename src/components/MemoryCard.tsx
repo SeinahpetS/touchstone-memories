@@ -4,16 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CategoryIcon, { CATEGORY_LABELS, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
-
-const CATEGORY_PLACEHOLDER_COLORS: Record<CategoryKey, string> = {
-  moment: "#C2714F",
-  person: "#E6A800",
-  object: "#4A6B8A",
-  place: "#5B4A3F",
-  food: "#B8860B",
-  sound: "#8B3A62",
-  imprint: "#8B3A62",
-};
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,20 +36,34 @@ interface Props {
     memory_year?: number | null;
     memory_month?: number | null;
     memory_day?: number | null;
+    when_text?: string | null;
     is_private?: boolean | null;
   };
   onClick?: () => void;
   onChanged?: () => void;
+  /** Retained for API compatibility — no longer affects layout. */
   pairedWithPhoto?: boolean;
 }
 
-const MemoryCard = ({ memory, onClick, onChanged, pairedWithPhoto }: Props) => {
+/**
+ * Standard memory card used across archive grid, timeline, and any other view.
+ *
+ * Structure (per design spec):
+ *   - Card bg #E8E4D8, radius 12px
+ *   - Photo area: full-width 1:1 square. With photo → full bleed.
+ *     Without photo → bg #E4E2DC + centered 52px dark navy icon tile.
+ *   - 3px full-width category bar in category color.
+ *   - Body: padding 10px, 22px icon tile + caps category label,
+ *     Playfair title, muted Jost date.
+ */
+const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
   const cat = memory.category as CategoryKey;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const isPrivate = !!memory.is_private;
+  const barColor = CATEGORY_BORDER_COLORS[cat] ?? "#B8860B";
 
   const togglePrivacy = async () => {
     setBusy(true);
@@ -92,101 +96,140 @@ const MemoryCard = ({ memory, onClick, onChanged, pairedWithPhoto }: Props) => {
     onChanged?.();
   };
 
+  const memoryDateLabel =
+    (memory.when_text && memory.when_text.trim()) ||
+    formatMemoryDate({
+      season: (memory.memory_season as any) ?? null,
+      year: memory.memory_year ?? null,
+      month: memory.memory_month ?? null,
+      day: memory.memory_day ?? null,
+    });
+
   return (
     <div
-      className="group relative w-full text-left rounded-lg overflow-hidden bg-card transition-colors hover:bg-border"
+      className="group relative w-full text-left overflow-hidden transition-colors"
+      style={{ backgroundColor: "#E8E4D8", borderRadius: 12 }}
     >
       <button
         type="button"
         onClick={onClick}
         className="w-full text-left"
       >
-        {/* Photo frame — 3:4 portrait, anchored top-center */}
+        {/* Photo / icon-fallback frame — 1:1 square */}
         {memory.photo_url ? (
-          <>
-            <div style={{ aspectRatio: "3 / 4", width: "100%", overflow: "hidden" }}>
-              <img
-                src={memory.photo_url}
-                alt={memory.title || "Memory"}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center top",
-                  display: "block",
-                }}
-                loading="lazy"
-              />
-            </div>
-            <div
-              aria-hidden
+          <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
+            <img
+              src={memory.photo_url}
+              alt={memory.title || "Memory"}
               style={{
-                height: "9px",
                 width: "100%",
-                backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center",
+                display: "block",
               }}
+              loading="lazy"
             />
-          </>
-        ) : pairedWithPhoto ? (
-          <div
-            aria-hidden
-            style={{
-              aspectRatio: "3 / 4",
-              width: "100%",
-              backgroundColor: CATEGORY_PLACEHOLDER_COLORS[cat] ?? "transparent",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CategoryIcon category={cat} size={48} color="#F2EEE5" />
           </div>
         ) : (
           <div
             aria-hidden
             style={{
-              height: "9px",
+              aspectRatio: "1 / 1",
               width: "100%",
-              backgroundColor: CATEGORY_BORDER_COLORS[cat] ?? "transparent",
-              borderTopLeftRadius: "0.5rem",
-              borderTopRightRadius: "0.5rem",
+              backgroundColor: "#E4E2DC",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
+          >
+            <span
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 10,
+                backgroundColor: "#2C3E50",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CategoryIcon category={cat} size={28} color="#B8860B" />
+            </span>
+          </div>
         )}
 
-        <div className="p-4 space-y-2">
-          {/* Category icon + label */}
+        {/* 3px category bar */}
+        <div
+          aria-hidden
+          style={{
+            height: 3,
+            width: "100%",
+            backgroundColor: barColor,
+          }}
+        />
+
+        {/* Body */}
+        <div style={{ padding: 10 }} className="space-y-1.5">
+          {/* Category icon tile (22px) + label in caps */}
           <div className="flex items-center gap-1.5">
-            <span className="inline-flex items-center justify-center rounded-md bg-[hsl(var(--dark-card))] p-1">
-              <CategoryIcon category={cat} size={16} />
+            <span
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 5,
+                backgroundColor: "#2C3E50",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CategoryIcon category={cat} size={14} color="#B8860B" />
             </span>
-            <span className="text-[10px] uppercase tracking-[0.06em] text-muted-foreground">
+            <span
+              style={{
+                fontFamily: "Jost, sans-serif",
+                fontSize: 10,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#8A8070",
+              }}
+            >
               {CATEGORY_LABELS[cat] ?? memory.category}
             </span>
           </div>
 
           {memory.title && (
-            <h3 className="font-playfair text-base font-semibold text-foreground line-clamp-1">
+            <h3
+              className="line-clamp-1"
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 16,
+                fontWeight: 600,
+                color: "#2C3E50",
+                margin: 0,
+              }}
+            >
               {memory.title}
             </h3>
           )}
-          {(() => {
-            const memoryDateLabel = formatMemoryDate({
-              season: (memory.memory_season as any) ?? null,
-              year: memory.memory_year ?? null,
-              month: memory.memory_month ?? null,
-              day: memory.memory_day ?? null,
-            });
-            return memoryDateLabel ? (
-              <p className="font-jost text-xs font-light text-[#5B4A3F]/60">
-                {memoryDateLabel}
-              </p>
-            ) : null;
-          })()}
+          {memoryDateLabel && (
+            <p
+              style={{
+                fontFamily: "Jost, sans-serif",
+                fontSize: 11,
+                fontWeight: 300,
+                color: "rgba(91,74,63,0.6)",
+                margin: 0,
+              }}
+            >
+              {memoryDateLabel}
+            </p>
+          )}
         </div>
       </button>
 
-      {/* Hover-state action menu — visible on hover, focus-within, or when open */}
+      {/* Hover-state action menu */}
       <div
         className={cn(
           "absolute top-2 right-2 transition-opacity",
