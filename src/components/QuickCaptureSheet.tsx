@@ -416,25 +416,12 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic mb-5"
             />
 
-            {/* Prompt — "Who else would remember this?" */}
-            <p
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                color: "#2C3E50",
-                fontSize: 18,
-                lineHeight: 1.4,
-                marginBottom: 10,
-              }}
-            >
-              {PROMPT}
-            </p>
-
             <Input
               type="text"
               autoComplete="off"
               value={whoWasThere}
               onChange={(e) => setWhoWasThere(e.target.value)}
-              placeholder="A name, a face, a feeling…"
+              placeholder={PROMPT}
               className="h-12 text-base bg-card border-0 placeholder:italic"
             />
 
