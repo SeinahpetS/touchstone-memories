@@ -50,26 +50,71 @@ const Archive = () => {
   const [search, setSearch] = useState("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [view, setView] = useState<"grid" | "timeline">("grid");
-  const [showUnlockReveal, setShowUnlockReveal] = useState(false);
+  const [bouncing, setBouncing] = useState(false);
+  const [showTimelineTooltip, setShowTimelineTooltip] = useState(false);
+  const [dotsVisible, setDotsVisible] = useState(false);
+  const dotsTimer = useRef<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
-  const TIMELINE_THRESHOLD = 15;
+  const TIMELINE_THRESHOLD = 20;
   const timelineUnlocked = totalCount >= TIMELINE_THRESHOLD;
 
-  // First-time reveal when crossing threshold
+  // Two-bounce hint animation on first unlock
   useEffect(() => {
     if (!user || !timelineUnlocked) return;
-    const key = `touchstone:timeline-revealed:${user.id}`;
+    const key = `touchstone:timeline-bounced:${user.id}`;
     if (!localStorage.getItem(key)) {
-      setShowUnlockReveal(true);
+      setBouncing(true);
+      localStorage.setItem(key, "1");
+      const t = window.setTimeout(() => setBouncing(false), 1700);
+      return () => window.clearTimeout(t);
     }
   }, [user, timelineUnlocked]);
 
-  const dismissUnlockReveal = () => {
-    if (user) {
-      localStorage.setItem(`touchstone:timeline-revealed:${user.id}`, "1");
+  // Show the dot indicators briefly, then fade
+  const flashDots = () => {
+    setDotsVisible(true);
+    if (dotsTimer.current) window.clearTimeout(dotsTimer.current);
+    dotsTimer.current = window.setTimeout(() => setDotsVisible(false), 2000);
+  };
+
+  const switchView = (next: "grid" | "timeline") => {
+    if (next === view) return;
+    if (next === "timeline" && !timelineUnlocked) return;
+    setView(next);
+    flashDots();
+    if (next === "timeline" && user) {
+      const seenKey = `touchstone:timeline-tooltip-seen:${user.id}`;
+      if (!localStorage.getItem(seenKey)) {
+        setShowTimelineTooltip(true);
+      }
     }
-    setShowUnlockReveal(false);
-    setView("timeline");
+  };
+
+  const dismissTimelineTooltip = () => {
+    if (user) {
+      localStorage.setItem(`touchstone:timeline-tooltip-seen:${user.id}`, "1");
+    }
+    setShowTimelineTooltip(false);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStartX.current = t.clientX;
+    touchStartY.current = t.clientY;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX.current;
+    const dy = t.clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx < 0 && view === "grid" && timelineUnlocked) switchView("timeline");
+    else if (dx > 0 && view === "timeline") switchView("grid");
   };
 
   // "/" keyboard shortcut to focus search
