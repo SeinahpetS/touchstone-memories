@@ -493,6 +493,7 @@ const Archive = () => {
                     fontSize: "22px",
                     color: "#2C3E50",
                     fontWeight: 400,
+                    fontStyle: "italic",
                     whiteSpace: "nowrap",
                     margin: 0,
                     lineHeight: 1.2,
