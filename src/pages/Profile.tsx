@@ -137,7 +137,7 @@ const Profile = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/archive")}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             ← Back
