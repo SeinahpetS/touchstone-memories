@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import {
+import CategoryIcon, {
   CategoryIconCard,
   CATEGORY_BORDER_COLORS,
   CATEGORY_LABELS,
@@ -92,6 +93,7 @@ interface Props {
 
 const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
@@ -103,6 +105,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -118,6 +121,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setPhotoPreview(null);
       setSaving(false);
       setConfirmed(false);
+      setSavedId(null);
       setError(null);
     }
   }, [open]);
@@ -246,17 +250,17 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
             : null,
       };
 
-      const { error: insertErr } = await (supabase as any)
+      const { data: inserted, error: insertErr } = await (supabase as any)
         .from("touchstones")
-        .insert(payload);
+        .insert(payload)
+        .select("id")
+        .single();
       if (insertErr) throw insertErr;
 
+      setSavedId(inserted?.id ?? null);
       setConfirmed(true);
       playSaveFeedback();
       onSaved?.();
-      window.setTimeout(() => {
-        onClose();
-      }, 3000);
     } catch (e) {
       setError("Couldn't save right now. Try again.");
     } finally {
@@ -288,16 +292,21 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       : "");
   const cardAnswer = whoWasThere.trim();
 
+  const handleEdit = () => {
+    if (savedId) navigate(`/?edit=${savedId}`);
+    onClose();
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
       style={{
         backgroundColor: confirmed
-          ? "rgba(28,22,14,0.65)"
+          ? "rgba(28,22,14,0.72)"
           : "rgba(44,62,80,0.55)",
         transition: "background-color 0.2s ease-out",
       }}
-      onClick={confirmed ? undefined : onClose}
+      onClick={confirmed ? onClose : onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Add a Touchstone"
@@ -314,75 +323,61 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               to { opacity: 1; transform: scale(1); }
             }
             @keyframes ts-goldPulse {
-              0%   { box-shadow: 0 0 0 0 rgba(184,134,11,0); border-color: rgba(184,134,11,0.15); }
-              35%  { box-shadow: 0 0 28px 6px rgba(184,134,11,0.55); border-color: rgba(184,134,11,1); }
-              100% { box-shadow: 0 0 0 0 rgba(184,134,11,0); border-color: rgba(184,134,11,0.45); }
+              0%   { box-shadow: 0 0 0 0 rgba(184,134,11,0); }
+              35%  { box-shadow: 0 0 28px 6px rgba(184,134,11,0.55); }
+              100% { box-shadow: 0 0 0 0 rgba(184,134,11,0); }
             }
-            @keyframes ts-fadeOut {
-              from { opacity: 1; }
-              to   { opacity: 0; }
-            }
-            .ts-confirm-wrap { animation: ts-fadeOut 0.5s ease-in 2.5s forwards; }
             .ts-confirm-text { animation: ts-fadeInUp 0.4s ease-out 0.35s both; }
             .ts-confirm-card {
               animation: ts-cardIn 0.3s ease-out both, ts-goldPulse 2.4s ease-out 0.3s 1 both;
-              border: 1px solid rgba(184,134,11,0.45);
             }
+            .ts-confirm-actions { animation: ts-fadeInUp 0.4s ease-out 0.6s both; }
           `}</style>
           <div
-            className="ts-confirm-wrap flex flex-col items-center justify-center w-full px-6"
+            className="flex flex-col items-center justify-center w-full px-6"
             onClick={(e) => e.stopPropagation()}
             role="status"
             aria-live="polite"
           >
-            {/* Confirmation text + diamond above the card */}
-            <div className="ts-confirm-text flex flex-col items-center text-center mb-4">
+            {/* Confirmation text — gold on dark plaque for legibility */}
+            <div
+              className="ts-confirm-text flex flex-col items-center text-center mb-5"
+              style={{
+                backgroundColor: "rgba(20,16,10,0.78)",
+                padding: "10px 22px 12px",
+                borderRadius: 999,
+                border: "1px solid rgba(184,134,11,0.35)",
+                boxShadow: "0 6px 24px rgba(0,0,0,0.35)",
+              }}
+            >
               <p
                 style={{
                   fontFamily: "'Playfair Display', serif",
                   fontStyle: "italic",
-                  color: "#B8860B",
-                  fontSize: 22,
-                  lineHeight: 1.35,
+                  color: "#E8C36A",
+                  fontSize: 18,
+                  lineHeight: 1.3,
                   letterSpacing: "0.01em",
                   margin: 0,
+                  textShadow: "0 1px 2px rgba(0,0,0,0.5)",
                 }}
               >
                 {CONFIRMATION}
               </p>
-              <span
-                aria-hidden
-                style={{
-                  color: "#B8860B",
-                  fontSize: 14,
-                  marginTop: 10,
-                  lineHeight: 1,
-                }}
-              >
-                ◆
-              </span>
             </div>
 
-            {/* Memory artifact card */}
+            {/* Memory artifact card — mirrors MemoryCard structure */}
             <div
               className="ts-confirm-card w-full sm:max-w-sm overflow-hidden"
               style={{
-                backgroundColor: cardCategoryColor,
-                borderRadius: 14,
-                padding: 14,
+                backgroundColor: "#E8E4D8",
+                borderRadius: 12,
+                boxShadow: "0 18px 50px rgba(0,0,0,0.35)",
               }}
             >
-              {photoPreview && category !== "sound" && (
-                <div
-                  style={{
-                    border: "3px solid #F2EEE5",
-                    borderRadius: 8,
-                    overflow: "hidden",
-                    aspectRatio: "1 / 1",
-                    width: "100%",
-                    marginBottom: 14,
-                  }}
-                >
+              {/* Photo / icon-fallback frame — 1:1 square */}
+              {photoPreview && category !== "sound" ? (
+                <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
                   <img
                     src={photoPreview}
                     alt={cardTitle || "Memory"}
@@ -390,93 +385,182 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
+                      objectPosition: "center",
                       display: "block",
                     }}
                   />
                 </div>
-              )}
-
-              {/* Category label */}
-              <p
-                style={{
-                  fontFamily: "Jost, sans-serif",
-                  fontSize: 10,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "rgba(242,238,229,0.6)",
-                  margin: 0,
-                }}
-              >
-                {cardCategoryLabel}
-              </p>
-
-              {/* Title */}
-              {cardTitle && (
-                <h3
+              ) : (
+                <div
+                  aria-hidden
                   style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontSize: 22,
-                    fontWeight: 600,
-                    color: "#F2EEE5",
-                    margin: "4px 0 2px",
-                    lineHeight: 1.2,
+                    aspectRatio: "1 / 1",
+                    width: "100%",
+                    backgroundColor: "#E4E2DC",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  {cardTitle}
-                </h3>
-              )}
-
-              {/* Date */}
-              {cardDateLabel && (
-                <p
-                  style={{
-                    fontFamily: "Jost, sans-serif",
-                    fontSize: 12,
-                    color: "rgba(242,238,229,0.5)",
-                    margin: 0,
-                  }}
-                >
-                  {cardDateLabel}
-                </p>
-              )}
-
-              {/* Divider + answer */}
-              {cardAnswer && (
-                <>
-                  <div
-                    aria-hidden
+                  <span
                     style={{
-                      height: 1,
-                      width: "100%",
-                      backgroundColor: "rgba(242,238,229,0.2)",
-                      margin: "12px 0 10px",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontFamily: "'Playfair Display', serif",
-                      fontStyle: "italic",
-                      fontSize: 12,
-                      color: "rgba(242,238,229,0.55)",
-                      margin: "0 0 6px",
+                      width: 64,
+                      height: 64,
+                      borderRadius: 12,
+                      backgroundColor: "#2C3E50",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {PROMPT}
-                  </p>
+                    <CategoryIcon category={category} size={34} color="#B8860B" />
+                  </span>
+                </div>
+              )}
+
+              {/* 3px category bar */}
+              <div
+                aria-hidden
+                style={{
+                  height: 3,
+                  width: "100%",
+                  backgroundColor: cardCategoryColor,
+                }}
+              />
+
+              {/* Body */}
+              <div style={{ padding: 14 }} className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    style={{
+                      width: 26,
+                      height: 26,
+                      borderRadius: 6,
+                      backgroundColor: "#2C3E50",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <CategoryIcon category={category} size={16} color="#B8860B" />
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "Jost, sans-serif",
+                      fontSize: 11,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "#8A8070",
+                    }}
+                  >
+                    {cardCategoryLabel}
+                  </span>
+                </div>
+
+                {cardTitle && (
+                  <h3
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: 20,
+                      fontWeight: 600,
+                      color: "#2C3E50",
+                      margin: 0,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {cardTitle}
+                  </h3>
+                )}
+
+                {cardDateLabel && (
                   <p
                     style={{
                       fontFamily: "Jost, sans-serif",
-                      fontSize: 14,
-                      lineHeight: 1.5,
-                      color: "rgba(242,238,229,0.8)",
+                      fontSize: 12,
+                      fontWeight: 300,
+                      color: "rgba(91,74,63,0.65)",
                       margin: 0,
-                      whiteSpace: "pre-wrap",
                     }}
                   >
-                    {cardAnswer}
+                    {cardDateLabel}
                   </p>
-                </>
-              )}
+                )}
+
+                {cardAnswer && (
+                  <>
+                    <div
+                      aria-hidden
+                      style={{
+                        height: 1,
+                        width: "100%",
+                        backgroundColor: "rgba(91,74,63,0.15)",
+                        margin: "8px 0 6px",
+                      }}
+                    />
+                    <p
+                      style={{
+                        fontFamily: "'Playfair Display', serif",
+                        fontStyle: "italic",
+                        fontSize: 12,
+                        color: "rgba(91,74,63,0.7)",
+                        margin: "0 0 4px",
+                      }}
+                    >
+                      {PROMPT}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: 14,
+                        lineHeight: 1.5,
+                        color: "#2C3E50",
+                        margin: 0,
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
+                      {cardAnswer}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="ts-confirm-actions mt-5 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-11 px-5 rounded-md transition-colors"
+                style={{
+                  fontFamily: "Jost, sans-serif",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  fontSize: 12,
+                  color: "#F2EEE5",
+                  backgroundColor: "rgba(242,238,229,0.08)",
+                  border: "1px solid rgba(242,238,229,0.35)",
+                }}
+              >
+                Dismiss
+              </button>
+              <button
+                type="button"
+                onClick={handleEdit}
+                disabled={!savedId}
+                className="h-11 px-5 rounded-md transition-colors"
+                style={{
+                  fontFamily: "Jost, sans-serif",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  fontSize: 12,
+                  color: "#1C160E",
+                  backgroundColor: "#B8860B",
+                  border: "1px solid #B8860B",
+                  opacity: savedId ? 1 : 0.5,
+                }}
+              >
+                Edit
+              </button>
             </div>
           </div>
         </>
