@@ -650,7 +650,6 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                 </div>
               );
             })()}
-            </div>
 
             {/* 3. Title */}
             <Input
