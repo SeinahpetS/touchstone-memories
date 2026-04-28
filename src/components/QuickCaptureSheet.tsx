@@ -121,6 +121,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setPhotoPreview(null);
       setSaving(false);
       setConfirmed(false);
+      setSavedId(null);
       setError(null);
     }
   }, [open]);
