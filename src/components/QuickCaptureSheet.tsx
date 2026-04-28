@@ -422,7 +422,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               <div
                 aria-hidden
                 style={{
-                  height: 3,
+                  height: 9,
                   width: "100%",
                   backgroundColor: cardCategoryColor,
                 }}
