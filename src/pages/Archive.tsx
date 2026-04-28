@@ -693,6 +693,48 @@ const Archive = () => {
           </button>
         </div>
       </div>
+
+      {showUnlockReveal && (
+        <button
+          type="button"
+          onClick={dismissUnlockReveal}
+          className="fixed inset-0 z-50 flex items-center justify-center px-8"
+          style={{ backgroundColor: "#F2EEE5" }}
+          aria-label="Enter your timeline"
+        >
+          <div className="text-center max-w-md">
+            <span
+              aria-hidden
+              className="inline-block h-3 w-3 rotate-45 mb-6"
+              style={{ backgroundColor: "#B8860B" }}
+            />
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontSize: 26,
+                lineHeight: 1.4,
+                color: "#2C3E50",
+                margin: 0,
+              }}
+            >
+              Your archive has grown deep enough to see the shape of your life.
+            </p>
+            <p
+              style={{
+                marginTop: 24,
+                fontFamily: "Jost, sans-serif",
+                fontSize: 11,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#B8860B",
+              }}
+            >
+              Tap to continue
+            </p>
+          </div>
+        </button>
+      )}
     </div>
   );
 };
