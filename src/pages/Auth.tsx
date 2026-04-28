@@ -82,9 +82,11 @@ const Auth = () => {
           <h1 className="font-playfair text-2xl font-semibold tracking-[0.2em] text-foreground uppercase">
             Touchstone
           </h1>
-          <p className="mt-2 text-base text-muted-foreground">
-            {isSignUp ? "Create your archive" : "Welcome back"}
-          </p>
+          {isSignUp && (
+            <p className="mt-2 text-base text-muted-foreground">
+              Create your archive
+            </p>
+          )}
         </div>
 
         {/* Google */}
