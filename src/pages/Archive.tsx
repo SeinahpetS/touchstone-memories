@@ -641,6 +641,26 @@ const Archive = () => {
                 style={{ backgroundColor: "#B8860B" }}
               />
             </div>
+          ) : view === "timeline" ? (
+            <div className="mt-2">
+              <h1
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 26,
+                  color: "#2C3E50",
+                  fontWeight: 400,
+                  margin: "0 0 4px 0",
+                  lineHeight: 1.2,
+                }}
+              >
+                Your timeline.
+              </h1>
+              <TimelineView
+                memories={visibleTouchstones}
+                onSelect={(m) => setSelected(m)}
+                onChanged={fetchTouchstones}
+              />
+            </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
               {visibleTouchstones.map((m, i) => {
