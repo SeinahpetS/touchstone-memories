@@ -12,7 +12,7 @@ import AudioUpload from "@/components/AudioUpload";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
-import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
+import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
