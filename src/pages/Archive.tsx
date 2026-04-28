@@ -727,11 +727,20 @@ const Archive = () => {
             </div>
           )}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => setQuickCaptureOpen(true)}
             className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             + Add a Touchstone
           </button>
+
+          <QuickCaptureSheet
+            open={quickCaptureOpen}
+            onClose={() => setQuickCaptureOpen(false)}
+            onSaved={() => {
+              fetchTouchstones();
+              fetchHeaderStats();
+            }}
+          />
         </div>
       </div>
 
