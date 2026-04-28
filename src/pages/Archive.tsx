@@ -49,6 +49,28 @@ const Archive = () => {
   const [firstName, setFirstName] = useState<string>("");
   const [search, setSearch] = useState("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const [view, setView] = useState<"grid" | "timeline">("grid");
+  const [showUnlockReveal, setShowUnlockReveal] = useState(false);
+
+  const TIMELINE_THRESHOLD = 15;
+  const timelineUnlocked = totalCount >= TIMELINE_THRESHOLD;
+
+  // First-time reveal when crossing threshold
+  useEffect(() => {
+    if (!user || !timelineUnlocked) return;
+    const key = `touchstone:timeline-revealed:${user.id}`;
+    if (!localStorage.getItem(key)) {
+      setShowUnlockReveal(true);
+    }
+  }, [user, timelineUnlocked]);
+
+  const dismissUnlockReveal = () => {
+    if (user) {
+      localStorage.setItem(`touchstone:timeline-revealed:${user.id}`, "1");
+    }
+    setShowUnlockReveal(false);
+    setView("timeline");
+  };
 
   // "/" keyboard shortcut to focus search
   useEffect(() => {
