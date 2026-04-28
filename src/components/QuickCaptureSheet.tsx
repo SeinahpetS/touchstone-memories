@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import PhotoUpload from "@/components/PhotoUpload";
+import AudioUpload from "@/components/AudioUpload";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
@@ -322,13 +323,17 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               </button>
             </div>
 
-            {/* 1. Photo upload */}
+            {/* 1. Photo / Audio upload */}
             <div className="mb-5">
-              <PhotoUpload
-                file={photoFile}
-                preview={photoPreview}
-                onSelect={setPhotoFile}
-              />
+              {category === "sound" ? (
+                <AudioUpload file={photoFile} onSelect={setPhotoFile} />
+              ) : (
+                <PhotoUpload
+                  file={photoFile}
+                  preview={photoPreview}
+                  onSelect={setPhotoFile}
+                />
+              )}
             </div>
 
             {/* 2. Category grid */}
