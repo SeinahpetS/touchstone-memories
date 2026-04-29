@@ -37,17 +37,18 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [justSelected, setJustSelected] = useState(false);
   const debounced = useDebounce(query, 250);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastSelectedRef = useRef<string>("");
 
   useEffect(() => {
     setQuery(value);
   }, [value]);
 
   useEffect(() => {
-    if (justSelected) {
-      setJustSelected(false);
+    if (debounced && debounced === lastSelectedRef.current) {
+      setPredictions([]);
+      setOpen(false);
       return;
     }
     if (!debounced || debounced.length < 2) {
@@ -78,7 +79,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
     return () => {
       cancelled = true;
     };
-  }, [debounced, justSelected]);
+  }, [debounced]);
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -89,7 +90,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
   }, []);
 
   const select = async (p: Prediction) => {
-    setJustSelected(true);
+    lastSelectedRef.current = p.description;
     setQuery(p.description);
     setOpen(false);
     setPredictions([]);
@@ -102,12 +103,14 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const d = await r.json();
+      const finalName = d.formatted_address || p.description;
+      lastSelectedRef.current = finalName;
       onChange({
-        name: d.formatted_address || p.description,
+        name: finalName,
         lat: d.lat ?? null,
         lng: d.lng ?? null,
       });
-      setQuery(d.formatted_address || p.description);
+      setQuery(finalName);
     } catch {
       /* ignore */
     }
@@ -116,7 +119,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
   const selectCustom = () => {
     const text = query.trim();
     if (!text) return;
-    setJustSelected(true);
+    lastSelectedRef.current = text;
     setQuery(text);
     setOpen(false);
     setPredictions([]);
@@ -152,12 +155,29 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
         )}
         {showDropdown && (
           <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-border bg-popover shadow-lg">
-            {predictions.map((p) => (
+            {showCustom && (
+              <button
+                type="button"
+                onClick={selectCustom}
+                className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted"
+              >
+                <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+                <div className="min-w-0">
+                  <div className="truncate font-medium text-foreground">
+                    Use “{trimmedQuery}” as a custom location
+                  </div>
+                </div>
+              </button>
+            )}
+            {predictions.map((p, idx) => (
               <button
                 key={p.place_id}
                 type="button"
                 onClick={() => select(p)}
-                className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted"
+                className={
+                  "flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted " +
+                  (showCustom && idx === 0 ? "border-t border-border" : "")
+                }
               >
                 <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                 <div className="min-w-0">
@@ -172,23 +192,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
                 </div>
               </button>
             ))}
-            {showCustom && (
-              <button
-                type="button"
-                onClick={selectCustom}
-                className={
-                  "flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted " +
-                  (predictions.length > 0 ? "border-t border-border" : "")
-                }
-              >
-                <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                <div className="min-w-0">
-                  <div className="truncate font-medium text-foreground">
-                    Use “{trimmedQuery}” as a custom location
-                  </div>
-                </div>
-              </button>
-            )}
           </div>
         )}
       </div>
