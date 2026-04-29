@@ -37,17 +37,18 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [justSelected, setJustSelected] = useState(false);
   const debounced = useDebounce(query, 250);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastSelectedRef = useRef<string>("");
 
   useEffect(() => {
     setQuery(value);
   }, [value]);
 
   useEffect(() => {
-    if (justSelected) {
-      setJustSelected(false);
+    if (debounced && debounced === lastSelectedRef.current) {
+      setPredictions([]);
+      setOpen(false);
       return;
     }
     if (!debounced || debounced.length < 2) {
