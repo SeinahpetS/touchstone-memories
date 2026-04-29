@@ -155,12 +155,29 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
         )}
         {showDropdown && (
           <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-border bg-popover shadow-lg">
-            {predictions.map((p) => (
+            {showCustom && (
+              <button
+                type="button"
+                onClick={selectCustom}
+                className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted"
+              >
+                <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+                <div className="min-w-0">
+                  <div className="truncate font-medium text-foreground">
+                    Use “{trimmedQuery}” as a custom location
+                  </div>
+                </div>
+              </button>
+            )}
+            {predictions.map((p, idx) => (
               <button
                 key={p.place_id}
                 type="button"
                 onClick={() => select(p)}
-                className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted"
+                className={
+                  "flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted " +
+                  (showCustom && idx === 0 ? "border-t border-border" : "")
+                }
               >
                 <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                 <div className="min-w-0">
@@ -175,23 +192,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
                 </div>
               </button>
             ))}
-            {showCustom && (
-              <button
-                type="button"
-                onClick={selectCustom}
-                className={
-                  "flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted " +
-                  (predictions.length > 0 ? "border-t border-border" : "")
-                }
-              >
-                <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                <div className="min-w-0">
-                  <div className="truncate font-medium text-foreground">
-                    Use “{trimmedQuery}” as a custom location
-                  </div>
-                </div>
-              </button>
-            )}
           </div>
         )}
       </div>
