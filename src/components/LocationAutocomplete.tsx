@@ -79,7 +79,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
     return () => {
       cancelled = true;
     };
-  }, [debounced, justSelected]);
+  }, [debounced]);
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
