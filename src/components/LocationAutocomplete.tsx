@@ -90,7 +90,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
   }, []);
 
   const select = async (p: Prediction) => {
-    setJustSelected(true);
+    lastSelectedRef.current = p.description;
     setQuery(p.description);
     setOpen(false);
     setPredictions([]);
@@ -103,12 +103,14 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const d = await r.json();
+      const finalName = d.formatted_address || p.description;
+      lastSelectedRef.current = finalName;
       onChange({
-        name: d.formatted_address || p.description,
+        name: finalName,
         lat: d.lat ?? null,
         lng: d.lng ?? null,
       });
-      setQuery(d.formatted_address || p.description);
+      setQuery(finalName);
     } catch {
       /* ignore */
     }
@@ -117,7 +119,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
   const selectCustom = () => {
     const text = query.trim();
     if (!text) return;
-    setJustSelected(true);
+    lastSelectedRef.current = text;
     setQuery(text);
     setOpen(false);
     setPredictions([]);
