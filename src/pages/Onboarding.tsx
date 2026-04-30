@@ -26,7 +26,28 @@ import {
   type OnboardingDraft,
 } from "@/lib/onboardingDraft";
 
-type Step = "splash" | "definition" | "category" | "photo" | "details" | "date" | "artifact" | "signup";
+type Step =
+  | "splash"
+  | "definition"
+  | "category"
+  | "time"
+  | "photo"
+  | "details"
+  | "date"
+  | "artifact"
+  | "signup";
+
+// Steps that show the slim gold progress bar at the top of the screen,
+// in the order users encounter them. Splash, definition, category and
+// artifact are intentionally excluded per spec.
+const PROGRESS_STEPS: Step[] = ["time", "photo", "details", "date", "signup"];
+
+const progressFor = (step: Step): number | null => {
+  const idx = PROGRESS_STEPS.indexOf(step);
+  if (idx === -1) return null;
+  // Fill proportionally; final step (signup) sits at 100%.
+  return (idx + 1) / PROGRESS_STEPS.length;
+};
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   moment: "What was happening in this moment? What do you want to remember?",
