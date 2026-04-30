@@ -211,36 +211,58 @@ const Onboarding = () => {
 
   // ---- CATEGORY ----
   if (step === "category") {
+    const ACTIVE: CategoryKey[] = ["moment", "object", "place", "food"];
+    const COMING: CategoryKey[] = ["person", "sound", "imprint"];
+    const pickCategory = (c: CategoryKey) => {
+      update({ category: c });
+      setStep("photo");
+    };
     return (
       <LightScreen onBack={() => setStep("definition")}>
-        <Question kicker="Step 1 of 4" title="What kind of memory is this?" />
+        <div className="space-y-2 pt-2 text-center">
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 15,
+              color: "rgba(44,62,80,0.65)",
+              margin: 0,
+            }}
+          >
+            Your archive starts with one memory.
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 28,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.2,
+            }}
+          >
+            What's worth keeping today?
+          </h2>
+        </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {CATEGORIES.slice(0, 4).map((c) => (
+          {ACTIVE.map((c) => (
             <CategoryIconCard
               key={c}
               category={c}
               active={draft.category === c}
               iconSize={30}
               labelSize={11}
-              onClick={() => {
-                update({ category: c });
-                setStep("photo");
-              }}
+              onClick={() => pickCategory(c)}
             />
           ))}
         </div>
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:max-w-[75%] sm:mx-auto">
-          {CATEGORIES.slice(4).map((c) => (
+        <div className="grid grid-cols-3 gap-3 sm:max-w-[75%] sm:mx-auto">
+          {COMING.map((c) => (
             <CategoryIconCard
               key={c}
               category={c}
-              active={draft.category === c}
+              comingSoon
               iconSize={30}
               labelSize={11}
-              onClick={() => {
-                update({ category: c });
-                setStep("photo");
-              }}
             />
           ))}
         </div>
