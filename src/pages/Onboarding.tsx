@@ -15,6 +15,7 @@ import CategoryIcon, {
 } from "@/components/CategoryIcon";
 import PhotoUpload from "@/components/PhotoUpload";
 import MemoryDateInput from "@/components/MemoryDateInput";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import {
   clearOnboardingDraft,
