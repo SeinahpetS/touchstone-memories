@@ -236,7 +236,7 @@ const Onboarding = () => {
     const COMING: CategoryKey[] = ["person", "sound", "imprint"];
     const pickCategory = (c: CategoryKey) => {
       update({ category: c });
-      setStep("photo");
+      setStep("time");
     };
     return (
       <LightScreen onBack={() => setStep("definition")}>
