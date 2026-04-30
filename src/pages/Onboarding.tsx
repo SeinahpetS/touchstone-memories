@@ -33,6 +33,7 @@ type Step =
   | "time"
   | "title"
   | "relationship"
+  | "who"
   | "photo"
   | "details"
   | "date"
@@ -42,7 +43,8 @@ type Step =
 // Steps that show the slim gold progress bar at the top of the screen,
 // in the order users encounter them. Splash, definition, category, time
 // and artifact are intentionally excluded per spec — the bar appears
-// from the Title screen (S3) onward.
+// from the Title screen (S3) onward. The conditional "who" screen (S4b)
+// is also excluded so the bar visually HOLDS its position there.
 const PROGRESS_STEPS: Step[] = ["title", "relationship", "photo", "details", "date", "signup"];
 
 // Per-category copy for the Relationship screen (S4).
@@ -81,12 +83,50 @@ const RELATIONSHIP_OPTIONS: Partial<Record<CategoryKey, string[]>> = {
   ],
 };
 
+// Relationship answers that lead to the conditional "who" screen (S4b).
+const WHO_TRIGGER_OPTIONS: Partial<Record<CategoryKey, string[]>> = {
+  object: ["It was given to me", "I inherited it", "It belongs to someone I care about"],
+  moment: ["Someone I know"],
+  place: ["Someone I know"],
+  food: ["Someone I know made it", "I discovered it somewhere"],
+};
+
+// Per-category copy for the Who screen (S4b).
+const WHO_HEADLINES: Partial<Record<CategoryKey, string>> = {
+  object: "Who does it connect you to?",
+  moment: "Who were they to you?",
+  place: "Who is it?",
+  food: "Who made it, or who introduced it to you?",
+};
+
+const WHO_EXAMPLES: Partial<Record<CategoryKey, string[]>> = {
+  object: [
+    "My grandmother",
+    "A friend I've lost touch with",
+    "Someone I never got to meet",
+  ],
+  moment: ["My best friend", "My dad, before things got complicated"],
+  place: ["My grandfather", "A version of myself I miss"],
+  food: ["My aunt", "A friend who knew how to cook"],
+};
+
+const triggersWhoScreen = (
+  category: CategoryKey,
+  relationship: string
+): boolean => {
+  const triggers = WHO_TRIGGER_OPTIONS[category] ?? [];
+  return triggers.includes(relationship);
+};
+
 const progressFor = (step: Step): number | null => {
-  const idx = PROGRESS_STEPS.indexOf(step);
+  // S4b ("who") holds the progress bar at the position of S4 ("relationship").
+  const lookup: Step = step === "who" ? "relationship" : step;
+  const idx = PROGRESS_STEPS.indexOf(lookup);
   if (idx === -1) return null;
   // Fill proportionally; final step (signup) sits at 100%.
   return (idx + 1) / PROGRESS_STEPS.length;
 };
+
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   moment: "What was happening in this moment? What do you want to remember?",
@@ -511,7 +551,11 @@ const Onboarding = () => {
     }
     const pickRelationship = (label: string) => {
       update({ whoWasThere: label });
-      setStep("photo");
+      if (triggersWhoScreen(draft.category, label)) {
+        setStep("who");
+      } else {
+        setStep("photo");
+      }
     };
     return (
       <LightScreen
@@ -561,6 +605,112 @@ const Onboarding = () => {
               </button>
             );
           })}
+        </div>
+      </LightScreen>
+    );
+  }
+
+  // ---- WHO (S4b, conditional) ----
+  if (step === "who") {
+    const headline = WHO_HEADLINES[draft.category] ?? "Who comes to mind?";
+    const examples = WHO_EXAMPLES[draft.category] ?? [];
+    // The relationship answer was stored in whoWasThere; on this screen the
+    // user replaces it with a specific person. Track the field locally so we
+    // don't clobber the relationship label until they type or skip.
+    const relationshipLabel =
+      draft.whoWasThere &&
+      (RELATIONSHIP_OPTIONS[draft.category] ?? []).includes(draft.whoWasThere)
+        ? draft.whoWasThere
+        : "";
+    const currentWho =
+      draft.whoWasThere === relationshipLabel ? "" : draft.whoWasThere;
+    const setWho = (val: string) => update({ whoWasThere: val });
+    const advance = () => {
+      // If the field is empty, fall back to the relationship label so we
+      // don't lose context. Otherwise keep the person the user typed.
+      if (!currentWho.trim() && relationshipLabel) {
+        update({ whoWasThere: relationshipLabel });
+      }
+      setStep("photo");
+    };
+    const skip = () => {
+      // Skipping preserves the relationship label.
+      if (relationshipLabel) update({ whoWasThere: relationshipLabel });
+      else update({ whoWasThere: "" });
+      setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("relationship")}
+        progress={progressFor("who")}
+      >
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder="Their name, or how you'd describe them"
+            value={currentWho}
+            onChange={(e) => setWho(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 pt-2">
+          <PrimaryCTA onClick={advance} disabled={!currentWho.trim()}>
+            Next
+          </PrimaryCTA>
+          <button
+            type="button"
+            onClick={skip}
+            className="mx-auto text-sm"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              color: "#5B4A3F",
+              opacity: 0.7,
+              padding: "8px 12px",
+              background: "transparent",
+              border: 0,
+            }}
+          >
+            Skip
+          </button>
         </div>
       </LightScreen>
     );
