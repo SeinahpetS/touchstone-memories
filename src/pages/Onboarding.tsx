@@ -1346,44 +1346,50 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
       <div
         className="ts-def-entry w-full max-w-md"
         style={{
-          fontFamily: "'Playfair Display', serif",
           color: "#2C3E50",
-          backgroundColor: "#E8E4D8",
-          borderRadius: 16,
-          padding: "28px 28px 30px",
+          backgroundColor: "#FAFAF8",
+          borderRadius: 12,
+          padding: 32,
+          boxShadow:
+            "0 1px 2px rgba(91,74,63,0.06), 0 8px 24px rgba(91,74,63,0.10), 0 24px 48px -12px rgba(91,74,63,0.08)",
         }}
       >
         {/* Headword + pronunciation */}
         <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
           <h1
             style={{
-              fontSize: "clamp(34px, 7vw, 44px)",
-              fontWeight: 600,
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(36px, 7.4vw, 48px)",
+              fontWeight: 700,
               letterSpacing: "-0.005em",
               margin: 0,
               lineHeight: 1.1,
+              color: "#2C3E50",
             }}
           >
             touch<span style={{ color: "rgba(44,62,80,0.45)", margin: "0 0.05em" }}>·</span>stone
           </h1>
           <span
             style={{
-              fontStyle: "italic",
-              fontSize: "clamp(20px, 3.4vw, 26px)",
-              color: "rgba(44,62,80,0.6)",
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              color: "rgba(44,62,80,0.55)",
+              letterSpacing: "0.02em",
             }}
           >
-            (təch-stŏn)
+            (təch-stōn)
           </span>
         </div>
 
         {/* Part of speech */}
         <p
           style={{
+            fontFamily: "'Jost', sans-serif",
             fontStyle: "italic",
-            fontSize: 18,
-            color: "rgba(44,62,80,0.6)",
-            margin: "10px 0 26px",
+            fontSize: 14,
+            color: "rgba(44,62,80,0.55)",
+            margin: "8px 0 24px",
+            letterSpacing: "0.01em",
           }}
         >
           noun
@@ -1397,8 +1403,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
             margin: 0,
             display: "flex",
             flexDirection: "column",
-            gap: 16,
-            counterReset: "ts-def",
+            gap: 18,
           }}
         >
           {[
@@ -1409,10 +1414,11 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
             <li
               key={i}
               style={{
+                fontFamily: "'Jost', sans-serif",
                 fontWeight: 400,
-                fontSize: 17,
-                lineHeight: 1.55,
-                color: "#5B4A3F",
+                fontSize: 16,
+                lineHeight: 1.6,
+                color: "#2C3E50",
                 display: "flex",
                 gap: 12,
               }}
@@ -1421,9 +1427,8 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
                 style={{
                   flexShrink: 0,
                   width: 18,
-                  fontSize: 15,
-                  color: "rgba(91,74,63,0.6)",
-                  fontStyle: "italic",
+                  fontSize: 14,
+                  color: "rgba(44,62,80,0.45)",
                 }}
               >
                 {i + 1}.
@@ -1450,31 +1455,28 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
       </p>
     </div>
 
-    {/* Quiet gold text CTA */}
-    <div className="ts-def-cta flex flex-col items-center pb-2 gap-3">
+    {/* Primary CTA */}
+    <div className="ts-def-cta flex flex-col items-center pb-2 gap-4">
       <button
         type="button"
         onClick={onContinue}
-        className="group inline-flex items-center gap-2 transition-opacity hover:opacity-80"
+        className="transition-all hover:opacity-90 active:scale-[0.98]"
         style={{
-          fontFamily: "'Playfair Display', serif",
-          fontStyle: "italic",
-          color: "#B8860B",
-          fontSize: 19,
-          padding: "10px 8px",
-          letterSpacing: "0.01em",
-          background: "transparent",
+          fontFamily: "'Jost', sans-serif",
+          fontWeight: 500,
+          fontSize: 16,
+          letterSpacing: "0.04em",
+          color: "#FAF8F3",
+          backgroundColor: "#B8860B",
           border: "none",
+          borderRadius: 999,
+          padding: "14px 40px",
+          minWidth: 220,
+          cursor: "pointer",
+          boxShadow: "0 2px 8px rgba(184,134,11,0.25)",
         }}
       >
         Let's begin
-        <span
-          aria-hidden
-          className="transition-transform group-hover:translate-x-1"
-          style={{ fontFamily: "'Playfair Display', serif" }}
-        >
-          →
-        </span>
       </button>
       <div className="flex flex-col items-center gap-1">
         <span
