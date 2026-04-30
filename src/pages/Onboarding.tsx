@@ -1930,4 +1930,183 @@ const MapLocationStep = ({
   );
 };
 
+/**
+ * Photo screen (S8). Category-aware copy and button order. The browser
+ * surfaces native OS photo/camera permission prompts when the hidden
+ * <input> is activated; we precede that with a soft Touchstone-voiced
+ * preface so the prompt feels intentional rather than abrupt.
+ */
+const PhotoStep = ({
+  category,
+  preview,
+  onSelect,
+  onSkip,
+  onContinue,
+  onBack,
+  progress,
+}: {
+  category: CategoryKey;
+  preview: string | null;
+  onSelect: (file: File | null) => void;
+  onSkip: () => void;
+  onContinue: () => void;
+  onBack: () => void;
+  progress: number | null;
+}) => {
+  const libraryRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const [showPreface, setShowPreface] = useState<"library" | "camera" | null>(null);
+
+  const headline = PHOTO_HEADLINES[category];
+  const subcopy = PHOTO_SUBCOPY[category];
+  const order = PHOTO_BUTTON_ORDER[category];
+
+  const triggerLibrary = () => libraryRef.current?.click();
+  const triggerCamera = () => cameraRef.current?.click();
+
+  const handleAction = (kind: "library" | "camera") => {
+    // Show a brief soft preface the first time, then immediately invoke
+    // the native picker so the OS permission prompt follows naturally.
+    setShowPreface(kind);
+    if (kind === "library") triggerLibrary();
+    else triggerCamera();
+  };
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setShowPreface(null);
+    if (file) onSelect(file);
+    // reset so picking the same file twice still triggers change
+    e.target.value = "";
+  };
+
+  const buttons: Record<"library" | "camera", { label: string; onClick: () => void }> = {
+    library: { label: "Choose from library", onClick: () => handleAction("library") },
+    camera: { label: "Take a photo", onClick: () => handleAction("camera") },
+  };
+
+  return (
+    <LightScreen onBack={onBack} progress={progress}>
+      <input
+        ref={libraryRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={onFileChange}
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={onFileChange}
+      />
+
+      <div className="space-y-2 pt-2 text-center">
+        <h2
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 26,
+            color: "#2C3E50",
+            margin: 0,
+            lineHeight: 1.25,
+          }}
+        >
+          {headline}
+        </h2>
+        <p
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: "italic",
+            fontSize: 14,
+            color: "rgba(44,62,80,0.7)",
+            margin: 0,
+          }}
+        >
+          {subcopy}
+        </p>
+      </div>
+
+      {preview && (
+        <div className="flex justify-center pt-2">
+          <img
+            src={preview}
+            alt="Selected memory"
+            style={{
+              maxHeight: 220,
+              maxWidth: "100%",
+              borderRadius: 12,
+              boxShadow: "0 4px 18px rgba(44,62,80,0.18)",
+            }}
+          />
+        </div>
+      )}
+
+      {showPreface && (
+        <p
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: "italic",
+            fontSize: 13,
+            color: "rgba(44,62,80,0.7)",
+            margin: 0,
+            textAlign: "center",
+          }}
+        >
+          {showPreface === "camera"
+            ? "To take a photo, we'll need access to your camera."
+            : "To add a photo, we'll need access to your library."}
+        </p>
+      )}
+
+      <div className="flex flex-col gap-2 pt-2">
+        {order.map((kind) => {
+          const b = buttons[kind];
+          return (
+            <button
+              key={kind}
+              type="button"
+              onClick={b.onClick}
+              className="w-full text-center transition-colors"
+              style={{
+                backgroundColor: "#E8E4D8",
+                color: "#2C3E50",
+                borderRadius: 12,
+                padding: "16px 20px",
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 18,
+                border: "1px solid rgba(44,62,80,0.06)",
+                boxShadow: "0 1px 2px rgba(44,62,80,0.04)",
+              }}
+            >
+              {b.label}
+            </button>
+          );
+        })}
+        {preview ? (
+          <PrimaryCTA onClick={onContinue}>Continue</PrimaryCTA>
+        ) : (
+          <button
+            type="button"
+            onClick={onSkip}
+            className="w-full text-center transition-colors"
+            style={{
+              background: "transparent",
+              color: "#5B4A3F",
+              borderRadius: 12,
+              padding: "14px 20px",
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 15,
+              border: "1px solid rgba(44,62,80,0.12)",
+            }}
+          >
+            Skip for now
+          </button>
+        )}
+      </div>
+    </LightScreen>
+  );
+};
+
 export default Onboarding;
