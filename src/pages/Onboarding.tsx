@@ -610,6 +610,112 @@ const Onboarding = () => {
     );
   }
 
+  // ---- WHO (S4b, conditional) ----
+  if (step === "who") {
+    const headline = WHO_HEADLINES[draft.category] ?? "Who comes to mind?";
+    const examples = WHO_EXAMPLES[draft.category] ?? [];
+    // The relationship answer was stored in whoWasThere; on this screen the
+    // user replaces it with a specific person. Track the field locally so we
+    // don't clobber the relationship label until they type or skip.
+    const relationshipLabel =
+      draft.whoWasThere &&
+      (RELATIONSHIP_OPTIONS[draft.category] ?? []).includes(draft.whoWasThere)
+        ? draft.whoWasThere
+        : "";
+    const currentWho =
+      draft.whoWasThere === relationshipLabel ? "" : draft.whoWasThere;
+    const setWho = (val: string) => update({ whoWasThere: val });
+    const advance = () => {
+      // If the field is empty, fall back to the relationship label so we
+      // don't lose context. Otherwise keep the person the user typed.
+      if (!currentWho.trim() && relationshipLabel) {
+        update({ whoWasThere: relationshipLabel });
+      }
+      setStep("photo");
+    };
+    const skip = () => {
+      // Skipping preserves the relationship label.
+      if (relationshipLabel) update({ whoWasThere: relationshipLabel });
+      else update({ whoWasThere: "" });
+      setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("relationship")}
+        progress={progressFor("who")}
+      >
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder="Their name, or how you'd describe them"
+            value={currentWho}
+            onChange={(e) => setWho(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 pt-2">
+          <PrimaryCTA onClick={advance} disabled={!currentWho.trim()}>
+            Next
+          </PrimaryCTA>
+          <button
+            type="button"
+            onClick={skip}
+            className="mx-auto text-sm"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              color: "#5B4A3F",
+              opacity: 0.7,
+              padding: "8px 12px",
+              background: "transparent",
+              border: 0,
+            }}
+          >
+            Skip
+          </button>
+        </div>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
