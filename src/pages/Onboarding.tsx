@@ -43,7 +43,43 @@ type Step =
 // in the order users encounter them. Splash, definition, category, time
 // and artifact are intentionally excluded per spec — the bar appears
 // from the Title screen (S3) onward.
-const PROGRESS_STEPS: Step[] = ["title", "photo", "details", "date", "signup"];
+const PROGRESS_STEPS: Step[] = ["title", "relationship", "photo", "details", "date", "signup"];
+
+// Per-category copy for the Relationship screen (S4).
+const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
+  object: "How did this come into your story?",
+  moment: "Who was part of this?",
+  place: "Who comes to mind when you think of this place?",
+  food: "Where does this food come from for you?",
+};
+
+const RELATIONSHIP_OPTIONS: Partial<Record<CategoryKey, string[]>> = {
+  object: [
+    "It was given to me",
+    "I inherited it",
+    "It belongs to someone I care about",
+    "I came across it",
+    "It was always just there",
+  ],
+  moment: [
+    "Just me",
+    "Someone I know",
+    "A group of people",
+    "A stranger",
+  ],
+  place: [
+    "Someone I know",
+    "A younger version of myself",
+    "A group of people",
+    "It's about the place itself",
+  ],
+  food: [
+    "Someone I know made it",
+    "I discovered it somewhere",
+    "It belongs to my past",
+    "It's just something I love",
+  ],
+};
 
 const progressFor = (step: Step): number | null => {
   const idx = PROGRESS_STEPS.indexOf(step);
