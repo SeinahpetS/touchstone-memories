@@ -33,6 +33,7 @@ type Step =
   | "time"
   | "title"
   | "relationship"
+  | "who"
   | "photo"
   | "details"
   | "date"
@@ -42,7 +43,8 @@ type Step =
 // Steps that show the slim gold progress bar at the top of the screen,
 // in the order users encounter them. Splash, definition, category, time
 // and artifact are intentionally excluded per spec — the bar appears
-// from the Title screen (S3) onward.
+// from the Title screen (S3) onward. The conditional "who" screen (S4b)
+// is also excluded so the bar visually HOLDS its position there.
 const PROGRESS_STEPS: Step[] = ["title", "relationship", "photo", "details", "date", "signup"];
 
 // Per-category copy for the Relationship screen (S4).
@@ -81,12 +83,50 @@ const RELATIONSHIP_OPTIONS: Partial<Record<CategoryKey, string[]>> = {
   ],
 };
 
+// Relationship answers that lead to the conditional "who" screen (S4b).
+const WHO_TRIGGER_OPTIONS: Partial<Record<CategoryKey, string[]>> = {
+  object: ["It was given to me", "I inherited it", "It belongs to someone I care about"],
+  moment: ["Someone I know"],
+  place: ["Someone I know"],
+  food: ["Someone I know made it", "I discovered it somewhere"],
+};
+
+// Per-category copy for the Who screen (S4b).
+const WHO_HEADLINES: Partial<Record<CategoryKey, string>> = {
+  object: "Who does it connect you to?",
+  moment: "Who were they to you?",
+  place: "Who is it?",
+  food: "Who made it, or who introduced it to you?",
+};
+
+const WHO_EXAMPLES: Partial<Record<CategoryKey, string[]>> = {
+  object: [
+    "My grandmother",
+    "A friend I've lost touch with",
+    "Someone I never got to meet",
+  ],
+  moment: ["My best friend", "My dad, before things got complicated"],
+  place: ["My grandfather", "A version of myself I miss"],
+  food: ["My aunt", "A friend who knew how to cook"],
+};
+
+const triggersWhoScreen = (
+  category: CategoryKey,
+  relationship: string
+): boolean => {
+  const triggers = WHO_TRIGGER_OPTIONS[category] ?? [];
+  return triggers.includes(relationship);
+};
+
 const progressFor = (step: Step): number | null => {
-  const idx = PROGRESS_STEPS.indexOf(step);
+  // S4b ("who") holds the progress bar at the position of S4 ("relationship").
+  const lookup: Step = step === "who" ? "relationship" : step;
+  const idx = PROGRESS_STEPS.indexOf(lookup);
   if (idx === -1) return null;
   // Fill proportionally; final step (signup) sits at 100%.
   return (idx + 1) / PROGRESS_STEPS.length;
 };
+
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   moment: "What was happening in this moment? What do you want to remember?",
