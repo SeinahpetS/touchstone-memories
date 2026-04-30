@@ -107,7 +107,7 @@ const Auth = () => {
           </h1>
           {isSignUp && (
             <p className="mt-2 text-base text-muted-foreground">
-              Create your archive
+              Everything that made you, still here.
             </p>
           )}
         </div>
