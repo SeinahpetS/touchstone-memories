@@ -411,6 +411,16 @@ const Onboarding = () => {
     }
   };
 
+  const handleApple = async () => {
+    saveOnboardingDraft(draft);
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error(result.error.message || "Apple sign-in failed");
+    }
+  };
+
   // ---- Render: while auth is loading or persisting, show a quiet placeholder
   if (loading || persisting) {
     return (
