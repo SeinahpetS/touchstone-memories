@@ -218,7 +218,7 @@ const Onboarding = () => {
       setStep("photo");
     };
     return (
-      <LightScreen onBack={() => setStep("definition")} hideProgress>
+      <LightScreen onBack={() => setStep("definition")}>
         <div className="space-y-2 pt-2 text-center">
           <p
             style={{
