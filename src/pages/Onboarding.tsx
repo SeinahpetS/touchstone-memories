@@ -551,7 +551,11 @@ const Onboarding = () => {
     }
     const pickRelationship = (label: string) => {
       update({ whoWasThere: label });
-      setStep("photo");
+      if (triggersWhoScreen(draft.category, label)) {
+        setStep("who");
+      } else {
+        setStep("photo");
+      }
     };
     return (
       <LightScreen
