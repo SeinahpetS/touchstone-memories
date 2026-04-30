@@ -291,10 +291,80 @@ const Onboarding = () => {
     );
   }
 
+  // ---- TIME ----
+  if (step === "time") {
+    const TIME_OPTIONS: { label: string; yearText: string }[] = [
+      { label: "A long time ago", yearText: "A long time ago" },
+      { label: "A few years back", yearText: "A few years back" },
+      { label: "Recently", yearText: "Recently" },
+      { label: "It's ongoing", yearText: "Ongoing" },
+    ];
+    const pickTime = (yearText: string) => {
+      update({
+        memoryDate: {
+          ...emptyMemoryDate(),
+          yearText,
+        },
+      });
+      setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("category")}
+        progress={progressFor("time")}
+      >
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 28,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.2,
+            }}
+          >
+            When does this belong to?
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          {TIME_OPTIONS.map((opt) => {
+            const selected = draft.memoryDate.yearText === opt.yearText;
+            return (
+              <button
+                key={opt.yearText}
+                type="button"
+                onClick={() => pickTime(opt.yearText)}
+                aria-pressed={selected}
+                className="w-full text-left transition-colors"
+                style={{
+                  backgroundColor: selected ? "#2C3E50" : "#E8E4D8",
+                  color: selected ? "#F2EEE5" : "#2C3E50",
+                  borderRadius: 12,
+                  padding: "18px 22px",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 19,
+                  letterSpacing: "0.005em",
+                  border: selected
+                    ? "1px solid rgba(184,134,11,0.6)"
+                    : "1px solid rgba(44,62,80,0.06)",
+                  boxShadow: selected
+                    ? "0 4px 18px rgba(44,62,80,0.18)"
+                    : "0 1px 2px rgba(44,62,80,0.04)",
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("category")}>
+      <LightScreen onBack={() => setStep("time")} progress={progressFor("photo")}>
         <Question
           kicker="Step 2 of 4"
           title="Add a photo, if you have one."
