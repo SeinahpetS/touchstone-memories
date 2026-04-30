@@ -32,6 +32,7 @@ type Step =
   | "category"
   | "time"
   | "title"
+  | "relationship"
   | "photo"
   | "details"
   | "date"
