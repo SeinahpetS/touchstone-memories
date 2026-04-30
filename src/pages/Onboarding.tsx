@@ -647,7 +647,7 @@ const Onboarding = () => {
       if (!currentWho.trim() && relationshipLabel) {
         update({ whoWasThere: relationshipLabel });
       }
-      setStep("photo");
+      setStep("emotional");
     };
     const skip = () => {
       // Skipping preserves the relationship label.
