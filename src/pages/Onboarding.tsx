@@ -395,10 +395,78 @@ const Onboarding = () => {
     );
   }
 
+  // ---- TITLE (S3) ----
+  if (step === "title") {
+    const headline = TITLE_HEADLINES[draft.category];
+    const examples = TITLE_EXAMPLES[draft.category] ?? [];
+    const canAdvance = draft.title.trim().length > 0;
+    const advance = () => {
+      if (canAdvance) setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("time")}
+        progress={progressFor("title")}
+      >
+        <div className="space-y-3 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 28,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.2,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder={TITLE_PLACEHOLDERS[draft.category]}
+            value={draft.title}
+            onChange={(e) => update({ title: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <PrimaryCTA onClick={advance} disabled={!canAdvance}>
+          Next
+        </PrimaryCTA>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("time")} progress={progressFor("photo")}>
+      <LightScreen onBack={() => setStep("title")} progress={progressFor("photo")}>
         <Question
           kicker="Step 2 of 4"
           title="Add a photo, if you have one."
@@ -418,21 +486,14 @@ const Onboarding = () => {
     );
   }
 
-  // ---- DETAILS (title + note) ----
+  // ---- DETAILS (note) ----
   if (step === "details") {
     return (
       <LightScreen onBack={() => setStep("photo")} progress={progressFor("details")}>
         <Question
           kicker="Step 3 of 4"
-          title="Tell us about it."
-          subtitle="A name, a few words — whatever you want to keep."
-        />
-        <Input
-          type="text"
-          placeholder={TITLE_PLACEHOLDERS[draft.category]}
-          value={draft.title}
-          onChange={(e) => update({ title: e.target.value })}
-          className="h-12 text-base bg-card border-0 placeholder:italic"
+          title="Anything you want to remember?"
+          subtitle="A few words — whatever you want to keep. Optional."
         />
         <Textarea
           placeholder={NOTE_PLACEHOLDERS[draft.category]}
@@ -441,17 +502,13 @@ const Onboarding = () => {
           rows={5}
           className="text-base bg-card border-0 placeholder:italic resize-none"
         />
-        <PrimaryCTA
-          onClick={() => setStep("date")}
-          disabled={!draft.title.trim() && !draft.note.trim() && !photoFile}
-        >
+        <PrimaryCTA onClick={() => setStep("date")}>
           Continue
         </PrimaryCTA>
       </LightScreen>
     );
   }
 
-  // ---- DATE ----
   if (step === "date") {
     return (
       <LightScreen onBack={() => setStep("details")} progress={progressFor("date")}>
