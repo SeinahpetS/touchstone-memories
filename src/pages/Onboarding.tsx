@@ -1355,7 +1355,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
         }}
       >
         {/* Headword + pronunciation */}
-        <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+        <div className="flex items-baseline flex-nowrap gap-x-3 gap-y-1 whitespace-nowrap">
           <h1
             style={{
               fontFamily: "'Playfair Display', serif",
