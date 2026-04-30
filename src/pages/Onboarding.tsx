@@ -1313,7 +1313,7 @@ const Splash = ({ onDone }: { onDone: () => void }) => {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundColor: "#FAF8F3",
+          backgroundColor: "#F2EEE5",
           opacity: dissolving ? 1 : 0,
           transition: "opacity 0.8s ease-in-out",
           pointerEvents: "none",
@@ -1330,7 +1330,7 @@ const Splash = ({ onDone }: { onDone: () => void }) => {
 const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn: () => void }) => (
   <div
     className="flex min-h-screen flex-col px-6 py-12"
-    style={{ backgroundColor: "#FAF8F3" }}
+    style={{ backgroundColor: "#F2EEE5" }}
   >
     <style>{`
       @keyframes ts-def-in {
@@ -1351,7 +1351,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
           borderRadius: 12,
           padding: 32,
           boxShadow:
-            "0 1px 2px rgba(91,74,63,0.06), 0 8px 24px rgba(91,74,63,0.10), 0 24px 48px -12px rgba(91,74,63,0.08)",
+            "0 1px 2px rgba(91,74,63,0.08), 0 12px 28px rgba(91,74,63,0.16), 0 32px 64px -16px rgba(91,74,63,0.18)",
         }}
       >
         {/* Headword + pronunciation */}
@@ -1466,7 +1466,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
           fontWeight: 500,
           fontSize: 16,
           letterSpacing: "0.04em",
-          color: "#FAF8F3",
+          color: "#F2EEE5",
           backgroundColor: "#B8860B",
           border: "none",
           borderRadius: 999,
@@ -1737,7 +1737,7 @@ const ArtifactReveal = ({
   return (
     <div
       className="min-h-screen w-full px-6 py-10 flex flex-col items-center"
-      style={{ backgroundColor: "#FAF8F3" }}
+      style={{ backgroundColor: "#F2EEE5" }}
     >
       <style>{`
         @keyframes ts-artifact-in {
