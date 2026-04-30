@@ -944,19 +944,79 @@ const Onboarding = () => {
     );
   }
 
+  // ---- WHEN (S7) ----
   if (step === "date") {
+    const headline = WHEN_HEADLINES[draft.category];
+    const examples = WHEN_EXAMPLES[draft.category] ?? [];
+    const whenValue = draft.memoryDate.yearText ?? "";
+    const setWhen = (val: string) =>
+      update({
+        memoryDate: { ...draft.memoryDate, yearText: val },
+      });
+    const advance = () => setStep("artifact");
     return (
       <LightScreen onBack={() => setStep("details")} progress={progressFor("date")}>
-        <Question
-          kicker="Step 4 of 4"
-          title="When was this?"
-          subtitle="Approximate is fine. Skip if you'd rather not say."
-        />
-        <MemoryDateInput
-          value={draft.memoryDate}
-          onChange={(d) => update({ memoryDate: d })}
-        />
-        <PrimaryCTA onClick={() => setStep("artifact")}>See it rendered</PrimaryCTA>
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder="A date, a year, or however you remember it"
+            value={whenValue}
+            onChange={(e) => setWhen(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 14,
+              color: "rgba(44,62,80,0.7)",
+              margin: 0,
+              textAlign: "center",
+            }}
+          >
+            Approximate is perfectly fine.
+          </p>
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <PrimaryCTA onClick={advance}>See it rendered</PrimaryCTA>
       </LightScreen>
     );
   }
