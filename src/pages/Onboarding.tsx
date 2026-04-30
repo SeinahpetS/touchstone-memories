@@ -1367,7 +1367,21 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
               color: "#2C3E50",
             }}
           >
-            touch<span style={{ color: "rgba(44,62,80,0.45)", margin: "0 0.05em" }}>·</span>stone
+            touch
+            <span
+              aria-hidden
+              style={{
+                display: "inline-block",
+                width: "0.42em",
+                height: "0.42em",
+                margin: "0 0.28em",
+                verticalAlign: "0.22em",
+                backgroundColor: "#B8860B",
+                transform: "rotate(45deg)",
+                boxShadow: "0 0 10px rgba(184,134,11,0.35)",
+              }}
+            />
+            stone
           </h1>
           <span
             style={{
