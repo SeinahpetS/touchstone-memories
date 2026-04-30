@@ -283,7 +283,12 @@ const Onboarding = () => {
         user_id: user.id,
         category: d.category as any,
         title: d.title.trim() || null,
-        note: d.note.trim() || null,
+        note: (() => {
+          const loc = d.emotionalLocation.trim();
+          const note = d.note.trim();
+          if (loc && note) return `${loc}\n\n${note}`;
+          return loc || note || null;
+        })(),
         photo_url,
         memory_season: d.memoryDate.season,
         memory_year: d.memoryDate.year,
