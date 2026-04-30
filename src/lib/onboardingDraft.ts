@@ -15,6 +15,10 @@ export interface OnboardingDraft {
   whoWasThere: string;
   /** Free-form "emotional location" answer captured on S5. */
   emotionalLocation: string;
+  /** Map location captured on S6 (Google Places or freeform). */
+  mapLocationName: string;
+  mapLocationLat: number | null;
+  mapLocationLng: number | null;
   memoryDate: MemoryDate;
   /** Object URL for the in-memory photo, used for preview only. */
   photoPreview: string | null;
@@ -36,6 +40,9 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   note: "",
   whoWasThere: "",
   emotionalLocation: "",
+  mapLocationName: "",
+  mapLocationLat: null,
+  mapLocationLng: null,
   memoryDate: emptyMemoryDate(),
   photoPreview: null,
 });
