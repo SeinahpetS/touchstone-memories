@@ -1386,7 +1386,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
           <span
             style={{
               fontFamily: "'Jost', sans-serif",
-              fontSize: 14,
+              fontSize: 18,
               color: "rgba(44,62,80,0.55)",
               letterSpacing: "0.02em",
             }}
@@ -1400,7 +1400,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
           style={{
             fontFamily: "'Jost', sans-serif",
             fontStyle: "italic",
-            fontSize: 14,
+            fontSize: 18,
             color: "rgba(44,62,80,0.55)",
             margin: "8px 0 24px",
             letterSpacing: "0.01em",
