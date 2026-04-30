@@ -794,11 +794,39 @@ const DarkScreen = ({ children }: { children: React.ReactNode }) => (
 const LightScreen = ({
   children,
   onBack,
+  progress,
 }: {
   children: React.ReactNode;
   onBack?: () => void;
+  /** 0-1 progress fill, or null to hide the bar entirely. */
+  progress?: number | null;
 }) => (
-  <div className="min-h-screen bg-background px-6 py-8">
+  <div className="relative min-h-screen bg-background px-6 py-8">
+    {/* Slim 2px gold progress bar — pinned to the very top of the screen */}
+    {typeof progress === "number" && (
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          backgroundColor: "rgba(184,134,11,0.12)",
+          zIndex: 50,
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${Math.max(0, Math.min(1, progress)) * 100}%`,
+            backgroundColor: "#B8860B",
+            transition: "width 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        />
+      </div>
+    )}
     <div className="mx-auto max-w-md space-y-6">
       <div className="flex items-center justify-between">
         {onBack ? (
