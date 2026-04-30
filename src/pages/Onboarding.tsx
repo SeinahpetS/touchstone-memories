@@ -65,6 +65,38 @@ const EMOTIONAL_EXAMPLES: Partial<Record<CategoryKey, string[]>> = {
   food: ["Her kitchen on a Sunday", "A restaurant I can't find anymore"],
 };
 
+// Per-category copy for the When screen (S7).
+const WHEN_HEADLINES: Record<CategoryKey, string> = {
+  object: "When did this enter your life?",
+  moment: "When did this happen?",
+  place: "When were you there?",
+  food: "When did you first have this?",
+  person: "When did they come into your life?",
+  sound: "When did you first hear this?",
+  imprint: "When did this find you?",
+};
+
+const WHEN_EXAMPLES: Record<CategoryKey, string[]> = {
+  object: [
+    "Summer 1987",
+    "June 12, 1994",
+    "I was about nine",
+    "It was always just there",
+  ],
+  moment: ["August 2003", "I was twelve", "More recently than it feels"],
+  place: [
+    "Every summer until I was sixteen",
+    "Just once, but it stayed with me",
+  ],
+  food: [
+    "Every Sunday growing up",
+    "Once, and I've been chasing it since",
+  ],
+  person: ["When I was a kid", "A few years ago"],
+  sound: ["Every morning growing up", "Just one summer"],
+  imprint: ["A long time ago", "I was around fifteen"],
+};
+
 // Per-category copy for the Relationship screen (S4).
 const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
   object: "How did this come into your story?",
