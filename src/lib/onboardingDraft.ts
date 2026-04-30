@@ -19,6 +19,8 @@ export interface OnboardingDraft {
   mapLocationName: string;
   mapLocationLat: number | null;
   mapLocationLng: number | null;
+  /** People-nudge answer captured on the Artifact screen. */
+  people: string;
   memoryDate: MemoryDate;
   /** Object URL for the in-memory photo, used for preview only. */
   photoPreview: string | null;
@@ -43,6 +45,7 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   mapLocationName: "",
   mapLocationLat: null,
   mapLocationLng: null,
+  people: "",
   memoryDate: emptyMemoryDate(),
   photoPreview: null,
 });

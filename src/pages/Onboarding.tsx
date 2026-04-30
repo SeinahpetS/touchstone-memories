@@ -363,6 +363,7 @@ const Onboarding = () => {
             ? d.memoryDate.yearText.trim()
             : null,
         who_was_there: d.whoWasThere.trim() || null,
+        people: d.people.trim() || null,
         location_name: d.mapLocationName.trim() || null,
         location_lat: d.mapLocationLat,
         location_lng: d.mapLocationLng,
@@ -1102,6 +1103,8 @@ const Onboarding = () => {
         draft={draft}
         photoPreview={photoPreview}
         onClaim={() => setStep("signup")}
+        peopleValue={draft.people}
+        onPeopleChange={(name) => update({ people: name })}
       />
     );
   }
@@ -1601,10 +1604,14 @@ const ArtifactReveal = ({
   draft,
   photoPreview,
   onClaim,
+  peopleValue,
+  onPeopleChange,
 }: {
   draft: OnboardingDraft;
   photoPreview: string | null;
   onClaim: () => void;
+  peopleValue: string;
+  onPeopleChange: (name: string) => void;
 }) => {
   const cat = draft.category;
   const barColor = CATEGORY_BORDER_COLORS[cat] ?? "#B8860B";
@@ -1615,15 +1622,46 @@ const ArtifactReveal = ({
   const noteText = draft.note.trim();
   const emotionalText = draft.emotionalLocation.trim();
 
-  const [phase, setPhase] = useState<"still" | "named" | "cta">("still");
+  // Sequence:
+  //  still  → just the artifact, full-screen stillness
+  //  named  → "You just made your first Touchstone." appears
+  //  nudge  → "Anyone who'd remember this too?" people prompt appears
+  //  cta    → quiet "Let's keep this safe." CTA appears
+  const [phase, setPhase] = useState<"still" | "named" | "nudge" | "cta">(
+    "still"
+  );
+  // The nudge fires once; once dismissed (added or skipped) it never comes
+  // back, even if the user navigates away and returns.
+  const [nudgeDone, setNudgeDone] = useState<boolean>(
+    () => peopleValue.trim().length > 0
+  );
+  const [nudgeMode, setNudgeMode] = useState<"prompt" | "input">("prompt");
+  const [nameDraft, setNameDraft] = useState<string>(peopleValue);
+
   useEffect(() => {
     const t1 = window.setTimeout(() => setPhase("named"), 1600);
-    const t2 = window.setTimeout(() => setPhase("cta"), 3200);
+    const t2 = window.setTimeout(
+      () => setPhase((p) => (p === "named" ? "nudge" : p)),
+      3000
+    );
+    const t3 = window.setTimeout(
+      () => setPhase((p) => (nudgeDone ? "cta" : p)),
+      4400
+    );
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
+      window.clearTimeout(t3);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When the nudge is resolved (added or skipped), advance to the CTA.
+  const finishNudge = (name: string | null) => {
+    if (name && name.trim()) onPeopleChange(name.trim());
+    setNudgeDone(true);
+    setPhase("cta");
+  };
 
   return (
     <div
@@ -1799,7 +1837,128 @@ const ArtifactReveal = ({
         </p>
       </div>
 
-      {/* Quiet CTA — appears after another beat */}
+      {/* People nudge — fires once, between the confirmation line and the CTA */}
+      {!nudgeDone && (
+        <div
+          style={{
+            marginTop: 28,
+            width: "100%",
+            maxWidth: 360,
+            opacity: phase === "nudge" || phase === "cta" ? 1 : 0,
+            transform:
+              phase === "nudge" || phase === "cta"
+                ? "translateY(0)"
+                : "translateY(6px)",
+            transition: "opacity 0.9s ease-out, transform 0.9s ease-out",
+            pointerEvents: phase === "nudge" ? "auto" : "none",
+          }}
+        >
+          {nudgeMode === "prompt" ? (
+            <div className="text-center space-y-3">
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: "italic",
+                  fontSize: 17,
+                  color: "rgba(44,62,80,0.85)",
+                  margin: 0,
+                }}
+              >
+                Anyone who'd remember this too?
+              </p>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNudgeMode("input")}
+                  style={{
+                    backgroundColor: "#E8E4D8",
+                    color: "#2C3E50",
+                    borderRadius: 999,
+                    padding: "10px 18px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: "1px solid rgba(184,134,11,0.4)",
+                  }}
+                >
+                  Add a name
+                </button>
+                <button
+                  type="button"
+                  onClick={() => finishNudge(null)}
+                  style={{
+                    background: "transparent",
+                    color: "#5B4A3F",
+                    opacity: 0.75,
+                    padding: "10px 14px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: 0,
+                  }}
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Input
+                type="text"
+                autoFocus
+                placeholder="Their name"
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    finishNudge(nameDraft);
+                  }
+                }}
+                className="h-12 text-base bg-card border-0 placeholder:italic"
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  color: "#2C3E50",
+                }}
+              />
+              <div className="flex items-center justify-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => finishNudge(nameDraft)}
+                  disabled={!nameDraft.trim()}
+                  style={{
+                    backgroundColor: "#2C3E50",
+                    color: "#F2EEE5",
+                    borderRadius: 999,
+                    padding: "10px 20px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: 0,
+                    opacity: nameDraft.trim() ? 1 : 0.4,
+                    cursor: nameDraft.trim() ? "pointer" : "not-allowed",
+                  }}
+                >
+                  Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => finishNudge(null)}
+                  style={{
+                    background: "transparent",
+                    color: "#5B4A3F",
+                    opacity: 0.75,
+                    padding: "10px 14px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: 0,
+                  }}
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div
         style={{
           marginTop: 24,
