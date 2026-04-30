@@ -428,10 +428,10 @@ const Archive = () => {
                         fontSize: "10px",
                         color: "#9E9585",
                         letterSpacing: "0.12em",
-                        textTransform: "uppercase",
+                        textTransform: "lowercase",
                       }}
                     >
-                      TOUCHSTONES
+                      touchstones
                     </span>
                   </div>
                 </div>

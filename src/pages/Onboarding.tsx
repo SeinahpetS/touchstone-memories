@@ -1288,11 +1288,11 @@ const Splash = ({ onDone }: { onDone: () => void }) => {
             fontSize: "clamp(34px, 8vw, 52px)",
             letterSpacing: "0.28em",
             color: "#F2EEE5",
-            textTransform: "uppercase",
+            textTransform: "lowercase",
             margin: 0,
           }}
         >
-          Touchstone
+          touchstone
         </h1>
         <span
           aria-hidden
@@ -1576,11 +1576,11 @@ const LightScreen = ({
             fontFamily: "'Playfair Display', serif",
             fontSize: 13,
             letterSpacing: "0.28em",
-            textTransform: "uppercase",
+            textTransform: "lowercase",
             color: "#2C3E50",
           }}
         >
-          Touchstone
+          touchstone
         </span>
         <span className="w-10" />
       </div>
