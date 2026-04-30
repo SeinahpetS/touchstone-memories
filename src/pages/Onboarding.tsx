@@ -65,6 +65,38 @@ const EMOTIONAL_EXAMPLES: Partial<Record<CategoryKey, string[]>> = {
   food: ["Her kitchen on a Sunday", "A restaurant I can't find anymore"],
 };
 
+// Per-category copy for the When screen (S7).
+const WHEN_HEADLINES: Record<CategoryKey, string> = {
+  object: "When did this enter your life?",
+  moment: "When did this happen?",
+  place: "When were you there?",
+  food: "When did you first have this?",
+  person: "When did they come into your life?",
+  sound: "When did you first hear this?",
+  imprint: "When did this find you?",
+};
+
+const WHEN_EXAMPLES: Record<CategoryKey, string[]> = {
+  object: [
+    "Summer 1987",
+    "June 12, 1994",
+    "I was about nine",
+    "It was always just there",
+  ],
+  moment: ["August 2003", "I was twelve", "More recently than it feels"],
+  place: [
+    "Every summer until I was sixteen",
+    "Just once, but it stayed with me",
+  ],
+  food: [
+    "Every Sunday growing up",
+    "Once, and I've been chasing it since",
+  ],
+  person: ["When I was a kid", "A few years ago"],
+  sound: ["Every morning growing up", "Just one summer"],
+  imprint: ["A long time ago", "I was around fifteen"],
+};
+
 // Per-category copy for the Relationship screen (S4).
 const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
   object: "How did this come into your story?",
@@ -912,19 +944,79 @@ const Onboarding = () => {
     );
   }
 
+  // ---- WHEN (S7) ----
   if (step === "date") {
+    const headline = WHEN_HEADLINES[draft.category];
+    const examples = WHEN_EXAMPLES[draft.category] ?? [];
+    const whenValue = draft.memoryDate.yearText ?? "";
+    const setWhen = (val: string) =>
+      update({
+        memoryDate: { ...draft.memoryDate, yearText: val },
+      });
+    const advance = () => setStep("artifact");
     return (
       <LightScreen onBack={() => setStep("details")} progress={progressFor("date")}>
-        <Question
-          kicker="Step 4 of 4"
-          title="When was this?"
-          subtitle="Approximate is fine. Skip if you'd rather not say."
-        />
-        <MemoryDateInput
-          value={draft.memoryDate}
-          onChange={(d) => update({ memoryDate: d })}
-        />
-        <PrimaryCTA onClick={() => setStep("artifact")}>See it rendered</PrimaryCTA>
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder="A date, a year, or however you remember it"
+            value={whenValue}
+            onChange={(e) => setWhen(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 14,
+              color: "rgba(44,62,80,0.7)",
+              margin: 0,
+              textAlign: "center",
+            }}
+          >
+            Approximate is perfectly fine.
+          </p>
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <PrimaryCTA onClick={advance}>See it rendered</PrimaryCTA>
       </LightScreen>
     );
   }
