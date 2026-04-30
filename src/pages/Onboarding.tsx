@@ -1430,7 +1430,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
 
       {/* Sub-copy */}
       <p
-        className="ts-def-sub mt-12 text-center"
+        className="ts-def-sub mt-12 text-center mx-auto"
         style={{
           fontFamily: "'Playfair Display', serif",
           fontStyle: "italic",
