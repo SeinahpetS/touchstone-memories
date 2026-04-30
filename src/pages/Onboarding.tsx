@@ -438,7 +438,7 @@ const Onboarding = () => {
     const examples = TITLE_EXAMPLES[draft.category] ?? [];
     const canAdvance = draft.title.trim().length > 0;
     const advance = () => {
-      if (canAdvance) setStep("photo");
+      if (canAdvance) setStep("relationship");
     };
     return (
       <LightScreen
