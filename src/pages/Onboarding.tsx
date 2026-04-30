@@ -1103,6 +1103,8 @@ const Onboarding = () => {
         draft={draft}
         photoPreview={photoPreview}
         onClaim={() => setStep("signup")}
+        peopleValue={draft.people}
+        onPeopleChange={(name) => update({ people: name })}
       />
     );
   }
