@@ -500,10 +500,77 @@ const Onboarding = () => {
     );
   }
 
+  // ---- RELATIONSHIP (S4) ----
+  if (step === "relationship") {
+    const headline =
+      RELATIONSHIP_HEADLINES[draft.category] ?? "Who was part of this?";
+    const options = RELATIONSHIP_OPTIONS[draft.category] ?? [];
+    if (options.length === 0) {
+      setStep("photo");
+      return null;
+    }
+    const pickRelationship = (label: string) => {
+      update({ whoWasThere: label });
+      setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("title")}
+        progress={progressFor("relationship")}
+      >
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          {options.map((opt) => {
+            const selected = draft.whoWasThere === opt;
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => pickRelationship(opt)}
+                aria-pressed={selected}
+                className="w-full text-left transition-colors"
+                style={{
+                  backgroundColor: selected ? "#2C3E50" : "#E8E4D8",
+                  color: selected ? "#F2EEE5" : "#2C3E50",
+                  borderRadius: 12,
+                  padding: "16px 20px",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 18,
+                  letterSpacing: "0.005em",
+                  border: selected
+                    ? "1px solid rgba(184,134,11,0.6)"
+                    : "1px solid rgba(44,62,80,0.06)",
+                  boxShadow: selected
+                    ? "0 4px 18px rgba(44,62,80,0.18)"
+                    : "0 1px 2px rgba(44,62,80,0.04)",
+                }}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("title")} progress={progressFor("photo")}>
+      <LightScreen onBack={() => setStep("relationship")} progress={progressFor("photo")}>
+
         <Question
           kicker="Step 2 of 4"
           title="Add a photo, if you have one."
