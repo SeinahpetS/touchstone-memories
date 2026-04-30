@@ -14,6 +14,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
@@ -38,12 +39,34 @@ const Auth = () => {
         toast.success("Check your email to confirm your account.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          const msg = (error.message || "").toLowerCase();
+          if (msg.includes("not confirmed") || msg.includes("confirm")) {
+            setUnconfirmedEmail(email);
+            return;
+          }
+          throw error;
+        }
       }
     } catch (err: any) {
       toast.error(err.message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!unconfirmedEmail) return;
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: unconfirmedEmail,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      toast.success("Confirmation email sent.");
+    } catch (err: any) {
+      toast.error(err.message || "Could not resend.");
     }
   };
 
