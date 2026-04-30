@@ -1,0 +1,841 @@
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import CategoryIcon, {
+  CATEGORY_BORDER_COLORS,
+  CATEGORY_LABELS,
+  CategoryIconCard,
+  type CategoryKey,
+} from "@/components/CategoryIcon";
+import PhotoUpload from "@/components/PhotoUpload";
+import MemoryDateInput from "@/components/MemoryDateInput";
+import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
+import {
+  clearOnboardingDraft,
+  emptyOnboardingDraft,
+  getOnboardingPhoto,
+  loadOnboardingDraft,
+  saveOnboardingDraft,
+  setOnboardingPhoto,
+  type OnboardingDraft,
+} from "@/lib/onboardingDraft";
+
+type Step = "splash" | "definition" | "category" | "photo" | "details" | "date" | "artifact" | "signup";
+
+const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
+  moment: "What was happening in this moment? What do you want to remember?",
+  person: "Who were they to you? What do you want to remember about them?",
+  object: "Where did this come from? What does it mean to you?",
+  place: "What brought you here? What do you want to remember about it?",
+  food: "What tastes stood out? What do you want to remember about the meal?",
+  sound: "What makes this sound memorable? What does it remind you of?",
+  imprint: "What does this remind you of? Why has it stayed with you?",
+};
+
+const TITLE_PLACEHOLDERS: Record<CategoryKey, string> = {
+  moment: "Name this moment",
+  person: "Their name",
+  object: "Name this object",
+  place: "Name this place",
+  food: "Name this meal",
+  sound: "Name this sound",
+  imprint: "Name this imprint",
+};
+
+const CATEGORIES: CategoryKey[] = [
+  "moment",
+  "person",
+  "object",
+  "place",
+  "food",
+  "sound",
+  "imprint",
+];
+
+const Onboarding = () => {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const [step, setStep] = useState<Step>("splash");
+  const [draft, setDraft] = useState<OnboardingDraft>(emptyOnboardingDraft());
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [persisting, setPersisting] = useState(false);
+
+  // Auth form state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // On mount: rehydrate any draft (e.g. after OAuth round-trip).
+  useEffect(() => {
+    const existing = loadOnboardingDraft();
+    if (existing) {
+      setDraft(existing);
+      setPhotoFile(getOnboardingPhoto());
+      setPhotoPreview(existing.photoPreview);
+    }
+  }, []);
+
+  // After auth, persist the captured memory and route into the app.
+  useEffect(() => {
+    if (loading || !user) return;
+    const stored = loadOnboardingDraft();
+    if (!stored) {
+      navigate("/archive", { replace: true });
+      return;
+    }
+    persistDraft(stored).then(() => {
+      navigate("/archive", { replace: true });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, loading]);
+
+  const update = (patch: Partial<OnboardingDraft>) => {
+    setDraft((prev) => ({ ...prev, ...patch }));
+  };
+
+  const handlePhotoSelect = (f: File | null) => {
+    setPhotoFile(f);
+    setOnboardingPhoto(f);
+    if (f) {
+      const url = URL.createObjectURL(f);
+      setPhotoPreview(url);
+      update({ photoPreview: url });
+    } else {
+      setPhotoPreview(null);
+      update({ photoPreview: null });
+    }
+  };
+
+  const persistDraft = async (d: OnboardingDraft) => {
+    if (!user || persisting) return;
+    setPersisting(true);
+    try {
+      let photo_url: string | null = null;
+      const file = getOnboardingPhoto();
+      if (file) {
+        const ext = file.name.split(".").pop();
+        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("memory-photos")
+          .upload(path, file);
+        if (!upErr) {
+          const { data } = supabase.storage.from("memory-photos").getPublicUrl(path);
+          photo_url = data.publicUrl;
+        }
+      }
+      const payload: Record<string, any> = {
+        user_id: user.id,
+        category: d.category as any,
+        title: d.title.trim() || null,
+        note: d.note.trim() || null,
+        photo_url,
+        memory_season: d.memoryDate.season,
+        memory_year: d.memoryDate.year,
+        memory_month: d.memoryDate.month,
+        memory_day: d.memoryDate.day,
+        when_text:
+          d.memoryDate.yearText && d.memoryDate.yearText.trim()
+            ? d.memoryDate.yearText.trim()
+            : null,
+        who_was_there: d.whoWasThere.trim() || null,
+      };
+      await (supabase as any).from("touchstones").insert(payload);
+      toast.success("Your first Touchstone is saved.");
+    } catch {
+      toast.error("Couldn't save your first memory — try again from the archive.");
+    } finally {
+      clearOnboardingDraft();
+      setPersisting(false);
+    }
+  };
+
+  // ---- Auth handlers ----
+  const handleEmailSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    saveOnboardingDraft(draft);
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name },
+          emailRedirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
+      toast.success("Check your email to confirm your account.");
+    } catch (err: any) {
+      toast.error(err.message || "Sign up failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    saveOnboardingDraft(draft);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error(result.error.message || "Google sign-in failed");
+    }
+  };
+
+  // ---- Render: while auth is loading or persisting, show a quiet placeholder
+  if (loading || persisting) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">One moment…</p>
+      </div>
+    );
+  }
+
+  // ---- SPLASH ----
+  if (step === "splash") {
+    return (
+      <DarkScreen>
+        <div className="flex flex-col items-center text-center gap-10">
+          <div className="space-y-3">
+            <h1
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 600,
+                fontSize: 36,
+                letterSpacing: "0.28em",
+                color: "#F2EEE5",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              Touchstone
+            </h1>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                color: "rgba(242,238,229,0.78)",
+                fontSize: 18,
+                margin: 0,
+              }}
+            >
+              A living archive of what you carry.
+            </p>
+          </div>
+          <PrimaryCTA onClick={() => setStep("definition")}>Begin</PrimaryCTA>
+        </div>
+      </DarkScreen>
+    );
+  }
+
+  // ---- DEFINITION ----
+  if (step === "definition") {
+    return (
+      <DarkScreen>
+        <div className="max-w-md text-center space-y-8 px-2">
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 13,
+              letterSpacing: "0.3em",
+              textTransform: "uppercase",
+              color: "#B8860B",
+              margin: 0,
+            }}
+          >
+            Touchstone
+            <span style={{ marginLeft: 10, opacity: 0.65 }}>noun</span>
+          </p>
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#F2EEE5",
+              fontSize: 22,
+              lineHeight: 1.5,
+              margin: 0,
+            }}
+          >
+            A small thing — a moment, a person, an object —
+            that holds something larger than itself.
+          </p>
+          <p
+            style={{
+              fontFamily: "'Source Sans 3', sans-serif",
+              color: "rgba(242,238,229,0.72)",
+              fontSize: 16,
+              lineHeight: 1.6,
+              margin: 0,
+            }}
+          >
+            Save one now. We'll show you what it becomes.
+          </p>
+          <PrimaryCTA onClick={() => setStep("category")}>Continue</PrimaryCTA>
+        </div>
+      </DarkScreen>
+    );
+  }
+
+  // ---- CATEGORY ----
+  if (step === "category") {
+    return (
+      <LightScreen onBack={() => setStep("definition")}>
+        <Question kicker="Step 1 of 4" title="What kind of memory is this?" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {CATEGORIES.slice(0, 4).map((c) => (
+            <CategoryIconCard
+              key={c}
+              category={c}
+              active={draft.category === c}
+              iconSize={30}
+              labelSize={11}
+              onClick={() => {
+                update({ category: c });
+                setStep("photo");
+              }}
+            />
+          ))}
+        </div>
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-3 sm:max-w-[75%] sm:mx-auto">
+          {CATEGORIES.slice(4).map((c) => (
+            <CategoryIconCard
+              key={c}
+              category={c}
+              active={draft.category === c}
+              iconSize={30}
+              labelSize={11}
+              onClick={() => {
+                update({ category: c });
+                setStep("photo");
+              }}
+            />
+          ))}
+        </div>
+      </LightScreen>
+    );
+  }
+
+  // ---- PHOTO ----
+  if (step === "photo") {
+    return (
+      <LightScreen onBack={() => setStep("category")}>
+        <Question
+          kicker="Step 2 of 4"
+          title="Add a photo, if you have one."
+          subtitle="Optional — you can also skip this."
+        />
+        <PhotoUpload
+          file={photoFile}
+          preview={photoPreview}
+          onSelect={handlePhotoSelect}
+        />
+        <div className="flex flex-col gap-3 pt-2">
+          <PrimaryCTA onClick={() => setStep("details")}>
+            {photoPreview ? "Continue" : "Skip for now"}
+          </PrimaryCTA>
+        </div>
+      </LightScreen>
+    );
+  }
+
+  // ---- DETAILS (title + note) ----
+  if (step === "details") {
+    return (
+      <LightScreen onBack={() => setStep("photo")}>
+        <Question
+          kicker="Step 3 of 4"
+          title="Tell us about it."
+          subtitle="A name, a few words — whatever you want to keep."
+        />
+        <Input
+          type="text"
+          placeholder={TITLE_PLACEHOLDERS[draft.category]}
+          value={draft.title}
+          onChange={(e) => update({ title: e.target.value })}
+          className="h-12 text-base bg-card border-0 placeholder:italic"
+        />
+        <Textarea
+          placeholder={NOTE_PLACEHOLDERS[draft.category]}
+          value={draft.note}
+          onChange={(e) => update({ note: e.target.value })}
+          rows={5}
+          className="text-base bg-card border-0 placeholder:italic resize-none"
+        />
+        <PrimaryCTA
+          onClick={() => setStep("date")}
+          disabled={!draft.title.trim() && !draft.note.trim() && !photoFile}
+        >
+          Continue
+        </PrimaryCTA>
+      </LightScreen>
+    );
+  }
+
+  // ---- DATE ----
+  if (step === "date") {
+    return (
+      <LightScreen onBack={() => setStep("details")}>
+        <Question
+          kicker="Step 4 of 4"
+          title="When was this?"
+          subtitle="Approximate is fine. Skip if you'd rather not say."
+        />
+        <MemoryDateInput
+          value={draft.memoryDate}
+          onChange={(d) => update({ memoryDate: d })}
+        />
+        <PrimaryCTA onClick={() => setStep("artifact")}>See it rendered</PrimaryCTA>
+      </LightScreen>
+    );
+  }
+
+  // ---- ARTIFACT REVEAL ----
+  if (step === "artifact") {
+    return (
+      <LightScreen>
+        <ArtifactReveal
+          draft={draft}
+          photoPreview={photoPreview}
+          onClaim={() => setStep("signup")}
+          onEdit={() => setStep("details")}
+        />
+      </LightScreen>
+    );
+  }
+
+  // ---- SIGN UP ----
+  return (
+    <LightScreen onBack={() => setStep("artifact")}>
+      <div className="text-center space-y-2">
+        <p
+          style={{
+            fontFamily: "Jost, sans-serif",
+            fontSize: 11,
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
+            color: "#B8860B",
+          }}
+        >
+          One last step
+        </p>
+        <h2
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 26,
+            color: "#2C3E50",
+            margin: 0,
+          }}
+        >
+          Keep this Touchstone forever.
+        </h2>
+        <p className="text-base text-muted-foreground">
+          Create a private archive — only you can see it.
+        </p>
+      </div>
+
+      <Button
+        onClick={handleGoogle}
+        variant="outline"
+        className="w-full h-12 text-base gap-3"
+      >
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2045c0-.6381-.0573-1.2518-.1636-1.8409H9v3.4814h4.8436c-.2086 1.125-.8427 2.0782-1.7959 2.7164v2.2581h2.9087c1.7018-1.5668 2.6836-3.874 2.6836-6.615z" />
+          <path fill="#34A853" d="M9 18c2.43 0 4.4673-.806 5.9564-2.1805l-2.9087-2.2581c-.806.54-1.8368.8595-3.0477.8595-2.344 0-4.3282-1.5831-5.036-3.7104H.9573v2.3318C2.4382 15.9832 5.4818 18 9 18z" />
+          <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.2823-1.1168-.2823-1.71s.1023-1.17.2823-1.71V4.9582H.9573C.3477 6.1731 0 7.5477 0 9c0 1.4523.3477 2.8268.9573 4.0418L3.964 10.71z" />
+          <path fill="#EA4335" d="M9 3.5795c1.3214 0 2.5077.4541 3.4405 1.3459l2.5813-2.5814C13.4632.8918 11.426 0 9 0 5.4818 0 2.4382 2.0168.9573 4.9582L3.964 7.29C4.6718 5.1627 6.656 3.5795 9 3.5795z" />
+        </svg>
+        Continue with Google
+      </Button>
+
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-sm text-muted-foreground">or</span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <form onSubmit={handleEmailSignup} className="space-y-3">
+        <Input
+          type="text"
+          placeholder="Your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="h-12 text-base bg-card border-0"
+        />
+        <Input
+          type="email"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="h-12 text-base bg-card border-0"
+        />
+        <Input
+          type="password"
+          placeholder="Password (6+ characters)"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          className="h-12 text-base bg-card border-0"
+        />
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full h-12 text-base bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          {submitting ? "…" : "Create my archive"}
+        </Button>
+      </form>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <button
+          onClick={() => {
+            saveOnboardingDraft(draft);
+            navigate("/auth");
+          }}
+          className="text-foreground underline underline-offset-4"
+        >
+          Sign in
+        </button>
+      </p>
+    </LightScreen>
+  );
+};
+
+// ---------- Sub-components ----------
+
+const DarkScreen = ({ children }: { children: React.ReactNode }) => (
+  <div
+    className="flex min-h-screen items-center justify-center px-6 py-10"
+    style={{ backgroundColor: "#2C3E50" }}
+  >
+    <div className="w-full max-w-md flex items-center justify-center">{children}</div>
+  </div>
+);
+
+const LightScreen = ({
+  children,
+  onBack,
+}: {
+  children: React.ReactNode;
+  onBack?: () => void;
+}) => (
+  <div className="min-h-screen bg-background px-6 py-8">
+    <div className="mx-auto max-w-md space-y-6">
+      <div className="flex items-center justify-between">
+        {onBack ? (
+          <button
+            onClick={onBack}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            style={{ fontFamily: "Jost, sans-serif", letterSpacing: "0.08em" }}
+          >
+            ← Back
+          </button>
+        ) : (
+          <span />
+        )}
+        <span
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 13,
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
+            color: "#2C3E50",
+          }}
+        >
+          Touchstone
+        </span>
+        <span className="w-10" />
+      </div>
+      {children}
+    </div>
+  </div>
+);
+
+const Question = ({
+  kicker,
+  title,
+  subtitle,
+}: {
+  kicker?: string;
+  title: string;
+  subtitle?: string;
+}) => (
+  <div className="space-y-2 pt-2">
+    {kicker && (
+      <p
+        style={{
+          fontFamily: "Jost, sans-serif",
+          fontSize: 11,
+          letterSpacing: "0.28em",
+          textTransform: "uppercase",
+          color: "#B8860B",
+        }}
+      >
+        {kicker}
+      </p>
+    )}
+    <h2
+      style={{
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 26,
+        color: "#2C3E50",
+        margin: 0,
+        lineHeight: 1.25,
+      }}
+    >
+      {title}
+    </h2>
+    {subtitle && (
+      <p className="text-base text-muted-foreground" style={{ fontFamily: "Jost, sans-serif" }}>
+        {subtitle}
+      </p>
+    )}
+  </div>
+);
+
+const PrimaryCTA = ({
+  children,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className="w-full transition-opacity disabled:opacity-50"
+    style={{
+      backgroundColor: "#B8860B",
+      color: "#F2EEE5",
+      borderRadius: 999,
+      padding: "14px 28px",
+      fontFamily: "Jost, sans-serif",
+      fontSize: 15,
+      letterSpacing: "0.16em",
+      textTransform: "uppercase",
+      fontWeight: 500,
+    }}
+  >
+    {children}
+  </button>
+);
+
+const ArtifactReveal = ({
+  draft,
+  photoPreview,
+  onClaim,
+  onEdit,
+}: {
+  draft: OnboardingDraft;
+  photoPreview: string | null;
+  onClaim: () => void;
+  onEdit: () => void;
+}) => {
+  const cat = draft.category;
+  const barColor = CATEGORY_BORDER_COLORS[cat] ?? "#B8860B";
+  const dateLabel =
+    (draft.memoryDate.yearText && draft.memoryDate.yearText.trim()) ||
+    formatMemoryDate(draft.memoryDate) ||
+    "";
+
+  return (
+    <div className="space-y-6 pt-4">
+      <style>{`
+        @keyframes ts-onb-cardIn {
+          from { opacity: 0; transform: scale(0.96) translateY(6px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes ts-onb-pulse {
+          0% { box-shadow: 0 12px 30px rgba(0,0,0,0.12), 0 0 0 0 rgba(184,134,11,0); }
+          40% { box-shadow: 0 12px 30px rgba(0,0,0,0.18), 0 0 28px 6px rgba(184,134,11,0.55); }
+          100% { box-shadow: 0 12px 30px rgba(0,0,0,0.12), 0 0 0 0 rgba(184,134,11,0); }
+        }
+        @keyframes ts-onb-fade {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .ts-onb-confirm { animation: ts-onb-fade 0.5s ease-out 0.1s both; }
+        .ts-onb-card {
+          animation: ts-onb-cardIn 0.45s ease-out both, ts-onb-pulse 2.6s ease-out 0.4s 1 both;
+        }
+        .ts-onb-actions { animation: ts-onb-fade 0.5s ease-out 0.7s both; }
+      `}</style>
+
+      <div className="ts-onb-confirm text-center space-y-1">
+        <p
+          style={{
+            fontFamily: "Jost, sans-serif",
+            fontSize: 11,
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
+            color: "#B8860B",
+          }}
+        >
+          Saved
+        </p>
+        <p
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: "italic",
+            fontSize: 20,
+            color: "#2C3E50",
+            margin: 0,
+          }}
+        >
+          Part of your story now.
+        </p>
+      </div>
+
+      {/* Card mirrors MemoryCard structure */}
+      <div
+        className="ts-onb-card mx-auto w-full max-w-sm overflow-hidden"
+        style={{ backgroundColor: "#E8E4D8", borderRadius: 12 }}
+      >
+        {photoPreview ? (
+          <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
+            <img
+              src={photoPreview}
+              alt={draft.title || "Memory"}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              aspectRatio: "1 / 1",
+              width: "100%",
+              backgroundColor: "#E4E2DC",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 12,
+                backgroundColor: "#2C3E50",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CategoryIcon category={cat} size={38} color="#B8860B" />
+            </span>
+          </div>
+        )}
+
+        <div style={{ height: 9, width: "100%", backgroundColor: barColor }} />
+
+        <div style={{ padding: 14 }} className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                backgroundColor: "#2C3E50",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CategoryIcon category={cat} size={16} color="#B8860B" />
+            </span>
+            <span
+              style={{
+                fontFamily: "Jost, sans-serif",
+                fontSize: 11,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#8A8070",
+              }}
+            >
+              {CATEGORY_LABELS[cat]}
+            </span>
+          </div>
+
+          {draft.title.trim() && (
+            <h3
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 20,
+                fontWeight: 600,
+                color: "#2C3E50",
+                margin: 0,
+                lineHeight: 1.2,
+              }}
+            >
+              {draft.title.trim()}
+            </h3>
+          )}
+          {dateLabel && (
+            <p
+              style={{
+                fontFamily: "Jost, sans-serif",
+                fontSize: 12,
+                fontWeight: 300,
+                color: "rgba(91,74,63,0.65)",
+                margin: 0,
+              }}
+            >
+              {dateLabel}
+            </p>
+          )}
+          {draft.note.trim() && (
+            <>
+              <div
+                aria-hidden
+                style={{
+                  height: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(91,74,63,0.15)",
+                  margin: "8px 0 6px",
+                }}
+              />
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: "italic",
+                  fontSize: 15,
+                  color: "#2C3E50",
+                  margin: 0,
+                  lineHeight: 1.5,
+                }}
+              >
+                {draft.note.trim()}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="ts-onb-actions space-y-3">
+        <PrimaryCTA onClick={onClaim}>Claim this Touchstone</PrimaryCTA>
+        <button
+          onClick={onEdit}
+          className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+          style={{ fontFamily: "Jost, sans-serif", letterSpacing: "0.1em" }}
+        >
+          Edit
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Onboarding;
