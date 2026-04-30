@@ -370,7 +370,6 @@ const Onboarding = () => {
         location_lng: d.mapLocationLng,
       };
       await (supabase as any).from("touchstones").insert(payload);
-      toast.success("Your first Touchstone is saved.");
     } catch {
       toast.error("Couldn't save your first memory — try again from the archive.");
     } finally {
