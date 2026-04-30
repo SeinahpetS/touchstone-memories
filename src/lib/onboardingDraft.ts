@@ -35,6 +35,7 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   title: "",
   note: "",
   whoWasThere: "",
+  emotionalLocation: "",
   memoryDate: emptyMemoryDate(),
   photoPreview: null,
 });
