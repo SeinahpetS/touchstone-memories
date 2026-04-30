@@ -1358,7 +1358,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
               lineHeight: 1.1,
             }}
           >
-            touchstone
+            touch<span style={{ color: "rgba(44,62,80,0.45)", margin: "0 0.05em" }}>·</span>stone
           </h1>
           <span
             style={{
