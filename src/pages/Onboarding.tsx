@@ -1430,7 +1430,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
 
       {/* Sub-copy */}
       <p
-        className="ts-def-sub mt-12 text-center"
+        className="ts-def-sub mt-12 text-center mx-auto"
         style={{
           fontFamily: "'Playfair Display', serif",
           fontStyle: "italic",
@@ -1470,22 +1470,37 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
           →
         </span>
       </button>
-      <button
-        type="button"
-        onClick={onSignIn}
-        className="transition-opacity hover:opacity-100"
-        style={{
-          fontFamily: "'Jost', sans-serif",
-          fontSize: 13,
-          color: "rgba(91,74,63,0.6)",
-          background: "transparent",
-          border: "none",
-          padding: "4px 8px",
-          letterSpacing: "0.01em",
-        }}
-      >
-        Sign in
-      </button>
+      <div className="flex flex-col items-center gap-1">
+        <span
+          style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            color: "rgba(91,74,63,0.6)",
+            letterSpacing: "0.01em",
+          }}
+        >
+          I already have an account
+        </span>
+        <button
+          type="button"
+          onClick={onSignIn}
+          className="transition-opacity hover:opacity-100"
+          style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            color: "rgba(91,74,63,0.75)",
+            background: "transparent",
+            border: "none",
+            padding: "2px 4px",
+            letterSpacing: "0.01em",
+            textDecoration: "underline",
+            textUnderlineOffset: "3px",
+            cursor: "pointer",
+          }}
+        >
+          Sign in
+        </button>
+      </div>
     </div>
   </div>
 );
