@@ -201,39 +201,7 @@ const Onboarding = () => {
 
   // ---- SPLASH ----
   if (step === "splash") {
-    return (
-      <DarkScreen>
-        <div className="flex flex-col items-center text-center gap-10">
-          <div className="space-y-3">
-            <h1
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 600,
-                fontSize: 36,
-                letterSpacing: "0.28em",
-                color: "#F2EEE5",
-                textTransform: "uppercase",
-                margin: 0,
-              }}
-            >
-              Touchstone
-            </h1>
-            <p
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontStyle: "italic",
-                color: "rgba(242,238,229,0.78)",
-                fontSize: 18,
-                margin: 0,
-              }}
-            >
-              A living archive of what you carry.
-            </p>
-          </div>
-          <PrimaryCTA onClick={() => setStep("definition")}>Begin</PrimaryCTA>
-        </div>
-      </DarkScreen>
-    );
+    return <Splash onDone={() => setStep("definition")} />;
   }
 
   // ---- DEFINITION ----
