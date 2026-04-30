@@ -732,10 +732,104 @@ const Onboarding = () => {
     );
   }
 
+  // ---- EMOTIONAL LOCATION (S5) ----
+  if (step === "emotional") {
+    const headline = EMOTIONAL_HEADLINES[draft.category];
+    const examples = EMOTIONAL_EXAMPLES[draft.category] ?? [];
+    // Categories without specific S5 copy skip the screen entirely.
+    if (!headline) {
+      setStep("photo");
+      return null;
+    }
+    // The previous step (relationship/who) determines where Back goes.
+    const cameFromWho = triggersWhoScreen(draft.category, draft.whoWasThere);
+    const back = () => setStep(cameFromWho ? "who" : "relationship");
+    const advance = () => setStep("photo");
+    const skip = () => {
+      update({ emotionalLocation: "" });
+      setStep("photo");
+    };
+    return (
+      <LightScreen onBack={back} progress={progressFor("emotional")}>
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder="A few words"
+            value={draft.emotionalLocation}
+            onChange={(e) => update({ emotionalLocation: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 pt-2">
+          <PrimaryCTA
+            onClick={advance}
+            disabled={!draft.emotionalLocation.trim()}
+          >
+            Next
+          </PrimaryCTA>
+          <button
+            type="button"
+            onClick={skip}
+            className="mx-auto text-sm"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              color: "#5B4A3F",
+              opacity: 0.7,
+              padding: "8px 12px",
+              background: "transparent",
+              border: 0,
+            }}
+          >
+            Skip
+          </button>
+        </div>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("relationship")} progress={progressFor("photo")}>
+      <LightScreen onBack={() => setStep("emotional")} progress={progressFor("photo")}>
 
         <Question
           kicker="Step 2 of 4"
