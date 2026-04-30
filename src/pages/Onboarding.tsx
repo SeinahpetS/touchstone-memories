@@ -832,10 +832,39 @@ const Onboarding = () => {
     );
   }
 
+  // ---- MAP LOCATION (S6) ----
+  if (step === "map") {
+    return (
+      <MapLocationStep
+        valueName={draft.mapLocationName}
+        valueLat={draft.mapLocationLat}
+        valueLng={draft.mapLocationLng}
+        onChange={(loc) =>
+          update({
+            mapLocationName: loc.name,
+            mapLocationLat: loc.lat,
+            mapLocationLng: loc.lng,
+          })
+        }
+        onBack={() => setStep("emotional")}
+        progress={progressFor("map")}
+        onAdvance={() => setStep("photo")}
+        onSkip={() => {
+          update({
+            mapLocationName: "",
+            mapLocationLat: null,
+            mapLocationLng: null,
+          });
+          setStep("photo");
+        }}
+      />
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("emotional")} progress={progressFor("photo")}>
+      <LightScreen onBack={() => setStep("map")} progress={progressFor("photo")}>
 
         <Question
           kicker="Step 2 of 4"
