@@ -653,7 +653,7 @@ const Onboarding = () => {
       // Skipping preserves the relationship label.
       if (relationshipLabel) update({ whoWasThere: relationshipLabel });
       else update({ whoWasThere: "" });
-      setStep("photo");
+      setStep("emotional");
     };
     return (
       <LightScreen
