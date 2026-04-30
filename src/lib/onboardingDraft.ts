@@ -45,6 +45,7 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   mapLocationName: "",
   mapLocationLat: null,
   mapLocationLng: null,
+  people: "",
   memoryDate: emptyMemoryDate(),
   photoPreview: null,
 });
