@@ -26,7 +26,28 @@ import {
   type OnboardingDraft,
 } from "@/lib/onboardingDraft";
 
-type Step = "splash" | "definition" | "category" | "photo" | "details" | "date" | "artifact" | "signup";
+type Step =
+  | "splash"
+  | "definition"
+  | "category"
+  | "time"
+  | "photo"
+  | "details"
+  | "date"
+  | "artifact"
+  | "signup";
+
+// Steps that show the slim gold progress bar at the top of the screen,
+// in the order users encounter them. Splash, definition, category and
+// artifact are intentionally excluded per spec.
+const PROGRESS_STEPS: Step[] = ["time", "photo", "details", "date", "signup"];
+
+const progressFor = (step: Step): number | null => {
+  const idx = PROGRESS_STEPS.indexOf(step);
+  if (idx === -1) return null;
+  // Fill proportionally; final step (signup) sits at 100%.
+  return (idx + 1) / PROGRESS_STEPS.length;
+};
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   moment: "What was happening in this moment? What do you want to remember?",
@@ -215,7 +236,7 @@ const Onboarding = () => {
     const COMING: CategoryKey[] = ["person", "sound", "imprint"];
     const pickCategory = (c: CategoryKey) => {
       update({ category: c });
-      setStep("photo");
+      setStep("time");
     };
     return (
       <LightScreen onBack={() => setStep("definition")}>
@@ -270,10 +291,80 @@ const Onboarding = () => {
     );
   }
 
+  // ---- TIME ----
+  if (step === "time") {
+    const TIME_OPTIONS: { label: string; yearText: string }[] = [
+      { label: "A long time ago", yearText: "A long time ago" },
+      { label: "A few years back", yearText: "A few years back" },
+      { label: "Recently", yearText: "Recently" },
+      { label: "It's ongoing", yearText: "Ongoing" },
+    ];
+    const pickTime = (yearText: string) => {
+      update({
+        memoryDate: {
+          ...emptyMemoryDate(),
+          yearText,
+        },
+      });
+      setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("category")}
+        progress={progressFor("time")}
+      >
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 28,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.2,
+            }}
+          >
+            When does this belong to?
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          {TIME_OPTIONS.map((opt) => {
+            const selected = draft.memoryDate.yearText === opt.yearText;
+            return (
+              <button
+                key={opt.yearText}
+                type="button"
+                onClick={() => pickTime(opt.yearText)}
+                aria-pressed={selected}
+                className="w-full text-left transition-colors"
+                style={{
+                  backgroundColor: selected ? "#2C3E50" : "#E8E4D8",
+                  color: selected ? "#F2EEE5" : "#2C3E50",
+                  borderRadius: 12,
+                  padding: "18px 22px",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 19,
+                  letterSpacing: "0.005em",
+                  border: selected
+                    ? "1px solid rgba(184,134,11,0.6)"
+                    : "1px solid rgba(44,62,80,0.06)",
+                  boxShadow: selected
+                    ? "0 4px 18px rgba(44,62,80,0.18)"
+                    : "0 1px 2px rgba(44,62,80,0.04)",
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("category")}>
+      <LightScreen onBack={() => setStep("time")} progress={progressFor("photo")}>
         <Question
           kicker="Step 2 of 4"
           title="Add a photo, if you have one."
@@ -296,7 +387,7 @@ const Onboarding = () => {
   // ---- DETAILS (title + note) ----
   if (step === "details") {
     return (
-      <LightScreen onBack={() => setStep("photo")}>
+      <LightScreen onBack={() => setStep("photo")} progress={progressFor("details")}>
         <Question
           kicker="Step 3 of 4"
           title="Tell us about it."
@@ -329,7 +420,7 @@ const Onboarding = () => {
   // ---- DATE ----
   if (step === "date") {
     return (
-      <LightScreen onBack={() => setStep("details")}>
+      <LightScreen onBack={() => setStep("details")} progress={progressFor("date")}>
         <Question
           kicker="Step 4 of 4"
           title="When was this?"
@@ -360,7 +451,7 @@ const Onboarding = () => {
 
   // ---- SIGN UP ----
   return (
-    <LightScreen onBack={() => setStep("artifact")}>
+    <LightScreen onBack={() => setStep("artifact")} progress={progressFor("signup")}>
       <div className="text-center space-y-2">
         <p
           style={{
@@ -703,11 +794,39 @@ const DarkScreen = ({ children }: { children: React.ReactNode }) => (
 const LightScreen = ({
   children,
   onBack,
+  progress,
 }: {
   children: React.ReactNode;
   onBack?: () => void;
+  /** 0-1 progress fill, or null to hide the bar entirely. */
+  progress?: number | null;
 }) => (
-  <div className="min-h-screen bg-background px-6 py-8">
+  <div className="relative min-h-screen bg-background px-6 py-8">
+    {/* Slim 2px gold progress bar — pinned to the very top of the screen */}
+    {typeof progress === "number" && (
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          backgroundColor: "rgba(184,134,11,0.12)",
+          zIndex: 50,
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${Math.max(0, Math.min(1, progress)) * 100}%`,
+            backgroundColor: "#B8860B",
+            transition: "width 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        />
+      </div>
+    )}
     <div className="mx-auto max-w-md space-y-6">
       <div className="flex items-center justify-between">
         {onBack ? (
