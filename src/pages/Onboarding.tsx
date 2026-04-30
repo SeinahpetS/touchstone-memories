@@ -1327,7 +1327,7 @@ const Splash = ({ onDone }: { onDone: () => void }) => {
  * Definition — ivory, full-bleed dictionary entry. Playfair throughout.
  * Sub-copy fades in 1s after the entry; quiet gold text CTA below.
  */
-const Definition = ({ onContinue }: { onContinue: () => void }) => (
+const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn: () => void }) => (
   <div
     className="flex min-h-screen flex-col px-6 py-12"
     style={{ backgroundColor: "#F2EEE5" }}
@@ -1445,7 +1445,7 @@ const Definition = ({ onContinue }: { onContinue: () => void }) => (
     </div>
 
     {/* Quiet gold text CTA */}
-    <div className="ts-def-cta flex justify-center pb-2">
+    <div className="ts-def-cta flex flex-col items-center pb-2 gap-3">
       <button
         type="button"
         onClick={onContinue}
@@ -1469,6 +1469,22 @@ const Definition = ({ onContinue }: { onContinue: () => void }) => (
         >
           →
         </span>
+      </button>
+      <button
+        type="button"
+        onClick={onSignIn}
+        className="transition-opacity hover:opacity-100"
+        style={{
+          fontFamily: "'Jost', sans-serif",
+          fontSize: 13,
+          color: "rgba(91,74,63,0.6)",
+          background: "transparent",
+          border: "none",
+          padding: "4px 8px",
+          letterSpacing: "0.01em",
+        }}
+      >
+        Sign in
       </button>
     </div>
   </div>
