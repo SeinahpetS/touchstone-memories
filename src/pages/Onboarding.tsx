@@ -1098,14 +1098,11 @@ const Onboarding = () => {
   // ---- ARTIFACT REVEAL ----
   if (step === "artifact") {
     return (
-      <LightScreen>
-        <ArtifactReveal
-          draft={draft}
-          photoPreview={photoPreview}
-          onClaim={() => setStep("signup")}
-          onEdit={() => setStep("details")}
-        />
-      </LightScreen>
+      <ArtifactReveal
+        draft={draft}
+        photoPreview={photoPreview}
+        onClaim={() => setStep("signup")}
+      />
     );
   }
 
@@ -1590,16 +1587,24 @@ const PrimaryCTA = ({
   </button>
 );
 
+/**
+ * Artifact Reveal — the most important screen in the product.
+ *
+ * Sequence (per spec):
+ *  1. Full-screen stillness. The artifact renders in. No copy, no buttons.
+ *  2. After a beat, "You just made your first Touchstone." fades in.
+ *  3. After another beat, the quiet "Let's keep this safe." CTA appears.
+ *
+ * The progress bar is intentionally not rendered here.
+ */
 const ArtifactReveal = ({
   draft,
   photoPreview,
   onClaim,
-  onEdit,
 }: {
   draft: OnboardingDraft;
   photoPreview: string | null;
   onClaim: () => void;
-  onEdit: () => void;
 }) => {
   const cat = draft.category;
   const barColor = CATEGORY_BORDER_COLORS[cat] ?? "#B8860B";
@@ -1607,66 +1612,58 @@ const ArtifactReveal = ({
     (draft.memoryDate.yearText && draft.memoryDate.yearText.trim()) ||
     formatMemoryDate(draft.memoryDate) ||
     "";
+  const noteText = draft.note.trim();
+  const emotionalText = draft.emotionalLocation.trim();
+
+  const [phase, setPhase] = useState<"still" | "named" | "cta">("still");
+  useEffect(() => {
+    const t1 = window.setTimeout(() => setPhase("named"), 1600);
+    const t2 = window.setTimeout(() => setPhase("cta"), 3200);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, []);
 
   return (
-    <div className="space-y-6 pt-4">
+    <div
+      className="min-h-screen w-full px-6 py-10 flex flex-col items-center"
+      style={{ backgroundColor: "#F2EEE5" }}
+    >
       <style>{`
-        @keyframes ts-onb-cardIn {
-          from { opacity: 0; transform: scale(0.96) translateY(6px); }
+        @keyframes ts-artifact-in {
+          from { opacity: 0; transform: scale(0.97) translateY(8px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        @keyframes ts-onb-pulse {
-          0% { box-shadow: 0 12px 30px rgba(0,0,0,0.12), 0 0 0 0 rgba(184,134,11,0); }
-          40% { box-shadow: 0 12px 30px rgba(0,0,0,0.18), 0 0 28px 6px rgba(184,134,11,0.55); }
-          100% { box-shadow: 0 12px 30px rgba(0,0,0,0.12), 0 0 0 0 rgba(184,134,11,0); }
-        }
-        @keyframes ts-onb-fade {
+        @keyframes ts-artifact-fade {
           from { opacity: 0; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .ts-onb-confirm { animation: ts-onb-fade 0.5s ease-out 0.1s both; }
-        .ts-onb-card {
-          animation: ts-onb-cardIn 0.45s ease-out both, ts-onb-pulse 2.6s ease-out 0.4s 1 both;
-        }
-        .ts-onb-actions { animation: ts-onb-fade 0.5s ease-out 0.7s both; }
+        .ts-artifact-card { animation: ts-artifact-in 0.9s ease-out both; }
+        .ts-artifact-line { animation: ts-artifact-fade 0.9s ease-out both; }
       `}</style>
 
-      <div className="ts-onb-confirm text-center space-y-1">
-        <p
-          style={{
-            fontFamily: "Jost, sans-serif",
-            fontSize: 11,
-            letterSpacing: "0.28em",
-            textTransform: "uppercase",
-            color: "#B8860B",
-          }}
-        >
-          Saved
-        </p>
-        <p
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic",
-            fontSize: 20,
-            color: "#2C3E50",
-            margin: 0,
-          }}
-        >
-          Part of your story now.
-        </p>
-      </div>
-
-      {/* Card mirrors MemoryCard structure */}
+      {/* The artifact itself — a rendered object, not a form. */}
       <div
-        className="ts-onb-card mx-auto w-full max-w-sm overflow-hidden"
-        style={{ backgroundColor: "#E8E4D8", borderRadius: 12 }}
+        className="ts-artifact-card mx-auto w-full max-w-sm overflow-hidden"
+        style={{
+          backgroundColor: "#E8E4D8",
+          borderRadius: 14,
+          boxShadow:
+            "0 24px 60px rgba(44,62,80,0.18), 0 4px 14px rgba(44,62,80,0.08)",
+        }}
       >
         {photoPreview ? (
           <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
             <img
               src={photoPreview}
               alt={draft.title || "Memory"}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
             />
           </div>
         ) : (
@@ -1674,63 +1671,40 @@ const ArtifactReveal = ({
             style={{
               aspectRatio: "1 / 1",
               width: "100%",
-              backgroundColor: "#E4E2DC",
+              backgroundColor: barColor,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <span
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: 12,
-                backgroundColor: "#2C3E50",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <CategoryIcon category={cat} size={38} color="#B8860B" />
-            </span>
+            <CategoryIcon category={cat} size={96} color="#F2EEE5" />
           </div>
         )}
 
+        {/* Category stripe */}
         <div style={{ height: 9, width: "100%", backgroundColor: barColor }} />
 
-        <div style={{ padding: 14 }} className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span
-              style={{
-                width: 26,
-                height: 26,
-                borderRadius: 6,
-                backgroundColor: "#2C3E50",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <CategoryIcon category={cat} size={16} color="#B8860B" />
-            </span>
-            <span
-              style={{
-                fontFamily: "Jost, sans-serif",
-                fontSize: 11,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#8A8070",
-              }}
-            >
-              {CATEGORY_LABELS[cat]}
-            </span>
-          </div>
+        <div style={{ padding: 18 }} className="space-y-2">
+          {/* Quiet category label */}
+          <p
+            style={{
+              fontFamily: "Jost, sans-serif",
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#8A8070",
+              margin: 0,
+            }}
+          >
+            {CATEGORY_LABELS[cat]}
+          </p>
 
+          {/* Title */}
           {draft.title.trim() && (
             <h3
               style={{
                 fontFamily: "'Playfair Display', serif",
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: 600,
                 color: "#2C3E50",
                 margin: 0,
@@ -1740,55 +1714,116 @@ const ArtifactReveal = ({
               {draft.title.trim()}
             </h3>
           )}
+
+          {/* Date captured */}
           {dateLabel && (
             <p
               style={{
                 fontFamily: "Jost, sans-serif",
                 fontSize: 12,
                 fontWeight: 300,
-                color: "rgba(91,74,63,0.65)",
+                color: "rgba(91,74,63,0.7)",
                 margin: 0,
+                letterSpacing: "0.04em",
               }}
             >
               {dateLabel}
             </p>
           )}
-          {draft.note.trim() && (
+
+          {/* Emotional location */}
+          {emotionalText && (
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontSize: 14,
+                color: "rgba(44,62,80,0.75)",
+                margin: 0,
+              }}
+            >
+              {emotionalText}
+            </p>
+          )}
+
+          {/* Note / answer */}
+          {noteText && (
             <>
               <div
                 aria-hidden
                 style={{
                   height: 1,
                   width: "100%",
-                  backgroundColor: "rgba(91,74,63,0.15)",
-                  margin: "8px 0 6px",
+                  backgroundColor: "rgba(91,74,63,0.18)",
+                  margin: "10px 0 8px",
                 }}
               />
               <p
                 style={{
                   fontFamily: "'Playfair Display', serif",
                   fontStyle: "italic",
-                  fontSize: 15,
+                  fontSize: 16,
                   color: "#2C3E50",
                   margin: 0,
-                  lineHeight: 1.5,
+                  lineHeight: 1.55,
                 }}
               >
-                {draft.note.trim()}
+                {noteText}
               </p>
             </>
           )}
         </div>
       </div>
 
-      <div className="ts-onb-actions space-y-3">
-        <PrimaryCTA onClick={onClaim}>Claim this Touchstone</PrimaryCTA>
-        <button
-          onClick={onEdit}
-          className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-          style={{ fontFamily: "Jost, sans-serif", letterSpacing: "0.1em" }}
+      {/* Confirmation line — appears after a beat */}
+      <div
+        style={{
+          minHeight: 32,
+          marginTop: 36,
+          textAlign: "center",
+          opacity: phase === "still" ? 0 : 1,
+          transform: phase === "still" ? "translateY(6px)" : "translateY(0)",
+          transition: "opacity 0.9s ease-out, transform 0.9s ease-out",
+        }}
+      >
+        <p
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: "italic",
+            fontSize: 19,
+            color: "#2C3E50",
+            margin: 0,
+          }}
         >
-          Edit
+          You just made your first Touchstone.
+        </p>
+      </div>
+
+      {/* Quiet CTA — appears after another beat */}
+      <div
+        style={{
+          marginTop: 24,
+          opacity: phase === "cta" ? 1 : 0,
+          transform: phase === "cta" ? "translateY(0)" : "translateY(6px)",
+          transition: "opacity 0.9s ease-out, transform 0.9s ease-out",
+          pointerEvents: phase === "cta" ? "auto" : "none",
+        }}
+      >
+        <button
+          type="button"
+          onClick={onClaim}
+          style={{
+            background: "transparent",
+            border: 0,
+            padding: "10px 16px",
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 16,
+            color: "#B8860B",
+            letterSpacing: "0.04em",
+            cursor: "pointer",
+          }}
+        >
+          Let's keep this safe.
         </button>
       </div>
     </div>
