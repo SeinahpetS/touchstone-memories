@@ -71,6 +71,38 @@ const TITLE_PLACEHOLDERS: Record<CategoryKey, string> = {
   imprint: "Name this imprint",
 };
 
+// Headline shown on the Title screen (S3), per category.
+const TITLE_HEADLINES: Record<CategoryKey, string> = {
+  moment: "What would you call this moment?",
+  person: "What would you call them?",
+  object: "What would you call this?",
+  place: "What do you call this place?",
+  food: "What would you call this?",
+  sound: "What would you call this sound?",
+  imprint: "What would you call this?",
+};
+
+// Example phrases shown quietly beneath the input as inspiration.
+const TITLE_EXAMPLES: Record<CategoryKey, string[]> = {
+  moment: [
+    "The last summer at the lake",
+    "The night everything changed",
+  ],
+  person: ["Grandma Rose", "Uncle Jim"],
+  object: [
+    "Mom's pageant crown",
+    "Dad's tackle box",
+    "The blue chair",
+  ],
+  place: ["Grandma's back porch", "The corner booth"],
+  food: [
+    "Mom's rice and beans",
+    "The sandwich from that place",
+  ],
+  sound: ["Dad's whistle", "The screen door"],
+  imprint: ["The smell of pine", "That song"],
+};
+
 const CATEGORIES: CategoryKey[] = [
   "moment",
   "person",
