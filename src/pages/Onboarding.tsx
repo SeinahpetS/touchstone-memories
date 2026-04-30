@@ -301,6 +301,9 @@ const Onboarding = () => {
             ? d.memoryDate.yearText.trim()
             : null,
         who_was_there: d.whoWasThere.trim() || null,
+        location_name: d.mapLocationName.trim() || null,
+        location_lat: d.mapLocationLat,
+        location_lng: d.mapLocationLng,
       };
       await (supabase as any).from("touchstones").insert(payload);
       toast.success("Your first Touchstone is saved.");
