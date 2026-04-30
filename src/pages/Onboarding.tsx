@@ -1345,7 +1345,13 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
     <div className="flex flex-1 flex-col items-center justify-center">
       <div
         className="ts-def-entry w-full max-w-md"
-        style={{ fontFamily: "'Playfair Display', serif", color: "#2C3E50" }}
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          color: "#2C3E50",
+          backgroundColor: "#E8E4D8",
+          borderRadius: 16,
+          padding: "28px 28px 30px",
+        }}
       >
         {/* Headword + pronunciation */}
         <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
