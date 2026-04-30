@@ -518,6 +518,157 @@ const Splash = ({ onDone }: { onDone: () => void }) => {
   );
 };
 
+/**
+ * Definition — ivory, full-bleed dictionary entry. Playfair throughout.
+ * Sub-copy fades in 1s after the entry; quiet gold text CTA below.
+ */
+const Definition = ({ onContinue }: { onContinue: () => void }) => (
+  <div
+    className="flex min-h-screen flex-col px-6 py-12"
+    style={{ backgroundColor: "#F2EEE5" }}
+  >
+    <style>{`
+      @keyframes ts-def-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .ts-def-entry  { animation: ts-def-in 0.7s ease-out 0.1s both; }
+      .ts-def-sub    { animation: ts-def-in 0.7s ease-out 1s both; }
+      .ts-def-cta    { animation: ts-def-in 0.6s ease-out 1.5s both; }
+    `}</style>
+
+    <div className="flex flex-1 flex-col items-center justify-center">
+      <div
+        className="ts-def-entry w-full max-w-md"
+        style={{ fontFamily: "'Playfair Display', serif", color: "#2C3E50" }}
+      >
+        {/* Headword + pronunciation */}
+        <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+          <h1
+            style={{
+              fontSize: "clamp(34px, 7vw, 44px)",
+              fontWeight: 600,
+              letterSpacing: "-0.005em",
+              margin: 0,
+              lineHeight: 1.1,
+            }}
+          >
+            touchstone
+          </h1>
+          <span
+            style={{
+              fontStyle: "italic",
+              fontSize: "clamp(20px, 3.4vw, 26px)",
+              color: "rgba(44,62,80,0.6)",
+            }}
+          >
+            (təch-stŏn)
+          </span>
+        </div>
+
+        {/* Part of speech */}
+        <p
+          style={{
+            fontStyle: "italic",
+            fontSize: 18,
+            color: "rgba(44,62,80,0.6)",
+            margin: "10px 0 26px",
+          }}
+        >
+          noun
+        </p>
+
+        {/* Definitions */}
+        <ol
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+            counterReset: "ts-def",
+          }}
+        >
+          {[
+            "a fundamental or quintessential part or feature.",
+            "a test or criterion for determining the quality or genuineness of a thing.",
+            "a black siliceous stone used to test the purity of precious metals by the streak left on the stone.",
+          ].map((d, i) => (
+            <li
+              key={i}
+              style={{
+                fontWeight: 400,
+                fontSize: 17,
+                lineHeight: 1.55,
+                color: "#5B4A3F",
+                display: "flex",
+                gap: 12,
+              }}
+            >
+              <span
+                style={{
+                  flexShrink: 0,
+                  width: 18,
+                  fontSize: 15,
+                  color: "rgba(91,74,63,0.6)",
+                  fontStyle: "italic",
+                }}
+              >
+                {i + 1}.
+              </span>
+              <span>{d}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Sub-copy */}
+      <p
+        className="ts-def-sub mt-12 text-center"
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          fontStyle: "italic",
+          fontSize: 19,
+          lineHeight: 1.5,
+          color: "rgba(44,62,80,0.78)",
+          maxWidth: 360,
+        }}
+      >
+        Your archive starts with one memory.
+      </p>
+    </div>
+
+    {/* Quiet gold text CTA */}
+    <div className="ts-def-cta flex justify-center pb-2">
+      <button
+        type="button"
+        onClick={onContinue}
+        className="group inline-flex items-center gap-2 transition-opacity hover:opacity-80"
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          fontStyle: "italic",
+          color: "#B8860B",
+          fontSize: 19,
+          padding: "10px 8px",
+          letterSpacing: "0.01em",
+          background: "transparent",
+          border: "none",
+        }}
+      >
+        Let's begin
+        <span
+          aria-hidden
+          className="transition-transform group-hover:translate-x-1"
+          style={{ fontFamily: "'Playfair Display', serif" }}
+        >
+          →
+        </span>
+      </button>
+    </div>
+  </div>
+);
+
 const DarkScreen = ({ children }: { children: React.ReactNode }) => (
   <div
     className="flex min-h-screen items-center justify-center px-6 py-10"
