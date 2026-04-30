@@ -31,6 +31,7 @@ type Step =
   | "definition"
   | "category"
   | "time"
+  | "title"
   | "photo"
   | "details"
   | "date"
@@ -38,9 +39,10 @@ type Step =
   | "signup";
 
 // Steps that show the slim gold progress bar at the top of the screen,
-// in the order users encounter them. Splash, definition, category and
-// artifact are intentionally excluded per spec.
-const PROGRESS_STEPS: Step[] = ["time", "photo", "details", "date", "signup"];
+// in the order users encounter them. Splash, definition, category, time
+// and artifact are intentionally excluded per spec — the bar appears
+// from the Title screen (S3) onward.
+const PROGRESS_STEPS: Step[] = ["title", "photo", "details", "date", "signup"];
 
 const progressFor = (step: Step): number | null => {
   const idx = PROGRESS_STEPS.indexOf(step);
