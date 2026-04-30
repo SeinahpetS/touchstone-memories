@@ -437,7 +437,12 @@ const Onboarding = () => {
 
   // ---- DEFINITION ----
   if (step === "definition") {
-    return <Definition onContinue={() => setStep("category")} />;
+    return (
+      <Definition
+        onContinue={() => setStep("category")}
+        onSignIn={() => navigate("/auth")}
+      />
+    );
   }
 
   // ---- CATEGORY ----
