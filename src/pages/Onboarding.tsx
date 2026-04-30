@@ -1837,7 +1837,128 @@ const ArtifactReveal = ({
         </p>
       </div>
 
-      {/* Quiet CTA — appears after another beat */}
+      {/* People nudge — fires once, between the confirmation line and the CTA */}
+      {!nudgeDone && (
+        <div
+          style={{
+            marginTop: 28,
+            width: "100%",
+            maxWidth: 360,
+            opacity: phase === "nudge" || phase === "cta" ? 1 : 0,
+            transform:
+              phase === "nudge" || phase === "cta"
+                ? "translateY(0)"
+                : "translateY(6px)",
+            transition: "opacity 0.9s ease-out, transform 0.9s ease-out",
+            pointerEvents: phase === "nudge" ? "auto" : "none",
+          }}
+        >
+          {nudgeMode === "prompt" ? (
+            <div className="text-center space-y-3">
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: "italic",
+                  fontSize: 17,
+                  color: "rgba(44,62,80,0.85)",
+                  margin: 0,
+                }}
+              >
+                Anyone who'd remember this too?
+              </p>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNudgeMode("input")}
+                  style={{
+                    backgroundColor: "#E8E4D8",
+                    color: "#2C3E50",
+                    borderRadius: 999,
+                    padding: "10px 18px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: "1px solid rgba(184,134,11,0.4)",
+                  }}
+                >
+                  Add a name
+                </button>
+                <button
+                  type="button"
+                  onClick={() => finishNudge(null)}
+                  style={{
+                    background: "transparent",
+                    color: "#5B4A3F",
+                    opacity: 0.75,
+                    padding: "10px 14px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: 0,
+                  }}
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Input
+                type="text"
+                autoFocus
+                placeholder="Their name"
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    finishNudge(nameDraft);
+                  }
+                }}
+                className="h-12 text-base bg-card border-0 placeholder:italic"
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  color: "#2C3E50",
+                }}
+              />
+              <div className="flex items-center justify-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => finishNudge(nameDraft)}
+                  disabled={!nameDraft.trim()}
+                  style={{
+                    backgroundColor: "#2C3E50",
+                    color: "#F2EEE5",
+                    borderRadius: 999,
+                    padding: "10px 20px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: 0,
+                    opacity: nameDraft.trim() ? 1 : 0.4,
+                    cursor: nameDraft.trim() ? "pointer" : "not-allowed",
+                  }}
+                >
+                  Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => finishNudge(null)}
+                  style={{
+                    background: "transparent",
+                    color: "#5B4A3F",
+                    opacity: 0.75,
+                    padding: "10px 14px",
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    border: 0,
+                  }}
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div
         style={{
           marginTop: 24,
