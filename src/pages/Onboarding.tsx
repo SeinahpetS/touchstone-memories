@@ -47,7 +47,7 @@ type Step =
 // and artifact are intentionally excluded per spec — the bar appears
 // from the Title screen (S3) onward. The conditional "who" screen (S4b)
 // is also excluded so the bar visually HOLDS its position there.
-const PROGRESS_STEPS: Step[] = ["title", "relationship", "emotional", "photo", "details", "date", "signup"];
+const PROGRESS_STEPS: Step[] = ["title", "relationship", "emotional", "map", "photo", "details", "date", "signup"];
 
 // Per-category copy for the Emotional Location screen (S5).
 const EMOTIONAL_HEADLINES: Partial<Record<CategoryKey, string>> = {
