@@ -927,27 +927,24 @@ const Onboarding = () => {
     );
   }
 
-  // ---- PHOTO ----
+  // ---- PHOTO (S8) ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("map")} progress={progressFor("photo")}>
-
-        <Question
-          kicker="Step 2 of 4"
-          title="Add a photo, if you have one."
-          subtitle="Optional — you can also skip this."
-        />
-        <PhotoUpload
-          file={photoFile}
-          preview={photoPreview}
-          onSelect={handlePhotoSelect}
-        />
-        <div className="flex flex-col gap-3 pt-2">
-          <PrimaryCTA onClick={() => setStep("details")}>
-            {photoPreview ? "Continue" : "Skip for now"}
-          </PrimaryCTA>
-        </div>
-      </LightScreen>
+      <PhotoStep
+        category={draft.category}
+        preview={photoPreview}
+        onSelect={(f) => {
+          handlePhotoSelect(f);
+          if (f) setStep("details");
+        }}
+        onSkip={() => {
+          handlePhotoSelect(null);
+          setStep("details");
+        }}
+        onContinue={() => setStep("details")}
+        onBack={() => setStep("map")}
+        progress={progressFor("photo")}
+      />
     );
   }
 
