@@ -1626,4 +1626,186 @@ const ArtifactReveal = ({
   );
 };
 
+/**
+ * Map Location screen (S6). Identical across all categories.
+ * Asks for permission in-context with a soft Touchstone-voiced line, falls
+ * back to freeform typing if denied, and uses the existing Google Places
+ * autocomplete component for predictions.
+ */
+const MapLocationStep = ({
+  valueName,
+  valueLat,
+  valueLng,
+  onChange,
+  onBack,
+  progress,
+  onAdvance,
+  onSkip,
+}: {
+  valueName: string;
+  valueLat: number | null;
+  valueLng: number | null;
+  onChange: (loc: { name: string; lat: number | null; lng: number | null }) => void;
+  onBack: () => void;
+  progress: number | null;
+  onAdvance: () => void;
+  onSkip: () => void;
+}) => {
+  const [permissionState, setPermissionState] = useState<
+    "idle" | "asking" | "granted" | "denied"
+  >("idle");
+
+  // Ask for native geolocation permission once, in-context, after the
+  // soft preface has been shown. We don't block the form on the result.
+  const askForLocation = () => {
+    if (!("geolocation" in navigator)) {
+      setPermissionState("denied");
+      return;
+    }
+    setPermissionState("asking");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setPermissionState("granted");
+        // Only seed coordinates if the user hasn't already picked a place.
+        if (!valueName) {
+          onChange({
+            name: "",
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        }
+      },
+      () => setPermissionState("denied"),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60_000 }
+    );
+  };
+
+  return (
+    <LightScreen onBack={onBack} progress={progress}>
+      <div className="space-y-2 pt-2 text-center">
+        <h2
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 26,
+            color: "#2C3E50",
+            margin: 0,
+            lineHeight: 1.25,
+          }}
+        >
+          Whereabouts in the world?
+        </h2>
+        {permissionState === "idle" && (
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 14,
+              color: "rgba(44,62,80,0.7)",
+              margin: 0,
+              paddingTop: 4,
+            }}
+          >
+            We'll just need a moment of location access.
+          </p>
+        )}
+      </div>
+
+      {permissionState === "idle" && (
+        <div className="flex flex-col gap-2 pt-1">
+          <button
+            type="button"
+            onClick={askForLocation}
+            className="w-full transition-colors"
+            style={{
+              backgroundColor: "#E8E4D8",
+              color: "#2C3E50",
+              borderRadius: 12,
+              padding: "14px 18px",
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              border: "1px solid rgba(184,134,11,0.35)",
+            }}
+          >
+            Use my current location
+          </button>
+          <button
+            type="button"
+            onClick={() => setPermissionState("denied")}
+            className="mx-auto text-sm"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              color: "#5B4A3F",
+              opacity: 0.7,
+              padding: "6px 12px",
+              background: "transparent",
+              border: 0,
+            }}
+          >
+            I'd rather just type it
+          </button>
+        </div>
+      )}
+
+      <div className="space-y-2 pt-1">
+        <LocationAutocomplete
+          value={valueName}
+          placeholder="Start typing a city, neighborhood, or place..."
+          onChange={(loc) =>
+            onChange({ name: loc.name, lat: loc.lat, lng: loc.lng })
+          }
+        />
+        <p
+          style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            color: "#5B4A3F",
+            opacity: 0.75,
+            margin: 0,
+            textAlign: "center",
+          }}
+        >
+          Even a country is enough. This is optional.
+        </p>
+        {permissionState === "granted" && !valueName && (
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 12,
+              color: "#367588",
+              margin: 0,
+              textAlign: "center",
+            }}
+          >
+            Got your location — pick a place above to drop a pin.
+          </p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2 pt-2">
+        <PrimaryCTA
+          onClick={onAdvance}
+          disabled={!valueName.trim() && valueLat === null}
+        >
+          Next
+        </PrimaryCTA>
+        <button
+          type="button"
+          onClick={onSkip}
+          className="mx-auto text-sm"
+          style={{
+            fontFamily: "'Jost', sans-serif",
+            color: "#5B4A3F",
+            opacity: 0.7,
+            padding: "8px 12px",
+            background: "transparent",
+            border: 0,
+          }}
+        >
+          Skip
+        </button>
+      </div>
+    </LightScreen>
+  );
+};
+
 export default Onboarding;
