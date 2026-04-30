@@ -562,7 +562,7 @@ const Onboarding = () => {
       RELATIONSHIP_HEADLINES[draft.category] ?? "Who was part of this?";
     const options = RELATIONSHIP_OPTIONS[draft.category] ?? [];
     if (options.length === 0) {
-      setStep("photo");
+      setStep("emotional");
       return null;
     }
     const pickRelationship = (label: string) => {
@@ -570,7 +570,7 @@ const Onboarding = () => {
       if (triggersWhoScreen(draft.category, label)) {
         setStep("who");
       } else {
-        setStep("photo");
+        setStep("emotional");
       }
     };
     return (
