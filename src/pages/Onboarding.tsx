@@ -948,25 +948,72 @@ const Onboarding = () => {
     );
   }
 
-  // ---- DETAILS (note) ----
+  // ---- NOTE (S9) ----
   if (step === "details") {
+    const advance = () => setStep("date");
+    const skip = () => {
+      update({ note: "" });
+      setStep("date");
+    };
     return (
       <LightScreen onBack={() => setStep("photo")} progress={progressFor("details")}>
-        <Question
-          kicker="Step 3 of 4"
-          title="Anything you want to remember?"
-          subtitle="A few words — whatever you want to keep. Optional."
-        />
-        <Textarea
-          placeholder={NOTE_PLACEHOLDERS[draft.category]}
-          value={draft.note}
-          onChange={(e) => update({ note: e.target.value })}
-          rows={5}
-          className="text-base bg-card border-0 placeholder:italic resize-none"
-        />
-        <PrimaryCTA onClick={() => setStep("date")}>
-          Continue
-        </PrimaryCTA>
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            What do you want to remember about this?
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Textarea
+            autoFocus
+            placeholder="What would you want someone to know about this?"
+            value={draft.note}
+            onChange={(e) => update({ note: e.target.value })}
+            rows={5}
+            className="text-base bg-card border-0 placeholder:italic resize-none"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          <p
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 14,
+              color: "rgba(44,62,80,0.7)",
+              margin: 0,
+              textAlign: "center",
+            }}
+          >
+            One sentence is enough. This is yours.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 pt-2">
+          <PrimaryCTA onClick={advance}>Continue</PrimaryCTA>
+          <button
+            type="button"
+            onClick={skip}
+            className="mx-auto text-sm"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              color: "#5B4A3F",
+              opacity: 0.7,
+              padding: "8px 12px",
+              background: "transparent",
+              border: 0,
+            }}
+          >
+            Skip
+          </button>
+        </div>
       </LightScreen>
     );
   }
