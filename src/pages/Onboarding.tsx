@@ -284,6 +284,7 @@ const Onboarding = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
 
   // On mount: rehydrate any draft (e.g. after OAuth round-trip).
   useEffect(() => {
