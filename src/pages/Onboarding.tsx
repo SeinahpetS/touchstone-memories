@@ -35,6 +35,7 @@ type Step =
   | "relationship"
   | "who"
   | "emotional"
+  | "map"
   | "photo"
   | "details"
   | "date"
