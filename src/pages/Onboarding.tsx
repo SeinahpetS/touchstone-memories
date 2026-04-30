@@ -1455,31 +1455,28 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
       </p>
     </div>
 
-    {/* Quiet gold text CTA */}
-    <div className="ts-def-cta flex flex-col items-center pb-2 gap-3">
+    {/* Primary CTA */}
+    <div className="ts-def-cta flex flex-col items-center pb-2 gap-4">
       <button
         type="button"
         onClick={onContinue}
-        className="group inline-flex items-center gap-2 transition-opacity hover:opacity-80"
+        className="transition-all hover:opacity-90 active:scale-[0.98]"
         style={{
-          fontFamily: "'Playfair Display', serif",
-          fontStyle: "italic",
-          color: "#B8860B",
-          fontSize: 19,
-          padding: "10px 8px",
-          letterSpacing: "0.01em",
-          background: "transparent",
+          fontFamily: "'Jost', sans-serif",
+          fontWeight: 500,
+          fontSize: 16,
+          letterSpacing: "0.04em",
+          color: "#FAF8F3",
+          backgroundColor: "#B8860B",
           border: "none",
+          borderRadius: 999,
+          padding: "14px 40px",
+          minWidth: 220,
+          cursor: "pointer",
+          boxShadow: "0 2px 8px rgba(184,134,11,0.25)",
         }}
       >
         Let's begin
-        <span
-          aria-hidden
-          className="transition-transform group-hover:translate-x-1"
-          style={{ fontFamily: "'Playfair Display', serif" }}
-        >
-          →
-        </span>
       </button>
       <div className="flex flex-col items-center gap-1">
         <span
