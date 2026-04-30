@@ -32,6 +32,7 @@ type Step =
   | "category"
   | "time"
   | "title"
+  | "relationship"
   | "photo"
   | "details"
   | "date"
@@ -42,7 +43,43 @@ type Step =
 // in the order users encounter them. Splash, definition, category, time
 // and artifact are intentionally excluded per spec — the bar appears
 // from the Title screen (S3) onward.
-const PROGRESS_STEPS: Step[] = ["title", "photo", "details", "date", "signup"];
+const PROGRESS_STEPS: Step[] = ["title", "relationship", "photo", "details", "date", "signup"];
+
+// Per-category copy for the Relationship screen (S4).
+const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
+  object: "How did this come into your story?",
+  moment: "Who was part of this?",
+  place: "Who comes to mind when you think of this place?",
+  food: "Where does this food come from for you?",
+};
+
+const RELATIONSHIP_OPTIONS: Partial<Record<CategoryKey, string[]>> = {
+  object: [
+    "It was given to me",
+    "I inherited it",
+    "It belongs to someone I care about",
+    "I came across it",
+    "It was always just there",
+  ],
+  moment: [
+    "Just me",
+    "Someone I know",
+    "A group of people",
+    "A stranger",
+  ],
+  place: [
+    "Someone I know",
+    "A younger version of myself",
+    "A group of people",
+    "It's about the place itself",
+  ],
+  food: [
+    "Someone I know made it",
+    "I discovered it somewhere",
+    "It belongs to my past",
+    "It's just something I love",
+  ],
+};
 
 const progressFor = (step: Step): number | null => {
   const idx = PROGRESS_STEPS.indexOf(step);
@@ -401,7 +438,7 @@ const Onboarding = () => {
     const examples = TITLE_EXAMPLES[draft.category] ?? [];
     const canAdvance = draft.title.trim().length > 0;
     const advance = () => {
-      if (canAdvance) setStep("photo");
+      if (canAdvance) setStep("relationship");
     };
     return (
       <LightScreen
@@ -463,10 +500,77 @@ const Onboarding = () => {
     );
   }
 
+  // ---- RELATIONSHIP (S4) ----
+  if (step === "relationship") {
+    const headline =
+      RELATIONSHIP_HEADLINES[draft.category] ?? "Who was part of this?";
+    const options = RELATIONSHIP_OPTIONS[draft.category] ?? [];
+    if (options.length === 0) {
+      setStep("photo");
+      return null;
+    }
+    const pickRelationship = (label: string) => {
+      update({ whoWasThere: label });
+      setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("title")}
+        progress={progressFor("relationship")}
+      >
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          {options.map((opt) => {
+            const selected = draft.whoWasThere === opt;
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => pickRelationship(opt)}
+                aria-pressed={selected}
+                className="w-full text-left transition-colors"
+                style={{
+                  backgroundColor: selected ? "#2C3E50" : "#E8E4D8",
+                  color: selected ? "#F2EEE5" : "#2C3E50",
+                  borderRadius: 12,
+                  padding: "16px 20px",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 18,
+                  letterSpacing: "0.005em",
+                  border: selected
+                    ? "1px solid rgba(184,134,11,0.6)"
+                    : "1px solid rgba(44,62,80,0.06)",
+                  boxShadow: selected
+                    ? "0 4px 18px rgba(44,62,80,0.18)"
+                    : "0 1px 2px rgba(44,62,80,0.04)",
+                }}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("title")} progress={progressFor("photo")}>
+      <LightScreen onBack={() => setStep("relationship")} progress={progressFor("photo")}>
+
         <Question
           kicker="Step 2 of 4"
           title="Add a photo, if you have one."
