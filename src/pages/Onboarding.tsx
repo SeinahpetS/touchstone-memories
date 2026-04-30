@@ -1123,37 +1123,46 @@ const Onboarding = () => {
   // ---- SIGN UP ----
   return (
     <LightScreen onBack={() => setStep("artifact")} progress={progressFor("signup")}>
-      <div className="text-center space-y-2">
-        <p
-          style={{
-            fontFamily: "Jost, sans-serif",
-            fontSize: 11,
-            letterSpacing: "0.28em",
-            textTransform: "uppercase",
-            color: "#B8860B",
-          }}
-        >
-          One last step
-        </p>
+      <div className="text-center space-y-3">
         <h2
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: 26,
+            fontSize: 30,
             color: "#2C3E50",
+            margin: 0,
+            lineHeight: 1.2,
+          }}
+        >
+          Let's keep this safe.
+        </h2>
+        <p
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: "italic",
+            fontSize: 17,
+            color: "#5B4A3F",
             margin: 0,
           }}
         >
-          Keep this Touchstone forever.
-        </h2>
-        <p className="text-base text-muted-foreground">
-          Create a private archive — only you can see it.
+          It deserves a home.
         </p>
       </div>
 
+      {/* Apple — primary */}
+      <Button
+        onClick={handleApple}
+        className="w-full h-12 text-base gap-3 bg-[#2C3E50] text-[#F2EEE5] hover:bg-[#2C3E50]/90"
+      >
+        <svg width="18" height="18" viewBox="0 0 384 512" aria-hidden="true" fill="currentColor">
+          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+        </svg>
+        Continue with Apple
+      </Button>
+
+      {/* Google — primary */}
       <Button
         onClick={handleGoogle}
-        variant="outline"
-        className="w-full h-12 text-base gap-3"
+        className="w-full h-12 text-base gap-3 bg-card text-foreground hover:bg-card/80 border border-border"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
           <path fill="#4285F4" d="M17.64 9.2045c0-.6381-.0573-1.2518-.1636-1.8409H9v3.4814h4.8436c-.2086 1.125-.8427 2.0782-1.7959 2.7164v2.2581h2.9087c1.7018-1.5668 2.6836-3.874 2.6836-6.615z" />
@@ -1164,45 +1173,53 @@ const Onboarding = () => {
         Continue with Google
       </Button>
 
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-sm text-muted-foreground">or</span>
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <form onSubmit={handleEmailSignup} className="space-y-3">
-        <Input
-          type="text"
-          placeholder="Your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="h-12 text-base bg-card border-0"
-        />
-        <Input
-          type="email"
-          placeholder="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="h-12 text-base bg-card border-0"
-        />
-        <Input
-          type="password"
-          placeholder="Password (6+ characters)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-          className="h-12 text-base bg-card border-0"
-        />
-        <Button
-          type="submit"
-          disabled={submitting}
-          className="w-full h-12 text-base bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          {submitting ? "…" : "Create my archive"}
-        </Button>
-      </form>
+      {/* Email reveal */}
+      {!showEmail ? (
+        <div className="text-center pt-1">
+          <button
+            type="button"
+            onClick={() => setShowEmail(true)}
+            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
+            style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}
+          >
+            I'd rather use my email
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleEmailSignup} className="space-y-3 pt-1">
+          <Input
+            type="text"
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-12 text-base bg-card border-0"
+          />
+          <Input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="h-12 text-base bg-card border-0"
+          />
+          <Input
+            type="password"
+            placeholder="Password (6+ characters)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            className="h-12 text-base bg-card border-0"
+          />
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="w-full h-12 text-base bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            {submitting ? "…" : "Create my archive"}
+          </Button>
+        </form>
+      )}
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
