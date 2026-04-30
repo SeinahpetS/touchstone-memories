@@ -34,6 +34,7 @@ type Step =
   | "title"
   | "relationship"
   | "who"
+  | "emotional"
   | "photo"
   | "details"
   | "date"
@@ -45,7 +46,22 @@ type Step =
 // and artifact are intentionally excluded per spec — the bar appears
 // from the Title screen (S3) onward. The conditional "who" screen (S4b)
 // is also excluded so the bar visually HOLDS its position there.
-const PROGRESS_STEPS: Step[] = ["title", "relationship", "photo", "details", "date", "signup"];
+const PROGRESS_STEPS: Step[] = ["title", "relationship", "emotional", "photo", "details", "date", "signup"];
+
+// Per-category copy for the Emotional Location screen (S5).
+const EMOTIONAL_HEADLINES: Partial<Record<CategoryKey, string>> = {
+  object: "Where does this belong?",
+  moment: "Where did this happen?",
+  place: "Describe it in a few words.",
+  food: "Where does this take you?",
+};
+
+const EMOTIONAL_EXAMPLES: Partial<Record<CategoryKey, string[]>> = {
+  object: ["Her kitchen", "The garage", "It moved around with us"],
+  moment: ["A campsite we found by accident", "Our kitchen at 2am"],
+  place: ["Small, always smelled like coffee", "Loud and full of people"],
+  food: ["Her kitchen on a Sunday", "A restaurant I can't find anymore"],
+};
 
 // Per-category copy for the Relationship screen (S4).
 const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
@@ -267,7 +283,12 @@ const Onboarding = () => {
         user_id: user.id,
         category: d.category as any,
         title: d.title.trim() || null,
-        note: d.note.trim() || null,
+        note: (() => {
+          const loc = d.emotionalLocation.trim();
+          const note = d.note.trim();
+          if (loc && note) return `${loc}\n\n${note}`;
+          return loc || note || null;
+        })(),
         photo_url,
         memory_season: d.memoryDate.season,
         memory_year: d.memoryDate.year,
@@ -546,7 +567,7 @@ const Onboarding = () => {
       RELATIONSHIP_HEADLINES[draft.category] ?? "Who was part of this?";
     const options = RELATIONSHIP_OPTIONS[draft.category] ?? [];
     if (options.length === 0) {
-      setStep("photo");
+      setStep("emotional");
       return null;
     }
     const pickRelationship = (label: string) => {
@@ -554,7 +575,7 @@ const Onboarding = () => {
       if (triggersWhoScreen(draft.category, label)) {
         setStep("who");
       } else {
-        setStep("photo");
+        setStep("emotional");
       }
     };
     return (
@@ -631,13 +652,13 @@ const Onboarding = () => {
       if (!currentWho.trim() && relationshipLabel) {
         update({ whoWasThere: relationshipLabel });
       }
-      setStep("photo");
+      setStep("emotional");
     };
     const skip = () => {
       // Skipping preserves the relationship label.
       if (relationshipLabel) update({ whoWasThere: relationshipLabel });
       else update({ whoWasThere: "" });
-      setStep("photo");
+      setStep("emotional");
     };
     return (
       <LightScreen
@@ -716,10 +737,104 @@ const Onboarding = () => {
     );
   }
 
+  // ---- EMOTIONAL LOCATION (S5) ----
+  if (step === "emotional") {
+    const headline = EMOTIONAL_HEADLINES[draft.category];
+    const examples = EMOTIONAL_EXAMPLES[draft.category] ?? [];
+    // Categories without specific S5 copy skip the screen entirely.
+    if (!headline) {
+      setStep("photo");
+      return null;
+    }
+    // The previous step (relationship/who) determines where Back goes.
+    const cameFromWho = triggersWhoScreen(draft.category, draft.whoWasThere);
+    const back = () => setStep(cameFromWho ? "who" : "relationship");
+    const advance = () => setStep("photo");
+    const skip = () => {
+      update({ emotionalLocation: "" });
+      setStep("photo");
+    };
+    return (
+      <LightScreen onBack={back} progress={progressFor("emotional")}>
+        <div className="space-y-2 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 26,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.25,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder="A few words"
+            value={draft.emotionalLocation}
+            onChange={(e) => update({ emotionalLocation: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 pt-2">
+          <PrimaryCTA
+            onClick={advance}
+            disabled={!draft.emotionalLocation.trim()}
+          >
+            Next
+          </PrimaryCTA>
+          <button
+            type="button"
+            onClick={skip}
+            className="mx-auto text-sm"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              color: "#5B4A3F",
+              opacity: 0.7,
+              padding: "8px 12px",
+              background: "transparent",
+              border: 0,
+            }}
+          >
+            Skip
+          </button>
+        </div>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("relationship")} progress={progressFor("photo")}>
+      <LightScreen onBack={() => setStep("emotional")} progress={progressFor("photo")}>
 
         <Question
           kicker="Step 2 of 4"

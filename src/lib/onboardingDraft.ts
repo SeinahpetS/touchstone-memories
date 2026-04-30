@@ -13,6 +13,8 @@ export interface OnboardingDraft {
   title: string;
   note: string;
   whoWasThere: string;
+  /** Free-form "emotional location" answer captured on S5. */
+  emotionalLocation: string;
   memoryDate: MemoryDate;
   /** Object URL for the in-memory photo, used for preview only. */
   photoPreview: string | null;
@@ -33,6 +35,7 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   title: "",
   note: "",
   whoWasThere: "",
+  emotionalLocation: "",
   memoryDate: emptyMemoryDate(),
   photoPreview: null,
 });
