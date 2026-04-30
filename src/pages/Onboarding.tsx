@@ -97,7 +97,37 @@ const WHEN_EXAMPLES: Record<CategoryKey, string[]> = {
   imprint: ["A long time ago", "I was around fifteen"],
 };
 
-// Per-category copy for the Relationship screen (S4).
+// Per-category copy for the Photo screen (S8).
+const PHOTO_HEADLINES: Record<CategoryKey, string> = {
+  object: "Do you have a photo of this?",
+  moment: "Do you have a photo from this moment?",
+  place: "Do you have a photo of this place?",
+  food: "Do you have a photo of this?",
+  person: "Do you have a photo of them?",
+  sound: "Do you have an image that goes with this?",
+  imprint: "Do you have a photo for this?",
+};
+
+const PHOTO_SUBCOPY: Record<CategoryKey, string> = {
+  object: "Even a photo of a photo is perfect. You can always add one later.",
+  moment: "It doesn't have to be perfect.",
+  place: "Even an old one works.",
+  food: "A recipe card, a dish, a place — anything counts.",
+  person: "Any photo you have. Skip if you'd rather not.",
+  sound: "Optional — anything that captures the feeling.",
+  imprint: "Optional. Add one later if you'd like.",
+};
+
+// Object leads with camera; everything else leads with library.
+const PHOTO_BUTTON_ORDER: Record<CategoryKey, ("camera" | "library")[]> = {
+  object: ["camera", "library"],
+  moment: ["library", "camera"],
+  place: ["library", "camera"],
+  food: ["library", "camera"],
+  person: ["library", "camera"],
+  sound: ["library", "camera"],
+  imprint: ["library", "camera"],
+};
 const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
   object: "How did this come into your story?",
   moment: "Who was part of this?",
