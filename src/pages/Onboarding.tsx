@@ -1604,10 +1604,14 @@ const ArtifactReveal = ({
   draft,
   photoPreview,
   onClaim,
+  peopleValue,
+  onPeopleChange,
 }: {
   draft: OnboardingDraft;
   photoPreview: string | null;
   onClaim: () => void;
+  peopleValue: string;
+  onPeopleChange: (name: string) => void;
 }) => {
   const cat = draft.category;
   const barColor = CATEGORY_BORDER_COLORS[cat] ?? "#B8860B";
@@ -1618,15 +1622,46 @@ const ArtifactReveal = ({
   const noteText = draft.note.trim();
   const emotionalText = draft.emotionalLocation.trim();
 
-  const [phase, setPhase] = useState<"still" | "named" | "cta">("still");
+  // Sequence:
+  //  still  → just the artifact, full-screen stillness
+  //  named  → "You just made your first Touchstone." appears
+  //  nudge  → "Anyone who'd remember this too?" people prompt appears
+  //  cta    → quiet "Let's keep this safe." CTA appears
+  const [phase, setPhase] = useState<"still" | "named" | "nudge" | "cta">(
+    "still"
+  );
+  // The nudge fires once; once dismissed (added or skipped) it never comes
+  // back, even if the user navigates away and returns.
+  const [nudgeDone, setNudgeDone] = useState<boolean>(
+    () => peopleValue.trim().length > 0
+  );
+  const [nudgeMode, setNudgeMode] = useState<"prompt" | "input">("prompt");
+  const [nameDraft, setNameDraft] = useState<string>(peopleValue);
+
   useEffect(() => {
     const t1 = window.setTimeout(() => setPhase("named"), 1600);
-    const t2 = window.setTimeout(() => setPhase("cta"), 3200);
+    const t2 = window.setTimeout(
+      () => setPhase((p) => (p === "named" ? "nudge" : p)),
+      3000
+    );
+    const t3 = window.setTimeout(
+      () => setPhase((p) => (nudgeDone ? "cta" : p)),
+      4400
+    );
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
+      window.clearTimeout(t3);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When the nudge is resolved (added or skipped), advance to the CTA.
+  const finishNudge = (name: string | null) => {
+    if (name && name.trim()) onPeopleChange(name.trim());
+    setNudgeDone(true);
+    setPhase("cta");
+  };
 
   return (
     <div
