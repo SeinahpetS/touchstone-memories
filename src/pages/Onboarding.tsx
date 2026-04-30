@@ -34,6 +34,7 @@ type Step =
   | "title"
   | "relationship"
   | "who"
+  | "emotional"
   | "photo"
   | "details"
   | "date"
@@ -45,7 +46,22 @@ type Step =
 // and artifact are intentionally excluded per spec — the bar appears
 // from the Title screen (S3) onward. The conditional "who" screen (S4b)
 // is also excluded so the bar visually HOLDS its position there.
-const PROGRESS_STEPS: Step[] = ["title", "relationship", "photo", "details", "date", "signup"];
+const PROGRESS_STEPS: Step[] = ["title", "relationship", "emotional", "photo", "details", "date", "signup"];
+
+// Per-category copy for the Emotional Location screen (S5).
+const EMOTIONAL_HEADLINES: Partial<Record<CategoryKey, string>> = {
+  object: "Where does this belong?",
+  moment: "Where did this happen?",
+  place: "Describe it in a few words.",
+  food: "Where does this take you?",
+};
+
+const EMOTIONAL_EXAMPLES: Partial<Record<CategoryKey, string[]>> = {
+  object: ["Her kitchen", "The garage", "It moved around with us"],
+  moment: ["A campsite we found by accident", "Our kitchen at 2am"],
+  place: ["Small, always smelled like coffee", "Loud and full of people"],
+  food: ["Her kitchen on a Sunday", "A restaurant I can't find anymore"],
+};
 
 // Per-category copy for the Relationship screen (S4).
 const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
