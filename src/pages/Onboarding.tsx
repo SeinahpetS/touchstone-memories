@@ -387,7 +387,7 @@ const Onboarding = () => {
   // ---- DETAILS (title + note) ----
   if (step === "details") {
     return (
-      <LightScreen onBack={() => setStep("photo")}>
+      <LightScreen onBack={() => setStep("photo")} progress={progressFor("details")}>
         <Question
           kicker="Step 3 of 4"
           title="Tell us about it."
@@ -420,7 +420,7 @@ const Onboarding = () => {
   // ---- DATE ----
   if (step === "date") {
     return (
-      <LightScreen onBack={() => setStep("details")}>
+      <LightScreen onBack={() => setStep("details")} progress={progressFor("date")}>
         <Question
           kicker="Step 4 of 4"
           title="When was this?"
@@ -451,7 +451,7 @@ const Onboarding = () => {
 
   // ---- SIGN UP ----
   return (
-    <LightScreen onBack={() => setStep("artifact")}>
+    <LightScreen onBack={() => setStep("artifact")} progress={progressFor("signup")}>
       <div className="text-center space-y-2">
         <p
           style={{
