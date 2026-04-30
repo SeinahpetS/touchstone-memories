@@ -340,7 +340,7 @@ const Onboarding = () => {
           yearText,
         },
       });
-      setStep("photo");
+      setStep("title");
     };
     return (
       <LightScreen
