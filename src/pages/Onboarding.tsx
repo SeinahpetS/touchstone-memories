@@ -1098,14 +1098,11 @@ const Onboarding = () => {
   // ---- ARTIFACT REVEAL ----
   if (step === "artifact") {
     return (
-      <LightScreen>
-        <ArtifactReveal
-          draft={draft}
-          photoPreview={photoPreview}
-          onClaim={() => setStep("signup")}
-          onEdit={() => setStep("details")}
-        />
-      </LightScreen>
+      <ArtifactReveal
+        draft={draft}
+        photoPreview={photoPreview}
+        onClaim={() => setStep("signup")}
+      />
     );
   }
 
