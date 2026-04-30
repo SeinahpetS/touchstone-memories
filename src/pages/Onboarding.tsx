@@ -363,6 +363,7 @@ const Onboarding = () => {
             ? d.memoryDate.yearText.trim()
             : null,
         who_was_there: d.whoWasThere.trim() || null,
+        people: d.people.trim() || null,
         location_name: d.mapLocationName.trim() || null,
         location_lat: d.mapLocationLat,
         location_lng: d.mapLocationLng,
