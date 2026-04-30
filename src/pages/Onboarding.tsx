@@ -31,6 +31,7 @@ type Step =
   | "definition"
   | "category"
   | "time"
+  | "title"
   | "photo"
   | "details"
   | "date"
@@ -38,9 +39,10 @@ type Step =
   | "signup";
 
 // Steps that show the slim gold progress bar at the top of the screen,
-// in the order users encounter them. Splash, definition, category and
-// artifact are intentionally excluded per spec.
-const PROGRESS_STEPS: Step[] = ["time", "photo", "details", "date", "signup"];
+// in the order users encounter them. Splash, definition, category, time
+// and artifact are intentionally excluded per spec — the bar appears
+// from the Title screen (S3) onward.
+const PROGRESS_STEPS: Step[] = ["title", "photo", "details", "date", "signup"];
 
 const progressFor = (step: Step): number | null => {
   const idx = PROGRESS_STEPS.indexOf(step);
@@ -67,6 +69,38 @@ const TITLE_PLACEHOLDERS: Record<CategoryKey, string> = {
   food: "Name this meal",
   sound: "Name this sound",
   imprint: "Name this imprint",
+};
+
+// Headline shown on the Title screen (S3), per category.
+const TITLE_HEADLINES: Record<CategoryKey, string> = {
+  moment: "What would you call this moment?",
+  person: "What would you call them?",
+  object: "What would you call this?",
+  place: "What do you call this place?",
+  food: "What would you call this?",
+  sound: "What would you call this sound?",
+  imprint: "What would you call this?",
+};
+
+// Example phrases shown quietly beneath the input as inspiration.
+const TITLE_EXAMPLES: Record<CategoryKey, string[]> = {
+  moment: [
+    "The last summer at the lake",
+    "The night everything changed",
+  ],
+  person: ["Grandma Rose", "Uncle Jim"],
+  object: [
+    "Mom's pageant crown",
+    "Dad's tackle box",
+    "The blue chair",
+  ],
+  place: ["Grandma's back porch", "The corner booth"],
+  food: [
+    "Mom's rice and beans",
+    "The sandwich from that place",
+  ],
+  sound: ["Dad's whistle", "The screen door"],
+  imprint: ["The smell of pine", "That song"],
 };
 
 const CATEGORIES: CategoryKey[] = [
@@ -306,7 +340,7 @@ const Onboarding = () => {
           yearText,
         },
       });
-      setStep("photo");
+      setStep("title");
     };
     return (
       <LightScreen
@@ -361,10 +395,78 @@ const Onboarding = () => {
     );
   }
 
+  // ---- TITLE (S3) ----
+  if (step === "title") {
+    const headline = TITLE_HEADLINES[draft.category];
+    const examples = TITLE_EXAMPLES[draft.category] ?? [];
+    const canAdvance = draft.title.trim().length > 0;
+    const advance = () => {
+      if (canAdvance) setStep("photo");
+    };
+    return (
+      <LightScreen
+        onBack={() => setStep("time")}
+        progress={progressFor("title")}
+      >
+        <div className="space-y-3 pt-2 text-center">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 28,
+              color: "#2C3E50",
+              margin: 0,
+              lineHeight: 1.2,
+            }}
+          >
+            {headline}
+          </h2>
+        </div>
+        <div className="space-y-3 pt-2">
+          <Input
+            type="text"
+            autoFocus
+            placeholder={TITLE_PLACEHOLDERS[draft.category]}
+            value={draft.title}
+            onChange={(e) => update({ title: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                advance();
+              }
+            }}
+            className="h-14 text-lg bg-card border-0 placeholder:italic"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#2C3E50",
+            }}
+          />
+          {examples.length > 0 && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                opacity: 0.75,
+                margin: 0,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}
+            >
+              e.g. {examples.map((s) => `“${s}”`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <PrimaryCTA onClick={advance} disabled={!canAdvance}>
+          Next
+        </PrimaryCTA>
+      </LightScreen>
+    );
+  }
+
   // ---- PHOTO ----
   if (step === "photo") {
     return (
-      <LightScreen onBack={() => setStep("time")} progress={progressFor("photo")}>
+      <LightScreen onBack={() => setStep("title")} progress={progressFor("photo")}>
         <Question
           kicker="Step 2 of 4"
           title="Add a photo, if you have one."
@@ -384,21 +486,14 @@ const Onboarding = () => {
     );
   }
 
-  // ---- DETAILS (title + note) ----
+  // ---- DETAILS (note) ----
   if (step === "details") {
     return (
       <LightScreen onBack={() => setStep("photo")} progress={progressFor("details")}>
         <Question
           kicker="Step 3 of 4"
-          title="Tell us about it."
-          subtitle="A name, a few words — whatever you want to keep."
-        />
-        <Input
-          type="text"
-          placeholder={TITLE_PLACEHOLDERS[draft.category]}
-          value={draft.title}
-          onChange={(e) => update({ title: e.target.value })}
-          className="h-12 text-base bg-card border-0 placeholder:italic"
+          title="Anything you want to remember?"
+          subtitle="A few words — whatever you want to keep. Optional."
         />
         <Textarea
           placeholder={NOTE_PLACEHOLDERS[draft.category]}
@@ -407,17 +502,13 @@ const Onboarding = () => {
           rows={5}
           className="text-base bg-card border-0 placeholder:italic resize-none"
         />
-        <PrimaryCTA
-          onClick={() => setStep("date")}
-          disabled={!draft.title.trim() && !draft.note.trim() && !photoFile}
-        >
+        <PrimaryCTA onClick={() => setStep("date")}>
           Continue
         </PrimaryCTA>
       </LightScreen>
     );
   }
 
-  // ---- DATE ----
   if (step === "date") {
     return (
       <LightScreen onBack={() => setStep("details")} progress={progressFor("date")}>
