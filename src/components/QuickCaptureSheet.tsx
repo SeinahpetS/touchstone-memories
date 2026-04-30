@@ -569,7 +569,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
         onClick={(e) => e.stopPropagation()}
         className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[92vh] overflow-y-auto"
         style={{
-          backgroundColor: "#F2EEE5",
+          backgroundColor: "#FAF8F3",
           padding: "24px 22px 28px",
           boxShadow: "0 -12px 40px rgba(0,0,0,0.18)",
           border: "1px solid rgba(184,134,11,0.25)",

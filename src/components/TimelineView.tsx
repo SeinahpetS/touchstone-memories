@@ -276,7 +276,7 @@ const TimelineView = ({ memories, onSelect, onChanged }: TimelineViewProps) => {
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                backgroundColor: "#F2EEE5",
+                backgroundColor: "#FAF8F3",
                 border: "1.5px solid #B8860B",
                 display: "flex",
                 alignItems: "center",

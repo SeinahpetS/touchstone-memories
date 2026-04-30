@@ -507,7 +507,7 @@ const Archive = () => {
             <span
               aria-hidden="true"
               style={{
-                backgroundColor: "#F2EEE5",
+                backgroundColor: "#FAF8F3",
                 color: "#B8860B",
                 borderRadius: "3px",
                 fontFamily: "'Source Sans 3', sans-serif",
@@ -532,7 +532,7 @@ const Archive = () => {
                 borderColor: filter === "all" ? "#B8860B" : "#E8E4D8",
                 borderWidth: filter === "all" ? "3.5px" : "1.5px",
                 borderStyle: "solid",
-                backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
+                backgroundColor: filter === "all" ? "#FAF8F3" : undefined,
                 padding: "14px 8px",
               }}
               className={cn(
