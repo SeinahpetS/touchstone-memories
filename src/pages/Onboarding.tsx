@@ -206,50 +206,7 @@ const Onboarding = () => {
 
   // ---- DEFINITION ----
   if (step === "definition") {
-    return (
-      <DarkScreen>
-        <div className="max-w-md text-center space-y-8 px-2">
-          <p
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontStyle: "italic",
-              fontSize: 13,
-              letterSpacing: "0.3em",
-              textTransform: "uppercase",
-              color: "#B8860B",
-              margin: 0,
-            }}
-          >
-            Touchstone
-            <span style={{ marginLeft: 10, opacity: 0.65 }}>noun</span>
-          </p>
-          <p
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              color: "#F2EEE5",
-              fontSize: 22,
-              lineHeight: 1.5,
-              margin: 0,
-            }}
-          >
-            A small thing — a moment, a person, an object —
-            that holds something larger than itself.
-          </p>
-          <p
-            style={{
-              fontFamily: "'Source Sans 3', sans-serif",
-              color: "rgba(242,238,229,0.72)",
-              fontSize: 16,
-              lineHeight: 1.6,
-              margin: 0,
-            }}
-          >
-            Save one now. We'll show you what it becomes.
-          </p>
-          <PrimaryCTA onClick={() => setStep("category")}>Continue</PrimaryCTA>
-        </div>
-      </DarkScreen>
-    );
+    return <Definition onContinue={() => setStep("category")} />;
   }
 
   // ---- CATEGORY ----
