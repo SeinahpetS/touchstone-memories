@@ -744,16 +744,16 @@ const Onboarding = () => {
     const examples = EMOTIONAL_EXAMPLES[draft.category] ?? [];
     // Categories without specific S5 copy skip the screen entirely.
     if (!headline) {
-      setStep("photo");
+      setStep("map");
       return null;
     }
     // The previous step (relationship/who) determines where Back goes.
     const cameFromWho = triggersWhoScreen(draft.category, draft.whoWasThere);
     const back = () => setStep(cameFromWho ? "who" : "relationship");
-    const advance = () => setStep("photo");
+    const advance = () => setStep("map");
     const skip = () => {
       update({ emotionalLocation: "" });
-      setStep("photo");
+      setStep("map");
     };
     return (
       <LightScreen onBack={back} progress={progressFor("emotional")}>
