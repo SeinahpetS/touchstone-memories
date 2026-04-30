@@ -22,7 +22,16 @@ const RootRoute = () => {
       </div>
     );
   }
-  return user ? <Index /> : <Onboarding />;
+  // If a logged-in user has a pending onboarding draft (just signed up),
+  // keep them in the Onboarding flow so its persist effect can flush
+  // the captured first memory before sending them to /archive.
+  if (user) {
+    const hasPendingDraft =
+      typeof window !== "undefined" &&
+      !!sessionStorage.getItem("ts_onboarding_draft_v1");
+    return hasPendingDraft ? <Onboarding /> : <Index />;
+  }
+  return <Onboarding />;
 };
 
 const App = () => (
