@@ -12,6 +12,7 @@ import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
+import PodcastSearch, { type PodcastPick } from "@/components/PodcastSearch";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { Input } from "@/components/ui/input";
@@ -103,6 +104,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [fields, setFields] = useState<CategoryFieldValues>({ ...initialFields });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [podcastPick, setPodcastPick] = useState<PodcastPick | null>(null);
+  const [podcastManual, setPodcastManual] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -119,6 +122,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setFields({ ...initialFields });
       setPhotoFile(null);
       setPhotoPreview(null);
+      setPodcastPick(null);
+      setPodcastManual(false);
       setSaving(false);
       setConfirmed(false);
       setSavedId(null);
@@ -153,7 +158,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
     note.trim().length > 0 ||
     !!fields.spotifyPick ||
     !!fields.bookPick ||
-    !!fields.tmdbPick;
+    !!fields.tmdbPick ||
+    !!podcastPick;
 
   const handleSave = async () => {
     if (!user) return;
@@ -184,6 +190,12 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           photo_url = fields.bookPick.coverUrl;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick?.image) {
           photo_url = fields.tmdbPick.image;
+        } else if (
+          fields.imprintType === "podcast" &&
+          !podcastManual &&
+          podcastPick?.image
+        ) {
+          photo_url = podcastPick.image;
         }
       }
 
@@ -196,6 +208,12 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           resolvedTitle = fields.bookPick.title;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick) {
           resolvedTitle = fields.tmdbPick.title;
+        } else if (
+          fields.imprintType === "podcast" &&
+          !podcastManual &&
+          podcastPick
+        ) {
+          resolvedTitle = podcastPick.composedTitle;
         }
       }
 
@@ -235,6 +253,19 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
         tmdb_id:
           category === "imprint" && fields.imprintSource === "tmdb"
             ? fields.tmdbPick?.id ?? null
+            : null,
+        imprint_subtype:
+          category === "imprint" && fields.imprintType
+            ? fields.imprintType === "tv"
+              ? "tv_show"
+              : fields.imprintType
+            : null,
+        source_url:
+          category === "imprint" &&
+          fields.imprintType === "podcast" &&
+          !podcastManual &&
+          podcastPick
+            ? podcastPick.sourceUrl
             : null,
         memory_season: memoryDate.season,
         memory_year: resolvedMemoryYear,
@@ -651,17 +682,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               );
             })()}
 
-            {/* 3. Title */}
-            <Input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={120}
-              placeholder="Name this Touchstone"
-              className="h-12 text-base bg-card border-0 placeholder:italic mb-4"
-            />
-
-            {/* Imprint sub-type */}
+            {/* Imprint sub-type — shown above the title so the title field can adapt to the choice */}
             {category === "imprint" && (
               <div className="mb-4">
                 <ImprintTypeSelector
@@ -680,10 +701,38 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                       imprintType: t,
                       imprintSource: source,
                     }));
+                    // Reset podcast state whenever sub-type changes.
+                    setPodcastPick(null);
+                    setPodcastManual(false);
+                    if (t === "podcast") setTitle("");
                   }}
                 />
               </div>
             )}
+
+            {/* 3. Title — podcast subtype swaps in a Listen Notes search experience */}
+            <div className="mb-4">
+              {category === "imprint" && fields.imprintType === "podcast" ? (
+                <PodcastSearch
+                  title={title}
+                  onTitleChange={setTitle}
+                  value={podcastPick}
+                  onChange={setPodcastPick}
+                  manualMode={podcastManual}
+                  onManualToggle={setPodcastManual}
+                />
+              ) : (
+                <Input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  maxLength={120}
+                  placeholder="Name this Touchstone"
+                  className="h-12 text-base bg-card border-0 placeholder:italic"
+                />
+              )}
+            </div>
+
 
             {/* Date */}
             <div className="mb-4">

@@ -80,6 +80,7 @@ export type Database = {
           created_at: string
           emotional_tone: string | null
           id: string
+          imprint_subtype: string | null
           is_premium_prompt: boolean
           is_private: boolean
           location_lat: number | null
@@ -95,6 +96,7 @@ export type Database = {
           photo_url: string | null
           relationship_type: string | null
           sentiment: string | null
+          source_url: string | null
           spotify_id: string | null
           title: string | null
           tmdb_id: string | null
@@ -111,6 +113,7 @@ export type Database = {
           created_at?: string
           emotional_tone?: string | null
           id?: string
+          imprint_subtype?: string | null
           is_premium_prompt?: boolean
           is_private?: boolean
           location_lat?: number | null
@@ -126,6 +129,7 @@ export type Database = {
           photo_url?: string | null
           relationship_type?: string | null
           sentiment?: string | null
+          source_url?: string | null
           spotify_id?: string | null
           title?: string | null
           tmdb_id?: string | null
@@ -142,6 +146,7 @@ export type Database = {
           created_at?: string
           emotional_tone?: string | null
           id?: string
+          imprint_subtype?: string | null
           is_premium_prompt?: boolean
           is_private?: boolean
           location_lat?: number | null
@@ -157,6 +162,7 @@ export type Database = {
           photo_url?: string | null
           relationship_type?: string | null
           sentiment?: string | null
+          source_url?: string | null
           spotify_id?: string | null
           title?: string | null
           tmdb_id?: string | null
