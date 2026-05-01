@@ -682,17 +682,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               );
             })()}
 
-            {/* 3. Title */}
-            <Input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={120}
-              placeholder="Name this Touchstone"
-              className="h-12 text-base bg-card border-0 placeholder:italic mb-4"
-            />
-
-            {/* Imprint sub-type */}
+            {/* Imprint sub-type — shown above the title so the title field can adapt to the choice */}
             {category === "imprint" && (
               <div className="mb-4">
                 <ImprintTypeSelector
@@ -711,10 +701,38 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                       imprintType: t,
                       imprintSource: source,
                     }));
+                    // Reset podcast state whenever sub-type changes.
+                    setPodcastPick(null);
+                    setPodcastManual(false);
+                    if (t === "podcast") setTitle("");
                   }}
                 />
               </div>
             )}
+
+            {/* 3. Title — podcast subtype swaps in a Listen Notes search experience */}
+            <div className="mb-4">
+              {category === "imprint" && fields.imprintType === "podcast" ? (
+                <PodcastSearch
+                  title={title}
+                  onTitleChange={setTitle}
+                  value={podcastPick}
+                  onChange={setPodcastPick}
+                  manualMode={podcastManual}
+                  onManualToggle={setPodcastManual}
+                />
+              ) : (
+                <Input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  maxLength={120}
+                  placeholder="Name this Touchstone"
+                  className="h-12 text-base bg-card border-0 placeholder:italic"
+                />
+              )}
+            </div>
+
 
             {/* Date */}
             <div className="mb-4">
