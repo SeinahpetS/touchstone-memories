@@ -1372,13 +1372,12 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
               aria-hidden
               style={{
                 display: "inline-block",
-                width: "0.17em",
-                height: "0.17em",
-                margin: "0 0.28em",
-                verticalAlign: "0.22em",
+                width: "0.11em",
+                height: "0.11em",
+                margin: "0 0.32em",
+                verticalAlign: "0.32em",
                 backgroundColor: "#B8860B",
                 transform: "rotate(45deg)",
-                boxShadow: "0 0 10px rgba(184,134,11,0.35)",
               }}
             />
             stone
