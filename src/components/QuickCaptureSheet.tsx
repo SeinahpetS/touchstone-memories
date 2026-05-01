@@ -189,6 +189,12 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           photo_url = fields.bookPick.coverUrl;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick?.image) {
           photo_url = fields.tmdbPick.image;
+        } else if (
+          fields.imprintType === "podcast" &&
+          !podcastManual &&
+          podcastPick?.image
+        ) {
+          photo_url = podcastPick.image;
         }
       }
 
