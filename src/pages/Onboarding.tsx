@@ -1372,8 +1372,8 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
               aria-hidden
               style={{
                 display: "inline-block",
-                width: "0.42em",
-                height: "0.42em",
+                width: "0.17em",
+                height: "0.17em",
                 margin: "0 0.28em",
                 verticalAlign: "0.22em",
                 backgroundColor: "#B8860B",
