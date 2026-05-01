@@ -207,6 +207,12 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           resolvedTitle = fields.bookPick.title;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick) {
           resolvedTitle = fields.tmdbPick.title;
+        } else if (
+          fields.imprintType === "podcast" &&
+          !podcastManual &&
+          podcastPick
+        ) {
+          resolvedTitle = podcastPick.composedTitle;
         }
       }
 
@@ -246,6 +252,19 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
         tmdb_id:
           category === "imprint" && fields.imprintSource === "tmdb"
             ? fields.tmdbPick?.id ?? null
+            : null,
+        imprint_subtype:
+          category === "imprint" && fields.imprintType
+            ? fields.imprintType === "tv"
+              ? "tv_show"
+              : fields.imprintType
+            : null,
+        source_url:
+          category === "imprint" &&
+          fields.imprintType === "podcast" &&
+          !podcastManual &&
+          podcastPick
+            ? podcastPick.sourceUrl
             : null,
         memory_season: memoryDate.season,
         memory_year: resolvedMemoryYear,
