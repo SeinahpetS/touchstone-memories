@@ -12,6 +12,7 @@ import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
+import PodcastSearch, { type PodcastPick } from "@/components/PodcastSearch";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { Input } from "@/components/ui/input";
@@ -103,6 +104,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [fields, setFields] = useState<CategoryFieldValues>({ ...initialFields });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [podcastPick, setPodcastPick] = useState<PodcastPick | null>(null);
+  const [podcastManual, setPodcastManual] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -119,6 +122,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setFields({ ...initialFields });
       setPhotoFile(null);
       setPhotoPreview(null);
+      setPodcastPick(null);
+      setPodcastManual(false);
       setSaving(false);
       setConfirmed(false);
       setSavedId(null);
