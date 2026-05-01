@@ -158,7 +158,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
     note.trim().length > 0 ||
     !!fields.spotifyPick ||
     !!fields.bookPick ||
-    !!fields.tmdbPick;
+    !!fields.tmdbPick ||
+    !!podcastPick;
 
   const handleSave = async () => {
     if (!user) return;
