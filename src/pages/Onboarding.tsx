@@ -1374,7 +1374,7 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
                 display: "inline-block",
                 width: "0.132em",
                 height: "0.132em",
-                margin: "0 0.32em",
+                margin: "0 0.12em",
                 verticalAlign: "0.32em",
                 backgroundColor: "#B8860B",
                 transform: "rotate(45deg)",
