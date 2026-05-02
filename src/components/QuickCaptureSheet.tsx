@@ -753,6 +753,32 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic mb-5"
             />
 
+            {/* Who is this connected to? — optional, all categories */}
+            <div className="mb-4">
+              <label
+                htmlFor="ts-connected-to"
+                className="block mb-1.5"
+                style={{
+                  fontFamily: "Jost, sans-serif",
+                  fontSize: 11,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#B8860B",
+                }}
+              >
+                Who is this connected to?
+              </label>
+              <Input
+                id="ts-connected-to"
+                type="text"
+                autoComplete="off"
+                value={connectedTo}
+                onChange={(e) => setConnectedTo(e.target.value)}
+                placeholder="A name — anyone this memory belongs to"
+                className="h-12 text-base bg-card border-0 placeholder:italic"
+              />
+            </div>
+
             <Input
               type="text"
               autoComplete="off"
@@ -761,6 +787,43 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               placeholder={PROMPT}
               className="h-12 text-base bg-card border-0 placeholder:italic"
             />
+
+            {/* Keep this private — toggle, off by default */}
+            <div
+              className="mt-4 flex items-center justify-between rounded-md px-4 py-3"
+              style={{ backgroundColor: "#E8E4D8" }}
+            >
+              <div className="pr-3">
+                <p
+                  style={{
+                    fontFamily: "Jost, sans-serif",
+                    fontSize: 13,
+                    letterSpacing: "0.04em",
+                    color: "#2C3E50",
+                    margin: 0,
+                  }}
+                >
+                  Keep this private
+                </p>
+                <p
+                  style={{
+                    fontFamily: "'Source Sans 3', sans-serif",
+                    fontSize: 12,
+                    color: "rgba(91,74,63,0.75)",
+                    margin: "2px 0 0",
+                    lineHeight: 1.35,
+                  }}
+                >
+                  Only visible to you — not shared or included in your book
+                </p>
+              </div>
+              <Switch
+                checked={isPrivate}
+                onCheckedChange={setIsPrivate}
+                aria-label="Keep this private"
+                className="data-[state=checked]:bg-[#B8860B]"
+              />
+            </div>
 
             {error && (
               <p
