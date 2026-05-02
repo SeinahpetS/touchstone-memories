@@ -129,6 +129,30 @@ const CategoryIcon = ({
         </g>
       </svg>
     ),
+    digital_traces: (
+      <svg width={size} height={size} viewBox="0 0 36 36" fill="none" className={className}>
+        <rect
+          x="6"
+          y="9"
+          width="24"
+          height="16"
+          rx="2"
+          stroke={color}
+          strokeWidth="1.5"
+          fill="none"
+        />
+        <line x1="14" y1="29" x2="22" y2="29" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="18" y1="25" x2="18" y2="29" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <path
+          d="M10,17 L13,17 L15,14 L17,20 L19,15 L21,18 L26,18"
+          stroke={color}
+          strokeWidth="1.3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </svg>
+    ),
   };
 
   return icons[key as CategoryKey] || null;
@@ -142,6 +166,7 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
   food: "Food",
   sound: "Sound",
   imprint: "Imprint",
+  digital_traces: "Digital Traces",
 };
 
 // Category bar / accent stripe colors used across MemoryCard, archive, timeline.
@@ -154,6 +179,7 @@ export const CATEGORY_BORDER_COLORS: Record<CategoryKey, string> = {
   food: "#C2714F",
   sound: "#5B4A3F",
   imprint: "#B8860B",
+  digital_traces: "#367588",
 };
 
 interface CategoryIconCardProps {
