@@ -74,6 +74,7 @@ const WHEN_HEADLINES: Record<CategoryKey, string> = {
   person: "When did they come into your life?",
   sound: "When did you first hear this?",
   imprint: "When did this find you?",
+  digital_traces: "When did you encounter this?",
 };
 
 const WHEN_EXAMPLES: Record<CategoryKey, string[]> = {
@@ -95,6 +96,7 @@ const WHEN_EXAMPLES: Record<CategoryKey, string[]> = {
   person: ["When I was a kid", "A few years ago"],
   sound: ["Every morning growing up", "Just one summer"],
   imprint: ["A long time ago", "I was around fifteen"],
+  digital_traces: ["A few years ago", "Last week"],
 };
 
 // Per-category copy for the Photo screen (S8).
@@ -106,6 +108,7 @@ const PHOTO_HEADLINES: Record<CategoryKey, string> = {
   person: "Do you have a photo of them?",
   sound: "Do you have an image that goes with this?",
   imprint: "Do you have a photo for this?",
+  digital_traces: "Do you have a screenshot of this?",
 };
 
 const PHOTO_SUBCOPY: Record<CategoryKey, string> = {
@@ -116,6 +119,7 @@ const PHOTO_SUBCOPY: Record<CategoryKey, string> = {
   person: "Any photo you have. Skip if you'd rather not.",
   sound: "Optional — anything that captures the feeling.",
   imprint: "Optional. Add one later if you'd like.",
+  digital_traces: "A screenshot, a photo, anything that captures it.",
 };
 
 // Object leads with camera; everything else leads with library.
@@ -127,6 +131,7 @@ const PHOTO_BUTTON_ORDER: Record<CategoryKey, ("camera" | "library")[]> = {
   person: ["library", "camera"],
   sound: ["library", "camera"],
   imprint: ["library", "camera"],
+  digital_traces: ["library", "camera"],
 };
 const RELATIONSHIP_HEADLINES: Partial<Record<CategoryKey, string>> = {
   object: "How did this come into your story?",
@@ -216,6 +221,7 @@ const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   food: "What tastes stood out? What do you want to remember about the meal?",
   sound: "What makes this sound memorable? What does it remind you of?",
   imprint: "What does this remind you of? Why has it stayed with you?",
+  digital_traces: "What is this trace? Why does it matter to you?",
 };
 
 const TITLE_PLACEHOLDERS: Record<CategoryKey, string> = {
@@ -226,6 +232,7 @@ const TITLE_PLACEHOLDERS: Record<CategoryKey, string> = {
   food: "Name this meal",
   sound: "Name this sound",
   imprint: "Name this imprint",
+  digital_traces: "Name this trace",
 };
 
 // Headline shown on the Title screen (S3), per category.
@@ -237,6 +244,7 @@ const TITLE_HEADLINES: Record<CategoryKey, string> = {
   food: "What would you call this?",
   sound: "What would you call this sound?",
   imprint: "What would you call this?",
+  digital_traces: "What would you call this trace?",
 };
 
 // Example phrases shown quietly beneath the input as inspiration.
