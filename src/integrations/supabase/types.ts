@@ -77,6 +77,7 @@ export type Database = {
           ai_prompt: string | null
           audio_url: string | null
           category: Database["public"]["Enums"]["memory_category"]
+          connected_to: string | null
           created_at: string
           emotional_tone: string | null
           id: string
@@ -110,6 +111,7 @@ export type Database = {
           ai_prompt?: string | null
           audio_url?: string | null
           category: Database["public"]["Enums"]["memory_category"]
+          connected_to?: string | null
           created_at?: string
           emotional_tone?: string | null
           id?: string
@@ -143,6 +145,7 @@ export type Database = {
           ai_prompt?: string | null
           audio_url?: string | null
           category?: Database["public"]["Enums"]["memory_category"]
+          connected_to?: string | null
           created_at?: string
           emotional_tone?: string | null
           id?: string
@@ -189,6 +192,7 @@ export type Database = {
         | "food"
         | "sound"
         | "imprint"
+        | "digital_traces"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -324,6 +328,7 @@ export const Constants = {
         "food",
         "sound",
         "imprint",
+        "digital_traces",
       ],
     },
   },
