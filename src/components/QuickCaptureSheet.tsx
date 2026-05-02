@@ -17,6 +17,7 @@ import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { playSaveFeedback } from "@/lib/saveFeedback";
 
@@ -28,6 +29,7 @@ const CATEGORIES: CategoryKey[] = [
   "food",
   "sound",
   "imprint",
+  "digital_traces",
 ];
 
 const PLURAL_LABELS: Record<CategoryKey, string> = {
@@ -38,6 +40,7 @@ const PLURAL_LABELS: Record<CategoryKey, string> = {
   food: "Foods",
   sound: "Sounds",
   imprint: "Imprints",
+  digital_traces: "Digital Traces",
 };
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
@@ -49,6 +52,7 @@ const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   food: "What tastes stood out to you? What do you want to remember about the meal?",
   sound: "What makes this sound memorable? What does it remind you of?",
   imprint: "What does this remind you of? Why has it stayed with you?",
+  digital_traces: "What is this trace? Why does it matter to you?",
 };
 
 const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
