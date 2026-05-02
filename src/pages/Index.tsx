@@ -49,6 +49,8 @@ const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
     "What makes this sound memorable? What does it remind you of?",
   imprint:
     "What does this remind you of? Why has it stayed with you?",
+  digital_traces:
+    "What is this trace? Why does it matter to you?",
 };
 
 const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
