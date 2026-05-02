@@ -31,6 +31,7 @@ const CATEGORY_RING_HSL: Record<CategoryKey, string> = {
   food: "17 49% 53%",      // #C2714F Coral
   sound: "25 18% 30%",     // #5B4A3F Walnut
   imprint: "210 30% 22%",  // #2C3E50 Ink
+  digital_traces: "192 39% 37%", // #367588 Teal
 };
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
