@@ -266,6 +266,7 @@ const TITLE_EXAMPLES: Record<CategoryKey, string[]> = {
   ],
   sound: ["Dad's whistle", "The screen door"],
   imprint: ["The smell of pine", "That song"],
+  digital_traces: ["The text I saved", "That bookmark"],
 };
 
 const CATEGORIES: CategoryKey[] = [
