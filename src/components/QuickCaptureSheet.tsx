@@ -104,6 +104,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [note, setNote] = useState("");
   const [emotionalTone, setEmotionalTone] = useState("");
   const [whoWasThere, setWhoWasThere] = useState("");
+  const [connectedTo, setConnectedTo] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [memoryDate, setMemoryDate] = useState<MemoryDate>(emptyMemoryDate());
   const [fields, setFields] = useState<CategoryFieldValues>({ ...initialFields });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -122,6 +124,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setNote("");
       setEmotionalTone("");
       setWhoWasThere("");
+      setConnectedTo("");
+      setIsPrivate(false);
       setMemoryDate(emptyMemoryDate());
       setFields({ ...initialFields });
       setPhotoFile(null);
