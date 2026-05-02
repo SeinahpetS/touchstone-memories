@@ -287,6 +287,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
             ? whoWasThere.trim()
             : null,
+        connected_to: connectedTo.trim() || null,
+        is_private: isPrivate,
       };
 
       const { data: inserted, error: insertErr } = await (supabase as any)
