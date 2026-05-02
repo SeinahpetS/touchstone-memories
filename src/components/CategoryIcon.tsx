@@ -7,7 +7,8 @@ export type CategoryKey =
   | "place"
   | "food"
   | "sound"
-  | "imprint";
+  | "imprint"
+  | "digital_traces";
 
 interface CategoryIconProps {
   category: CategoryKey | "people";
