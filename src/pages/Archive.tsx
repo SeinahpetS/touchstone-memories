@@ -36,6 +36,7 @@ const PLURAL_LABELS: Record<CategoryKey, string> = {
   food: "Foods",
   sound: "Sounds",
   imprint: "Imprints",
+  digital_traces: "Digital Traces",
 };
 
 const Archive = () => {

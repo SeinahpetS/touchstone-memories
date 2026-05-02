@@ -17,6 +17,7 @@ import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { playSaveFeedback } from "@/lib/saveFeedback";
 
@@ -28,6 +29,7 @@ const CATEGORIES: CategoryKey[] = [
   "food",
   "sound",
   "imprint",
+  "digital_traces",
 ];
 
 const PLURAL_LABELS: Record<CategoryKey, string> = {
@@ -38,6 +40,7 @@ const PLURAL_LABELS: Record<CategoryKey, string> = {
   food: "Foods",
   sound: "Sounds",
   imprint: "Imprints",
+  digital_traces: "Digital Traces",
 };
 
 const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
@@ -49,6 +52,7 @@ const NOTE_PLACEHOLDERS: Record<CategoryKey, string> = {
   food: "What tastes stood out to you? What do you want to remember about the meal?",
   sound: "What makes this sound memorable? What does it remind you of?",
   imprint: "What does this remind you of? Why has it stayed with you?",
+  digital_traces: "What is this trace? Why does it matter to you?",
 };
 
 const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
@@ -100,6 +104,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [note, setNote] = useState("");
   const [emotionalTone, setEmotionalTone] = useState("");
   const [whoWasThere, setWhoWasThere] = useState("");
+  const [connectedTo, setConnectedTo] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [memoryDate, setMemoryDate] = useState<MemoryDate>(emptyMemoryDate());
   const [fields, setFields] = useState<CategoryFieldValues>({ ...initialFields });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -118,6 +124,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setNote("");
       setEmotionalTone("");
       setWhoWasThere("");
+      setConnectedTo("");
+      setIsPrivate(false);
       setMemoryDate(emptyMemoryDate());
       setFields({ ...initialFields });
       setPhotoFile(null);
@@ -279,6 +287,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
             ? whoWasThere.trim()
             : null,
+        connected_to: connectedTo.trim() || null,
+        is_private: isPrivate,
       };
 
       const { data: inserted, error: insertErr } = await (supabase as any)
@@ -640,11 +650,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               )}
             </div>
 
-            {/* 2. Category grid — top row of 4, bottom row of 3 centered */}
-            {(() => {
-              const topRow = CATEGORIES.slice(0, 4);
-              const bottomRow = CATEGORIES.slice(4);
-              const renderCard = (c: CategoryKey) => (
+            {/* 2. Category grid — 4 columns × 2 rows */}
+            <div className="mb-5 grid grid-cols-4 gap-2">
+              {CATEGORIES.map((c) => (
                 <CategoryIconCard
                   key={c}
                   category={c}
@@ -655,32 +663,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                   active={category === c}
                   onClick={() => setCategory(c)}
                 />
-              );
-              return (
-                <div className="mb-5 space-y-2">
-                  <div className="grid grid-cols-4 gap-2">
-                    {topRow.map(renderCard)}
-                  </div>
-                  <div
-                    className="grid gap-2"
-                    style={{
-                      gridTemplateColumns: "repeat(8, minmax(0, 1fr))",
-                    }}
-                  >
-                    {bottomRow.map((c, i) => (
-                      <div
-                        key={c}
-                        style={{
-                          gridColumn: `${i * 2 + 2} / span 2`,
-                        }}
-                      >
-                        {renderCard(c)}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
+              ))}
+            </div>
 
             {/* Imprint sub-type — shown above the title so the title field can adapt to the choice */}
             {category === "imprint" && (
@@ -769,6 +753,32 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic mb-5"
             />
 
+            {/* Who is this connected to? — optional, all categories */}
+            <div className="mb-4">
+              <label
+                htmlFor="ts-connected-to"
+                className="block mb-1.5"
+                style={{
+                  fontFamily: "Jost, sans-serif",
+                  fontSize: 11,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#B8860B",
+                }}
+              >
+                Who is this connected to?
+              </label>
+              <Input
+                id="ts-connected-to"
+                type="text"
+                autoComplete="off"
+                value={connectedTo}
+                onChange={(e) => setConnectedTo(e.target.value)}
+                placeholder="A name — anyone this memory belongs to"
+                className="h-12 text-base bg-card border-0 placeholder:italic"
+              />
+            </div>
+
             <Input
               type="text"
               autoComplete="off"
@@ -777,6 +787,43 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               placeholder={PROMPT}
               className="h-12 text-base bg-card border-0 placeholder:italic"
             />
+
+            {/* Keep this private — toggle, off by default */}
+            <div
+              className="mt-4 flex items-center justify-between rounded-md px-4 py-3"
+              style={{ backgroundColor: "#E8E4D8" }}
+            >
+              <div className="pr-3">
+                <p
+                  style={{
+                    fontFamily: "Jost, sans-serif",
+                    fontSize: 13,
+                    letterSpacing: "0.04em",
+                    color: "#2C3E50",
+                    margin: 0,
+                  }}
+                >
+                  Keep this private
+                </p>
+                <p
+                  style={{
+                    fontFamily: "'Source Sans 3', sans-serif",
+                    fontSize: 12,
+                    color: "rgba(91,74,63,0.75)",
+                    margin: "2px 0 0",
+                    lineHeight: 1.35,
+                  }}
+                >
+                  Only visible to you — not shared or included in your book
+                </p>
+              </div>
+              <Switch
+                checked={isPrivate}
+                onCheckedChange={setIsPrivate}
+                aria-label="Keep this private"
+                className="data-[state=checked]:bg-[#B8860B]"
+              />
+            </div>
 
             {error && (
               <p
