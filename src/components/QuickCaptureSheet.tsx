@@ -117,6 +117,13 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // AI follow-up prompt (post-save)
+  const [aiPromptQuestion, setAiPromptQuestion] = useState<string | null>(null);
+  const [aiPromptLoading, setAiPromptLoading] = useState(false);
+  const [aiPromptAnswer, setAiPromptAnswer] = useState("");
+  const [aiPromptSaving, setAiPromptSaving] = useState(false);
+  const [aiPromptDone, setAiPromptDone] = useState(false);
+
   useEffect(() => {
     if (open) {
       setCategory("moment");
