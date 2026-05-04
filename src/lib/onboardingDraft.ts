@@ -50,9 +50,14 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   photoPreview: null,
 });
 
+const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
 export const saveOnboardingDraft = (draft: OnboardingDraft) => {
   try {
-    sessionStorage.setItem(KEY, JSON.stringify(draft));
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({ draft, savedAt: Date.now() })
+    );
   } catch {
     /* ignore */
   }
@@ -60,9 +65,20 @@ export const saveOnboardingDraft = (draft: OnboardingDraft) => {
 
 export const loadOnboardingDraft = (): OnboardingDraft | null => {
   try {
-    const raw = sessionStorage.getItem(KEY);
+    const raw = localStorage.getItem(KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as OnboardingDraft;
+    const parsed = JSON.parse(raw) as
+      | { draft: OnboardingDraft; savedAt: number }
+      | OnboardingDraft;
+    // Back-compat: older drafts were stored without a wrapper.
+    if (parsed && typeof parsed === "object" && "draft" in parsed && "savedAt" in parsed) {
+      if (Date.now() - parsed.savedAt > MAX_AGE_MS) {
+        clearOnboardingDraft();
+        return null;
+      }
+      return parsed.draft;
+    }
+    return parsed as OnboardingDraft;
   } catch {
     return null;
   }
@@ -70,7 +86,7 @@ export const loadOnboardingDraft = (): OnboardingDraft | null => {
 
 export const clearOnboardingDraft = () => {
   try {
-    sessionStorage.removeItem(KEY);
+    localStorage.removeItem(KEY);
   } catch {
     /* ignore */
   }
