@@ -29,6 +29,7 @@ import {
 
 type Step =
   | "splash"
+  | "resume"
   | "definition"
   | "category"
   | "time"
@@ -441,8 +442,92 @@ const Onboarding = () => {
   }
 
   // ---- SPLASH ----
+  const handleAfterSplash = () => {
+    const existing = loadOnboardingDraft();
+    if (existing) {
+      setStep("resume");
+    } else {
+      setStep("definition");
+    }
+  };
+
   if (step === "splash") {
-    return <Splash onDone={() => setStep("definition")} />;
+    return <Splash onDone={handleAfterSplash} />;
+  }
+
+  if (step === "resume") {
+    const d = draft;
+    let resumeStep: Step = "category";
+    if (d.memoryDate?.yearText) resumeStep = "artifact";
+    else if (d.note) resumeStep = "date";
+    else if (d.photoPreview) resumeStep = "details";
+    else if (d.mapLocationName) resumeStep = "photo";
+    else if (d.emotionalLocation) resumeStep = "map";
+    else if (d.whoWasThere) resumeStep = "emotional";
+    else if (d.title) resumeStep = "relationship";
+
+    const subtext = d.title
+      ? `A memory about "${d.title}"`
+      : d.category
+      ? `A ${CATEGORY_LABELS[d.category]} — not yet named`
+      : "";
+
+    const startFresh = () => {
+      clearOnboardingDraft();
+      setDraft(emptyOnboardingDraft());
+      setPhotoFile(null);
+      setPhotoPreview(null);
+      setStep("definition");
+    };
+
+    return (
+      <LightScreen>
+        <div className="flex flex-1 flex-col items-center justify-center text-center gap-6 px-6">
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 22,
+              color: "#2C3E50",
+              lineHeight: 1.25,
+              margin: 0,
+            }}
+          >
+            You were in the middle of something.
+          </h2>
+          {subtext && (
+            <p
+              style={{
+                fontFamily: "Jost, sans-serif",
+                fontSize: 14,
+                color: "rgba(44,62,80,0.65)",
+                margin: 0,
+              }}
+            >
+              {subtext}
+            </p>
+          )}
+          <PrimaryCTA onClick={() => setStep(resumeStep)}>
+            Pick up where I left off
+          </PrimaryCTA>
+          <button
+            type="button"
+            onClick={startFresh}
+            style={{
+              fontFamily: "Jost, sans-serif",
+              fontSize: 13,
+              color: "rgba(44,62,80,0.55)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Start fresh
+          </button>
+        </div>
+      </LightScreen>
+    );
   }
 
   // ---- DEFINITION ----
