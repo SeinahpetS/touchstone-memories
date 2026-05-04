@@ -117,6 +117,13 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // AI follow-up prompt (post-save)
+  const [aiPromptQuestion, setAiPromptQuestion] = useState<string | null>(null);
+  const [aiPromptLoading, setAiPromptLoading] = useState(false);
+  const [aiPromptAnswer, setAiPromptAnswer] = useState("");
+  const [aiPromptSaving, setAiPromptSaving] = useState(false);
+  const [aiPromptDone, setAiPromptDone] = useState(false);
+
   useEffect(() => {
     if (open) {
       setCategory("moment");
@@ -136,6 +143,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setConfirmed(false);
       setSavedId(null);
       setError(null);
+      setAiPromptQuestion(null);
+      setAiPromptLoading(false);
+      setAiPromptAnswer("");
+      setAiPromptSaving(false);
+      setAiPromptDone(false);
     }
   }, [open]);
 
@@ -298,10 +310,43 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
         .single();
       if (insertErr) throw insertErr;
 
-      setSavedId(inserted?.id ?? null);
+      const newId = inserted?.id ?? null;
+      setSavedId(newId);
       setConfirmed(true);
       playSaveFeedback();
       onSaved?.();
+
+      // Fire-and-forget AI follow-up question
+      setAiPromptLoading(true);
+      (async () => {
+        try {
+          const { data: aiData, error: aiErr } = await supabase.functions.invoke(
+            "generate-ai-prompt",
+            {
+              body: {
+                memory: {
+                  category: payload.category,
+                  title: payload.title,
+                  note: payload.note,
+                  emotional_tone: payload.emotional_tone,
+                  who_was_there: payload.who_was_there,
+                  connected_to: payload.connected_to,
+                  location_name: payload.location_name,
+                  when_text: payload.when_text,
+                  memory_year: payload.memory_year,
+                },
+              },
+            },
+          );
+          if (aiErr) throw aiErr;
+          const q = (aiData as any)?.question?.trim?.();
+          if (q) setAiPromptQuestion(q);
+        } catch (err) {
+          console.error("AI prompt failed", err);
+        } finally {
+          setAiPromptLoading(false);
+        }
+      })();
     } catch (e) {
       setError("Couldn't save right now. Try again.");
     } finally {
@@ -336,6 +381,31 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const handleEdit = () => {
     if (savedId) navigate(`/?edit=${savedId}`);
     onClose();
+  };
+
+  const handleSaveAiAnswer = async () => {
+    if (!savedId || !aiPromptQuestion || !aiPromptAnswer.trim()) return;
+    setAiPromptSaving(true);
+    try {
+      const { error: updErr } = await (supabase as any)
+        .from("touchstones")
+        .update({
+          ai_prompt: aiPromptQuestion,
+          ai_answer: aiPromptAnswer.trim(),
+          is_premium_prompt: true,
+        })
+        .eq("id", savedId);
+      if (updErr) throw updErr;
+      setAiPromptDone(true);
+    } catch (err) {
+      console.error("Failed to save AI answer", err);
+    } finally {
+      setAiPromptSaving(false);
+    }
+  };
+
+  const handleSkipAiPrompt = () => {
+    setAiPromptDone(true);
   };
 
   return (
@@ -565,6 +635,96 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                 )}
               </div>
             </div>
+
+            {/* AI follow-up prompt */}
+            {(aiPromptLoading || aiPromptQuestion) && !aiPromptDone && (
+              <div
+                className="w-full sm:max-w-sm mt-5"
+                style={{
+                  backgroundColor: "rgba(20,16,10,0.78)",
+                  border: "1px solid rgba(184,134,11,0.35)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  animation: "ts-fadeInUp 0.4s ease-out 0.7s both",
+                }}
+              >
+                {aiPromptLoading && !aiPromptQuestion ? (
+                  <p
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontStyle: "italic",
+                      color: "rgba(232,195,106,0.8)",
+                      fontSize: 14,
+                      margin: 0,
+                    }}
+                  >
+                    Listening…
+                  </p>
+                ) : (
+                  <>
+                    <p
+                      style={{
+                        fontFamily: "'Playfair Display', serif",
+                        fontStyle: "italic",
+                        color: "#E8C36A",
+                        fontSize: 16,
+                        lineHeight: 1.4,
+                        margin: "0 0 12px",
+                      }}
+                    >
+                      {aiPromptQuestion}
+                    </p>
+                    <Textarea
+                      value={aiPromptAnswer}
+                      onChange={(e) => setAiPromptAnswer(e.target.value)}
+                      placeholder="A line, a feeling, anything…"
+                      className="min-h-[72px] text-base resize-none placeholder:italic"
+                      style={{
+                        backgroundColor: "rgba(242,238,229,0.08)",
+                        color: "#F2EEE5",
+                        border: "1px solid rgba(242,238,229,0.18)",
+                      }}
+                    />
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveAiAnswer}
+                        disabled={!aiPromptAnswer.trim() || aiPromptSaving}
+                        className="h-10 px-4 rounded-md transition-colors"
+                        style={{
+                          fontFamily: "Jost, sans-serif",
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
+                          fontSize: 12,
+                          color: "#1C160E",
+                          backgroundColor: "#B8860B",
+                          border: "1px solid #B8860B",
+                          opacity:
+                            !aiPromptAnswer.trim() || aiPromptSaving ? 0.5 : 1,
+                        }}
+                      >
+                        {aiPromptSaving ? "Saving…" : "Add to memory"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSkipAiPrompt}
+                        style={{
+                          background: "transparent",
+                          color: "rgba(242,238,229,0.6)",
+                          padding: "10px 14px",
+                          fontFamily: "Jost, sans-serif",
+                          fontSize: 13,
+                          border: 0,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Skip
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Actions */}
             <div className="ts-confirm-actions mt-5 flex items-center gap-3">
