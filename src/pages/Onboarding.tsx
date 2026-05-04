@@ -277,6 +277,7 @@ const CATEGORIES: CategoryKey[] = [
   "food",
   "sound",
   "imprint",
+  "digital_traces",
 ];
 
 const Onboarding = () => {
@@ -456,8 +457,16 @@ const Onboarding = () => {
 
   // ---- CATEGORY ----
   if (step === "category") {
-    const ACTIVE: CategoryKey[] = ["moment", "object", "place", "food"];
-    const COMING: CategoryKey[] = ["person", "sound", "imprint"];
+    const ACTIVE: CategoryKey[] = [
+      "moment",
+      "object",
+      "place",
+      "food",
+      "person",
+      "sound",
+      "imprint",
+      "digital_traces",
+    ];
     const pickCategory = (c: CategoryKey) => {
       update({ category: c });
       setStep("time");
@@ -488,7 +497,7 @@ const Onboarding = () => {
             What's worth keeping today?
           </h2>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-4 gap-3">
           {ACTIVE.map((c) => (
             <CategoryIconCard
               key={c}
@@ -497,17 +506,6 @@ const Onboarding = () => {
               iconSize={30}
               labelSize={11}
               onClick={() => pickCategory(c)}
-            />
-          ))}
-        </div>
-        <div className="grid grid-cols-3 gap-3 sm:max-w-[75%] sm:mx-auto">
-          {COMING.map((c) => (
-            <CategoryIconCard
-              key={c}
-              category={c}
-              comingSoon
-              iconSize={30}
-              labelSize={11}
             />
           ))}
         </div>
