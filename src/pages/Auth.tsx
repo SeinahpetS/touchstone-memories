@@ -102,7 +102,7 @@ const Auth = () => {
       <div className="w-full max-w-sm space-y-8">
         {/* Wordmark */}
         <div className="text-center">
-          <h1 className="font-playfair text-[1.65rem] font-bold tracking-[0.2em] text-foreground lowercase">
+          <h1 className="font-playfair text-[1.65rem] font-black tracking-[0.2em] text-foreground lowercase">
             touchstone
           </h1>
           {isSignUp && (
