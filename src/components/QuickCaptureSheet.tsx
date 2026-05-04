@@ -636,6 +636,96 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               </div>
             </div>
 
+            {/* AI follow-up prompt */}
+            {(aiPromptLoading || aiPromptQuestion) && !aiPromptDone && (
+              <div
+                className="w-full sm:max-w-sm mt-5"
+                style={{
+                  backgroundColor: "rgba(20,16,10,0.78)",
+                  border: "1px solid rgba(184,134,11,0.35)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  animation: "ts-fadeInUp 0.4s ease-out 0.7s both",
+                }}
+              >
+                {aiPromptLoading && !aiPromptQuestion ? (
+                  <p
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontStyle: "italic",
+                      color: "rgba(232,195,106,0.8)",
+                      fontSize: 14,
+                      margin: 0,
+                    }}
+                  >
+                    Listening…
+                  </p>
+                ) : (
+                  <>
+                    <p
+                      style={{
+                        fontFamily: "'Playfair Display', serif",
+                        fontStyle: "italic",
+                        color: "#E8C36A",
+                        fontSize: 16,
+                        lineHeight: 1.4,
+                        margin: "0 0 12px",
+                      }}
+                    >
+                      {aiPromptQuestion}
+                    </p>
+                    <Textarea
+                      value={aiPromptAnswer}
+                      onChange={(e) => setAiPromptAnswer(e.target.value)}
+                      placeholder="A line, a feeling, anything…"
+                      className="min-h-[72px] text-base resize-none placeholder:italic"
+                      style={{
+                        backgroundColor: "rgba(242,238,229,0.08)",
+                        color: "#F2EEE5",
+                        border: "1px solid rgba(242,238,229,0.18)",
+                      }}
+                    />
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveAiAnswer}
+                        disabled={!aiPromptAnswer.trim() || aiPromptSaving}
+                        className="h-10 px-4 rounded-md transition-colors"
+                        style={{
+                          fontFamily: "Jost, sans-serif",
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
+                          fontSize: 12,
+                          color: "#1C160E",
+                          backgroundColor: "#B8860B",
+                          border: "1px solid #B8860B",
+                          opacity:
+                            !aiPromptAnswer.trim() || aiPromptSaving ? 0.5 : 1,
+                        }}
+                      >
+                        {aiPromptSaving ? "Saving…" : "Add to memory"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSkipAiPrompt}
+                        style={{
+                          background: "transparent",
+                          color: "rgba(242,238,229,0.6)",
+                          padding: "10px 14px",
+                          fontFamily: "Jost, sans-serif",
+                          fontSize: 13,
+                          border: 0,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Skip
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
             {/* Actions */}
             <div className="ts-confirm-actions mt-5 flex items-center gap-3">
               <button
