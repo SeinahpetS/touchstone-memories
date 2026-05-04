@@ -45,7 +45,7 @@ const CategorySelector = ({ value, onChange }: Props) => (
     </div>
     {/* Row 2: 3 tiles, stretched so the row spans the same width as row 1 */}
     <div
-      className="grid grid-cols-3 gap-3"
+      className="grid grid-cols-4 gap-3"
       style={{ width: "476px", maxWidth: "100%" }}
     >
       {ROW_TWO.map((cat) => (
