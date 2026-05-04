@@ -1,5 +1,5 @@
 const Wordmark = () => (
-  <h1 className="font-playfair text-xl font-semibold tracking-[0.25em] text-foreground lowercase text-center select-none">
+  <h1 className="font-playfair text-[1.375rem] font-bold tracking-[0.25em] text-foreground lowercase text-center select-none">
     touchstone
   </h1>
 );
