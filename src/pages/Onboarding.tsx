@@ -1376,8 +1376,8 @@ const Splash = ({ onDone }: { onDone: () => void }) => {
           className="ts-splash-wordmark"
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontWeight: 600,
-            fontSize: "clamp(34px, 8vw, 52px)",
+            fontWeight: 700,
+            fontSize: "clamp(37px, 8.8vw, 57px)",
             letterSpacing: "0.28em",
             color: "#F2EEE5",
             textTransform: "lowercase",
@@ -1679,9 +1679,10 @@ const LightScreen = ({
         <span
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: 13,
+            fontSize: 14,
             letterSpacing: "0.28em",
             textTransform: "lowercase",
+            fontWeight: 700,
             color: "#2C3E50",
           }}
         >
