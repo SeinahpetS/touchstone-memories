@@ -28,7 +28,7 @@ const RootRoute = () => {
   if (user) {
     const hasPendingDraft =
       typeof window !== "undefined" &&
-      !!sessionStorage.getItem("ts_onboarding_draft_v1");
+      !!localStorage.getItem("ts_onboarding_draft_v1");
     return hasPendingDraft ? <Onboarding /> : <Index />;
   }
   return <Onboarding />;
