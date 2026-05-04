@@ -8,7 +8,7 @@ import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import TimelineView from "@/components/TimelineView";
-import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import {
   DropdownMenu,
@@ -522,57 +522,87 @@ const Archive = () => {
             </span>
           </div>
 
-          {/* Zone 1 — filter grid: compact 4x2 */}
-          <div
-            className="grid grid-cols-4 mt-4 mb-4 justify-items-stretch"
-            style={{ gap: "6px" }}
-          >
+          {/* Zone 1 — filter grid: 4x2 categories + ALL bar */}
+          <div className="mt-4 mb-4">
+            <div
+              className="grid"
+              style={{ gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}
+            >
+              {FILTER_CATEGORIES.map((c) => {
+                const active = filter === c;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setFilter(c)}
+                    aria-pressed={active}
+                    style={{
+                      background: active ? "#253748" : "#1E2E3E",
+                      borderRadius: 12,
+                      border: `2px solid ${active ? "#B8860B" : "transparent"}`,
+                      padding: "18px 8px 14px",
+                    }}
+                    className="flex flex-col items-center justify-center"
+                  >
+                    <span style={{ marginBottom: 10 }} className="flex items-center justify-center">
+                      <CategoryIcon
+                        category={c}
+                        size={c === "imprint" ? 20 : 26}
+                        color="#B8860B"
+                      />
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: "0.12em",
+                        color: "#E8E4D8",
+                        textTransform: "uppercase",
+                        fontWeight: 500,
+                        fontFamily: "Jost, sans-serif",
+                      }}
+                    >
+                      {PLURAL_LABELS[c]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
             <button
               onClick={() => setFilter("all")}
               aria-pressed={filter === "all"}
               style={{
-                borderColor: filter === "all" ? "#B8860B" : "#E8E4D8",
-                borderWidth: filter === "all" ? "3.5px" : "1.5px",
-                borderStyle: "solid",
-                backgroundColor: filter === "all" ? "#F2EEE5" : undefined,
-                padding: "14px 8px",
+                marginTop: 10,
+                width: "100%",
+                height: 44,
+                borderRadius: 12,
+                background: filter === "all" ? "#253748" : "#1E2E3E",
+                border: `2px solid ${filter === "all" ? "#B8860B" : "transparent"}`,
               }}
-              className={cn(
-                "flex flex-col items-center justify-center gap-1.5 rounded-[10px] transition-colors w-full",
-                filter !== "all" && "bg-[hsl(var(--dark-card))]"
-              )}
+              className="flex items-center justify-center"
             >
-              <span className="flex items-center justify-center" style={{ height: 26 }}>
+              <span className="flex items-center" style={{ gap: 8 }}>
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                  <polygon
+                    points="7.5,1 14,7.5 7.5,14 1,7.5"
+                    stroke="#B8860B"
+                    strokeWidth="1.5"
+                    fill="none"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 <span
-                  className="inline-block rotate-45 border-[1.5px]"
-                  style={{ borderColor: "#B8860B", height: 20, width: 20 }}
-                />
-              </span>
-              <span
-                className="font-sans uppercase tracking-[0.06em]"
-                style={{
-                  fontSize: "10px",
-                  color: filter === "all" ? "#2C3E50" : undefined,
-                }}
-              >
-                <span className={cn(filter !== "all" && "text-[hsl(var(--label-color))]")}>
-                  All
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: "0.12em",
+                    color: "#E8E4D8",
+                    textTransform: "uppercase",
+                    fontWeight: 500,
+                    fontFamily: "Jost, sans-serif",
+                  }}
+                >
+                  ALL
                 </span>
               </span>
             </button>
-
-            {FILTER_CATEGORIES.map((c) => (
-              <CategoryIconCard
-                key={c}
-                category={c}
-                label={PLURAL_LABELS[c]}
-                className="w-full !min-w-0 !px-[8px] !py-[14px] !gap-1.5"
-                iconSize={26}
-                labelSize={10}
-                active={filter === c}
-                onClick={() => setFilter(c)}
-              />
-            ))}
           </div>
         </div>
 
