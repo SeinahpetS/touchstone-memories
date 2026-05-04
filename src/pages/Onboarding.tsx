@@ -1376,12 +1376,11 @@ const Splash = ({ onDone }: { onDone: () => void }) => {
           className="ts-splash-wordmark"
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontWeight: 600,
+            fontWeight: 700,
             fontSize: "clamp(37px, 8.8vw, 57px)",
             letterSpacing: "0.28em",
             color: "#F2EEE5",
             textTransform: "lowercase",
-            fontWeight: 700,
             margin: 0,
           }}
         >
