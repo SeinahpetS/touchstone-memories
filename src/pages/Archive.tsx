@@ -8,7 +8,7 @@ import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import TimelineView from "@/components/TimelineView";
-import CategoryIcon, { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CategoryIconCard, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import {
   DropdownMenu,
@@ -536,9 +536,9 @@ const Archive = () => {
                     onClick={() => setFilter(c)}
                     aria-pressed={active}
                     style={{
-                      background: active ? "#253748" : "#1E2E3E",
+                      background: "#1E2E3E",
                       borderRadius: 12,
-                      border: `2px solid ${active ? "#B8860B" : "transparent"}`,
+                      border: `2px solid ${active ? CATEGORY_BORDER_COLORS[c] : "transparent"}`,
                       padding: "18px 8px 14px",
                     }}
                     className="flex flex-col items-center justify-center"
@@ -574,7 +574,7 @@ const Archive = () => {
                 width: "100%",
                 height: 44,
                 borderRadius: 12,
-                background: filter === "all" ? "#253748" : "#1E2E3E",
+                background: "#1E2E3E",
                 border: `2px solid ${filter === "all" ? "#B8860B" : "transparent"}`,
               }}
               className="flex items-center justify-center"
