@@ -383,6 +383,31 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
     onClose();
   };
 
+  const handleSaveAiAnswer = async () => {
+    if (!savedId || !aiPromptQuestion || !aiPromptAnswer.trim()) return;
+    setAiPromptSaving(true);
+    try {
+      const { error: updErr } = await (supabase as any)
+        .from("touchstones")
+        .update({
+          ai_prompt: aiPromptQuestion,
+          ai_answer: aiPromptAnswer.trim(),
+          is_premium_prompt: true,
+        })
+        .eq("id", savedId);
+      if (updErr) throw updErr;
+      setAiPromptDone(true);
+    } catch (err) {
+      console.error("Failed to save AI answer", err);
+    } finally {
+      setAiPromptSaving(false);
+    }
+  };
+
+  const handleSkipAiPrompt = () => {
+    setAiPromptDone(true);
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
