@@ -17,6 +17,7 @@ const ROW_TWO: CategoryDef[] = [
   { value: "food", enabled: true },
   { value: "sound", enabled: true },
   { value: "imprint", enabled: true },
+  { value: "digital_traces", enabled: true },
 ];
 
 interface Props {
