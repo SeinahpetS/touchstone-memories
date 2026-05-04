@@ -143,6 +143,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       setConfirmed(false);
       setSavedId(null);
       setError(null);
+      setAiPromptQuestion(null);
+      setAiPromptLoading(false);
+      setAiPromptAnswer("");
+      setAiPromptSaving(false);
+      setAiPromptDone(false);
     }
   }, [open]);
 
