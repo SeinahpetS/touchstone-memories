@@ -26,6 +26,7 @@ const FILTER_CATEGORIES: CategoryKey[] = [
   "food",
   "sound",
   "imprint",
+  "digital_traces",
 ];
 
 const PLURAL_LABELS: Record<CategoryKey, string> = {
