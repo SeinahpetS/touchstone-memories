@@ -913,32 +913,6 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic mb-5"
             />
 
-            {/* Who is this connected to? — optional, all categories */}
-            <div className="mb-4">
-              <label
-                htmlFor="ts-connected-to"
-                className="block mb-1.5"
-                style={{
-                  fontFamily: "Jost, sans-serif",
-                  fontSize: 11,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "#B8860B",
-                }}
-              >
-                Who is this connected to?
-              </label>
-              <Input
-                id="ts-connected-to"
-                type="text"
-                autoComplete="off"
-                value={connectedTo}
-                onChange={(e) => setConnectedTo(e.target.value)}
-                placeholder="A name — anyone this memory belongs to"
-                className="h-12 text-base bg-card border-0 placeholder:italic"
-              />
-            </div>
-
             <Input
               type="text"
               autoComplete="off"
