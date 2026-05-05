@@ -260,7 +260,7 @@ const Profile = () => {
 
         {/* Tier */}
         <section className="space-y-3">
-          <h2 className="font-playfair text-lg">Tier</h2>
+          <h2 className="font-playfair text-lg">Current Plan</h2>
           <div className="flex items-center justify-between rounded-md border border-border px-4 py-3">
             <div>
               <p className="text-sm font-medium">{tierLabel}</p>
@@ -269,12 +269,18 @@ const Profile = () => {
                   Trial ends {new Date(profile.trial_ends_at).toLocaleDateString()}
                 </p>
               ) : (
-                <p className="text-xs text-muted-foreground">Current plan</p>
+                <p className="text-[13px] text-[#2C3E50]" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  One AI prompt per day. Your archive, always yours.
+                </p>
               )}
             </div>
-            <span className="inline-flex items-center rounded-full bg-[hsl(var(--gold)/0.15)] px-3 py-1 text-xs font-medium text-[hsl(var(--gold))]">
-              {tierLabel}
-            </span>
+            <button
+              onClick={() => console.log("upgrade tapped")}
+              className="inline-flex items-center rounded-full bg-[#B8860B] px-3 py-1 text-[13px] font-medium text-[#F2EEE5]"
+              style={{ fontFamily: "'Jost', sans-serif" }}
+            >
+              Upgrade
+            </button>
           </div>
         </section>
 
