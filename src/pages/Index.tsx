@@ -13,6 +13,8 @@ import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import ShareMemorySheet from "@/components/ShareMemorySheet";
+import { Share } from "lucide-react";
 import PostSaveNudge from "@/components/PostSaveNudge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
