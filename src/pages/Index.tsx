@@ -118,6 +118,7 @@ const Index = () => {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
