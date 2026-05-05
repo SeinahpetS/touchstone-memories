@@ -559,7 +559,7 @@ const Archive = () => {
                     style={{
                       background: "#1E2E3E",
                       borderRadius: 12,
-                      border: `2px solid ${active ? CATEGORY_BORDER_COLORS[c] : "transparent"}`,
+                      border: active ? `4px solid ${CATEGORY_BORDER_COLORS[c]}` : "2px solid transparent",
                       padding: "18px 8px 14px",
                     }}
                     className="flex flex-col items-center justify-center"
