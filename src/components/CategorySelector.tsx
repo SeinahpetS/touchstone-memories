@@ -1,65 +1,72 @@
-import { CategoryIconCard } from "@/components/CategoryIcon";
-import type { CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 
-type CategoryDef = {
-  value: CategoryKey;
-  enabled: boolean;
+const CATEGORIES: CategoryKey[] = [
+  "moment",
+  "person",
+  "object",
+  "place",
+  "food",
+  "sound",
+  "imprint",
+  "digital_traces",
+];
+
+const PLURAL_LABELS: Record<CategoryKey, string> = {
+  moment: "Moments",
+  person: "People",
+  object: "Objects",
+  place: "Places",
+  food: "Foods",
+  sound: "Sounds",
+  imprint: "Imprints",
+  digital_traces: "Digital Traces",
 };
-
-const ROW_ONE: CategoryDef[] = [
-  { value: "moment", enabled: true },
-  { value: "person", enabled: true },
-  { value: "object", enabled: true },
-  { value: "place", enabled: true },
-];
-
-const ROW_TWO: CategoryDef[] = [
-  { value: "food", enabled: true },
-  { value: "sound", enabled: true },
-  { value: "imprint", enabled: true },
-  { value: "digital_traces", enabled: true },
-];
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
 }
 
-// Row 1: 4 tiles × 110px + 3 gaps × 12px = 476px total width.
-// Row 2: same 476px width split across 3 tiles + 2 gaps = (476 - 24) / 3 ≈ 150.67px per tile.
 const CategorySelector = ({ value, onChange }: Props) => (
-  <div className="flex flex-col items-center gap-3">
-    {/* Row 1: 4 fixed-size tiles, matching constellation filter sizing */}
-    <div className="flex justify-center gap-3">
-      {ROW_ONE.map((cat) => (
-        <CategoryIconCard
-          key={cat.value}
-          category={cat.value}
-          className="w-[110px] h-[75px] !min-w-0"
-          iconSize={33}
-          active={value === cat.value && cat.enabled}
-          comingSoon={!cat.enabled}
-          onClick={() => onChange(cat.value)}
-        />
-      ))}
-    </div>
-    {/* Row 2: 3 tiles, stretched so the row spans the same width as row 1 */}
-    <div
-      className="grid grid-cols-4 gap-3"
-      style={{ width: "476px", maxWidth: "100%" }}
-    >
-      {ROW_TWO.map((cat) => (
-        <CategoryIconCard
-          key={cat.value}
-          category={cat.value}
-          className="w-full h-[75px] !min-w-0"
-          iconSize={33}
-          active={value === cat.value && cat.enabled}
-          comingSoon={!cat.enabled}
-          onClick={() => onChange(cat.value)}
-        />
-      ))}
-    </div>
+  <div
+    className="grid"
+    style={{ gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}
+  >
+    {CATEGORIES.map((c) => {
+      const active = value === c;
+      return (
+        <button
+          key={c}
+          type="button"
+          onClick={() => onChange(c)}
+          aria-pressed={active}
+          style={{
+            background: "#1E2E3E",
+            borderRadius: 12,
+            border: active ? `4px solid ${CATEGORY_BORDER_COLORS[c]}` : "2px solid transparent",
+            padding: "10px 6px 8px",
+            height: 78,
+          }}
+          className="flex flex-col items-center justify-center"
+        >
+          <span style={{ marginBottom: 6 }} className="flex items-center justify-center">
+            <CategoryIcon category={c} size={c === "imprint" ? 18 : 22} color="#B8860B" />
+          </span>
+          <span
+            style={{
+              fontSize: 10,
+              letterSpacing: "0.12em",
+              color: "#E8E4D8",
+              textTransform: "uppercase",
+              fontWeight: 500,
+              fontFamily: "Jost, sans-serif",
+            }}
+          >
+            {PLURAL_LABELS[c]}
+          </span>
+        </button>
+      );
+    })}
   </div>
 );
 
