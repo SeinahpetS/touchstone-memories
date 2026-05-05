@@ -560,14 +560,15 @@ const Archive = () => {
                       background: "#1E2E3E",
                       borderRadius: 12,
                       border: active ? `4px solid ${CATEGORY_BORDER_COLORS[c]}` : "2px solid transparent",
-                      padding: "18px 8px 14px",
+                      padding: "10px 6px 8px",
+                      height: 78,
                     }}
                     className="flex flex-col items-center justify-center"
                   >
-                    <span style={{ marginBottom: 10 }} className="flex items-center justify-center">
+                    <span style={{ marginBottom: 6 }} className="flex items-center justify-center">
                       <CategoryIcon
                         category={c}
-                        size={c === "imprint" ? 20 : 26}
+                        size={c === "imprint" ? 18 : 22}
                         color="#B8860B"
                       />
                     </span>
