@@ -378,6 +378,21 @@ const Index = () => {
           <ProfileAvatarButton />
         </div>
 
+        {saved && (
+          <div className="flex justify-end -mt-4">
+            <button
+              onClick={() => setShareOpen(true)}
+              className="flex flex-col items-center gap-1"
+              aria-label="Share"
+            >
+              <Share className="h-5 w-5" style={{ color: "#1E2E3E" }} />
+              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 12, color: "#1E2E3E" }}>
+                Share
+              </span>
+            </button>
+          </div>
+        )}
+
         {saved ? (
           <>
             <MemoryArtifact
