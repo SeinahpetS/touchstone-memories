@@ -444,6 +444,13 @@ const Index = () => {
                 Done
               </button>
             </div>
+            <ShareMemorySheet
+              open={shareOpen}
+              onOpenChange={setShareOpen}
+              senderName={user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Someone"}
+              memoryTitle={saved.title}
+              memoryNote={saved.note}
+            />
           </>
         ) : (
           <>
