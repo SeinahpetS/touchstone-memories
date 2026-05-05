@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { MoreHorizontal, Pencil, Search } from "lucide-react";
+import { MoreHorizontal, Pencil, Search, Share } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import ShareMemorySheet from "@/components/ShareMemorySheet";
 import TimelineView from "@/components/TimelineView";
 import CategoryIcon, { CategoryIconCard, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
@@ -46,6 +47,7 @@ const Archive = () => {
   const [touchstones, setTouchstones] = useState<any[]>([]);
   const [filter, setFilter] = useState<"all" | CategoryKey>("all");
   const [selected, setSelected] = useState<any>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [lastMemoryAt, setLastMemoryAt] = useState<string | null>(null);
@@ -324,12 +326,31 @@ const Archive = () => {
               <ProfileAvatarButton />
             </div>
           </div>
+          <div className="flex justify-end -mt-2 mb-2">
+            <button
+              onClick={() => setShareOpen(true)}
+              className="flex flex-col items-center gap-1"
+              aria-label="Share"
+            >
+              <Share className="h-5 w-5" style={{ color: "#1E2E3E" }} />
+              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 12, color: "#1E2E3E" }}>
+                Share
+              </span>
+            </button>
+          </div>
           <MemoryArtifact
             photoUrl={selected.photo_url}
             category={selected.category}
             title={selected.title}
             note={selected.note}
             createdAt={selected.created_at}
+          />
+          <ShareMemorySheet
+            open={shareOpen}
+            onOpenChange={setShareOpen}
+            senderName={user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Someone"}
+            memoryTitle={selected.title}
+            memoryNote={selected.note}
           />
         </div>
       </div>

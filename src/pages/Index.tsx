@@ -13,6 +13,8 @@ import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import ShareMemorySheet from "@/components/ShareMemorySheet";
+import { Share } from "lucide-react";
 import PostSaveNudge from "@/components/PostSaveNudge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,6 +118,7 @@ const Index = () => {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<any>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
@@ -375,6 +378,21 @@ const Index = () => {
           <ProfileAvatarButton />
         </div>
 
+        {saved && (
+          <div className="flex justify-end -mt-4">
+            <button
+              onClick={() => setShareOpen(true)}
+              className="flex flex-col items-center gap-1"
+              aria-label="Share"
+            >
+              <Share className="h-5 w-5" style={{ color: "#1E2E3E" }} />
+              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 12, color: "#1E2E3E" }}>
+                Share
+              </span>
+            </button>
+          </div>
+        )}
+
         {saved ? (
           <>
             <MemoryArtifact
@@ -426,6 +444,13 @@ const Index = () => {
                 Done
               </button>
             </div>
+            <ShareMemorySheet
+              open={shareOpen}
+              onOpenChange={setShareOpen}
+              senderName={user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Someone"}
+              memoryTitle={saved.title}
+              memoryNote={saved.note}
+            />
           </>
         ) : (
           <>
