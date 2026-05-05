@@ -47,6 +47,7 @@ const Archive = () => {
   const [touchstones, setTouchstones] = useState<any[]>([]);
   const [filter, setFilter] = useState<"all" | CategoryKey>("all");
   const [selected, setSelected] = useState<any>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [lastMemoryAt, setLastMemoryAt] = useState<string | null>(null);
