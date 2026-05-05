@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import ShareMemorySheet from "@/components/ShareMemorySheet";
 import TimelineView from "@/components/TimelineView";
 import CategoryIcon, { CategoryIconCard, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
