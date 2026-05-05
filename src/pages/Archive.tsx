@@ -326,12 +326,31 @@ const Archive = () => {
               <ProfileAvatarButton />
             </div>
           </div>
+          <div className="flex justify-end -mt-2 mb-2">
+            <button
+              onClick={() => setShareOpen(true)}
+              className="flex flex-col items-center gap-1"
+              aria-label="Share"
+            >
+              <Share className="h-5 w-5" style={{ color: "#1E2E3E" }} />
+              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 12, color: "#1E2E3E" }}>
+                Share
+              </span>
+            </button>
+          </div>
           <MemoryArtifact
             photoUrl={selected.photo_url}
             category={selected.category}
             title={selected.title}
             note={selected.note}
             createdAt={selected.created_at}
+          />
+          <ShareMemorySheet
+            open={shareOpen}
+            onOpenChange={setShareOpen}
+            senderName={user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Someone"}
+            memoryTitle={selected.title}
+            memoryNote={selected.note}
           />
         </div>
       </div>
