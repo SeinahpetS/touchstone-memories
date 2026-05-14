@@ -421,7 +421,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               marginTop: "2.2rem",
             }}
           >
-            This is where it lives.
+            Everything that made you. Still here.
           </div>
           <button
             onClick={onBegin}
