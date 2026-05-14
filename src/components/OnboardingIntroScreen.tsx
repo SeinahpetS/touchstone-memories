@@ -172,6 +172,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     if (!el) return;
     const W = el.offsetWidth;
     const H = el.offsetHeight;
+    // Scale quotes/stars up on larger screens. Baseline is ~390px wide phone.
+    const scale = Math.min(2.6, Math.max(1, W / 420));
 
     const occupied: Rect[] = [];
     // Center reservation
