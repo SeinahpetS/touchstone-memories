@@ -314,11 +314,6 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     return () => timers.forEach((t) => clearTimeout(t));
   }, [advancing]);
 
-  // dummy to keep structure
-  useEffect(() => {
-    });
-    return () => timers.forEach((t) => clearTimeout(t));
-  }, [order]);
 
   const wordmark = useMemo(
     () => (
