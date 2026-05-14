@@ -452,6 +452,15 @@ const Onboarding = () => {
     }
   };
 
+  if (step === "intro") {
+    return (
+      <OnboardingIntroScreen
+        onBegin={() => setStep("splash")}
+        onSkip={() => setStep("splash")}
+      />
+    );
+  }
+
   if (step === "splash") {
     return <Splash onDone={handleAfterSplash} />;
   }
