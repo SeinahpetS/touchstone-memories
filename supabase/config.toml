@@ -1,7 +1,7 @@
 project_id = "molmsqlnngtusxeggeij"
 
 [functions.places-search]
-verify_jwt = true
+verify_jwt = false
 
 [functions.spotify-search]
 verify_jwt = true
