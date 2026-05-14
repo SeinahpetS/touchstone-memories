@@ -409,7 +409,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           >
             Your story deserves to be somewhere.
           </div>
-          <div style={{ margin: "0.9rem 0" }}>
+          <div style={{ margin: "1.4rem 0", transform: "scale(3)", transformOrigin: "center" }}>
             <Wordmark />
           </div>
           <div
@@ -417,7 +417,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               fontFamily: '"Playfair Display", Georgia, serif',
               fontStyle: "italic",
               fontSize: "clamp(18px, 3.8vw, 22px)",
-              color: "#4A6B8A",
+              color: "#B8860B",
+              marginTop: "2.2rem",
             }}
           >
             This is where it lives.
