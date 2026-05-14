@@ -64,14 +64,14 @@ const QUOTES: QuoteSpec[] = [
 ];
 
 const STARS: StarSpec[] = [
-  { size: 10, color: "#B8860B" },
-  { size: 6, color: "#1E2E3E" },
-  { size: 8, color: "#B8860B" },
-  { size: 5, color: "#4A6B8A" },
-  { size: 9, color: "#B8860B" },
-  { size: 4, color: "#1E2E3E" },
-  { size: 7, color: "#4A6B8A" },
-  { size: 5, color: "#B8860B" },
+  { size: 18, color: "#B8860B" },
+  { size: 12, color: "#1E2E3E" },
+  { size: 16, color: "#B8860B" },
+  { size: 10, color: "#4A6B8A" },
+  { size: 17, color: "#B8860B" },
+  { size: 9, color: "#1E2E3E" },
+  { size: 14, color: "#4A6B8A" },
+  { size: 11, color: "#B8860B" },
 ];
 
 const GAP = 12;
@@ -102,9 +102,9 @@ function shuffle<T>(arr: T[]): T[] {
 
 function computeFontSize(q: QuoteSpec) {
   const wc = q.text.trim().split(/\s+/).length;
-  if (wc <= 8) return q.baseSize + 4;
+  if (wc <= 8) return q.baseSize + 6;
   if (wc <= 14) return q.baseSize + 2;
-  return q.baseSize;
+  return q.baseSize * 0.85;
 }
 
 function estimateQuoteHeight(q: QuoteSpec, fontSize: number) {
