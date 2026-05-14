@@ -285,7 +285,7 @@ const CATEGORIES: CategoryKey[] = [
 const Onboarding = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [step, setStep] = useState<Step>("splash");
+  const [step, setStep] = useState<Step>("intro");
   const [draft, setDraft] = useState<OnboardingDraft>(emptyOnboardingDraft());
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
