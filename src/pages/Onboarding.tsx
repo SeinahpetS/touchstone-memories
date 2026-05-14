@@ -1834,10 +1834,16 @@ const ArtifactReveal = ({
   }, []);
 
   // When the nudge is resolved (added or skipped), advance to the CTA.
+  // If a name was provided, auto-progress after a brief beat so the user
+  // lands on the archive without having to tap the CTA.
   const finishNudge = (name: string | null) => {
-    if (name && name.trim()) onPeopleChange(name.trim());
+    const trimmed = name?.trim() ?? "";
+    if (trimmed) onPeopleChange(trimmed);
     setNudgeDone(true);
     setPhase("cta");
+    if (trimmed) {
+      window.setTimeout(() => onClaim(), 1200);
+    }
   };
 
   return (
