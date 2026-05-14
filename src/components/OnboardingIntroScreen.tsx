@@ -172,6 +172,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     if (!el) return;
     const W = el.offsetWidth;
     const H = el.offsetHeight;
+    // Scale quotes/stars up on larger screens. Baseline is ~390px wide phone.
+    const scale = Math.min(2.6, Math.max(1, W / 420));
 
     const occupied: Rect[] = [];
     // Center reservation
@@ -210,12 +212,14 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
 
     quoteOrder.forEach((qi) => {
       const quote = QUOTES[qi];
-      const fontSize = computeFontSize(quote);
-      const h = estimateQuoteHeight(quote, fontSize);
-      const qRect = tryPlace(quote.width, h);
+      const fontSize = computeFontSize(quote) * scale;
+      const width = quote.width * scale;
+      const h = estimateQuoteHeight({ ...quote, width }, fontSize);
+      const qRect = tryPlace(width, h);
       if (!qRect) return;
       occupied.push(qRect);
-      const star = starAssignment[qi % starAssignment.length];
+      const baseStar = starAssignment[qi % starAssignment.length];
+      const star = { ...baseStar, size: baseStar.size * scale };
       const sRect = tryPlace(star.size, star.size);
       if (!sRect) {
         placed.push({ kind: "quote", idx: qi, quote, fontSize, rect: qRect });
