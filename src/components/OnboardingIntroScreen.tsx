@@ -166,6 +166,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const [order, setOrder] = useState<number[]>([]);
   const [showClosing, setShowClosing] = useState(false);
   const [dimmed, setDimmed] = useState(false);
+  const [closingStage, setClosingStage] = useState(0); // 0 none, 1 first line, 2 + second line, 3 + wordmark
 
   // Compute placements once on mount
   useEffect(() => {
