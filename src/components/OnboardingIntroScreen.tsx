@@ -102,9 +102,9 @@ function shuffle<T>(arr: T[]): T[] {
 
 function computeFontSize(q: QuoteSpec) {
   const wc = q.text.trim().split(/\s+/).length;
-  if (wc <= 8) return q.baseSize + 4;
+  if (wc <= 8) return q.baseSize + 6;
   if (wc <= 14) return q.baseSize + 2;
-  return q.baseSize;
+  return q.baseSize * 0.85;
 }
 
 function estimateQuoteHeight(q: QuoteSpec, fontSize: number) {
