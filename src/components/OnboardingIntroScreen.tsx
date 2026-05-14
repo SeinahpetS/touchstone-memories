@@ -196,75 +196,82 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
 
     const placed: Placed[] = [];
 
-    const tryPlace = (w: number, h: number): Rect | null => {
-      for (let attempt = 0; attempt < 600; attempt++) {
-        if (w >= W || h >= maxY - minY) return null;
-        const x = Math.random() * (W - w);
-        const y = minY + Math.random() * (maxY - minY - h);
-        const rect = { x, y, w, h };
-        let ok = true;
-        for (const o of occupied) {
-          if (rectsOverlap(rect, o)) {
-            ok = false;
-            break;
-          }
-        }
-        if (ok) return rect;
-      }
-      return null;
-    };
+    // Build a balanced grid covering the full screen, then assign quotes + stars
+    // to cells so the two are interleaved spatially rather than clustered.
+    type Item =
+      | { kind: "quote"; idx: number; quote: QuoteSpec; fontSize: number; w: number; h: number }
+      | { kind: "star"; idx: number; star: StarSpec; w: number; h: number };
 
+    const items: Item[] = [];
     quoteOrder.forEach((qi) => {
       const quote = QUOTES[qi];
       const fontSize = computeFontSize(quote) * scale;
       const width = quote.width * scale;
       const h = estimateQuoteHeight({ ...quote, width }, fontSize);
-      const qRect = tryPlace(width, h);
-      if (!qRect) return;
-      occupied.push(qRect);
-      placed.push({ kind: "quote", idx: qi, quote, fontSize, rect: qRect });
+      items.push({ kind: "quote", idx: qi, quote, fontSize, w: width, h });
     });
-
-    // Place stars independently, spread across the full screen via grid-jitter
-    const starCount = starAssignment.length;
-    const cols = Math.ceil(Math.sqrt(starCount * (W / Math.max(1, maxY - minY))));
-    const rows = Math.ceil(starCount / cols);
-    const cellW = W / cols;
-    const cellH = (maxY - minY) / rows;
-    const cells: { cx: number; cy: number }[] = [];
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        cells.push({ cx: c, cy: r });
-      }
-    }
-    const shuffledCells = shuffle(cells).slice(0, starCount);
-
     starAssignment.forEach((baseStar, i) => {
       const star = { ...baseStar, size: baseStar.size * scale };
-      const cell = shuffledCells[i];
-      let sRect: Rect | null = null;
-      for (let attempt = 0; attempt < 80; attempt++) {
-        const jitterX = Math.random() * Math.max(0, cellW - star.size);
-        const jitterY = Math.random() * Math.max(0, cellH - star.size);
-        const x = cell.cx * cellW + jitterX;
-        const y = minY + cell.cy * cellH + jitterY;
-        const rect = { x, y, w: star.size, h: star.size };
-        let ok = true;
-        for (const o of occupied) {
-          if (rectsOverlap(rect, o)) {
-            ok = false;
-            break;
-          }
-        }
-        if (ok) {
-          sRect = rect;
+      items.push({ kind: "star", idx: i, star, w: star.size, h: star.size });
+    });
+
+    // Interleave: alternate quote, star, quote, star ... so neighbors in the
+    // placement order (which gets cells in sequence) mix the two kinds.
+    const quotesQ = items.filter((it) => it.kind === "quote");
+    const starsQ = items.filter((it) => it.kind === "star");
+    const interleaved: Item[] = [];
+    while (quotesQ.length || starsQ.length) {
+      if (quotesQ.length) interleaved.push(quotesQ.shift()!);
+      if (starsQ.length) interleaved.push(starsQ.shift()!);
+    }
+
+    const total = interleaved.length;
+    const usableH = maxY - minY;
+    const cols = Math.max(2, Math.round(Math.sqrt(total * (W / Math.max(1, usableH)))));
+    const rows = Math.max(2, Math.ceil(total / cols));
+    const cellW = W / cols;
+    const cellH = usableH / rows;
+    const cells: { cx: number; cy: number }[] = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) cells.push({ cx: c, cy: r });
+    }
+    const shuffledCells = shuffle(cells);
+
+    const tryPlaceFree = (w: number, h: number): Rect | null => {
+      for (let attempt = 0; attempt < 400; attempt++) {
+        if (w >= W || h >= usableH) return null;
+        const x = Math.random() * (W - w);
+        const y = minY + Math.random() * (usableH - h);
+        const rect = { x, y, w, h };
+        if (!occupied.some((o) => rectsOverlap(rect, o))) return rect;
+      }
+      return null;
+    };
+
+    interleaved.forEach((it, i) => {
+      const cell = shuffledCells[i % shuffledCells.length];
+      let rect: Rect | null = null;
+      for (let attempt = 0; attempt < 60; attempt++) {
+        const cx = cell.cx * cellW;
+        const cy = minY + cell.cy * cellH;
+        const maxJX = Math.max(0, cellW - it.w);
+        const maxJY = Math.max(0, cellH - it.h);
+        const x = Math.max(0, Math.min(W - it.w, cx + Math.random() * maxJX));
+        const y = Math.max(minY, Math.min(maxY - it.h, cy + Math.random() * maxJY));
+        const candidate = { x, y, w: it.w, h: it.h };
+        if (!occupied.some((o) => rectsOverlap(candidate, o))) {
+          rect = candidate;
           break;
         }
       }
-      if (!sRect) sRect = tryPlace(star.size, star.size);
-      if (!sRect) return;
-      occupied.push(sRect);
-      placed.push({ kind: "star", idx: i, star, rect: sRect });
+      if (!rect) rect = tryPlaceFree(it.w, it.h);
+      if (!rect) return;
+      occupied.push(rect);
+      if (it.kind === "quote") {
+        placed.push({ kind: "quote", idx: it.idx, quote: it.quote, fontSize: it.fontSize, rect });
+      } else {
+        placed.push({ kind: "star", idx: it.idx, star: it.star, rect });
+      }
     });
 
     setPlacements(placed);
