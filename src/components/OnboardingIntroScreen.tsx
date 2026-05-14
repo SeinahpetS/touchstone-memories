@@ -288,7 +288,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         window.setTimeout(() => {
           setRevealedIds((prev) => {
             const next = new Set(prev);
-            next.add(`s-${qi}`);
+            next.add(`s-${i}`);
             return next;
           });
         }, cumulative + 437),
