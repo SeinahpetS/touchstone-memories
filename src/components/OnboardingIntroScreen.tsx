@@ -220,16 +220,49 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
       const qRect = tryPlace(width, h);
       if (!qRect) return;
       occupied.push(qRect);
-      const baseStar = starAssignment[qi % starAssignment.length];
-      const star = { ...baseStar, size: baseStar.size * scale };
-      const sRect = tryPlace(star.size, star.size);
-      if (!sRect) {
-        placed.push({ kind: "quote", idx: qi, quote, fontSize, rect: qRect });
-        return;
-      }
-      occupied.push(sRect);
       placed.push({ kind: "quote", idx: qi, quote, fontSize, rect: qRect });
-      placed.push({ kind: "star", idx: qi, star, rect: sRect });
+    });
+
+    // Place stars independently, spread across the full screen via grid-jitter
+    const starCount = starAssignment.length;
+    const cols = Math.ceil(Math.sqrt(starCount * (W / Math.max(1, maxY - minY))));
+    const rows = Math.ceil(starCount / cols);
+    const cellW = W / cols;
+    const cellH = (maxY - minY) / rows;
+    const cells: { cx: number; cy: number }[] = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        cells.push({ cx: c, cy: r });
+      }
+    }
+    const shuffledCells = shuffle(cells).slice(0, starCount);
+
+    starAssignment.forEach((baseStar, i) => {
+      const star = { ...baseStar, size: baseStar.size * scale };
+      const cell = shuffledCells[i];
+      let sRect: Rect | null = null;
+      for (let attempt = 0; attempt < 80; attempt++) {
+        const jitterX = Math.random() * Math.max(0, cellW - star.size);
+        const jitterY = Math.random() * Math.max(0, cellH - star.size);
+        const x = cell.cx * cellW + jitterX;
+        const y = minY + cell.cy * cellH + jitterY;
+        const rect = { x, y, w: star.size, h: star.size };
+        let ok = true;
+        for (const o of occupied) {
+          if (rectsOverlap(rect, o)) {
+            ok = false;
+            break;
+          }
+        }
+        if (ok) {
+          sRect = rect;
+          break;
+        }
+      }
+      if (!sRect) sRect = tryPlace(star.size, star.size);
+      if (!sRect) return;
+      occupied.push(sRect);
+      placed.push({ kind: "star", idx: i, star, rect: sRect });
     });
 
     setPlacements(placed);
