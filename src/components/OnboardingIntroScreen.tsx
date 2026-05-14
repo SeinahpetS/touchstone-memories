@@ -166,6 +166,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const [order, setOrder] = useState<number[]>([]);
   const [showClosing, setShowClosing] = useState(false);
   const [dimmed, setDimmed] = useState(false);
+  const [closingStage, setClosingStage] = useState(0); // 0 none, 1 first line, 2 + second line, 3 + wordmark
 
   // Compute placements once on mount
   useEffect(() => {
@@ -257,16 +258,18 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             next.add(`s-${qi}`);
             return next;
           });
-        }, cumulative + 380),
+        }, cumulative + 437),
       );
-      cumulative += 1000;
+      cumulative += 1150;
       if (i === order.length - 1) {
-        timers.push(
-          window.setTimeout(() => {
-            setDimmed(true);
-            setShowClosing(true);
-          }, cumulative + 900),
-        );
+        // Two beats after last reveal, then fade quotes to 0
+        const dimAt = cumulative + 1400;
+        timers.push(window.setTimeout(() => setDimmed(true), dimAt));
+        // After fade completes (~1.4s), reveal closing in stages
+        const closingStart = dimAt + 1500;
+        timers.push(window.setTimeout(() => { setShowClosing(true); setClosingStage(1); }, closingStart));
+        timers.push(window.setTimeout(() => setClosingStage(2), closingStart + 1800));
+        timers.push(window.setTimeout(() => setClosingStage(3), closingStart + 3600));
       }
     });
     return () => timers.forEach((t) => clearTimeout(t));
@@ -329,7 +332,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
                 fontSize: p.fontSize,
                 lineHeight: 1.35,
                 color: p.quote.color,
-                opacity: dimmed ? 0.085 : visible ? 1 : 0,
+                opacity: dimmed ? 0 : visible ? 1 : 0,
                 transition: dimmed
                   ? "opacity 1.4s ease"
                   : "opacity 1.1s ease",
@@ -350,7 +353,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               top: p.rect.y,
               width: p.rect.w,
               height: p.rect.h,
-              opacity: dimmed ? 0.085 : visible ? 1 : 0,
+              opacity: dimmed ? 0 : visible ? 1 : 0,
               transition: dimmed ? "opacity 1.4s ease" : "opacity 1.1s ease",
             }}
           >
@@ -393,8 +396,6 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             justifyContent: "center",
             textAlign: "center",
             padding: "0 1.5rem",
-            opacity: 0,
-            animation: "ts-intro-fade 1.8s ease forwards",
             zIndex: 10,
           }}
         >
@@ -405,12 +406,11 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               fontSize: "clamp(20px, 5vw, 26px)",
               color: "#1E2E3E",
               marginBottom: "0.6rem",
+              opacity: closingStage >= 1 ? 1 : 0,
+              transition: "opacity 1.6s ease",
             }}
           >
-            Your story deserves a special place to live.
-          </div>
-          <div style={{ margin: "1.4rem 0", transform: "scale(3)", transformOrigin: "center" }}>
-            <Wordmark />
+            Your story has parts worth remembering.
           </div>
           <div
             style={{
@@ -419,14 +419,27 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               fontSize: "clamp(18px, 3.8vw, 22px)",
               color: "#B8860B",
               marginTop: "2.2rem",
+              opacity: closingStage >= 2 ? 1 : 0,
+              transition: "opacity 1.6s ease",
             }}
           >
             Everything that made you. Still here.
           </div>
+          <div
+            style={{
+              margin: "2.4rem 0 0",
+              transform: "scale(3)",
+              transformOrigin: "center",
+              opacity: closingStage >= 3 ? 1 : 0,
+              transition: "opacity 1.8s ease",
+            }}
+          >
+            <Wordmark />
+          </div>
           <button
             onClick={onBegin}
             style={{
-              marginTop: "1.6rem",
+              marginTop: "3.2rem",
               fontFamily: '"Playfair Display", Georgia, serif',
               fontSize: 14,
               color: "#F2EEE5",
@@ -435,6 +448,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               borderRadius: 6,
               padding: "0.75rem 2rem",
               cursor: "pointer",
+              opacity: closingStage >= 3 ? 1 : 0,
+              transition: "opacity 1.4s ease",
+              pointerEvents: closingStage >= 3 ? "auto" : "none",
             }}
           >
             Begin →
