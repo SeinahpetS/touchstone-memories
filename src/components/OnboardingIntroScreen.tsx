@@ -408,18 +408,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           >
             Your story deserves to be somewhere.
           </div>
-          <div
-            style={{
-              fontFamily: '"Playfair Display", Georgia, serif',
-              fontStyle: "italic",
-              fontSize: 13,
-              letterSpacing: "0.28em",
-              textTransform: "uppercase",
-              color: "#B8860B",
-              margin: "0.9rem 0",
-            }}
-          >
-            Touchstone
+          <div style={{ margin: "0.9rem 0" }}>
+            <Wordmark />
           </div>
           <div
             style={{
