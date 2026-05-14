@@ -385,7 +385,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
                   : "opacity 1.1s ease",
               }}
             >
-              {p.quote.text}
+              {`\u201C${p.quote.text}\u201D`}
             </div>
           );
         }
