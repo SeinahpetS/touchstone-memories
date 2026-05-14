@@ -167,6 +167,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const [showClosing, setShowClosing] = useState(false);
   const [dimmed, setDimmed] = useState(false);
   const [closingStage, setClosingStage] = useState(0); // 0 none, 1 first line, 2 + second line, 3 + wordmark
+  const [quotesDone, setQuotesDone] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
 
   // Compute placements once on mount
   useEffect(() => {
@@ -295,18 +297,23 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
       );
       cumulative += 1150;
       if (i === order.length - 1) {
-        // Two beats after last reveal, then fade quotes to 0
-        const dimAt = cumulative + 1400;
-        timers.push(window.setTimeout(() => setDimmed(true), dimAt));
-        // After fade completes (~1.4s), reveal closing in stages
-        const closingStart = dimAt + 1500;
-        timers.push(window.setTimeout(() => { setShowClosing(true); setClosingStage(1); }, closingStart));
-        timers.push(window.setTimeout(() => setClosingStage(2), closingStart + 1800));
-        timers.push(window.setTimeout(() => setClosingStage(3), closingStart + 3600));
+        timers.push(window.setTimeout(() => setQuotesDone(true), cumulative + 600));
       }
     });
     return () => timers.forEach((t) => clearTimeout(t));
   }, [order]);
+
+  // Trigger closing sequence when user advances
+  useEffect(() => {
+    if (!advancing) return;
+    const timers: number[] = [];
+    setDimmed(true);
+    timers.push(window.setTimeout(() => { setShowClosing(true); setClosingStage(1); }, 1500));
+    timers.push(window.setTimeout(() => setClosingStage(2), 1500 + 1800));
+    timers.push(window.setTimeout(() => setClosingStage(3), 1500 + 3600));
+    return () => timers.forEach((t) => clearTimeout(t));
+  }, [advancing]);
+
 
   const wordmark = useMemo(
     () => (
@@ -415,6 +422,36 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           }}
         >
           Skip →
+        </button>
+      )}
+
+      {!showClosing && quotesDone && !advancing && (
+        <button
+          onClick={() => setAdvancing(true)}
+          aria-label="Continue"
+          style={{
+            position: "absolute",
+            bottom: 28,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 52,
+            height: 52,
+            borderRadius: "50%",
+            background: "#1E2E3E",
+            color: "#F2EEE5",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 22,
+            lineHeight: 1,
+            boxShadow: "0 6px 20px rgba(30,46,62,0.25)",
+            zIndex: 6,
+            animation: "ts-intro-fade 1.2s ease both",
+          }}
+        >
+          →
         </button>
       )}
 
