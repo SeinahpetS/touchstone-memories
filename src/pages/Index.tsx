@@ -395,19 +395,28 @@ const Index = () => {
 
         {saved ? (
           <>
-            <MemoryArtifact
-              photoUrl={saved.photo_url}
-              category={saved.category}
-              title={saved.title}
-              note={saved.note}
-              createdAt={saved.created_at}
-              memoryDate={{
-                season: saved.memory_season ?? null,
-                year: saved.memory_year ?? null,
-                month: saved.memory_month ?? null,
-                day: saved.memory_day ?? null,
+            <div
+              style={{
+                borderRadius: 18,
+                boxShadow:
+                  "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)",
+                transition: "box-shadow 0.6s ease",
               }}
-            />
+            >
+              <MemoryArtifact
+                photoUrl={saved.photo_url}
+                category={saved.category}
+                title={saved.title}
+                note={saved.note}
+                createdAt={saved.created_at}
+                memoryDate={{
+                  season: saved.memory_season ?? null,
+                  year: saved.memory_year ?? null,
+                  month: saved.memory_month ?? null,
+                  day: saved.memory_day ?? null,
+                }}
+              />
+            </div>
             <PostSaveNudge
               memoryId={saved.id}
               hasDate={Boolean(saved.memory_season || saved.memory_year || saved.memory_month)}
