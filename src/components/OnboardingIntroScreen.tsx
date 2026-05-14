@@ -21,7 +21,7 @@ const QUOTES: QuoteSpec[] = [
     color: "rgba(30,46,62,0.95)",
   },
   {
-    text: "She asked if we could stay five more minutes. We stayed twenty.",
+    text: "She asked if we could stay ten more minutes to watch the meteor shower. We stayed for an hour.",
     baseSize: 16,
     width: 182,
     color: "rgba(30,46,62,0.92)",
