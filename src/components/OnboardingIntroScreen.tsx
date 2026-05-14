@@ -414,27 +414,27 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           </div>
           <div
             style={{
-              fontFamily: '"Playfair Display", Georgia, serif',
-              fontStyle: "italic",
-              fontSize: "clamp(18px, 3.8vw, 22px)",
-              color: "#B8860B",
-              marginTop: "2.2rem",
-              opacity: closingStage >= 2 ? 1 : 0,
-              transition: "opacity 1.6s ease",
-            }}
-          >
-            Everything that made you. Still here.
-          </div>
-          <div
-            style={{
               margin: "2.4rem 0 0",
               transform: "scale(3)",
               transformOrigin: "center",
-              opacity: closingStage >= 3 ? 1 : 0,
+              opacity: closingStage >= 2 ? 1 : 0,
               transition: "opacity 1.8s ease",
             }}
           >
             <Wordmark />
+          </div>
+          <div
+            style={{
+              fontFamily: '"Playfair Display", Georgia, serif',
+              fontStyle: "italic",
+              fontSize: "clamp(18px, 3.8vw, 22px)",
+              color: "#B8860B",
+              marginTop: "3.2rem",
+              opacity: closingStage >= 3 ? 1 : 0,
+              transition: "opacity 1.6s ease",
+            }}
+          >
+            Everything that made you. Still here.
           </div>
           <button
             onClick={onBegin}
