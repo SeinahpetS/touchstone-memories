@@ -28,6 +28,7 @@ import {
 } from "@/lib/onboardingDraft";
 
 type Step =
+  | "intro"
   | "splash"
   | "resume"
   | "definition"
