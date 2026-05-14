@@ -412,6 +412,19 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             style={{
               fontFamily: '"Playfair Display", Georgia, serif',
               fontStyle: "italic",
+              fontSize: 13,
+              letterSpacing: "0.28em",
+              textTransform: "uppercase",
+              color: "#B8860B",
+              margin: "0.9rem 0",
+            }}
+          >
+            Touchstone
+          </div>
+          <div
+            style={{
+              fontFamily: '"Playfair Display", Georgia, serif',
+              fontStyle: "italic",
               fontSize: "clamp(18px, 3.8vw, 22px)",
               color: "#4A6B8A",
             }}
