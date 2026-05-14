@@ -258,16 +258,18 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             next.add(`s-${qi}`);
             return next;
           });
-        }, cumulative + 380),
+        }, cumulative + 437),
       );
-      cumulative += 1000;
+      cumulative += 1150;
       if (i === order.length - 1) {
-        timers.push(
-          window.setTimeout(() => {
-            setDimmed(true);
-            setShowClosing(true);
-          }, cumulative + 900),
-        );
+        // Two beats after last reveal, then fade quotes to 0
+        const dimAt = cumulative + 1400;
+        timers.push(window.setTimeout(() => setDimmed(true), dimAt));
+        // After fade completes (~1.4s), reveal closing in stages
+        const closingStart = dimAt + 1500;
+        timers.push(window.setTimeout(() => { setShowClosing(true); setClosingStage(1); }, closingStart));
+        timers.push(window.setTimeout(() => setClosingStage(2), closingStart + 1800));
+        timers.push(window.setTimeout(() => setClosingStage(3), closingStart + 3600));
       }
     });
     return () => timers.forEach((t) => clearTimeout(t));
