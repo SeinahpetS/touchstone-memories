@@ -425,6 +425,36 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         </button>
       )}
 
+      {!showClosing && quotesDone && !advancing && (
+        <button
+          onClick={() => setAdvancing(true)}
+          aria-label="Continue"
+          style={{
+            position: "absolute",
+            bottom: 28,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 52,
+            height: 52,
+            borderRadius: "50%",
+            background: "#1E2E3E",
+            color: "#F2EEE5",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 22,
+            lineHeight: 1,
+            boxShadow: "0 6px 20px rgba(30,46,62,0.25)",
+            zIndex: 6,
+            animation: "ts-intro-fade 1.2s ease both",
+          }}
+        >
+          →
+        </button>
+      )}
+
       {showClosing && (
         <div
           style={{
