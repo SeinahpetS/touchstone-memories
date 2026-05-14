@@ -407,7 +407,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               marginBottom: "0.6rem",
             }}
           >
-            Your story deserves to be somewhere.
+            Your story deserves a special place to live.
           </div>
           <div style={{ margin: "1.4rem 0", transform: "scale(3)", transformOrigin: "center" }}>
             <Wordmark />
