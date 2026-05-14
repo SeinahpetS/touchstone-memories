@@ -297,15 +297,25 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
       );
       cumulative += 1150;
       if (i === order.length - 1) {
-        // Two beats after last reveal, then fade quotes to 0
-        const dimAt = cumulative + 1400;
-        timers.push(window.setTimeout(() => setDimmed(true), dimAt));
-        // After fade completes (~1.4s), reveal closing in stages
-        const closingStart = dimAt + 1500;
-        timers.push(window.setTimeout(() => { setShowClosing(true); setClosingStage(1); }, closingStart));
-        timers.push(window.setTimeout(() => setClosingStage(2), closingStart + 1800));
-        timers.push(window.setTimeout(() => setClosingStage(3), closingStart + 3600));
+        timers.push(window.setTimeout(() => setQuotesDone(true), cumulative + 600));
       }
+    });
+    return () => timers.forEach((t) => clearTimeout(t));
+  }, [order]);
+
+  // Trigger closing sequence when user advances
+  useEffect(() => {
+    if (!advancing) return;
+    const timers: number[] = [];
+    setDimmed(true);
+    timers.push(window.setTimeout(() => { setShowClosing(true); setClosingStage(1); }, 1500));
+    timers.push(window.setTimeout(() => setClosingStage(2), 1500 + 1800));
+    timers.push(window.setTimeout(() => setClosingStage(3), 1500 + 3600));
+    return () => timers.forEach((t) => clearTimeout(t));
+  }, [advancing]);
+
+  // dummy to keep structure
+  useEffect(() => {
     });
     return () => timers.forEach((t) => clearTimeout(t));
   }, [order]);
