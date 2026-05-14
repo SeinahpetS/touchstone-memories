@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import Wordmark from "./Wordmark";
 
 type QuoteSpec = {
   text: string;
