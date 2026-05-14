@@ -18,17 +18,6 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return json({ error: "Missing auth" }, 401);
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-    const { data: userData, error: userErr } = await supabase.auth.getUser();
-    if (userErr || !userData.user) return json({ error: "Unauthorized" }, 401);
-
     const apiKey = Deno.env.get("GOOGLE_API_KEY");
     if (!apiKey) return json({ error: "GOOGLE_API_KEY not configured" }, 500);
 

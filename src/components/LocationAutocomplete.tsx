@@ -60,10 +60,13 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
       setLoading(true);
       try {
         const session = (await supabase.auth.getSession()).data.session;
-        if (!session) return;
+        const token = session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-search?mode=autocomplete&q=${encodeURIComponent(debounced)}`;
         const r = await fetch(url, {
-          headers: { Authorization: `Bearer ${session.access_token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
         });
         const d = await r.json();
         if (!cancelled) {
@@ -97,10 +100,13 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
     onChange({ name: p.description, lat: null, lng: null });
     try {
       const session = (await supabase.auth.getSession()).data.session;
-      if (!session) return;
+      const token = session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-search?mode=details&place_id=${encodeURIComponent(p.place_id)}`;
       const r = await fetch(url, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
       });
       const d = await r.json();
       const finalName = d.formatted_address || p.description;
