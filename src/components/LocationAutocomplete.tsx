@@ -60,10 +60,13 @@ const LocationAutocomplete = ({ value, onChange, placeholder, label }: Props) =>
       setLoading(true);
       try {
         const session = (await supabase.auth.getSession()).data.session;
-        if (!session) return;
+        const token = session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-search?mode=autocomplete&q=${encodeURIComponent(debounced)}`;
         const r = await fetch(url, {
-          headers: { Authorization: `Bearer ${session.access_token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
         });
         const d = await r.json();
         if (!cancelled) {
