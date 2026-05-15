@@ -374,7 +374,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           zIndex: 5,
         }}
       >
-        Touchstone
+        <span className="text-4xl">Touchstone</span>
       </div>
     ),
     [],
