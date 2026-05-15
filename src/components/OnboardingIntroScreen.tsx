@@ -528,7 +528,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             justifyContent: "center",
             textAlign: "center",
             padding: "0 1.5rem",
-            zIndex: 10,
+            zIndex: 27,
+            background: "#F2EEE5",
           }}
         >
           <div
