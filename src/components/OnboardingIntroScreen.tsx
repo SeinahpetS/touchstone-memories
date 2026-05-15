@@ -475,53 +475,6 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         })}
       </div>
 
-        {placements.map((p) => {
-          if (p.kind === "quote") {
-            const id = `q-${p.idx}`;
-            const visible = revealedIds.has(id);
-            return (
-              <div
-                key={id}
-                style={{
-                  position: "absolute",
-                  left: p.rect.x,
-                  top: p.rect.y,
-                  width: p.rect.w,
-                  fontFamily: '"Playfair Display", Georgia, serif',
-                  fontStyle: "italic",
-                  fontSize: p.fontSize,
-                  lineHeight: 1.35,
-                  color: p.quote.color,
-                  opacity: dimmed ? 0 : visible ? 1 : 0,
-                  transition: dimmed
-                    ? "opacity 1.4s ease"
-                    : "opacity 1.1s ease",
-                }}
-              >
-                {`\u201C${p.quote.text}\u201D`}
-              </div>
-            );
-          }
-          const id = `s-${p.idx}`;
-          const visible = revealedIds.has(id);
-          return (
-            <div
-              key={id}
-              style={{
-                position: "absolute",
-                left: p.rect.x,
-                top: p.rect.y,
-                width: p.rect.w,
-                height: p.rect.h,
-                opacity: dimmed ? 0 : visible ? 1 : 0,
-                transition: dimmed ? "opacity 1.4s ease" : "opacity 1.1s ease",
-              }}
-            >
-              <FourPointStar size={p.star.size} color={p.star.color} />
-            </div>
-          );
-        })}
-      </div>
 
       {!showClosing && !ripple && (
         <button
