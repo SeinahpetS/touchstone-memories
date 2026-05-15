@@ -540,7 +540,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               color: "#1E2E3E",
               marginBottom: "0.6rem",
               opacity: closingStage >= 1 ? 1 : 0,
-              transition: "opacity 1.6s ease",
+              transition: "opacity 600ms ease",
             }}
           >
             Your story has parts worth remembering.
