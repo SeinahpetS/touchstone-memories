@@ -424,11 +424,57 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         style={{
           position: "absolute",
           inset: 0,
-          opacity: ripple ? 0 : 1,
-          transition: ripple ? "opacity 300ms ease" : "opacity 0ms",
           pointerEvents: ripple ? "none" : "auto",
         }}
       >
+        {placements.map((p) => {
+          if (p.kind === "quote") {
+            const id = `q-${p.idx}`;
+            const visible = revealedIds.has(id);
+            return (
+              <div
+                key={id}
+                data-fadeable
+                style={{
+                  position: "absolute",
+                  left: p.rect.x,
+                  top: p.rect.y,
+                  width: p.rect.w,
+                  fontFamily: '"Playfair Display", Georgia, serif',
+                  fontStyle: "italic",
+                  fontSize: p.fontSize,
+                  lineHeight: 1.35,
+                  color: p.quote.color,
+                  opacity: visible ? 1 : 0,
+                  transition: "opacity 1.1s ease",
+                }}
+              >
+                {`\u201C${p.quote.text}\u201D`}
+              </div>
+            );
+          }
+          const id = `s-${p.idx}`;
+          const visible = revealedIds.has(id);
+          return (
+            <div
+              key={id}
+              data-fadeable
+              style={{
+                position: "absolute",
+                left: p.rect.x,
+                top: p.rect.y,
+                width: p.rect.w,
+                height: p.rect.h,
+                opacity: visible ? 1 : 0,
+                transition: "opacity 1.1s ease",
+              }}
+            >
+              <FourPointStar size={p.star.size} color={p.star.color} />
+            </div>
+          );
+        })}
+      </div>
+
         {placements.map((p) => {
           if (p.kind === "quote") {
             const id = `q-${p.idx}`;
