@@ -169,6 +169,18 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const [closingStage, setClosingStage] = useState(0); // 0 none, 1 first line, 2 + second line, 3 + wordmark
   const [quotesDone, setQuotesDone] = useState(false);
   const [advancing, setAdvancing] = useState(false);
+  const [ripple, setRipple] = useState(false);
+  const [distort, setDistort] = useState(false);
+  const [whiteout, setWhiteout] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const handleRemember = () => {
+    if (advancing) return;
+    setRipple(true);
+    setDistort(true);
+    window.setTimeout(() => setWhiteout(true), 500);
+    window.setTimeout(() => setAdvancing(true), 700);
+  };
 
   // Compute placements once on mount
   useEffect(() => {
