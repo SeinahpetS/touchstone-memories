@@ -21,7 +21,7 @@ const QUOTES: QuoteSpec[] = [
     color: "rgba(30,46,62,0.95)",
   },
   {
-    text: "She asked if we could stay ten more minutes to watch the meteor shower. We stayed for an hour.",
+    text: "She asked if we could stay for ten more minutes to watch the meteor shower. We ended up staying for a couple hours.",
     baseSize: 16,
     width: 182,
     color: "rgba(30,46,62,0.92)",
@@ -39,13 +39,13 @@ const QUOTES: QuoteSpec[] = [
     color: "rgba(30,46,62,0.87)",
   },
   {
-    text: "I want to take a mental snapshot — the morning sun through the kitchen window while making breakfast for Isabelle.",
+    text: "One of my favorite things about the summer is the way the morning sun comes through the kitchen window when I'm making breakfast for the kiddos.",
     baseSize: 12,
     width: 168,
     color: "rgba(30,46,62,0.72)",
   },
   {
-    text: "Mum told me she used to take a solo road trip every year after college. Just her and the car. I never knew that.",
+    text: "Did you know mom used to take a solo road trip every year in college? Just her and her car.",
     baseSize: 12,
     width: 165,
     color: "rgba(30,46,62,0.70)",
@@ -57,7 +57,7 @@ const QUOTES: QuoteSpec[] = [
     color: "rgba(30,46,62,0.74)",
   },
   {
-    text: "Something about today felt like it mattered. I don't know why yet.",
+    text: "Whoa! I used to have one of these when I was a kid!",
     baseSize: 12,
     width: 160,
     color: "rgba(30,46,62,0.62)",
