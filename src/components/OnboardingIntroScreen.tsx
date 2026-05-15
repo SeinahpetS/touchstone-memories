@@ -52,9 +52,9 @@ const QUOTES: QuoteSpec[] = [
   },
   {
     text: "Dad had a word for that feeling when a trip is almost over but you're still in it. I can't remember it now.",
-    baseSize: 12,
-    width: 168,
-    color: "rgba(30,46,62,0.74)",
+    baseSize: 18,
+    width: 220,
+    color: "rgba(30,46,62,0.88)",
   },
   {
     text: "Whoa! I used to have one of these when I was a kid!",
@@ -73,6 +73,14 @@ const STARS: StarSpec[] = [
   { size: 9, color: "#1E2E3E" },
   { size: 14, color: "#4A6B8A" },
   { size: 11, color: "#B8860B" },
+  { size: 15, color: "#B8860B" },
+  { size: 10, color: "#1E2E3E" },
+  { size: 13, color: "#4A6B8A" },
+  { size: 17, color: "#B8860B" },
+  { size: 9, color: "#1E2E3E" },
+  { size: 16, color: "#4A6B8A" },
+  { size: 11, color: "#B8860B" },
+  { size: 14, color: "#1E2E3E" },
 ];
 
 const GAP = 12;
@@ -305,14 +313,25 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           });
         }, cumulative),
       );
+      const starA = i * 2;
+      const starB = i * 2 + 1;
       timers.push(
         window.setTimeout(() => {
           setRevealedIds((prev) => {
             const next = new Set(prev);
-            next.add(`s-${i}`);
+            next.add(`s-${starA}`);
             return next;
           });
-        }, cumulative + 437),
+        }, cumulative + 400),
+      );
+      timers.push(
+        window.setTimeout(() => {
+          setRevealedIds((prev) => {
+            const next = new Set(prev);
+            next.add(`s-${starB}`);
+            return next;
+          });
+        }, cumulative + 750),
       );
       cumulative += 1150;
       if (i === order.length - 1) {
