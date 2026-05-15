@@ -596,6 +596,18 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           from { opacity: 0; }
           to { opacity: 1; }
         }
+        @keyframes ts-remember-pulse {
+          0%, 100% { box-shadow: 0 2px 16px rgba(30,46,62,0.18); }
+          50% { box-shadow: 0 2px 24px rgba(30,46,62,0.42); }
+        }
+        @keyframes ts-ripple {
+          from { width: 0; height: 0; opacity: 0; }
+          to { width: 250vmax; height: 250vmax; opacity: 0.6; }
+        }
+        @keyframes ts-whiteout {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
       `}</style>
     </div>
   );
