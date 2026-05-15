@@ -375,9 +375,45 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     >
       {wordmark}
 
-      {placements.map((p) => {
-        if (p.kind === "quote") {
-          const id = `q-${p.idx}`;
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          filter: distort ? "blur(8px)" : "blur(0px)",
+          transform: distort ? "scale(1.04)" : "scale(1)",
+          transformOrigin: "center center",
+          transition: "filter 500ms ease-out, transform 500ms ease-out",
+          pointerEvents: ripple ? "none" : "auto",
+        }}
+      >
+        {placements.map((p) => {
+          if (p.kind === "quote") {
+            const id = `q-${p.idx}`;
+            const visible = revealedIds.has(id);
+            return (
+              <div
+                key={id}
+                style={{
+                  position: "absolute",
+                  left: p.rect.x,
+                  top: p.rect.y,
+                  width: p.rect.w,
+                  fontFamily: '"Playfair Display", Georgia, serif',
+                  fontStyle: "italic",
+                  fontSize: p.fontSize,
+                  lineHeight: 1.35,
+                  color: p.quote.color,
+                  opacity: dimmed ? 0 : visible ? 1 : 0,
+                  transition: dimmed
+                    ? "opacity 1.4s ease"
+                    : "opacity 1.1s ease",
+                }}
+              >
+                {`\u201C${p.quote.text}\u201D`}
+              </div>
+            );
+          }
+          const id = `s-${p.idx}`;
           const visible = revealedIds.has(id);
           return (
             <div
@@ -387,42 +423,18 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
                 left: p.rect.x,
                 top: p.rect.y,
                 width: p.rect.w,
-                fontFamily: '"Playfair Display", Georgia, serif',
-                fontStyle: "italic",
-                fontSize: p.fontSize,
-                lineHeight: 1.35,
-                color: p.quote.color,
+                height: p.rect.h,
                 opacity: dimmed ? 0 : visible ? 1 : 0,
-                transition: dimmed
-                  ? "opacity 1.4s ease"
-                  : "opacity 1.1s ease",
+                transition: dimmed ? "opacity 1.4s ease" : "opacity 1.1s ease",
               }}
             >
-              {`\u201C${p.quote.text}\u201D`}
+              <FourPointStar size={p.star.size} color={p.star.color} />
             </div>
           );
-        }
-        const id = `s-${p.idx}`;
-        const visible = revealedIds.has(id);
-        return (
-          <div
-            key={id}
-            style={{
-              position: "absolute",
-              left: p.rect.x,
-              top: p.rect.y,
-              width: p.rect.w,
-              height: p.rect.h,
-              opacity: dimmed ? 0 : visible ? 1 : 0,
-              transition: dimmed ? "opacity 1.4s ease" : "opacity 1.1s ease",
-            }}
-          >
-            <FourPointStar size={p.star.size} color={p.star.color} />
-          </div>
-        );
-      })}
+        })}
+      </div>
 
-      {!showClosing && (
+      {!showClosing && !ripple && (
         <button
           onClick={onSkip}
           style={{
@@ -445,34 +457,64 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         </button>
       )}
 
-      {!showClosing && quotesDone && !advancing && (
+      {!showClosing && quotesDone && !ripple && (
         <button
-          onClick={() => setAdvancing(true)}
-          aria-label="Continue"
+          ref={buttonRef}
+          onClick={handleRemember}
           style={{
-            position: "absolute",
-            bottom: 28,
+            position: "fixed",
+            top: "50%",
             left: "50%",
-            transform: "translateX(-50%)",
-            width: 52,
-            height: 52,
-            borderRadius: "50%",
+            transform: "translate(-50%, -50%)",
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontStyle: "italic",
+            fontSize: 16,
+            color: "#B8860B",
             background: "#1E2E3E",
-            color: "#F2EEE5",
             border: "none",
+            borderRadius: 999,
+            padding: "0.7rem 2rem",
             cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 22,
-            lineHeight: 1,
-            boxShadow: "0 6px 20px rgba(30,46,62,0.25)",
-            zIndex: 6,
-            animation: "ts-intro-fade 1.2s ease both",
+            zIndex: 30,
+            animation: "ts-intro-fade 1.2s ease both, ts-remember-pulse 2s ease-in-out infinite",
           }}
         >
-          →
+          Remember…
         </button>
+      )}
+
+      {ripple && (
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            width: 0,
+            height: 0,
+            borderRadius: "50%",
+            background: "#F2EEE5",
+            transform: "translate(-50%, -50%) scale(1)",
+            animation: "ts-ripple 400ms ease-out forwards",
+            zIndex: 25,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {whiteout && (
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "#F2EEE5",
+            opacity: 0,
+            animation: "ts-whiteout 200ms ease-out forwards",
+            zIndex: 26,
+            pointerEvents: "none",
+          }}
+        />
       )}
 
       {showClosing && (
