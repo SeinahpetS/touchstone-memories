@@ -535,11 +535,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         </button>
       )}
 
-            zIndex: 26,
-            pointerEvents: "none",
-          }}
-        />
-      )}
+
 
       {showClosing && (
         <div
