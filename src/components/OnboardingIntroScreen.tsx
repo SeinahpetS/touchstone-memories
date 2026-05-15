@@ -391,7 +391,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           opacity: 0.75,
           pointerEvents: "none",
           zIndex: 5,
+          transition: "opacity 200ms ease",
         }}
+        data-wordmark
       >
         Touchstone
       </div>
