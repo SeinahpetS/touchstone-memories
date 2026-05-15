@@ -178,8 +178,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const [quotesDone, setQuotesDone] = useState(false);
   const [advancing, setAdvancing] = useState(false);
   const [ripple, setRipple] = useState(false);
-  const [distort, setDistort] = useState(false);
-  const [whiteout, setWhiteout] = useState(false);
+  
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleRemember = () => {
