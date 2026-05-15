@@ -185,9 +185,30 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const handleRemember = () => {
     if (advancing) return;
     setRipple(true);
-    setDistort(true);
-    window.setTimeout(() => setWhiteout(true), 500);
-    window.setTimeout(() => setAdvancing(true), 700);
+    const btn = buttonRef.current;
+    const rect = btn?.getBoundingClientRect();
+    const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const maxDist = Math.sqrt(
+      Math.max(cx, vw - cx) ** 2 + Math.max(cy, vh - cy) ** 2,
+    );
+    const targetDiameter = maxDist * 2;
+    const startSize = 24;
+    const scale = targetDiameter / startSize;
+
+    const node = document.createElement("div");
+    node.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;width:${startSize}px;height:${startSize}px;margin-left:${-startSize / 2}px;margin-top:${-startSize / 2}px;border-radius:50%;background:#F2EEE5;transform:scale(0);transition:transform 800ms cubic-bezier(0.4,0,0.2,1);z-index:100;pointer-events:none;will-change:transform;`;
+    document.body.appendChild(node);
+    requestAnimationFrame(() => {
+      node.style.transform = `scale(${scale})`;
+    });
+
+    window.setTimeout(() => setAdvancing(true), 400);
+    window.setTimeout(() => {
+      node.remove();
+    }, 900);
   };
 
   // Compute placements once on mount
