@@ -426,10 +426,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         style={{
           position: "absolute",
           inset: 0,
-          filter: distort ? "blur(8px)" : "blur(0px)",
-          transform: distort ? "scale(1.04)" : "scale(1)",
-          transformOrigin: "center center",
-          transition: "filter 500ms ease-out, transform 500ms ease-out",
+          opacity: ripple ? 0 : 1,
+          transition: ripple ? "opacity 300ms ease" : "opacity 0ms",
           pointerEvents: ripple ? "none" : "auto",
         }}
       >
