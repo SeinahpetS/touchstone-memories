@@ -548,7 +548,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             zIndex: 27,
             background: "#F2EEE5",
             opacity: closingStage >= 3 ? 1 : 0,
-            transition: "opacity 500ms ease",
+            transition: "opacity 700ms ease-in-out",
           }}
         >
           <div
