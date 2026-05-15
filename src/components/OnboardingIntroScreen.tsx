@@ -413,7 +413,14 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         fontFamily: '"Playfair Display", Georgia, serif',
       }}
     >
-      {wordmark}
+      <div
+        style={{
+          opacity: ripple ? 0 : 1,
+          transition: "opacity 200ms ease",
+        }}
+      >
+        {wordmark}
+      </div>
 
       <div
         style={{
