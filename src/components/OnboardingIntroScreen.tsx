@@ -33,7 +33,7 @@ const QUOTES: QuoteSpec[] = [
     color: "rgba(30,46,62,0.88)",
   },
   {
-    text: "This is the last summer they'll all be this age at the same time.",
+    text: "This time next year we'll all be living in different cities.",
     baseSize: 14,
     width: 180,
     color: "rgba(30,46,62,0.87)",
