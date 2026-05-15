@@ -361,13 +361,12 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     return () => timers.forEach((t) => clearTimeout(t));
   }, [order]);
 
-  // Trigger closing sequence when user advances
+  // Trigger Begin screen reveal at 1500ms (200ms hold after 1300ms bare ivory)
   useEffect(() => {
     if (!advancing) return;
     const timers: number[] = [];
-    setDimmed(true);
     setShowClosing(true);
-    timers.push(window.setTimeout(() => setClosingStage(3), 50));
+    timers.push(window.setTimeout(() => setClosingStage(3), 200));
     return () => timers.forEach((t) => clearTimeout(t));
   }, [advancing]);
 
