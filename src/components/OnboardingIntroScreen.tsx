@@ -178,16 +178,36 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const [quotesDone, setQuotesDone] = useState(false);
   const [advancing, setAdvancing] = useState(false);
   const [ripple, setRipple] = useState(false);
-  const [distort, setDistort] = useState(false);
-  const [whiteout, setWhiteout] = useState(false);
+  
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleRemember = () => {
     if (advancing) return;
     setRipple(true);
-    setDistort(true);
-    window.setTimeout(() => setWhiteout(true), 500);
-    window.setTimeout(() => setAdvancing(true), 700);
+    const btn = buttonRef.current;
+    const rect = btn?.getBoundingClientRect();
+    const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const maxDist = Math.sqrt(
+      Math.max(cx, vw - cx) ** 2 + Math.max(cy, vh - cy) ** 2,
+    );
+    const targetDiameter = maxDist * 2;
+    const startSize = 24;
+    const scale = targetDiameter / startSize;
+
+    const node = document.createElement("div");
+    node.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;width:${startSize}px;height:${startSize}px;margin-left:${-startSize / 2}px;margin-top:${-startSize / 2}px;border-radius:50%;background:#F2EEE5;transform:scale(0);transition:transform 800ms cubic-bezier(0.4,0,0.2,1);z-index:100;pointer-events:none;will-change:transform;`;
+    document.body.appendChild(node);
+    requestAnimationFrame(() => {
+      node.style.transform = `scale(${scale})`;
+    });
+
+    window.setTimeout(() => setAdvancing(true), 400);
+    window.setTimeout(() => {
+      node.remove();
+    }, 900);
   };
 
   // Compute placements once on mount
@@ -347,9 +367,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     const timers: number[] = [];
     setDimmed(true);
     setShowClosing(true);
-    timers.push(window.setTimeout(() => setClosingStage(1), 50));
-    timers.push(window.setTimeout(() => setClosingStage(2), 1800));
-    timers.push(window.setTimeout(() => setClosingStage(3), 3600));
+    timers.push(window.setTimeout(() => setClosingStage(3), 50));
     return () => timers.forEach((t) => clearTimeout(t));
   }, [advancing]);
 
@@ -372,7 +390,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           opacity: 0.75,
           pointerEvents: "none",
           zIndex: 5,
+          transition: "opacity 200ms ease",
         }}
+        data-wordmark
       >
         Touchstone
       </div>
@@ -392,16 +412,21 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         fontFamily: '"Playfair Display", Georgia, serif',
       }}
     >
-      {wordmark}
+      <div
+        style={{
+          opacity: ripple ? 0 : 1,
+          transition: "opacity 200ms ease",
+        }}
+      >
+        {wordmark}
+      </div>
 
       <div
         style={{
           position: "absolute",
           inset: 0,
-          filter: distort ? "blur(8px)" : "blur(0px)",
-          transform: distort ? "scale(1.04)" : "scale(1)",
-          transformOrigin: "center center",
-          transition: "filter 500ms ease-out, transform 500ms ease-out",
+          opacity: ripple ? 0 : 1,
+          transition: ripple ? "opacity 300ms ease" : "opacity 0ms",
           pointerEvents: ripple ? "none" : "auto",
         }}
       >
@@ -476,10 +501,11 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         </button>
       )}
 
-      {!showClosing && quotesDone && !ripple && (
+      {!showClosing && quotesDone && (
         <button
           ref={buttonRef}
           onClick={handleRemember}
+          disabled={ripple}
           style={{
             position: "fixed",
             top: "50%",
@@ -497,46 +523,18 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             padding: "1.4rem 4rem",
             cursor: "pointer",
             zIndex: 30,
-            animation: "ts-intro-fade 1.2s ease both, ts-remember-pulse 2s ease-in-out infinite",
+            opacity: ripple ? 0 : undefined,
+            transition: "opacity 150ms ease",
+            animation: ripple
+              ? undefined
+              : "ts-intro-fade 1.2s ease both, ts-remember-pulse 2s ease-in-out infinite",
           }}
         >
           Remember...
         </button>
       )}
 
-      {ripple && (
-        <div
-          aria-hidden
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            width: 0,
-            height: 0,
-            borderRadius: "50%",
-            background: "#F2EEE5",
-            transform: "translate(-50%, -50%) scale(1)",
-            animation: "ts-ripple 400ms ease-out forwards",
-            zIndex: 25,
-            pointerEvents: "none",
-          }}
-        />
-      )}
 
-      {whiteout && (
-        <div
-          aria-hidden
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "#F2EEE5",
-            opacity: 0,
-            animation: "ts-whiteout 200ms ease-out forwards",
-            zIndex: 26,
-            pointerEvents: "none",
-          }}
-        />
-      )}
 
       {showClosing && (
         <div
@@ -551,6 +549,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             padding: "0 1.5rem",
             zIndex: 27,
             background: "#F2EEE5",
+            opacity: closingStage >= 3 ? 1 : 0,
+            transition: "opacity 500ms ease",
           }}
         >
           <div
