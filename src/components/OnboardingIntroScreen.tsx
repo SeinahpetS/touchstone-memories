@@ -468,18 +468,20 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             transform: "translate(-50%, -50%)",
             fontFamily: '"Playfair Display", Georgia, serif',
             fontStyle: "italic",
-            fontSize: 16,
-            color: "#B8860B",
-            background: "#1E2E3E",
+            fontSize: 22,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "#F2EEE5",
+            background: "#4A6B8A",
             border: "none",
             borderRadius: 999,
-            padding: "0.7rem 2rem",
+            padding: "1.4rem 4rem",
             cursor: "pointer",
             zIndex: 30,
             animation: "ts-intro-fade 1.2s ease both, ts-remember-pulse 2s ease-in-out infinite",
           }}
         >
-          Remember…
+          Remember
         </button>
       )}
 
