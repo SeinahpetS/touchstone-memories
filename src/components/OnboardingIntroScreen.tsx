@@ -173,7 +173,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
   const [order, setOrder] = useState<number[]>([]);
   const [showClosing, setShowClosing] = useState(false);
-  const [dimmed, setDimmed] = useState(false);
+  
   const [closingStage, setClosingStage] = useState(0); // 0 none, 1 first line, 2 + second line, 3 + wordmark
   const [quotesDone, setQuotesDone] = useState(false);
   const [advancing, setAdvancing] = useState(false);
@@ -184,30 +184,30 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const handleRemember = () => {
     if (advancing) return;
     setRipple(true);
-    const btn = buttonRef.current;
-    const rect = btn?.getBoundingClientRect();
-    const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
-    const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const maxDist = Math.sqrt(
-      Math.max(cx, vw - cx) ** 2 + Math.max(cy, vh - cy) ** 2,
-    );
-    const targetDiameter = maxDist * 2;
-    const startSize = 24;
-    const scale = targetDiameter / startSize;
 
-    const node = document.createElement("div");
-    node.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;width:${startSize}px;height:${startSize}px;margin-left:${-startSize / 2}px;margin-top:${-startSize / 2}px;border-radius:50%;background:#F2EEE5;transform:scale(0);transition:transform 800ms cubic-bezier(0.4,0,0.2,1);z-index:100;pointer-events:none;will-change:transform;`;
-    document.body.appendChild(node);
-    requestAnimationFrame(() => {
-      node.style.transform = `scale(${scale})`;
-    });
+    const root = screenRef.current;
+    if (root) {
+      const items = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-fadeable]"),
+      );
+      items.forEach((el) => {
+        const delay = Math.random() * 800;
+        window.setTimeout(() => {
+          el.style.transition = "opacity 400ms ease-in-out";
+          el.style.opacity = "0";
+        }, delay);
+      });
+      const wm = root.querySelector<HTMLElement>("[data-wordmark]");
+      if (wm) {
+        window.setTimeout(() => {
+          wm.style.transition = "opacity 400ms ease-in-out";
+          wm.style.opacity = "0";
+        }, 900);
+      }
+    }
 
-    window.setTimeout(() => setAdvancing(true), 400);
-    window.setTimeout(() => {
-      node.remove();
-    }, 900);
+    // Mount Begin screen (hidden) and reveal at 1500ms
+    window.setTimeout(() => setAdvancing(true), 1300);
   };
 
   // Compute placements once on mount
@@ -361,13 +361,12 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     return () => timers.forEach((t) => clearTimeout(t));
   }, [order]);
 
-  // Trigger closing sequence when user advances
+  // Trigger Begin screen reveal at 1500ms (200ms hold after 1300ms bare ivory)
   useEffect(() => {
     if (!advancing) return;
     const timers: number[] = [];
-    setDimmed(true);
     setShowClosing(true);
-    timers.push(window.setTimeout(() => setClosingStage(3), 50));
+    timers.push(window.setTimeout(() => setClosingStage(3), 200));
     return () => timers.forEach((t) => clearTimeout(t));
   }, [advancing]);
 
@@ -425,8 +424,6 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         style={{
           position: "absolute",
           inset: 0,
-          opacity: ripple ? 0 : 1,
-          transition: ripple ? "opacity 300ms ease" : "opacity 0ms",
           pointerEvents: ripple ? "none" : "auto",
         }}
       >
@@ -437,6 +434,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             return (
               <div
                 key={id}
+                data-fadeable
                 style={{
                   position: "absolute",
                   left: p.rect.x,
@@ -447,10 +445,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
                   fontSize: p.fontSize,
                   lineHeight: 1.35,
                   color: p.quote.color,
-                  opacity: dimmed ? 0 : visible ? 1 : 0,
-                  transition: dimmed
-                    ? "opacity 1.4s ease"
-                    : "opacity 1.1s ease",
+                  opacity: visible ? 1 : 0,
+                  transition: "opacity 1.1s ease",
                 }}
               >
                 {`\u201C${p.quote.text}\u201D`}
@@ -462,14 +458,15 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           return (
             <div
               key={id}
+              data-fadeable
               style={{
                 position: "absolute",
                 left: p.rect.x,
                 top: p.rect.y,
                 width: p.rect.w,
                 height: p.rect.h,
-                opacity: dimmed ? 0 : visible ? 1 : 0,
-                transition: dimmed ? "opacity 1.4s ease" : "opacity 1.1s ease",
+                opacity: visible ? 1 : 0,
+                transition: "opacity 1.1s ease",
               }}
             >
               <FourPointStar size={p.star.size} color={p.star.color} />
@@ -477,6 +474,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
           );
         })}
       </div>
+
 
       {!showClosing && !ripple && (
         <button
@@ -550,7 +548,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             zIndex: 27,
             background: "#F2EEE5",
             opacity: closingStage >= 3 ? 1 : 0,
-            transition: "opacity 500ms ease",
+            transition: "opacity 700ms ease-in-out",
           }}
         >
           <div
