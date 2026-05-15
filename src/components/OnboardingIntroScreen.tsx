@@ -327,9 +327,10 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     if (!advancing) return;
     const timers: number[] = [];
     setDimmed(true);
-    timers.push(window.setTimeout(() => { setShowClosing(true); setClosingStage(1); }, 1500));
-    timers.push(window.setTimeout(() => setClosingStage(2), 1500 + 1800));
-    timers.push(window.setTimeout(() => setClosingStage(3), 1500 + 3600));
+    setShowClosing(true);
+    timers.push(window.setTimeout(() => setClosingStage(1), 50));
+    timers.push(window.setTimeout(() => setClosingStage(2), 1800));
+    timers.push(window.setTimeout(() => setClosingStage(3), 3600));
     return () => timers.forEach((t) => clearTimeout(t));
   }, [advancing]);
 
