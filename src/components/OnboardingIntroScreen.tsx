@@ -502,10 +502,11 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         </button>
       )}
 
-      {!showClosing && quotesDone && !ripple && (
+      {!showClosing && quotesDone && (
         <button
           ref={buttonRef}
           onClick={handleRemember}
+          disabled={ripple}
           style={{
             position: "fixed",
             top: "50%",
@@ -523,41 +524,17 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             padding: "1.4rem 4rem",
             cursor: "pointer",
             zIndex: 30,
-            animation: "ts-intro-fade 1.2s ease both, ts-remember-pulse 2s ease-in-out infinite",
+            opacity: ripple ? 0 : undefined,
+            transition: "opacity 150ms ease",
+            animation: ripple
+              ? undefined
+              : "ts-intro-fade 1.2s ease both, ts-remember-pulse 2s ease-in-out infinite",
           }}
         >
           Remember...
         </button>
       )}
 
-      {ripple && (
-        <div
-          aria-hidden
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            width: 0,
-            height: 0,
-            borderRadius: "50%",
-            background: "#F2EEE5",
-            transform: "translate(-50%, -50%) scale(1)",
-            animation: "ts-ripple 400ms ease-out forwards",
-            zIndex: 25,
-            pointerEvents: "none",
-          }}
-        />
-      )}
-
-      {whiteout && (
-        <div
-          aria-hidden
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "#F2EEE5",
-            opacity: 0,
-            animation: "ts-whiteout 200ms ease-out forwards",
             zIndex: 26,
             pointerEvents: "none",
           }}
