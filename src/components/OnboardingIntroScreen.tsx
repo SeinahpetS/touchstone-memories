@@ -184,30 +184,30 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   const handleRemember = () => {
     if (advancing) return;
     setRipple(true);
-    const btn = buttonRef.current;
-    const rect = btn?.getBoundingClientRect();
-    const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
-    const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const maxDist = Math.sqrt(
-      Math.max(cx, vw - cx) ** 2 + Math.max(cy, vh - cy) ** 2,
-    );
-    const targetDiameter = maxDist * 2;
-    const startSize = 24;
-    const scale = targetDiameter / startSize;
 
-    const node = document.createElement("div");
-    node.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;width:${startSize}px;height:${startSize}px;margin-left:${-startSize / 2}px;margin-top:${-startSize / 2}px;border-radius:50%;background:#F2EEE5;transform:scale(0);transition:transform 800ms cubic-bezier(0.4,0,0.2,1);z-index:100;pointer-events:none;will-change:transform;`;
-    document.body.appendChild(node);
-    requestAnimationFrame(() => {
-      node.style.transform = `scale(${scale})`;
-    });
+    const root = screenRef.current;
+    if (root) {
+      const items = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-fadeable]"),
+      );
+      items.forEach((el) => {
+        const delay = Math.random() * 800;
+        window.setTimeout(() => {
+          el.style.transition = "opacity 400ms ease-in-out";
+          el.style.opacity = "0";
+        }, delay);
+      });
+      const wm = root.querySelector<HTMLElement>("[data-wordmark]");
+      if (wm) {
+        window.setTimeout(() => {
+          wm.style.transition = "opacity 400ms ease-in-out";
+          wm.style.opacity = "0";
+        }, 900);
+      }
+    }
 
-    window.setTimeout(() => setAdvancing(true), 400);
-    window.setTimeout(() => {
-      node.remove();
-    }, 900);
+    // Mount Begin screen (hidden) and reveal at 1500ms
+    window.setTimeout(() => setAdvancing(true), 1300);
   };
 
   // Compute placements once on mount
