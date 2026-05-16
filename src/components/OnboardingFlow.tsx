@@ -110,9 +110,11 @@ const ProgressDots = ({ screen }: { screen: Screen }) => {
 const ScreenShell = ({
   screen,
   children,
+  hideDots = false,
 }: {
   screen: Screen;
   children: React.ReactNode;
+  hideDots?: boolean;
 }) => (
   <div
     style={{
@@ -126,7 +128,7 @@ const ScreenShell = ({
   >
     <Wordmark />
     {children}
-    <ProgressDots screen={screen} />
+    {!hideDots && <ProgressDots screen={screen} />}
   </div>
 );
 
