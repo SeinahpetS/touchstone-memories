@@ -600,7 +600,7 @@ const OnboardingFlow = ({
         <ScreenShell screen={4}>
           <CenteredCard>
             <h2 style={headlineStyle}>When were you born?</h2>
-            <p style={subLineStyle}>Helps us understand your era.</p>
+            <p style={subLineStyle}>(Helps us understand your era.)</p>
             <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
               <select
                 className="ts-onb-input ts-onb-select"
