@@ -365,12 +365,37 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     return () => timers.forEach((t) => clearTimeout(t));
   }, [order]);
 
-  // Trigger Begin screen reveal at 1500ms (200ms hold after 1300ms bare ivory)
+  // Staged closing reveal:
+  //   stage 1 — "Your story has parts worth remembering." fades in
+  //   stage 2 — Touchstone wordmark fades in slowly
+  //   stage 3 — "Everything that made you." letter-by-letter reveal
+  //   stage 4 — "Still here." + Begin button fade in
+  const [everythingChars, setEverythingChars] = useState(0);
+  const EVERYTHING_TEXT = "Everything that made you.";
+
   useEffect(() => {
     if (!advancing) return;
     const timers: number[] = [];
     setShowClosing(true);
-    timers.push(window.setTimeout(() => setClosingStage(3), 200));
+    timers.push(window.setTimeout(() => setClosingStage(1), 100));
+    timers.push(window.setTimeout(() => setClosingStage(2), 1400));
+    timers.push(
+      window.setTimeout(() => {
+        setClosingStage(3);
+        // letter-by-letter reveal of "Everything that made you."
+        for (let i = 1; i <= EVERYTHING_TEXT.length; i++) {
+          timers.push(
+            window.setTimeout(() => setEverythingChars(i), i * 75),
+          );
+        }
+      }, 3400),
+    );
+    timers.push(
+      window.setTimeout(
+        () => setClosingStage(4),
+        3400 + EVERYTHING_TEXT.length * 75 + 400,
+      ),
+    );
     return () => timers.forEach((t) => clearTimeout(t));
   }, [advancing]);
 
