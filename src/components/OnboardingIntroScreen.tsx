@@ -576,7 +576,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             padding: "0 1.5rem",
             zIndex: 27,
             background: "#F2EEE5",
-            opacity: closingStage >= 3 ? 1 : 0,
+            opacity: 1,
             transition: "opacity 700ms ease-in-out",
           }}
         >
@@ -588,7 +588,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               color: "#1E2E3E",
               marginBottom: "0.6rem",
               opacity: closingStage >= 1 ? 1 : 0,
-              transition: "opacity 600ms ease",
+              transition: "opacity 1100ms ease",
             }}
           >
             Your story has parts worth remembering.
@@ -599,7 +599,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               transform: "scale(3)",
               transformOrigin: "center",
               opacity: closingStage >= 2 ? 1 : 0,
-              transition: "opacity 1.8s ease",
+              transition: "opacity 1800ms ease",
             }}
           >
             <Wordmark />
@@ -611,11 +611,23 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               fontSize: "clamp(18px, 3.8vw, 22px)",
               color: "#B8860B",
               marginTop: "3.2rem",
-              opacity: closingStage >= 3 ? 1 : 0,
-              transition: "opacity 1.6s ease",
+              minHeight: "1.4em",
             }}
           >
-            Everything that made you. Still here.
+            <span style={{ whiteSpace: "pre" }}>
+              {EVERYTHING_TEXT.slice(0, everythingChars)}
+            </span>
+            {closingStage >= 4 && (
+              <span
+                style={{
+                  marginLeft: "0.4em",
+                  opacity: closingStage >= 4 ? 1 : 0,
+                  transition: "opacity 1200ms ease",
+                }}
+              >
+                Still here.
+              </span>
+            )}
           </div>
           <button
             onClick={onBegin}
@@ -629,9 +641,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               borderRadius: 6,
               padding: "0.75rem 2rem",
               cursor: "pointer",
-              opacity: closingStage >= 3 ? 1 : 0,
-              transition: "opacity 1.4s ease",
-              pointerEvents: closingStage >= 3 ? "auto" : "none",
+              opacity: closingStage >= 4 ? 1 : 0,
+              transition: "opacity 1400ms ease",
+              pointerEvents: closingStage >= 4 ? "auto" : "none",
             }}
           >
             Begin →
