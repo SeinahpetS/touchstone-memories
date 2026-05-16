@@ -86,6 +86,7 @@ const STARS: StarSpec[] = [
 const GAP = 12;
 const TOP_EXCLUDE = 44;
 const BOTTOM_EXCLUDE = 36;
+const SIDE_EXCLUDE = 20;
 const CENTER_W = 300;
 const CENTER_H = 170;
 
