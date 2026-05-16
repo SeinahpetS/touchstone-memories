@@ -1,4 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useDebounce } from "@/hooks/useDebounce";
+
+export interface OnboardingLocation {
+  city: string;
+  region: string;
+  country: string;
+  locationDisplay: string;
+  lat: number | null;
+  lng: number | null;
+}
 
 interface OnboardingFlowProps {
   initialFirstName?: string;
@@ -6,12 +17,14 @@ interface OnboardingFlowProps {
   initialBirthYear?: number | null;
   initialCity?: string;
   initialState?: string;
+  initialLocation?: OnboardingLocation | null;
   onComplete: (data: {
     firstName: string;
     birthMonth: number | null;
     birthYear: number | null;
     city: string;
     state: string;
+    location: OnboardingLocation | null;
   }) => void;
 }
 
