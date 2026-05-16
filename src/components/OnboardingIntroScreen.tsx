@@ -39,7 +39,7 @@ const QUOTES: QuoteSpec[] = [
     color: "rgba(30,46,62,0.87)",
   },
   {
-    text: "One of my favorite things about the summer is the way the morning sun comes through the kitchen window when I'm making breakfast for the kiddos.",
+    text: "One of my favorite things about the summer is the way the morning sun comes through the kitchen window.",
     baseSize: 12,
     width: 168,
     color: "rgba(30,46,62,0.72)",
