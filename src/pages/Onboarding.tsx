@@ -17,6 +17,7 @@ import PhotoUpload from "@/components/PhotoUpload";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
+import OnboardingFlow from "@/components/OnboardingFlow";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import {
   clearOnboardingDraft,
