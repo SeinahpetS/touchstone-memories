@@ -273,7 +273,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     const usableH = maxY - minY;
     const cols = Math.max(2, Math.round(Math.sqrt(total * (W / Math.max(1, usableH)))));
     const rows = Math.max(2, Math.ceil(total / cols));
-    const cellW = W / cols;
+    const cellW = usableW / cols;
     const cellH = usableH / rows;
     const cells: { cx: number; cy: number }[] = [];
     for (let r = 0; r < rows; r++) {
@@ -283,8 +283,8 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
 
     const tryPlaceFree = (w: number, h: number): Rect | null => {
       for (let attempt = 0; attempt < 400; attempt++) {
-        if (w >= W || h >= usableH) return null;
-        const x = Math.random() * (W - w);
+        if (w >= usableW || h >= usableH) return null;
+        const x = minX + Math.random() * (usableW - w);
         const y = minY + Math.random() * (usableH - h);
         const rect = { x, y, w, h };
         if (!occupied.some((o) => rectsOverlap(rect, o))) return rect;
@@ -296,11 +296,11 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
       const cell = shuffledCells[i % shuffledCells.length];
       let rect: Rect | null = null;
       for (let attempt = 0; attempt < 60; attempt++) {
-        const cx = cell.cx * cellW;
+        const cx = minX + cell.cx * cellW;
         const cy = minY + cell.cy * cellH;
         const maxJX = Math.max(0, cellW - it.w);
         const maxJY = Math.max(0, cellH - it.h);
-        const x = Math.max(0, Math.min(W - it.w, cx + Math.random() * maxJX));
+        const x = Math.max(minX, Math.min(maxX - it.w, cx + Math.random() * maxJX));
         const y = Math.max(minY, Math.min(maxY - it.h, cy + Math.random() * maxJY));
         const candidate = { x, y, w: it.w, h: it.h };
         if (!occupied.some((o) => rectsOverlap(candidate, o))) {
