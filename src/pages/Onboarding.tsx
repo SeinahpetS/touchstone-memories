@@ -612,42 +612,44 @@ const Onboarding = () => {
       setStep("time");
     };
     return (
-      <LightScreen onBack={() => setStep("definition")}>
-        <div className="space-y-2 pt-2 text-center">
-          <p
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontStyle: "italic",
-              fontSize: 15,
-              color: "rgba(44,62,80,0.65)",
-              margin: 0,
-            }}
-          >
-            Your archive starts with one memory.
-          </p>
-          <h2
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: 28,
-              color: "#2C3E50",
-              margin: 0,
-              lineHeight: 1.2,
-            }}
-          >
-            What's worth keeping today?
-          </h2>
-        </div>
-        <div className="grid grid-cols-4 gap-3">
-          {ACTIVE.map((c) => (
-            <CategoryIconCard
-              key={c}
-              category={c}
-              active={draft.category === c}
-              iconSize={30}
-              labelSize={11}
-              onClick={() => pickCategory(c)}
-            />
-          ))}
+      <LightScreen>
+        <div className="flex flex-col min-h-[calc(100dvh-120px)]">
+          <div className="space-y-2 pt-2 text-center flex-shrink-0">
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontSize: 15,
+                color: "rgba(44,62,80,0.65)",
+                margin: 0,
+              }}
+            >
+              Your archive starts with one memory.
+            </p>
+            <h2
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 28,
+                color: "#2C3E50",
+                margin: 0,
+                lineHeight: 1.2,
+              }}
+            >
+              What's worth keeping today?
+            </h2>
+          </div>
+          <div className="grid grid-cols-4 gap-3 flex-1 content-center">
+            {ACTIVE.map((c) => (
+              <CategoryIconCard
+                key={c}
+                category={c}
+                active={draft.category === c}
+                iconSize={30}
+                labelSize={11}
+                onClick={() => pickCategory(c)}
+              />
+            ))}
+          </div>
         </div>
       </LightScreen>
     );
