@@ -629,7 +629,7 @@ const OnboardingFlow = ({
                 ))}
               </select>
             </div>
-            <p className="text-sm font-thin" style={privacyStyle}>
+            <p className="text-sm font-thin" style={{ ...privacyStyle, marginTop: "3rem" }}>
               Your information is yours.<br />We will never share or sell it.
             </p>
             <button
