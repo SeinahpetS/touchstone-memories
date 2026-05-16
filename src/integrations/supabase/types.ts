@@ -41,30 +41,48 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          birth_month: number | null
+          birth_year: number | null
+          city: string | null
           created_at: string
+          first_name: string | null
           id: string
           name: string | null
           notification_preferences: Json
+          onboarding_complete: boolean
+          state: string | null
           tier: string
           trial_ends_at: string | null
           trial_started_at: string | null
         }
         Insert: {
           avatar_url?: string | null
+          birth_month?: number | null
+          birth_year?: number | null
+          city?: string | null
           created_at?: string
+          first_name?: string | null
           id: string
           name?: string | null
           notification_preferences?: Json
+          onboarding_complete?: boolean
+          state?: string | null
           tier?: string
           trial_ends_at?: string | null
           trial_started_at?: string | null
         }
         Update: {
           avatar_url?: string | null
+          birth_month?: number | null
+          birth_year?: number | null
+          city?: string | null
           created_at?: string
+          first_name?: string | null
           id?: string
           name?: string | null
           notification_preferences?: Json
+          onboarding_complete?: boolean
+          state?: string | null
           tier?: string
           trial_ends_at?: string | null
           trial_started_at?: string | null
