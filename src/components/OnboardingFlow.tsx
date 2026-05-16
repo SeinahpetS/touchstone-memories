@@ -666,7 +666,7 @@ const OnboardingFlow = ({
               onClear={() => setLocation(null)}
             />
             <p className="text-sm font-thin" style={privacyStyle}>
-              Your information is yours. We will never share or sell it.
+              Your information is yours.<br />We will never share or sell it.
             </p>
             <button
               onClick={() => location && finish(true)}
