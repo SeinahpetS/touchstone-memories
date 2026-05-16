@@ -54,6 +54,11 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   people: "",
   memoryDate: emptyMemoryDate(),
   photoPreview: null,
+  firstName: "",
+  birthMonth: null,
+  birthYear: null,
+  city: "",
+  state: "",
 });
 
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
