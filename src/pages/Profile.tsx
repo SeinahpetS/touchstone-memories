@@ -122,6 +122,33 @@ const Profile = () => {
     }
   };
 
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  const handleExport = async () => {
+    setExporting(true);
+    setExportError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-export");
+      if (error) throw error;
+      const json = JSON.stringify(data);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "touchstone-export.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      setExportError("Something went wrong. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth", { replace: true });
