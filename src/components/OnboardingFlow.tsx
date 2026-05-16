@@ -110,9 +110,11 @@ const ProgressDots = ({ screen }: { screen: Screen }) => {
 const ScreenShell = ({
   screen,
   children,
+  hideDots = false,
 }: {
   screen: Screen;
   children: React.ReactNode;
+  hideDots?: boolean;
 }) => (
   <div
     style={{
@@ -126,7 +128,7 @@ const ScreenShell = ({
   >
     <Wordmark />
     {children}
-    <ProgressDots screen={screen} />
+    {!hideDots && <ProgressDots screen={screen} />}
   </div>
 );
 
@@ -159,7 +161,7 @@ const Slide = ({
 }) => {
   const slide = SLIDES[index];
   return (
-    <ScreenShell screen={screen}>
+    <ScreenShell screen={screen} hideDots>
       <div
         style={{
           display: "flex",
@@ -234,7 +236,33 @@ const Slide = ({
                 </p>
               ))}
           </div>
-          <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+              {[0, 1, 2, 3].map((i) => {
+                const activeDot = screen <= 2 ? screen : 3;
+                const active = i === activeDot;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      width: active ? 24 : 6,
+                      height: 6,
+                      borderRadius: 999,
+                      background: MUTED,
+                      opacity: active ? 1 : 0.3,
+                      transition: "width 300ms ease, opacity 300ms ease",
+                    }}
+                  />
+                );
+              })}
+            </div>
             <button
               onClick={onNext}
               style={{
