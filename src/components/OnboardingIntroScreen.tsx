@@ -627,17 +627,15 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
                 </span>
               ))}
             </span>
-            {closingStage >= 4 && (
-              <span
-                style={{
-                  marginLeft: "0.4em",
-                  opacity: closingStage >= 4 ? 1 : 0,
-                  transition: "opacity 1200ms ease",
-                }}
-              >
-                Still here.
-              </span>
-            )}
+            <span
+              style={{
+                marginLeft: "0.4em",
+                opacity: closingStage >= 4 ? 1 : 0,
+                transition: "opacity 1200ms ease",
+              }}
+            >
+              Still here.
+            </span>
           </div>
           <button
             onClick={onBegin}
