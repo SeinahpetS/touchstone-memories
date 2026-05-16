@@ -231,6 +231,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
 
     const minY = TOP_EXCLUDE;
     const maxY = H - BOTTOM_EXCLUDE;
+    const minX = SIDE_EXCLUDE;
+    const maxX = W - SIDE_EXCLUDE;
+    const usableW = maxX - minX;
 
     const quoteOrder = shuffle(QUOTES.map((_, i) => i));
     const starAssignment = shuffle(STARS.slice());
