@@ -44,12 +44,17 @@ export type Database = {
           birth_month: number | null
           birth_year: number | null
           city: string | null
+          country: string | null
           created_at: string
           first_name: string | null
           id: string
+          lat: number | null
+          lng: number | null
+          location_display: string | null
           name: string | null
           notification_preferences: Json
           onboarding_complete: boolean
+          region: string | null
           state: string | null
           tier: string
           trial_ends_at: string | null
@@ -60,12 +65,17 @@ export type Database = {
           birth_month?: number | null
           birth_year?: number | null
           city?: string | null
+          country?: string | null
           created_at?: string
           first_name?: string | null
           id: string
+          lat?: number | null
+          lng?: number | null
+          location_display?: string | null
           name?: string | null
           notification_preferences?: Json
           onboarding_complete?: boolean
+          region?: string | null
           state?: string | null
           tier?: string
           trial_ends_at?: string | null
@@ -76,12 +86,17 @@ export type Database = {
           birth_month?: number | null
           birth_year?: number | null
           city?: string | null
+          country?: string | null
           created_at?: string
           first_name?: string | null
           id?: string
+          lat?: number | null
+          lng?: number | null
+          location_display?: string | null
           name?: string | null
           notification_preferences?: Json
           onboarding_complete?: boolean
+          region?: string | null
           state?: string | null
           tier?: string
           trial_ends_at?: string | null
