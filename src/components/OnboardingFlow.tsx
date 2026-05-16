@@ -230,15 +230,15 @@ const Slide = ({
           <button
             onClick={onNext}
             style={{
-              background: "transparent",
+              background: GOLD,
               border: "none",
               cursor: "pointer",
               fontFamily: '"Playfair Display", Georgia, serif',
               fontStyle: "italic",
               fontSize: 14,
-              color: GOLD,
-              opacity: 0.9,
-              padding: 8,
+              color: IVORY,
+              borderRadius: 999,
+              padding: "0.6rem 1.6rem",
             }}
           >
             {slide.nextLabel}
