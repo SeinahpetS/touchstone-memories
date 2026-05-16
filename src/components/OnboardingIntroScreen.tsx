@@ -399,7 +399,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   //   stage 3 — "Everything that made you." letter-by-letter reveal
   //   stage 4 — "Still here." + Begin button fade in
   const [everythingChars, setEverythingChars] = useState(0);
-  const EVERYTHING_TEXT = "Everything that made you.";
+  const EVERYTHING_TEXT = "Where stories connect.";
 
   useEffect(() => {
     if (!advancing) return;
@@ -624,7 +624,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               transition: "opacity 1100ms ease",
             }}
           >
-            Your story unfolds one piece at a time.
+            Your life unfolds one piece at a time.
           </div>
           <div
             style={{
@@ -659,15 +659,6 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
                   {ch}
                 </span>
               ))}
-            </span>
-            <span
-              style={{
-                marginLeft: "0.4em",
-                opacity: closingStage >= 4 ? 1 : 0,
-                transition: "opacity 1200ms ease",
-              }}
-            >
-              Still here.
             </span>
           </div>
           <button
