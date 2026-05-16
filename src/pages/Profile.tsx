@@ -33,6 +33,8 @@ const Profile = () => {
   const [inAppNotif, setInAppNotif] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
