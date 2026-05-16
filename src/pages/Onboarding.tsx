@@ -31,6 +31,7 @@ import {
 
 type Step =
   | "intro"
+  | "flow"
   | "splash"
   | "resume"
   | "definition"
