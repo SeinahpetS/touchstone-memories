@@ -72,8 +72,7 @@ const Wordmark = () => (
 );
 
 const ProgressDots = ({ screen }: { screen: Screen }) => {
-  // Dot 1: screen 0, Dot 2: screen 1, Dot 3: screen 2, Dot 4: screens 3-5
-  const activeDot = screen <= 2 ? screen : 3;
+  const total = 6;
   return (
     <div
       style={{
@@ -87,8 +86,8 @@ const ProgressDots = ({ screen }: { screen: Screen }) => {
         zIndex: 5,
       }}
     >
-      {[0, 1, 2, 3].map((i) => {
-        const active = i === activeDot;
+      {Array.from({ length: total }).map((_, i) => {
+        const active = i === screen;
         return (
           <div
             key={i}
