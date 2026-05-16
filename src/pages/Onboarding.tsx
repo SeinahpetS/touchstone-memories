@@ -17,6 +17,7 @@ import PhotoUpload from "@/components/PhotoUpload";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
+import OnboardingFlow from "@/components/OnboardingFlow";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import {
   clearOnboardingDraft,
@@ -30,6 +31,7 @@ import {
 
 type Step =
   | "intro"
+  | "flow"
   | "splash"
   | "resume"
   | "definition"
@@ -383,6 +385,16 @@ const Onboarding = () => {
         location_lng: d.mapLocationLng,
       };
       await (supabase as any).from("touchstones").insert(payload);
+
+      // Persist personal info captured in the post-Begin onboarding flow.
+      const profilePatch: Record<string, any> = { onboarding_complete: true };
+      if (d.firstName && d.firstName.trim()) profilePatch.first_name = d.firstName.trim();
+      if (d.firstName && d.firstName.trim()) profilePatch.name = d.firstName.trim();
+      if (d.birthMonth) profilePatch.birth_month = d.birthMonth;
+      if (d.birthYear) profilePatch.birth_year = d.birthYear;
+      if (d.city && d.city.trim()) profilePatch.city = d.city.trim();
+      if (d.state) profilePatch.state = d.state;
+      await (supabase as any).from("profiles").update(profilePatch).eq("id", user.id);
     } catch {
       toast.error("Couldn't save your first memory — try again from the archive.");
     } finally {
@@ -456,8 +468,30 @@ const Onboarding = () => {
   if (step === "intro") {
     return (
       <OnboardingIntroScreen
-        onBegin={() => setStep("splash")}
-        onSkip={() => setStep("splash")}
+        onBegin={() => setStep("flow")}
+        onSkip={() => setStep("flow")}
+      />
+    );
+  }
+
+  if (step === "flow") {
+    return (
+      <OnboardingFlow
+        initialFirstName={draft.firstName ?? ""}
+        initialBirthMonth={draft.birthMonth ?? null}
+        initialBirthYear={draft.birthYear ?? null}
+        initialCity={draft.city ?? ""}
+        initialState={draft.state ?? ""}
+        onComplete={(data) => {
+          update({
+            firstName: data.firstName,
+            birthMonth: data.birthMonth,
+            birthYear: data.birthYear,
+            city: data.city,
+            state: data.state,
+          });
+          setStep("splash");
+        }}
       />
     );
   }
