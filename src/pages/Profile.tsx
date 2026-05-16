@@ -34,6 +34,7 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportSent, setExportSent] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -130,16 +131,8 @@ const Profile = () => {
     try {
       const { data, error } = await supabase.functions.invoke("generate-export");
       if (error) throw error;
-      const json = JSON.stringify(data);
-      const blob = new Blob([json], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "touchstone-export.json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      if (!data?.success) throw new Error("Export failed");
+      setExportSent(true);
     } catch (err) {
       console.error(err);
       setExportError("Something went wrong. Please try again.");
@@ -311,36 +304,44 @@ const Profile = () => {
         </section>
 
         {/* Your Data */}
-        <section className="space-y-3">
+        <section className="space-y-3" style={{ borderTop: "1px solid #E8E4D8", paddingTop: 24 }}>
           <h2 className="font-playfair text-lg">Your Data</h2>
           <p style={{ fontFamily: "'Jost', sans-serif", color: "#2C3E50", fontSize: 14 }}>
-            Your memories belong to you — always. Download a copy of your archive as a data file.
+            Your memories belong to you — always. Request a copy of your archive and we'll email you a download link.
           </p>
           <p style={{ fontFamily: "'Jost', sans-serif", color: "#5B4A3F", fontSize: 12 }}>
-            Photo links expire in 7 days — save any photos you need within that window.
+            The download link expires in 7 days.
           </p>
-          <button
-            type="button"
-            onClick={handleExport}
-            disabled={exporting}
-            style={{
-              border: "1px solid #1E2E3E",
-              color: "#1E2E3E",
-              background: "transparent",
-              fontFamily: "'Jost', sans-serif",
-              fontSize: 14,
-              borderRadius: 6,
-              padding: "10px 20px",
-              opacity: exporting ? 0.7 : 1,
-              cursor: exporting ? "not-allowed" : "pointer",
-            }}
-          >
-            {exporting ? "Preparing your export…" : "Export my archive"}
-          </button>
-          {exportError && (
-            <p style={{ color: "#C2714F", fontSize: 12, fontFamily: "'Jost', sans-serif" }}>
-              {exportError}
+          {exportSent ? (
+            <p style={{ fontFamily: "'Jost', sans-serif", color: "#2E7D5E", fontSize: 13 }}>
+              Check your inbox — your download link is on its way.
             </p>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={exporting}
+                style={{
+                  border: "1px solid #1E2E3E",
+                  color: "#1E2E3E",
+                  background: "transparent",
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 14,
+                  borderRadius: 6,
+                  padding: "10px 20px",
+                  opacity: exporting ? 0.7 : 1,
+                  cursor: exporting ? "not-allowed" : "pointer",
+                }}
+              >
+                {exporting ? "Preparing your archive…" : "Email me my archive"}
+              </button>
+              {exportError && (
+                <p style={{ color: "#C2714F", fontSize: 12, fontFamily: "'Jost', sans-serif" }}>
+                  {exportError}
+                </p>
+              )}
+            </>
           )}
         </section>
 

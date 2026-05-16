@@ -1,4 +1,4 @@
-// Export the authenticated user's full Touchstone archive as JSON.
+// Generate user data export, upload to storage, email signed link via Resend.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -9,6 +9,8 @@ const corsHeaders = {
 
 const SIGNED_URL_TTL = 60 * 60 * 24 * 7; // 7 days
 const PHOTO_BUCKET = "memory-photos";
+const EXPORT_BUCKET = "exports";
+const FROM_ADDRESS = "Touchstone <exports@usetouchstone.app>";
 
 function formatDate(iso: string | null): string | null {
   if (!iso) return null;
@@ -42,6 +44,15 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+
+    if (!resendKey) {
+      console.error("RESEND_API_KEY not configured");
+      return new Response(JSON.stringify({ error: "Email not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
@@ -54,9 +65,17 @@ Deno.serve(async (req) => {
       });
     }
     const userId = userData.user.id;
+    const userEmail = userData.user.email;
+    if (!userEmail) {
+      return new Response(JSON.stringify({ error: "No email on account" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const admin = createClient(supabaseUrl, serviceKey);
 
+    // Step 1: query memories
     const { data: rows, error: qErr } = await admin
       .from("touchstones")
       .select(
@@ -73,7 +92,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const out = await Promise.all(
+    const memories = await Promise.all(
       (rows ?? []).map(async (r: any) => {
         let signed: string | null = null;
         const path = extractStoragePath(r.photo_url);
@@ -81,9 +100,7 @@ Deno.serve(async (req) => {
           const { data: s } = await admin.storage
             .from(PHOTO_BUCKET)
             .createSignedUrl(path, SIGNED_URL_TTL);
-          signed = s?.signedUrl ?? r.photo_url ?? null;
-        } else if (r.photo_url) {
-          signed = r.photo_url;
+          signed = s?.signedUrl ?? null;
         }
         return {
           id: r.id,
@@ -100,12 +117,74 @@ Deno.serve(async (req) => {
       }),
     );
 
-    return new Response(JSON.stringify(out), {
+    const json = JSON.stringify(memories);
+
+    // Step 2: upload to private exports bucket
+    const timestamp = Date.now();
+    const filePath = `${userId}/${timestamp}.json`;
+    const { error: upErr } = await admin.storage
+      .from(EXPORT_BUCKET)
+      .upload(filePath, new Blob([json], { type: "application/json" }), {
+        contentType: "application/json",
+        upsert: false,
+      });
+    if (upErr) {
+      console.error("export upload error", upErr);
+      return new Response(JSON.stringify({ error: "Upload failed" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: signedData, error: signErr } = await admin.storage
+      .from(EXPORT_BUCKET)
+      .createSignedUrl(filePath, SIGNED_URL_TTL);
+    if (signErr || !signedData?.signedUrl) {
+      console.error("signed url error", signErr);
+      return new Response(JSON.stringify({ error: "Could not sign URL" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const downloadUrl = signedData.signedUrl;
+
+    // Step 3: send via Resend
+    const textBody = `Your archive is ready to download.
+
+Download my archive: ${downloadUrl}
+
+This link expires in 7 days.
+
+The file also includes signed links to your photos — those expire in 7 days too. Save any photos you want to keep within that window.
+
+— Touchstone`;
+
+    const emailRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
       headers: {
-        ...corsHeaders,
+        Authorization: `Bearer ${resendKey}`,
         "Content-Type": "application/json",
-        "Content-Disposition": 'attachment; filename="touchstone-export.json"',
       },
+      body: JSON.stringify({
+        from: FROM_ADDRESS,
+        to: [userEmail],
+        subject: "Your Touchstone archive is ready",
+        text: textBody,
+      }),
+    });
+
+    if (!emailRes.ok) {
+      const errText = await emailRes.text();
+      console.error("Resend send failed", emailRes.status, errText);
+      return new Response(JSON.stringify({ error: "Email send failed" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("generate-export error", e);
