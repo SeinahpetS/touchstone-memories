@@ -131,16 +131,8 @@ const Profile = () => {
     try {
       const { data, error } = await supabase.functions.invoke("generate-export");
       if (error) throw error;
-      const json = JSON.stringify(data);
-      const blob = new Blob([json], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "touchstone-export.json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      if (!data?.success) throw new Error("Export failed");
+      setExportSent(true);
     } catch (err) {
       console.error(err);
       setExportError("Something went wrong. Please try again.");
