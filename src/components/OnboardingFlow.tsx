@@ -184,20 +184,41 @@ const Slide = ({
             justifyContent: "center",
           }}
         >
-          <p
-            style={{
-              fontFamily: '"Playfair Display", Georgia, serif',
-              fontStyle: "italic",
-              fontSize: "clamp(18px, 4vw, 22px)",
-              color: INK,
-              lineHeight: 1.5,
-              maxWidth: 340,
-              textAlign: "center",
-              margin: 0,
-            }}
-          >
-            {slide.copy}
-          </p>
+          {index === 1 ? (
+            <div style={{ maxWidth: 340, display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {["One tap saves it.", "Touchstone asks the question you didn't know you needed to answer."].map((line, i) => (
+                <p
+                  key={i}
+                  style={{
+                    fontFamily: '"Playfair Display", Georgia, serif',
+                    fontStyle: "italic",
+                    fontSize: "clamp(18px, 4vw, 22px)",
+                    color: INK,
+                    lineHeight: 1.5,
+                    textAlign: "center",
+                    margin: 0,
+                  }}
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontStyle: "italic",
+                fontSize: "clamp(18px, 4vw, 22px)",
+                color: INK,
+                lineHeight: 1.5,
+                maxWidth: 340,
+                textAlign: "center",
+                margin: 0,
+              }}
+            >
+              {slide.copy}
+            </p>
+          )}
         </div>
         <div style={{ flex: 1 }} />
         <div
