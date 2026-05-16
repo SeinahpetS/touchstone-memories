@@ -51,7 +51,7 @@ const QUOTES: QuoteSpec[] = [
     color: "rgba(30,46,62,0.70)",
   },
   {
-    text: "Dad had a word for that feeling when a trip is almost over but you're still in it. I can't remember it now.",
+    text: "There's that one photo I can't find of my dad wearing his favorite shirt at the cabin. That's how I picture him now.",
     baseSize: 18,
     width: 220,
     color: "rgba(30,46,62,0.88)",
