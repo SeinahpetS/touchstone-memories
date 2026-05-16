@@ -24,6 +24,12 @@ export interface OnboardingDraft {
   memoryDate: MemoryDate;
   /** Object URL for the in-memory photo, used for preview only. */
   photoPreview: string | null;
+  /** Personal info captured in the post-Begin onboarding flow. */
+  firstName?: string;
+  birthMonth?: number | null;
+  birthYear?: number | null;
+  city?: string;
+  state?: string;
 }
 
 const KEY = "ts_onboarding_draft_v1";
