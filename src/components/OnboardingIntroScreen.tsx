@@ -565,7 +565,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             position: "fixed",
             top: "50%",
             left: "50%",
-            transform: "translate(-50%, -50%)",
+            
             fontFamily: '"Playfair Display", Georgia, serif',
             fontStyle: "italic",
             fontSize: 22,
