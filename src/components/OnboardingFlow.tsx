@@ -65,7 +65,7 @@ const ProgressDots = ({ screen }: { screen: Screen }) => {
     <div
       style={{
         position: "absolute",
-        bottom: 24,
+        bottom: 72,
         left: 0,
         right: 0,
         display: "flex",
