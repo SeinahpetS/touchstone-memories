@@ -399,7 +399,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   //   stage 3 — "Everything that made you." letter-by-letter reveal
   //   stage 4 — "Still here." + Begin button fade in
   const [everythingChars, setEverythingChars] = useState(0);
-  const EVERYTHING_TEXT = "Where stories connect.";
+  const EVERYTHING_TEXT = "Where stories meet and memories last.";
 
   useEffect(() => {
     if (!advancing) return;
