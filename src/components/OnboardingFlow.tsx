@@ -622,7 +622,7 @@ const OnboardingFlow = ({
                 onChange={(e) =>
                   setBirthYear(e.target.value ? Number(e.target.value) : null)
                 }
-                style={{ ...inputBaseStyle, fontSize: 15, width: "40%" }}
+                style={{ ...inputBaseStyle, fontSize: 15, width: "40%", textAlign: "center", textAlignLast: "center" }}
               >
                 <option value="">Year</option>
                 {years.map((y) => (
