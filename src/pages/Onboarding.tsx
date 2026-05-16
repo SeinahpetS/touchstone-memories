@@ -385,6 +385,16 @@ const Onboarding = () => {
         location_lng: d.mapLocationLng,
       };
       await (supabase as any).from("touchstones").insert(payload);
+
+      // Persist personal info captured in the post-Begin onboarding flow.
+      const profilePatch: Record<string, any> = { onboarding_complete: true };
+      if (d.firstName && d.firstName.trim()) profilePatch.first_name = d.firstName.trim();
+      if (d.firstName && d.firstName.trim()) profilePatch.name = d.firstName.trim();
+      if (d.birthMonth) profilePatch.birth_month = d.birthMonth;
+      if (d.birthYear) profilePatch.birth_year = d.birthYear;
+      if (d.city && d.city.trim()) profilePatch.city = d.city.trim();
+      if (d.state) profilePatch.state = d.state;
+      await (supabase as any).from("profiles").update(profilePatch).eq("id", user.id);
     } catch {
       toast.error("Couldn't save your first memory — try again from the archive.");
     } finally {
