@@ -120,7 +120,7 @@ const ScreenShell = ({
 const SLIDES: { img: string; copy: string; nextLabel: string }[] = [
   {
     img: "/images/constellations/orion-placeholder.png",
-    copy: "Touchstone holds everything that made you who you are,\n And reveals why it still matters.",
+    copy: "Touchstone holds everything that made you who you are, and reveals why it still matters.",
     nextLabel: "Next →",
   },
   {
