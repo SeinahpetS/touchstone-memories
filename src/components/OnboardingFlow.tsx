@@ -630,7 +630,7 @@ const OnboardingFlow = ({
                 ))}
               </select>
             </div>
-            <p style={privacyStyle}>
+            <p className="text-sm font-thin" style={privacyStyle}>
               Your information is yours. We will never share or sell it.
             </p>
             <button
