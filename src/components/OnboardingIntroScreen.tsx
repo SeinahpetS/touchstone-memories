@@ -394,7 +394,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   }, [order]);
 
   // Staged closing reveal:
-  //   stage 1 — "Your story has parts worth remembering." fades in
+  //   stage 1 — "Your story unfolds one piece at a time." fades in
   //   stage 2 — Touchstone wordmark fades in slowly
   //   stage 3 — "Everything that made you." letter-by-letter reveal
   //   stage 4 — "Still here." + Begin button fade in
