@@ -285,8 +285,8 @@ const skipLinkStyle: React.CSSProperties = {
   fontFamily: '"Playfair Display", Georgia, serif',
   fontStyle: "italic",
   fontSize: 12,
-  color: MUTED,
-  opacity: 0.45,
+  color: GOLD,
+  opacity: 0.9,
   textDecoration: "none",
 };
 
