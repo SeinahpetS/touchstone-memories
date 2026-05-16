@@ -624,7 +624,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               transition: "opacity 1100ms ease",
             }}
           >
-            Your story has parts worth remembering.
+            Your story unfolds one piece at a time.
           </div>
           <div
             style={{
