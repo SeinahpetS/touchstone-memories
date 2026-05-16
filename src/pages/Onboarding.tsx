@@ -458,8 +458,30 @@ const Onboarding = () => {
   if (step === "intro") {
     return (
       <OnboardingIntroScreen
-        onBegin={() => setStep("splash")}
-        onSkip={() => setStep("splash")}
+        onBegin={() => setStep("flow")}
+        onSkip={() => setStep("flow")}
+      />
+    );
+  }
+
+  if (step === "flow") {
+    return (
+      <OnboardingFlow
+        initialFirstName={draft.firstName ?? ""}
+        initialBirthMonth={draft.birthMonth ?? null}
+        initialBirthYear={draft.birthYear ?? null}
+        initialCity={draft.city ?? ""}
+        initialState={draft.state ?? ""}
+        onComplete={(data) => {
+          update({
+            firstName: data.firstName,
+            birthMonth: data.birthMonth,
+            birthYear: data.birthYear,
+            city: data.city,
+            state: data.state,
+          });
+          setStep("splash");
+        }}
       />
     );
   }
