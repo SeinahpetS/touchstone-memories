@@ -83,8 +83,8 @@ const ProgressDots = ({ screen }: { screen: Screen }) => {
               width: active ? 24 : 6,
               height: 6,
               borderRadius: 999,
-              background: active ? GOLD : INK,
-              opacity: active ? 1 : 0.18,
+              background: MUTED,
+              opacity: active ? 1 : 0.3,
               transition: "width 300ms ease, opacity 300ms ease",
             }}
           />
