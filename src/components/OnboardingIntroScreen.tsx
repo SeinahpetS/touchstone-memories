@@ -365,12 +365,37 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     return () => timers.forEach((t) => clearTimeout(t));
   }, [order]);
 
-  // Trigger Begin screen reveal at 1500ms (200ms hold after 1300ms bare ivory)
+  // Staged closing reveal:
+  //   stage 1 — "Your story has parts worth remembering." fades in
+  //   stage 2 — Touchstone wordmark fades in slowly
+  //   stage 3 — "Everything that made you." letter-by-letter reveal
+  //   stage 4 — "Still here." + Begin button fade in
+  const [everythingChars, setEverythingChars] = useState(0);
+  const EVERYTHING_TEXT = "Everything that made you.";
+
   useEffect(() => {
     if (!advancing) return;
     const timers: number[] = [];
     setShowClosing(true);
-    timers.push(window.setTimeout(() => setClosingStage(3), 200));
+    timers.push(window.setTimeout(() => setClosingStage(1), 100));
+    timers.push(window.setTimeout(() => setClosingStage(2), 1400));
+    timers.push(
+      window.setTimeout(() => {
+        setClosingStage(3);
+        // letter-by-letter reveal of "Everything that made you."
+        for (let i = 1; i <= EVERYTHING_TEXT.length; i++) {
+          timers.push(
+            window.setTimeout(() => setEverythingChars(i), i * 75),
+          );
+        }
+      }, 3400),
+    );
+    timers.push(
+      window.setTimeout(
+        () => setClosingStage(4),
+        3400 + EVERYTHING_TEXT.length * 75 + 400,
+      ),
+    );
     return () => timers.forEach((t) => clearTimeout(t));
   }, [advancing]);
 
@@ -551,7 +576,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             padding: "0 1.5rem",
             zIndex: 27,
             background: "#F2EEE5",
-            opacity: closingStage >= 3 ? 1 : 0,
+            opacity: 1,
             transition: "opacity 700ms ease-in-out",
           }}
         >
@@ -563,7 +588,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               color: "#1E2E3E",
               marginBottom: "0.6rem",
               opacity: closingStage >= 1 ? 1 : 0,
-              transition: "opacity 600ms ease",
+              transition: "opacity 1100ms ease",
             }}
           >
             Your story has parts worth remembering.
@@ -574,7 +599,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               transform: "scale(3)",
               transformOrigin: "center",
               opacity: closingStage >= 2 ? 1 : 0,
-              transition: "opacity 1.8s ease",
+              transition: "opacity 1800ms ease",
             }}
           >
             <Wordmark />
@@ -586,11 +611,23 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               fontSize: "clamp(18px, 3.8vw, 22px)",
               color: "#B8860B",
               marginTop: "3.2rem",
-              opacity: closingStage >= 3 ? 1 : 0,
-              transition: "opacity 1.6s ease",
+              minHeight: "1.4em",
             }}
           >
-            Everything that made you. Still here.
+            <span style={{ whiteSpace: "pre" }}>
+              {EVERYTHING_TEXT.slice(0, everythingChars)}
+            </span>
+            {closingStage >= 4 && (
+              <span
+                style={{
+                  marginLeft: "0.4em",
+                  opacity: closingStage >= 4 ? 1 : 0,
+                  transition: "opacity 1200ms ease",
+                }}
+              >
+                Still here.
+              </span>
+            )}
           </div>
           <button
             onClick={onBegin}
@@ -604,9 +641,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               borderRadius: 6,
               padding: "0.75rem 2rem",
               cursor: "pointer",
-              opacity: closingStage >= 3 ? 1 : 0,
-              transition: "opacity 1.4s ease",
-              pointerEvents: closingStage >= 3 ? "auto" : "none",
+              opacity: closingStage >= 4 ? 1 : 0,
+              transition: "opacity 1400ms ease",
+              pointerEvents: closingStage >= 4 ? "auto" : "none",
             }}
           >
             Begin →
