@@ -1,4 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useDebounce } from "@/hooks/useDebounce";
+
+export interface OnboardingLocation {
+  city: string;
+  region: string;
+  country: string;
+  locationDisplay: string;
+  lat: number | null;
+  lng: number | null;
+}
 
 interface OnboardingFlowProps {
   initialFirstName?: string;
@@ -6,12 +17,14 @@ interface OnboardingFlowProps {
   initialBirthYear?: number | null;
   initialCity?: string;
   initialState?: string;
+  initialLocation?: OnboardingLocation | null;
   onComplete: (data: {
     firstName: string;
     birthMonth: number | null;
     birthYear: number | null;
     city: string;
     state: string;
+    location: OnboardingLocation | null;
   }) => void;
 }
 
@@ -330,20 +343,178 @@ const CenteredCard = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
+const PlacesAutocomplete = ({
+  value,
+  onSelect,
+  onClear,
+}: {
+  value: string;
+  onSelect: (loc: OnboardingLocation) => void;
+  onClear: () => void;
+}) => {
+  const [query, setQuery] = useState(value);
+  const [preds, setPreds] = useState<
+    { place_id: string; description: string; main_text: string; secondary_text: string }[]
+  >([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const debounced = useDebounce(query, 250);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lockedRef = useRef<string>(value);
+
+  useEffect(() => { setQuery(value); lockedRef.current = value; }, [value]);
+
+  useEffect(() => {
+    if (!debounced || debounced.length < 2 || debounced === lockedRef.current) {
+      setPreds([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const session = (await supabase.auth.getSession()).data.session;
+        const token = session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-search?mode=autocomplete&types=cities&q=${encodeURIComponent(debounced)}`;
+        const r = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+        });
+        const d = await r.json();
+        if (!cancelled) {
+          setPreds((d.predictions ?? []).slice(0, 5));
+          setOpen(true);
+        }
+      } catch { /* ignore */ }
+      finally { if (!cancelled) setLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, [debounced]);
+
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  const pick = async (p: { place_id: string; description: string }) => {
+    setOpen(false);
+    setPreds([]);
+    setQuery(p.description);
+    lockedRef.current = p.description;
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const token = session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-search?mode=details&place_id=${encodeURIComponent(p.place_id)}`;
+      const r = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+      });
+      const d = await r.json();
+      const display = d.formatted_address || p.description;
+      setQuery(display);
+      lockedRef.current = display;
+      onSelect({
+        city: d.city ?? "",
+        region: d.region ?? "",
+        country: d.country ?? "",
+        locationDisplay: display,
+        lat: d.lat ?? null,
+        lng: d.lng ?? null,
+      });
+    } catch { /* ignore */ }
+  };
+
+  return (
+    <div ref={containerRef} style={{ position: "relative", width: "100%" }}>
+      <input
+        className="ts-onb-input"
+        type="text"
+        value={query}
+        placeholder="start typing your city…"
+        onChange={(e) => {
+          setQuery(e.target.value);
+          if (lockedRef.current && e.target.value !== lockedRef.current) {
+            lockedRef.current = "";
+            onClear();
+          }
+        }}
+        onFocus={() => preds.length > 0 && setOpen(true)}
+        style={{ ...inputBaseStyle, fontSize: 18 }}
+        autoComplete="off"
+      />
+      {loading && (
+        <div style={{
+          position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)",
+          fontSize: 11, color: MUTED, fontStyle: "italic", opacity: 0.6,
+        }}>…</div>
+      )}
+      {open && preds.length > 0 && (
+        <div style={{
+          position: "absolute",
+          top: "calc(100% + 4px)",
+          left: 0, right: 0,
+          background: IVORY,
+          border: `1px solid rgba(30,46,62,0.12)`,
+          borderRadius: 8,
+          overflow: "hidden",
+          zIndex: 10,
+          boxShadow: "0 4px 16px rgba(30,46,62,0.08)",
+        }}>
+          {preds.map((p) => (
+            <button
+              key={p.place_id}
+              type="button"
+              onClick={() => pick(p)}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "left",
+                padding: "10px 14px",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontSize: 14,
+                color: INK,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(30,46,62,0.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              <div>{p.main_text}</div>
+              {p.secondary_text && (
+                <div style={{ fontSize: 12, color: MUTED, opacity: 0.7, fontStyle: "italic" }}>
+                  {p.secondary_text}
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const OnboardingFlow = ({
   initialFirstName = "",
   initialBirthMonth = null,
   initialBirthYear = null,
   initialCity = "",
   initialState = "",
+  initialLocation = null,
   onComplete,
 }: OnboardingFlowProps) => {
   const [screen, setScreen] = useState<Screen>(0);
   const [firstName, setFirstName] = useState(initialFirstName);
   const [birthMonth, setBirthMonth] = useState<number | null>(initialBirthMonth);
   const [birthYear, setBirthYear] = useState<number | null>(initialBirthYear);
-  const [city, setCity] = useState(initialCity);
-  const [stateVal, setStateVal] = useState(initialState);
+  const [location, setLocation] = useState<OnboardingLocation | null>(initialLocation);
   const [fadeKey, setFadeKey] = useState(0);
 
   const years = useMemo(() => {
@@ -358,13 +529,15 @@ const OnboardingFlow = ({
     setFadeKey((k) => k + 1);
   };
 
-  const finish = (saveCityState: boolean) => {
+  const finish = (saveLocation: boolean) => {
+    const loc = saveLocation ? location : null;
     onComplete({
       firstName: firstName.trim(),
       birthMonth: birthMonth ?? null,
       birthYear: birthYear ?? null,
-      city: saveCityState ? city.trim() : "",
-      state: saveCityState ? stateVal : "",
+      city: loc?.city ?? "",
+      state: loc?.region ?? "",
+      location: loc,
     });
   };
 
@@ -488,34 +661,18 @@ const OnboardingFlow = ({
             <p style={subLineStyle}>
               For when Touchstone connects you with others who shared your world.
             </p>
-            <div style={{ display: "flex", gap: 12, width: "100%" }}>
-              <input
-                className="ts-onb-input"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="city"
-                style={{ ...inputBaseStyle, fontSize: 15, width: "55%" }}
-              />
-              <select
-                className="ts-onb-input ts-onb-select"
-                value={stateVal}
-                onChange={(e) => setStateVal(e.target.value)}
-                style={{ ...inputBaseStyle, fontSize: 15, width: "40%" }}
-              >
-                <option value="">State</option>
-                {US_STATES.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
+            <PlacesAutocomplete
+              value={location?.locationDisplay ?? ""}
+              onSelect={(loc) => setLocation(loc)}
+              onClear={() => setLocation(null)}
+            />
             <p style={privacyStyle}>
               Your information is yours. We will never share or sell it.
             </p>
             <button
-              onClick={() => city.trim() && stateVal && finish(true)}
-              disabled={!(city.trim() && stateVal)}
-              style={continueBtnStyle(!!(city.trim() && stateVal))}
+              onClick={() => location && finish(true)}
+              disabled={!location}
+              style={continueBtnStyle(!!location)}
             >
               Continue →
             </button>

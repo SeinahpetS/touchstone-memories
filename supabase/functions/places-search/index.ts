@@ -26,7 +26,13 @@ Deno.serve(async (req) => {
 
     if (mode === "autocomplete") {
       const q = url.searchParams.get("q")?.trim();
+      const types = url.searchParams.get("types"); // e.g. "cities"
       if (!q || q.length < 2) return json({ predictions: [] });
+
+      const body: Record<string, unknown> = { input: q };
+      if (types === "cities") {
+        body.includedPrimaryTypes = ["locality", "administrative_area_level_3"];
+      }
 
       const r = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
         method: "POST",
@@ -34,7 +40,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           "X-Goog-Api-Key": apiKey,
         },
-        body: JSON.stringify({ input: q }),
+        body: JSON.stringify(body),
       });
       const data = await r.json();
       if (!r.ok) {
@@ -68,7 +74,7 @@ Deno.serve(async (req) => {
         {
           headers: {
             "X-Goog-Api-Key": apiKey,
-            "X-Goog-FieldMask": "id,displayName,formattedAddress,location",
+            "X-Goog-FieldMask": "id,displayName,formattedAddress,location,addressComponents",
           },
         }
       );
@@ -79,11 +85,20 @@ Deno.serve(async (req) => {
           502
         );
       }
+      const components: any[] = data.addressComponents ?? [];
+      const findComp = (type: string, useShort = false) => {
+        const c = components.find((c) => (c.types ?? []).includes(type));
+        if (!c) return null;
+        return useShort ? c.shortText ?? c.longText ?? null : c.longText ?? c.shortText ?? null;
+      };
       return json({
         name: data.displayName?.text ?? null,
         formatted_address: data.formattedAddress ?? null,
         lat: data.location?.latitude ?? null,
         lng: data.location?.longitude ?? null,
+        city: findComp("locality") ?? findComp("administrative_area_level_3") ?? findComp("postal_town"),
+        region: findComp("administrative_area_level_1"),
+        country: findComp("country"),
       });
     }
 

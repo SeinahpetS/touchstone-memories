@@ -394,6 +394,11 @@ const Onboarding = () => {
       if (d.birthYear) profilePatch.birth_year = d.birthYear;
       if (d.city && d.city.trim()) profilePatch.city = d.city.trim();
       if (d.state) profilePatch.state = d.state;
+      if (d.region) profilePatch.region = d.region;
+      if (d.country) profilePatch.country = d.country;
+      if (d.locationDisplay) profilePatch.location_display = d.locationDisplay;
+      if (typeof d.lat === "number") profilePatch.lat = d.lat;
+      if (typeof d.lng === "number") profilePatch.lng = d.lng;
       await (supabase as any).from("profiles").update(profilePatch).eq("id", user.id);
     } catch {
       toast.error("Couldn't save your first memory — try again from the archive.");
@@ -487,8 +492,13 @@ const Onboarding = () => {
             firstName: data.firstName,
             birthMonth: data.birthMonth,
             birthYear: data.birthYear,
-            city: data.city,
-            state: data.state,
+            city: data.location?.city ?? data.city,
+            state: data.location?.region ?? data.state,
+            region: data.location?.region ?? "",
+            country: data.location?.country ?? "",
+            locationDisplay: data.location?.locationDisplay ?? "",
+            lat: data.location?.lat ?? null,
+            lng: data.location?.lng ?? null,
           });
           setStep("splash");
         }}
