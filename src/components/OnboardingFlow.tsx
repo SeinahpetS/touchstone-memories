@@ -203,8 +203,8 @@ const Slide = ({
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
-            padding: "0 1.5rem 4rem",
+            justifyContent: "center",
+            padding: "0 1.5rem 1.5rem",
           }}
         >
           <button
@@ -215,9 +215,9 @@ const Slide = ({
               cursor: "pointer",
               fontFamily: '"Playfair Display", Georgia, serif',
               fontStyle: "italic",
-              fontSize: 13,
-              color: MUTED,
-              opacity: 0.7,
+              fontSize: 14,
+              color: GOLD,
+              opacity: 0.9,
               padding: 8,
             }}
           >
