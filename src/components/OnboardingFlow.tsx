@@ -609,7 +609,7 @@ const OnboardingFlow = ({
                 onChange={(e) =>
                   setBirthMonth(e.target.value ? Number(e.target.value) : null)
                 }
-                style={{ ...inputBaseStyle, fontSize: 15, width: "55%" }}
+                style={{ ...inputBaseStyle, fontSize: 15, width: "55%", textAlign: "center", textAlignLast: "center" }}
               >
                 <option value="">Month</option>
                 {MONTHS.map((m, i) => (
