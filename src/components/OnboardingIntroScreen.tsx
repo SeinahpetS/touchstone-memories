@@ -615,7 +615,17 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             }}
           >
             <span style={{ whiteSpace: "pre" }}>
-              {EVERYTHING_TEXT.slice(0, everythingChars)}
+              {EVERYTHING_TEXT.split("").map((ch, i) => (
+                <span
+                  key={i}
+                  style={{
+                    opacity: i < everythingChars ? 1 : 0,
+                    transition: "opacity 120ms ease",
+                  }}
+                >
+                  {ch}
+                </span>
+              ))}
             </span>
             {closingStage >= 4 && (
               <span
