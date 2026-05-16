@@ -318,6 +318,34 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
       }
     });
 
+    // Guarantee a minimum number of quotes are visible. If grid placement
+    // dropped any, retry with relaxed constraints (shrinking width if needed)
+    // until we hit MIN_QUOTES or run out of quote candidates.
+    const MIN_QUOTES = Math.min(4, QUOTES.length);
+    const placedQuoteIdx = new Set(
+      placed.filter((p) => p.kind === "quote").map((p) => (p as any).idx as number)
+    );
+    if (placedQuoteIdx.size < MIN_QUOTES) {
+      const remaining = quoteOrder.filter((qi) => !placedQuoteIdx.has(qi));
+      for (const qi of remaining) {
+        if (placedQuoteIdx.size >= MIN_QUOTES) break;
+        const quote = QUOTES[qi];
+        const fontSize = computeFontSize(quote) * scale;
+        let width = quote.width * scale;
+        let rect: Rect | null = null;
+        for (let shrink = 0; shrink < 4 && !rect; shrink++) {
+          const h = estimateQuoteHeight({ ...quote, width }, fontSize);
+          rect = tryPlaceFree(width, h);
+          if (!rect) width *= 0.85;
+        }
+        if (rect) {
+          occupied.push(rect);
+          placed.push({ kind: "quote", idx: qi, quote, fontSize, rect });
+          placedQuoteIdx.add(qi);
+        }
+      }
+    }
+
     setPlacements(placed);
     setOrder(quoteOrder.filter((qi) => placed.some((p) => p.kind === "quote" && p.idx === qi)));
   }, []);
