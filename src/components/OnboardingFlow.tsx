@@ -161,7 +161,7 @@ const Slide = ({
 }) => {
   const slide = SLIDES[index];
   return (
-    <ScreenShell screen={screen}>
+    <ScreenShell screen={screen} hideDots>
       <div
         style={{
           display: "flex",
