@@ -610,7 +610,27 @@ const OnboardingFlow = ({
       {screen === 3 && (
         <ScreenShell screen={3}>
           <CenteredCard>
-            <h2 style={{ ...headlineStyle, marginBottom: "2rem" }}>
+            <p
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontStyle: "italic",
+                fontSize: 16,
+                color: "#4A6B8A",
+                marginBottom: "0.75rem",
+                textAlign: "center",
+              }}
+            >
+              Let's make this yours.
+            </p>
+            <h2
+              style={{
+                ...headlineStyle,
+                fontStyle: "italic",
+                fontSize: "clamp(22px, 5vw, 28px)",
+                color: "#1E2E3E",
+                marginBottom: "2rem",
+              }}
+            >
               What's your first name?
             </h2>
             <input
