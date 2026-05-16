@@ -34,6 +34,7 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportSent, setExportSent] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
   useEffect(() => {
