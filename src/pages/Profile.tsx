@@ -122,9 +122,6 @@ const Profile = () => {
     }
   };
 
-  const [exporting, setExporting] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
-
   const handleExport = async () => {
     setExporting(true);
     setExportError(null);
