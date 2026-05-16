@@ -565,7 +565,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             position: "fixed",
             top: "50%",
             left: "50%",
-            transform: "translate(-50%, -50%)",
+            
             fontFamily: '"Playfair Display", Georgia, serif',
             fontStyle: "italic",
             fontSize: 22,
@@ -579,7 +579,12 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
             cursor: "pointer",
             zIndex: 30,
             opacity: ripple ? 0 : undefined,
-            transition: "opacity 150ms ease",
+            filter: ripple ? "blur(8px)" : undefined,
+            transform: ripple
+              ? "translate(-50%, -50%) scale(1.1)"
+              : "translate(-50%, -50%)",
+            transition:
+              "opacity 700ms ease-out, filter 700ms ease-out, transform 700ms ease-out",
             animation: ripple
               ? undefined
               : "ts-intro-fade 1.2s ease both, ts-remember-pulse 2s ease-in-out infinite",
