@@ -601,14 +601,14 @@ const OnboardingFlow = ({
           <CenteredCard>
             <h2 style={headlineStyle}>When were you born?</h2>
             <p style={subLineStyle}>Helps us understand your era.</p>
-            <div style={{ display: "flex", gap: 12, width: "100%" }}>
+            <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
               <select
                 className="ts-onb-input ts-onb-select"
                 value={birthMonth ?? ""}
                 onChange={(e) =>
                   setBirthMonth(e.target.value ? Number(e.target.value) : null)
                 }
-                style={{ ...inputBaseStyle, fontSize: 15, width: "55%", textAlign: "center", textAlignLast: "center" }}
+                style={{ ...inputBaseStyle, fontSize: 14, width: 130, textAlign: "center", textAlignLast: "center" }}
               >
                 <option value="">Month</option>
                 {MONTHS.map((m, i) => (
@@ -621,7 +621,7 @@ const OnboardingFlow = ({
                 onChange={(e) =>
                   setBirthYear(e.target.value ? Number(e.target.value) : null)
                 }
-                style={{ ...inputBaseStyle, fontSize: 15, width: "40%", textAlign: "center", textAlignLast: "center" }}
+                style={{ ...inputBaseStyle, fontSize: 14, width: 80, textAlign: "center", textAlignLast: "center" }}
               >
                 <option value="">Year</option>
                 {years.map((y) => (
