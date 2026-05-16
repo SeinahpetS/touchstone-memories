@@ -661,34 +661,18 @@ const OnboardingFlow = ({
             <p style={subLineStyle}>
               For when Touchstone connects you with others who shared your world.
             </p>
-            <div style={{ display: "flex", gap: 12, width: "100%" }}>
-              <input
-                className="ts-onb-input"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="city"
-                style={{ ...inputBaseStyle, fontSize: 15, width: "55%" }}
-              />
-              <select
-                className="ts-onb-input ts-onb-select"
-                value={stateVal}
-                onChange={(e) => setStateVal(e.target.value)}
-                style={{ ...inputBaseStyle, fontSize: 15, width: "40%" }}
-              >
-                <option value="">State</option>
-                {US_STATES.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
+            <PlacesAutocomplete
+              value={location?.locationDisplay ?? ""}
+              onSelect={(loc) => setLocation(loc)}
+              onClear={() => setLocation(null)}
+            />
             <p style={privacyStyle}>
               Your information is yours. We will never share or sell it.
             </p>
             <button
-              onClick={() => city.trim() && stateVal && finish(true)}
-              disabled={!(city.trim() && stateVal)}
-              style={continueBtnStyle(!!(city.trim() && stateVal))}
+              onClick={() => location && finish(true)}
+              disabled={!location}
+              style={continueBtnStyle(!!location)}
             >
               Continue →
             </button>
