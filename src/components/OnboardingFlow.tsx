@@ -162,39 +162,55 @@ const Slide = ({
     <ScreenShell screen={screen}>
       <div
         style={{
-          paddingTop: "3.2rem",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          minHeight: "100dvh",
+          background: IVORY,
         }}
       >
+        {/* Section 1 — Wordmark spacer (Wordmark itself is absolutely positioned in ScreenShell) */}
         <div
           style={{
-            width: "100%",
-            height: 280,
+            flexShrink: 0,
+            padding: "1.2rem 0 0.8rem",
+            textAlign: "center",
+            // reserve vertical room equivalent to the wordmark
+            minHeight: "3.2rem",
+          }}
+        />
+        {/* Section 2 — Sky panel */}
+        <div
+          style={{
+            flex: "0 0 45vh",
+            minHeight: 200,
+            maxHeight: 360,
             background: "#1A2535",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 24,
+            width: "100%",
+            overflow: "hidden",
           }}
         >
           <img
             src={slide.img}
             alt=""
             style={{
-              maxWidth: "100%",
-              maxHeight: "100%",
+              width: "100%",
+              height: "100%",
               objectFit: "contain",
+              padding: 24,
               opacity: 0.85,
+              boxSizing: "border-box",
             }}
           />
         </div>
+        {/* Section 3 — Copy + navigation */}
         <div
           style={{
-            padding: "2rem 2rem 0",
+            flex: 1,
             display: "flex",
-            justifyContent: "center",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "2rem 2rem 2.5rem",
           }}
         >
           <div style={{ maxWidth: 340, display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -218,31 +234,24 @@ const Slide = ({
                 </p>
               ))}
           </div>
-        </div>
-        <div style={{ flex: 1 }} />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "0 1.5rem 1.5rem",
-          }}
-        >
-          <button
-            onClick={onNext}
-            style={{
-              background: GOLD,
-              border: "none",
-              cursor: "pointer",
-              fontFamily: '"Playfair Display", Georgia, serif',
-              fontStyle: "italic",
-              fontSize: 14,
-              color: IVORY,
-              borderRadius: 999,
-              padding: "0.6rem 1.6rem",
-            }}
-          >
-            {slide.nextLabel}
-          </button>
+          <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+            <button
+              onClick={onNext}
+              style={{
+                background: GOLD,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontStyle: "italic",
+                fontSize: 14,
+                color: IVORY,
+                borderRadius: 999,
+                padding: "0.6rem 1.6rem",
+              }}
+            >
+              {slide.nextLabel}
+            </button>
+          </div>
         </div>
       </div>
     </ScreenShell>
