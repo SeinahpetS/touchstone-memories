@@ -309,15 +309,14 @@ const subLineStyle: React.CSSProperties = {
   lineHeight: 1.5,
 };
 
-const privacyStyle: React.CSSProperties = {
-  fontFamily: '"Playfair Display", Georgia, serif',
-  fontStyle: "italic",
-  fontSize: 12,
-  color: MUTED,
-  opacity: 0.7,
-  textAlign: "center",
-  marginTop: "1.5rem",
-};
+ const privacyStyle: React.CSSProperties = {
+   fontFamily: '"Playfair Display", Georgia, serif',
+   fontStyle: "italic",
+   color: MUTED,
+   opacity: 0.7,
+   textAlign: "center",
+   marginTop: "1.5rem",
+ };
 
 const CenteredCard = ({ children }: { children: React.ReactNode }) => (
   <div
