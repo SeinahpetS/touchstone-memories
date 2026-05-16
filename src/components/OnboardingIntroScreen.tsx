@@ -615,19 +615,6 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
         >
           <div
             style={{
-              fontFamily: '"Playfair Display", Georgia, serif',
-              fontStyle: "italic",
-              fontSize: "clamp(20px, 5vw, 26px)",
-              color: "#1E2E3E",
-              marginBottom: "0.6rem",
-              opacity: closingStage >= 1 ? 1 : 0,
-              transition: "opacity 1100ms ease",
-            }}
-          >
-            Your life unfolds one piece at a time.
-          </div>
-          <div
-            style={{
               margin: "2.4rem 0 0",
               transform: "scale(3)",
               transformOrigin: "center",
