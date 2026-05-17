@@ -29,7 +29,7 @@ const RootRoute = () => {
     const hasPendingDraft =
       typeof window !== "undefined" &&
       !!localStorage.getItem("ts_onboarding_draft_v1");
-    return hasPendingDraft ? <Onboarding /> : <Index />;
+    return hasPendingDraft ? <Onboarding /> : <Archive />;
   }
   return <Onboarding />;
 };
