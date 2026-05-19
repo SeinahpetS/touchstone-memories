@@ -43,9 +43,11 @@ export type Database = {
           avatar_url: string | null
           birth_month: number | null
           birth_year: number | null
+          cancel_at_period_end: boolean
           city: string | null
           country: string | null
           created_at: string
+          current_period_end: string | null
           first_name: string | null
           id: string
           lat: number | null
@@ -56,17 +58,26 @@ export type Database = {
           onboarding_complete: boolean
           region: string | null
           state: string | null
+          stripe_customer_id: string | null
+          stripe_env: string | null
+          stripe_subscription_id: string | null
+          subscription_price_id: string | null
+          subscription_status: string | null
           tier: string
+          timezone: string | null
           trial_ends_at: string | null
           trial_started_at: string | null
+          vivid_since: string | null
         }
         Insert: {
           avatar_url?: string | null
           birth_month?: number | null
           birth_year?: number | null
+          cancel_at_period_end?: boolean
           city?: string | null
           country?: string | null
           created_at?: string
+          current_period_end?: string | null
           first_name?: string | null
           id: string
           lat?: number | null
@@ -77,17 +88,26 @@ export type Database = {
           onboarding_complete?: boolean
           region?: string | null
           state?: string | null
+          stripe_customer_id?: string | null
+          stripe_env?: string | null
+          stripe_subscription_id?: string | null
+          subscription_price_id?: string | null
+          subscription_status?: string | null
           tier?: string
+          timezone?: string | null
           trial_ends_at?: string | null
           trial_started_at?: string | null
+          vivid_since?: string | null
         }
         Update: {
           avatar_url?: string | null
           birth_month?: number | null
           birth_year?: number | null
+          cancel_at_period_end?: boolean
           city?: string | null
           country?: string | null
           created_at?: string
+          current_period_end?: string | null
           first_name?: string | null
           id?: string
           lat?: number | null
@@ -98,9 +118,16 @@ export type Database = {
           onboarding_complete?: boolean
           region?: string | null
           state?: string | null
+          stripe_customer_id?: string | null
+          stripe_env?: string | null
+          stripe_subscription_id?: string | null
+          subscription_price_id?: string | null
+          subscription_status?: string | null
           tier?: string
+          timezone?: string | null
           trial_ends_at?: string | null
           trial_started_at?: string | null
+          vivid_since?: string | null
         }
         Relationships: []
       }
@@ -214,7 +241,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_active_vivid: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       memory_category:
