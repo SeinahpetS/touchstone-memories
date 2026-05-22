@@ -1,5 +1,6 @@
 // Generate a single warm, contextual follow-up question via Anthropic Claude.
-// Called after a Touchstone is saved.
+// Called after a Touchstone is saved. Gated on active Vivid (trial or paid).
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
