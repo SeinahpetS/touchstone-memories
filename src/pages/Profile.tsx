@@ -30,6 +30,11 @@ const Profile = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const fileRef = useRef<HTMLInputElement>(null);
+  const entitlement = useEntitlement();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [pricingOpen, setPricingOpen] = useState(false);
+  const [exportPaywallOpen, setExportPaywallOpen] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [name, setName] = useState("");
@@ -44,6 +49,18 @@ const Profile = () => {
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
   }, [user, loading, navigate]);
+
+  // Show success toast on checkout return and refresh entitlement.
+  useEffect(() => {
+    if (searchParams.get("checkout") === "success") {
+      toast.success("Welcome to Vivid. Your subscription is active.");
+      void entitlement.refresh();
+      searchParams.delete("checkout");
+      searchParams.delete("session_id");
+      setSearchParams(searchParams, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!user) return;
