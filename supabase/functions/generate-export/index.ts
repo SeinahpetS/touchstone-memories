@@ -73,6 +73,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Entitlement gate: export is Vivid-only.
+    const { data: allowed } = await userClient.rpc("has_active_vivid", {
+      _user_id: userId,
+    });
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "subscription_required", code: "vivid_required" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const admin = createClient(supabaseUrl, serviceKey);
 
     // Step 1: query memories

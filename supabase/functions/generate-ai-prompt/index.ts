@@ -1,5 +1,6 @@
 // Generate a single warm, contextual follow-up question via Anthropic Claude.
-// Called after a Touchstone is saved.
+// Called after a Touchstone is saved. Gated on active Vivid (trial or paid).
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,6 +58,37 @@ Deno.serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+
+    // Entitlement gate: require active trial or subscription.
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: allowed } = await userClient.rpc("has_active_vivid", {
+      _user_id: userData.user.id,
+    });
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "subscription_required", code: "vivid_required" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
 
     const body = await req.json().catch(() => ({}));
     const memory: MemoryContext = body?.memory ?? {};
