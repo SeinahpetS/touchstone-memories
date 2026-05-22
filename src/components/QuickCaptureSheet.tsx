@@ -100,6 +100,8 @@ interface Props {
 
 const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
   const { user } = useAuth();
+  const entitlement = useEntitlement();
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const navigate = useNavigate();
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [title, setTitle] = useState("");
