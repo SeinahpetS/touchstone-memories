@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Camera, LogOut, Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { PricingSheet } from "@/components/PricingSheet";
+import { PaywallSheet } from "@/components/PaywallSheet";
 
 interface ProfileRow {
   id: string;

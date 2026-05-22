@@ -34,12 +34,15 @@ const RootRoute = () => {
   return <Onboarding />;
 };
 
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <PaymentTestModeBanner />
         <Routes>
           <Route path="/" element={<RootRoute />} />
           <Route path="/welcome" element={<Onboarding />} />
