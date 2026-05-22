@@ -59,6 +59,37 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Entitlement gate: require active trial or subscription.
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: allowed } = await userClient.rpc("has_active_vivid", {
+      _user_id: userData.user.id,
+    });
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "subscription_required", code: "vivid_required" }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+
     const body = await req.json().catch(() => ({}));
     const memory: MemoryContext = body?.memory ?? {};
     if (!memory || typeof memory !== "object") {
