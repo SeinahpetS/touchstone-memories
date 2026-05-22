@@ -339,29 +339,36 @@ const Profile = () => {
           </div>
         </section>
 
-        {/* Tier */}
+        {/* Plan */}
         <section className="space-y-3">
           <h2 className="font-playfair text-lg">Current Plan</h2>
           <div className="flex items-center justify-between rounded-md border border-border px-4 py-3">
             <div>
-              <p className="text-sm font-medium">{tierLabel}</p>
-              {profile?.trial_ends_at ? (
-                <p className="text-xs text-muted-foreground">
-                  Trial ends {new Date(profile.trial_ends_at).toLocaleDateString()}
-                </p>
-              ) : (
+              <p className="text-sm font-medium">{planLabel}</p>
+              {planSubtitle && (
                 <p className="text-[13px] text-[#2C3E50]" style={{ fontFamily: "'Jost', sans-serif" }}>
-                  One AI prompt per day. Your archive, always yours.
+                  {planSubtitle}
                 </p>
               )}
             </div>
-            <button
-              onClick={() => console.log("upgrade tapped")}
-              className="inline-flex items-center rounded-full bg-[#B8860B] px-3 py-1 text-[13px] font-medium text-[#F2EEE5]"
-              style={{ fontFamily: "'Jost', sans-serif" }}
-            >
-              Upgrade
-            </button>
+            {entitlement.isSubscribed ? (
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="inline-flex items-center rounded-full border border-[#2C3E50] px-3 py-1 text-[13px] font-medium text-[#2C3E50] disabled:opacity-60"
+                style={{ fontFamily: "'Jost', sans-serif" }}
+              >
+                {portalLoading ? "…" : "Manage"}
+              </button>
+            ) : (
+              <button
+                onClick={() => setPricingOpen(true)}
+                className="inline-flex items-center rounded-full bg-[#B8860B] px-3 py-1 text-[13px] font-medium text-[#F2EEE5]"
+                style={{ fontFamily: "'Jost', sans-serif" }}
+              >
+                {entitlement.isTrialing ? "Become Vivid" : "Upgrade"}
+              </button>
+            )}
           </div>
         </section>
 
