@@ -427,6 +427,12 @@ const Profile = () => {
           </button>
         </div>
       </div>
+      <PricingSheet open={pricingOpen} onOpenChange={setPricingOpen} />
+      <PaywallSheet
+        open={exportPaywallOpen}
+        onOpenChange={setExportPaywallOpen}
+        feature="export"
+      />
     </div>
   );
 };
