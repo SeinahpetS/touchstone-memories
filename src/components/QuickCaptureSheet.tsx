@@ -996,6 +996,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           </>
       </div>
       )}
+      <PaywallSheet open={paywallOpen} onOpenChange={setPaywallOpen} feature="ai_prompt" />
     </div>
   );
 };
