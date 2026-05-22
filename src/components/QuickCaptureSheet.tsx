@@ -320,37 +320,42 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
       playSaveFeedback();
       onSaved?.();
 
-      // Fire-and-forget AI follow-up question
-      setAiPromptLoading(true);
-      (async () => {
-        try {
-          const { data: aiData, error: aiErr } = await supabase.functions.invoke(
-            "generate-ai-prompt",
-            {
-              body: {
-                memory: {
-                  category: payload.category,
-                  title: payload.title,
-                  note: payload.note,
-                  emotional_tone: payload.emotional_tone,
-                  who_was_there: payload.who_was_there,
-                  connected_to: payload.connected_to,
-                  location_name: payload.location_name,
-                  when_text: payload.when_text,
-                  memory_year: payload.memory_year,
+      // AI follow-up: only fetch when entitled (trial or active subscription).
+      // For non-entitled users we open the paywall sheet instead of silently calling.
+      if (!entitlement.hasAccess) {
+        setPaywallOpen(true);
+      } else {
+        setAiPromptLoading(true);
+        (async () => {
+          try {
+            const { data: aiData, error: aiErr } = await supabase.functions.invoke(
+              "generate-ai-prompt",
+              {
+                body: {
+                  memory: {
+                    category: payload.category,
+                    title: payload.title,
+                    note: payload.note,
+                    emotional_tone: payload.emotional_tone,
+                    who_was_there: payload.who_was_there,
+                    connected_to: payload.connected_to,
+                    location_name: payload.location_name,
+                    when_text: payload.when_text,
+                    memory_year: payload.memory_year,
+                  },
                 },
               },
-            },
-          );
-          if (aiErr) throw aiErr;
-          const q = (aiData as any)?.question?.trim?.();
-          if (q) setAiPromptQuestion(q);
-        } catch (err) {
-          console.error("AI prompt failed", err);
-        } finally {
-          setAiPromptLoading(false);
-        }
-      })();
+            );
+            if (aiErr) throw aiErr;
+            const q = (aiData as any)?.question?.trim?.();
+            if (q) setAiPromptQuestion(q);
+          } catch (err) {
+            console.error("AI prompt failed", err);
+          } finally {
+            setAiPromptLoading(false);
+          }
+        })();
+      }
     } catch (e) {
       setError("Couldn't save right now. Try again.");
     } finally {
