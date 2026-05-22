@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { PaywallSheet } from "@/components/PaywallSheet";
 import CategoryIcon, {
   CategoryIconCard,
   CATEGORY_BORDER_COLORS,
