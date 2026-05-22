@@ -147,6 +147,11 @@ const Profile = () => {
   };
 
   const handleExport = async () => {
+    // Export is gated on Vivid (active subscription or trial).
+    if (!entitlement.hasAccess) {
+      setExportPaywallOpen(true);
+      return;
+    }
     setExporting(true);
     setExportError(null);
     try {
@@ -162,14 +167,50 @@ const Profile = () => {
     }
   };
 
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-portal-session", {
+        body: {
+          returnUrl: `${window.location.origin}/profile`,
+          environment: getStripeEnvironment(),
+        },
+      });
+      if (error) throw error;
+      const url = (data as any)?.url;
+      if (!url) throw new Error("Portal URL missing");
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Couldn't open billing portal.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth", { replace: true });
   };
 
-  const tierLabel = profile?.tier
-    ? profile.tier.charAt(0).toUpperCase() + profile.tier.slice(1)
-    : "Free";
+  // Derive plan label from real entitlement state, not the stale `tier` column.
+  let planLabel = "Free";
+  let planSubtitle: string | null = "One AI prompt per day. Your archive, always yours.";
+  if (entitlement.isSubscribed) {
+    planLabel = entitlement.subscriptionPriceId === "vivid_annual" ? "Vivid Annual" : "Vivid";
+    planSubtitle = entitlement.cancelAtPeriodEnd && entitlement.currentPeriodEnd
+      ? `Cancels ${entitlement.currentPeriodEnd.toLocaleDateString()}`
+      : entitlement.currentPeriodEnd
+        ? `Renews ${entitlement.currentPeriodEnd.toLocaleDateString()}`
+        : null;
+  } else if (entitlement.isTrialing) {
+    planLabel = "Free trial";
+    planSubtitle = entitlement.trialDaysLeft === 1
+      ? "Trial ends tomorrow"
+      : `${entitlement.trialDaysLeft} days left in trial`;
+  } else if (entitlement.trialEndsAt) {
+    planLabel = "Free";
+    planSubtitle = "Trial ended — upgrade to keep AI prompts and export";
+  }
 
   return (
     <div className="min-h-screen bg-background">
