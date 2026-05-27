@@ -679,35 +679,44 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
               <div
                 className="w-full sm:max-w-sm mt-5"
                 style={{
-                  backgroundColor: "rgba(20,16,10,0.78)",
-                  border: "1px solid rgba(184,134,11,0.35)",
-                  borderRadius: 12,
-                  padding: "16px 18px",
+                  backgroundColor: "#F2EEE5",
+                  border: "1px solid rgba(184,134,11,0.25)",
+                  borderRadius: 16,
+                  padding: "22px 22px 20px",
                   animation: "ts-fadeInUp 0.4s ease-out 0.7s both",
+                  boxShadow: "0 18px 50px rgba(0,0,0,0.25)",
                 }}
+                onClick={(e) => e.stopPropagation()}
               >
+                <style>{`
+                  @keyframes ts-softPulse {
+                    0%, 100% { opacity: 0.45; }
+                    50% { opacity: 0.85; }
+                  }
+                `}</style>
                 {aiPromptLoading && !aiPromptQuestion ? (
-                  <p
+                  <div
+                    aria-hidden
                     style={{
-                      fontFamily: "'Playfair Display', serif",
-                      fontStyle: "italic",
-                      color: "rgba(232,195,106,0.8)",
-                      fontSize: 14,
-                      margin: 0,
+                      height: 14,
+                      width: "70%",
+                      margin: "8px auto",
+                      borderRadius: 999,
+                      backgroundColor: "rgba(44,62,80,0.18)",
+                      animation: "ts-softPulse 1.6s ease-in-out infinite",
                     }}
-                  >
-                    Listening…
-                  </p>
+                  />
                 ) : (
                   <>
                     <p
                       style={{
                         fontFamily: "'Playfair Display', serif",
                         fontStyle: "italic",
-                        color: "#E8C36A",
-                        fontSize: 16,
+                        color: "#2C3E50",
+                        fontSize: 20,
                         lineHeight: 1.4,
-                        margin: "0 0 12px",
+                        margin: "0 0 16px",
+                        textAlign: "center",
                       }}
                     >
                       {aiPromptQuestion}
@@ -715,44 +724,53 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                     <Textarea
                       value={aiPromptAnswer}
                       onChange={(e) => setAiPromptAnswer(e.target.value)}
-                      placeholder="A line, a feeling, anything…"
-                      className="min-h-[72px] text-base resize-none placeholder:italic"
+                      className="min-h-[88px] resize-none"
                       style={{
-                        backgroundColor: "rgba(242,238,229,0.08)",
-                        color: "#F2EEE5",
-                        border: "1px solid rgba(242,238,229,0.18)",
+                        fontFamily: "Jost, sans-serif",
+                        fontSize: 15,
+                        lineHeight: 1.5,
+                        backgroundColor: "#E8E4D8",
+                        color: "#2C3E50",
+                        border: "1px solid rgba(91,74,63,0.18)",
+                        borderRadius: 10,
                       }}
                     />
-                    <div className="mt-3 flex items-center gap-2">
+                    <div className="mt-4 flex flex-col items-center gap-2">
                       <button
                         type="button"
                         onClick={handleSaveAiAnswer}
                         disabled={!aiPromptAnswer.trim() || aiPromptSaving}
-                        className="h-10 px-4 rounded-md transition-colors"
+                        className="transition-opacity"
                         style={{
                           fontFamily: "Jost, sans-serif",
-                          letterSpacing: "0.06em",
-                          textTransform: "uppercase",
-                          fontSize: 12,
-                          color: "#1C160E",
-                          backgroundColor: "#B8860B",
-                          border: "1px solid #B8860B",
+                          fontSize: 14,
+                          letterSpacing: "0.04em",
+                          color: "#B8860B",
+                          backgroundColor: "#1E2E3E",
+                          border: 0,
+                          borderRadius: 999,
+                          padding: "12px 28px",
+                          cursor:
+                            !aiPromptAnswer.trim() || aiPromptSaving
+                              ? "default"
+                              : "pointer",
                           opacity:
                             !aiPromptAnswer.trim() || aiPromptSaving ? 0.5 : 1,
                         }}
                       >
-                        {aiPromptSaving ? "Saving…" : "Add to memory"}
+                        {aiPromptSaving ? "Saving…" : "Save answer"}
                       </button>
                       <button
                         type="button"
                         onClick={handleSkipAiPrompt}
                         style={{
                           background: "transparent",
-                          color: "rgba(242,238,229,0.6)",
-                          padding: "10px 14px",
+                          color: "#888888",
+                          padding: "6px 10px",
                           fontFamily: "Jost, sans-serif",
                           fontSize: 13,
                           border: 0,
+                          textDecoration: "none",
                           cursor: "pointer",
                         }}
                       >
