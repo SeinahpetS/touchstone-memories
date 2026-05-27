@@ -331,22 +331,48 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
         setAiPromptLoading(true);
         (async () => {
           try {
+            // Convert photo to base64 for vision input if present
+            let photoBase64: string | null = null;
+            let photoMediaType: string | null = null;
+            if (photoFile) {
+              const dataUrl = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = reject;
+                reader.readAsDataURL(photoFile);
+              });
+              const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+              if (match) {
+                photoMediaType = match[1];
+                photoBase64 = match[2];
+              }
+            }
+
+            // Map internal category names to AI prompt schema
+            const categoryMap: Record<string, string> = {
+              person: "people",
+              digital_traces: "digital_trace",
+            };
+            const aiCategory = categoryMap[payload.category] ?? payload.category;
+
+            const aiBody: Record<string, any> = {
+              category: aiCategory,
+            };
+            if (payload.title) {
+              aiBody.title = payload.title;
+            }
+            if (payload.category === "person" && payload.still_in_touch !== null && payload.still_in_touch !== undefined) {
+              aiBody.still_in_touch = payload.still_in_touch;
+            }
+            if (photoBase64 && photoMediaType) {
+              aiBody.photo_base64 = photoBase64;
+              aiBody.photo_media_type = photoMediaType;
+            }
+
             const { data: aiData, error: aiErr } = await supabase.functions.invoke(
               "generate-ai-prompt",
               {
-                body: {
-                  memory: {
-                    category: payload.category,
-                    title: payload.title,
-                    note: payload.note,
-                    emotional_tone: payload.emotional_tone,
-                    who_was_there: payload.who_was_there,
-                    connected_to: payload.connected_to,
-                    location_name: payload.location_name,
-                    when_text: payload.when_text,
-                    memory_year: payload.memory_year,
-                  },
-                },
+                body: aiBody,
               },
             );
             if (aiErr) throw aiErr;
