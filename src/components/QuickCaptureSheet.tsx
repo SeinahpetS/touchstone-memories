@@ -85,6 +85,7 @@ const initialFields: CategoryFieldValues = {
   locationLng: null,
   venueName: "",
   relationshipType: "",
+  stillInTouch: null,
   spotifyPick: null,
   bookPick: null,
   tmdbPick: null,
