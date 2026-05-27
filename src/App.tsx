@@ -35,6 +35,7 @@ const RootRoute = () => {
 };
 
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { VividCelebrationGate } from "@/components/VividCelebrationGate";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -43,6 +44,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <PaymentTestModeBanner />
+        <VividCelebrationGate />
         <Routes>
           <Route path="/" element={<RootRoute />} />
           <Route path="/welcome" element={<Onboarding />} />
