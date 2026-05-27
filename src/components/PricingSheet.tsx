@@ -40,10 +40,10 @@ const PLANS: Array<{
 ];
 
 const FEATURES = [
-  "Unlimited AI follow-up prompts",
-  "Premium reflective prompts",
-  "Email your full archive anytime",
-  "Everything you capture stays yours, forever",
+  "Unlimited AI prompts",
+  "Ask Your Archive",
+  "The heirloom book — coming after launch",
+  "Data export",
 ];
 
 export function PricingSheet({ open, onOpenChange, defaultPlan = "vivid_annual", returnUrl }: Props) {
