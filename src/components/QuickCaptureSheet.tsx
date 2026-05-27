@@ -267,6 +267,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
           category === "person" && fields.relationshipType
             ? fields.relationshipType
             : null,
+        still_in_touch:
+          category === "person" ? fields.stillInTouch : null,
         spotify_id:
           category === "imprint" && fields.imprintSource === "spotify"
             ? fields.spotifyPick?.id ?? null
