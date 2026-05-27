@@ -53,29 +53,40 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
   return (
     <div className="space-y-4">
       {category === "person" && (
-        <div className="flex items-center gap-2">
-          {(["personal", "professional"] as const).map((t) => {
-            const active = values.relationshipType === t;
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={() =>
-                  onChange({ relationshipType: active ? "" : t })
-                }
-                className={[
-                  "flex-1 h-11 rounded-md text-sm capitalize transition-colors",
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card text-foreground hover:bg-muted",
-                ].join(" ")}
-                aria-pressed={active}
-              >
-                {t}
-              </button>
-            );
-          })}
-        </div>
+        <>
+          <div className="flex items-center gap-2">
+            {(["personal", "professional"] as const).map((t) => {
+              const active = values.relationshipType === t;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() =>
+                    onChange({ relationshipType: active ? "" : t })
+                  }
+                  className={[
+                    "flex-1 h-11 rounded-md text-sm capitalize transition-colors",
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card text-foreground hover:bg-muted",
+                  ].join(" ")}
+                  aria-pressed={active}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <Checkbox
+              checked={values.stillInTouch === null ? true : values.stillInTouch}
+              onCheckedChange={(checked) =>
+                onChange({ stillInTouch: checked === true })
+              }
+            />
+            <span className="text-sm text-foreground">Still in touch?</span>
+          </label>
+        </>
       )}
 
       {category === "food" && (
