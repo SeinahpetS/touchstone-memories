@@ -159,6 +159,7 @@ export type Database = {
           sentiment: string | null
           source_url: string | null
           spotify_id: string | null
+          still_in_touch: boolean | null
           title: string | null
           tmdb_id: string | null
           user_id: string
@@ -193,6 +194,7 @@ export type Database = {
           sentiment?: string | null
           source_url?: string | null
           spotify_id?: string | null
+          still_in_touch?: boolean | null
           title?: string | null
           tmdb_id?: string | null
           user_id: string
@@ -227,6 +229,7 @@ export type Database = {
           sentiment?: string | null
           source_url?: string | null
           spotify_id?: string | null
+          still_in_touch?: boolean | null
           title?: string | null
           tmdb_id?: string | null
           user_id?: string

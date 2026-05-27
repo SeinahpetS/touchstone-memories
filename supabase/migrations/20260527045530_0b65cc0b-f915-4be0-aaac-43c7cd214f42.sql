@@ -1,0 +1,1 @@
+ALTER TABLE public.touchstones ADD COLUMN IF NOT EXISTS still_in_touch boolean;
