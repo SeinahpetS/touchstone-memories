@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import SpotifySearch, { type SpotifyPick } from "@/components/SpotifySearch";
 import BookSearch, { type BookPick } from "@/components/BookSearch";
@@ -12,6 +13,7 @@ export interface CategoryFieldValues {
   locationLng: number | null;
   venueName: string;
   relationshipType: "personal" | "professional" | "";
+  stillInTouch: boolean | null;
   spotifyPick: SpotifyPick | null;
   bookPick: BookPick | null;
   tmdbPick: TmdbPick | null;
