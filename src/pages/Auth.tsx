@@ -99,6 +99,21 @@ const Auth = () => {
     );
   }
 
+  if (showIntro) {
+    return (
+      <OnboardingIntroScreen
+        onBegin={() => {
+          setIsSignUp(true);
+          setShowIntro(false);
+        }}
+        onSkip={() => {
+          setIsSignUp(true);
+          setShowIntro(false);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm space-y-8">
@@ -212,7 +227,13 @@ const Auth = () => {
         <p className="text-center text-base text-muted-foreground">
           {isSignUp ? "Already have an account?" : "New here?"}{" "}
           <button
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => {
+              if (isSignUp) {
+                setIsSignUp(false);
+              } else {
+                setShowIntro(true);
+              }
+            }}
             className="text-foreground underline underline-offset-4"
           >
             {isSignUp ? "Sign in" : "Create Account"}
