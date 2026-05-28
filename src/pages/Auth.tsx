@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
