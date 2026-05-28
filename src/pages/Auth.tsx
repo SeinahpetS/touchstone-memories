@@ -227,7 +227,13 @@ const Auth = () => {
         <p className="text-center text-base text-muted-foreground">
           {isSignUp ? "Already have an account?" : "New here?"}{" "}
           <button
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => {
+              if (isSignUp) {
+                setIsSignUp(false);
+              } else {
+                setShowIntro(true);
+              }
+            }}
             className="text-foreground underline underline-offset-4"
           >
             {isSignUp ? "Sign in" : "Create Account"}
