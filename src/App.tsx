@@ -31,7 +31,7 @@ const RootRoute = () => {
       !!localStorage.getItem("ts_onboarding_draft_v1");
     return hasPendingDraft ? <Onboarding /> : <Archive />;
   }
-  return <Onboarding />;
+  return <Auth />;
 };
 
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
