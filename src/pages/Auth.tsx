@@ -99,6 +99,21 @@ const Auth = () => {
     );
   }
 
+  if (showIntro) {
+    return (
+      <OnboardingIntroScreen
+        onBegin={() => {
+          setIsSignUp(true);
+          setShowIntro(false);
+        }}
+        onSkip={() => {
+          setIsSignUp(true);
+          setShowIntro(false);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm space-y-8">
