@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, X } from "lucide-react";
+import { Camera, Upload, X } from "lucide-react";
 
 interface Props {
   file: File | null;
@@ -8,7 +8,8 @@ interface Props {
 }
 
 const PhotoUpload = ({ file, preview, onSelect }: Props) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +19,8 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
 
   const clear = () => {
     onSelect(null);
-    if (inputRef.current) inputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -58,33 +60,46 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
         setIsDragging(false);
       }}
       onDrop={handleDrop}
-      onClick={() => inputRef.current?.click()}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          inputRef.current?.click();
-        }
-      }}
-      className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-8 transition-colors ${
+      className={`flex w-full flex-col items-center justify-center gap-3 rounded-lg py-6 transition-colors ${
         isDragging
           ? "bg-foreground/5 text-foreground"
           : "bg-card text-muted-foreground"
       }`}
       style={{
-        // Custom dashed border: 4px stroke, generous dash + gap spacing.
         backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'><rect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='${
           isDragging ? "%23000000" : "%23B8860B"
         }' stroke-opacity='${isDragging ? "0.6" : "0.55"}' stroke-width='4' stroke-dasharray='14 10'/></svg>")`,
       }}
     >
-      <Camera className="h-5 w-5" />
-      <span className="text-base">
-        {isDragging ? "Drop photo to upload" : "Add a photo or drag & drop"}
-      </span>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={() => cameraInputRef.current?.click()}
+          className="flex items-center gap-2 rounded-full bg-foreground/5 hover:bg-foreground/10 px-4 py-2 text-foreground transition-colors"
+        >
+          <Camera className="h-5 w-5" />
+          <span className="text-base">Take photo</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="flex items-center gap-2 rounded-full bg-foreground/5 hover:bg-foreground/10 px-4 py-2 text-foreground transition-colors"
+        >
+          <Upload className="h-5 w-5" />
+          <span className="text-base">Upload</span>
+        </button>
+      </div>
+      <span className="text-xs opacity-70">or drag & drop an image</span>
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleChange}
+        className="hidden"
+      />
+      <input
+        ref={fileInputRef}
         type="file"
         accept="image/*"
         onChange={handleChange}
