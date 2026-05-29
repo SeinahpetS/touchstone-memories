@@ -28,10 +28,10 @@ const DefinitionSplash = ({ onBegin }: Props) => (
       <img
         src={touchstoneLogo}
         alt="Touchstone"
-        width={52}
-        height={52}
+        width={156}
+        height={156}
         className="ts-def-logo"
-        style={{ width: 52, height: 52, marginBottom: 24, objectFit: "contain" }}
+        style={{ width: 156, height: 156, marginBottom: 24, objectFit: "contain" }}
       />
 
       <div
