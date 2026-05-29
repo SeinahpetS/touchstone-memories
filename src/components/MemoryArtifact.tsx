@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
-import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
 
 interface Props {
   photoUrl?: string | null;
@@ -16,12 +16,30 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
-      {/* Category icon tile */}
-      <div className="flex justify-center">
-        <div className="w-[84px]">
-          <CategoryIconCard category={category as CategoryKey} />
-        </div>
+      {/* Inline category label */}
+      <div
+        className="flex items-center justify-center"
+        style={{ paddingTop: 20, paddingBottom: 12, gap: 6 }}
+      >
+        <CategoryIcon
+          category={category as CategoryKey}
+          size={16}
+          color="#1E2E3E"
+        />
+        <span
+          style={{
+            fontFamily: "Jost, sans-serif",
+            fontSize: 11,
+            fontWeight: 500,
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            color: "#1E2E3E",
+          }}
+        >
+          {CATEGORY_LABELS[category as CategoryKey]}
+        </span>
       </div>
+
 
       {photoUrl && (
         <img src={photoUrl} alt={title || "Memory"} className="w-full rounded-lg object-cover max-h-72" />
