@@ -160,14 +160,15 @@ const DefinitionSplash = ({ onBegin }: Props) => (
         className="ts-def-begin"
         style={{
           marginTop: 16,
-          background: "none",
+          background: "#B8860B",
           border: "none",
-          padding: "8px 12px",
+          borderRadius: 9999,
+          padding: "10px 28px",
           cursor: "pointer",
           fontFamily: "'Playfair Display', serif",
           fontStyle: "italic",
           fontSize: 18,
-          color: "#1E2E3E",
+          color: "#FAFAF8",
         }}
       >
         Begin
