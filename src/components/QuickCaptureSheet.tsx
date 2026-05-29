@@ -531,48 +531,63 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                 boxShadow: "0 18px 50px rgba(0,0,0,0.35)",
               }}
             >
-              {/* Photo / icon-fallback frame — 1:1 square */}
-              {photoPreview && category !== "sound" ? (
-                <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
-                  <img
-                    src={photoPreview}
-                    alt={cardTitle || "Memory"}
+              {/* Photo / icon-fallback frame — 1:1 square.
+                  For imprints (song/album/book/film), fall back to the picked
+                  cover art when the user hasn't uploaded their own photo. */}
+              {(() => {
+                const imprintCover =
+                  category === "imprint"
+                    ? fields.spotifyPick?.image ||
+                      fields.bookPick?.coverUrl ||
+                      fields.tmdbPick?.image ||
+                      null
+                    : null;
+                const displayPhoto = photoPreview || imprintCover;
+                if (displayPhoto && category !== "sound") {
+                  return (
+                    <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
+                      <img
+                        src={displayPhoto}
+                        alt={cardTitle || "Memory"}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          objectPosition: "center",
+                          display: "block",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <div
+                    aria-hidden
                     style={{
+                      aspectRatio: "1 / 1",
                       width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      objectPosition: "center",
-                      display: "block",
-                    }}
-                  />
-                </div>
-              ) : (
-                <div
-                  aria-hidden
-                  style={{
-                    aspectRatio: "1 / 1",
-                    width: "100%",
-                    backgroundColor: "#E4E2DC",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: 12,
-                      backgroundColor: "#2C3E50",
+                      backgroundColor: "#E4E2DC",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <CategoryIcon category={category} size={34} color="#B8860B" />
-                  </span>
-                </div>
-              )}
+                    <span
+                      style={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: 12,
+                        backgroundColor: "#2C3E50",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <CategoryIcon category={category} size={34} color="#B8860B" />
+                    </span>
+                  </div>
+                );
+              })()}
 
               {/* 3px category bar */}
               <div
