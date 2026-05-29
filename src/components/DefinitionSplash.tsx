@@ -1,8 +1,14 @@
+import touchstoneLogo from "@/assets/touchstone-logo.svg";
+
 /**
- * DefinitionSplash — visual-only definition card used on app launch.
- * Mirrors the Definition screen design from Onboarding but without CTAs.
+ * DefinitionSplash — definition card shown on app launch.
+ * Waits for the user to tap "Begin" before advancing.
  */
-const DefinitionSplash = () => (
+type Props = {
+  onBegin?: () => void;
+};
+
+const DefinitionSplash = ({ onBegin }: Props) => (
   <div
     className="flex min-h-screen flex-col px-6 py-12"
     style={{ backgroundColor: "#F2EEE5" }}
@@ -12,11 +18,22 @@ const DefinitionSplash = () => (
         from { opacity: 0; transform: translateY(8px); }
         to   { opacity: 1; transform: translateY(0); }
       }
+      .ts-def-logo   { animation: ts-def-in 0.7s ease-out 0s both; }
       .ts-def-entry  { animation: ts-def-in 0.7s ease-out 0.1s both; }
       .ts-def-sub    { animation: ts-def-in 0.7s ease-out 1s both; }
+      .ts-def-begin  { animation: ts-def-in 0.7s ease-out 1.25s both; }
     `}</style>
 
     <div className="flex flex-1 flex-col items-center justify-center">
+      <img
+        src={touchstoneLogo}
+        alt="Touchstone"
+        width={52}
+        height={52}
+        className="ts-def-logo"
+        style={{ width: 52, height: 52, marginBottom: 24, objectFit: "contain" }}
+      />
+
       <div
         className="ts-def-entry w-full max-w-md"
         style={{
@@ -136,6 +153,25 @@ const DefinitionSplash = () => (
       >
         Your archive starts with one memory.
       </p>
+
+      <button
+        type="button"
+        onClick={onBegin}
+        className="ts-def-begin"
+        style={{
+          marginTop: 16,
+          background: "none",
+          border: "none",
+          padding: "8px 12px",
+          cursor: "pointer",
+          fontFamily: "'Playfair Display', serif",
+          fontStyle: "italic",
+          fontSize: 18,
+          color: "#1E2E3E",
+        }}
+      >
+        Begin
+      </button>
     </div>
   </div>
 );
