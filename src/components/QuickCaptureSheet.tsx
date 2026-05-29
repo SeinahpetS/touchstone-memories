@@ -375,9 +375,16 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                 body: aiBody,
               },
             );
-            if (aiErr) throw aiErr;
-            const q = (aiData as any)?.question?.trim?.();
-            if (q) setAiPromptQuestion(q);
+            if (aiErr) {
+              // 402 / subscription_required is expected for non-Vivid users — skip silently.
+              const msg = (aiErr as any)?.message ?? "";
+              if (!/402|subscription_required|vivid_required/i.test(msg)) {
+                console.error("AI prompt failed", aiErr);
+              }
+            } else {
+              const q = (aiData as any)?.question?.trim?.();
+              if (q) setAiPromptQuestion(q);
+            }
           } catch (err) {
             console.error("AI prompt failed", err);
           } finally {
