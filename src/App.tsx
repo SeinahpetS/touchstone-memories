@@ -92,9 +92,6 @@ const RootRoute = () => {
   );
 };
 
-  );
-};
-
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { VividCelebrationGate } from "@/components/VividCelebrationGate";
 
