@@ -391,7 +391,6 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
             setAiPromptLoading(false);
           }
         })();
-        })();
       }
     } catch (e) {
       setError("Couldn't save right now. Try again.");
