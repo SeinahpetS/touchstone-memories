@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
-import { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import { CategoryIcon, CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
+
 
 interface Props {
   photoUrl?: string | null;
