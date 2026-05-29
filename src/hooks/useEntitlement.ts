@@ -81,7 +81,7 @@ export function useEntitlement(): Entitlement {
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel(`profile-entitlement-${user.id}`)
+      .channel(`profile-entitlement-${user.id}-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
