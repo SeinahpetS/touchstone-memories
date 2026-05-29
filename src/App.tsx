@@ -54,15 +54,26 @@ const PostSplashRoute = () => {
     const hasPendingDraft =
       typeof window !== "undefined" &&
       !!localStorage.getItem("ts_onboarding_draft_v1");
+    const isEditing =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).has("edit");
+    if (isEditing) return <Index />;
     return hasPendingDraft ? <Onboarding /> : <Archive />;
   }
+
   return <Auth />;
 };
 
 const RootRoute = () => {
+  // Skip splash entirely when arriving with intent (e.g. /?edit=<id>).
+  const hasIntent =
+    typeof window !== "undefined" && window.location.search.length > 0;
 
   // Phases: "splash" (waits for tap) -> "out" (600ms fade) -> "in" (400ms fade-in app)
-  const [phase, setPhase] = useState<"splash" | "out" | "in">("splash");
+  const [phase, setPhase] = useState<"splash" | "out" | "in">(
+    hasIntent ? "in" : "splash",
+  );
+
 
   const handleBegin = () => {
     if (phase !== "splash") return;
