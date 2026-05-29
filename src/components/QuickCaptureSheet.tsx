@@ -531,21 +531,37 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                 boxShadow: "0 18px 50px rgba(0,0,0,0.35)",
               }}
             >
-              {/* Photo / icon-fallback frame — 1:1 square */}
-              {photoPreview && category !== "sound" ? (
-                <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
-                  <img
-                    src={photoPreview}
-                    alt={cardTitle || "Memory"}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      objectPosition: "center",
-                      display: "block",
-                    }}
-                  />
-                </div>
+              {/* Photo / icon-fallback frame — 1:1 square.
+                  For imprints (song/album/book/film), fall back to the picked
+                  cover art when the user hasn't uploaded their own photo. */}
+              {(() => {
+                const imprintCover =
+                  category === "imprint"
+                    ? fields.spotifyPick?.image ||
+                      fields.bookPick?.coverUrl ||
+                      fields.tmdbPick?.image ||
+                      null
+                    : null;
+                const displayPhoto = photoPreview || imprintCover;
+                if (displayPhoto && category !== "sound") {
+                  return (
+                    <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
+                      <img
+                        src={displayPhoto}
+                        alt={cardTitle || "Memory"}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          objectPosition: "center",
+                          display: "block",
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return null;
+              })() || (
               ) : (
                 <div
                   aria-hidden
