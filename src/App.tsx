@@ -54,8 +54,13 @@ const PostSplashRoute = () => {
     const hasPendingDraft =
       typeof window !== "undefined" &&
       !!localStorage.getItem("ts_onboarding_draft_v1");
+    const isEditing =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).has("edit");
+    if (isEditing) return <Index />;
     return hasPendingDraft ? <Onboarding /> : <Archive />;
   }
+
   return <Auth />;
 };
 
