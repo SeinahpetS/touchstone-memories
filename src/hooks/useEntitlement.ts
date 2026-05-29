@@ -79,9 +79,9 @@ export function useEntitlement(): Entitlement {
 
   // Realtime updates on the profile row so checkout completion reflects instantly.
   useEffect(() => {
-    if (!user) return;
     const channel = supabase
-      .channel(`profile-entitlement-${user.id}`)
+      .channel(`profile-entitlement-${user.id}-${Math.random().toString(36).slice(2)}`)
+      .on(
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
