@@ -338,13 +338,37 @@ const Archive = () => {
               </span>
             </button>
           </div>
-          <MemoryArtifact
-            photoUrl={selected.photo_url}
-            category={selected.category}
-            title={selected.title}
-            note={selected.note}
-            createdAt={selected.created_at}
-          />
+          <div
+            style={{
+              borderRadius: 18,
+              boxShadow:
+                "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)",
+              transition: "box-shadow 0.6s ease",
+            }}
+          >
+            <MemoryArtifact
+              photoUrl={selected.photo_url}
+              category={selected.category}
+              title={selected.title}
+              note={selected.note}
+              createdAt={selected.created_at}
+              memoryDate={{
+                season: selected.memory_season ?? null,
+                year: selected.memory_year ?? null,
+                month: selected.memory_month ?? null,
+                day: selected.memory_day ?? null,
+              }}
+            />
+          </div>
+          <div className="flex justify-center pt-4">
+            <button
+              onClick={() => navigate(`/?edit=${selected.id}`)}
+              className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Edit
+            </button>
+          </div>
+
           <ShareMemorySheet
             open={shareOpen}
             onOpenChange={setShareOpen}
