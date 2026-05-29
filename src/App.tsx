@@ -57,7 +57,10 @@ const PostSplashRoute = () => {
     return hasPendingDraft ? <Onboarding /> : <Archive />;
   }
   return <Auth />;
+};
+
 const RootRoute = () => {
+
   // Phases: "splash" (waits for tap) -> "out" (600ms fade) -> "in" (400ms fade-in app)
   const [phase, setPhase] = useState<"splash" | "out" | "in">("splash");
 
