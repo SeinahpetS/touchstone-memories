@@ -60,9 +60,15 @@ const PostSplashRoute = () => {
 };
 
 const RootRoute = () => {
+  // Skip splash entirely when arriving with intent (e.g. /?edit=<id>).
+  const hasIntent =
+    typeof window !== "undefined" && window.location.search.length > 0;
 
   // Phases: "splash" (waits for tap) -> "out" (600ms fade) -> "in" (400ms fade-in app)
-  const [phase, setPhase] = useState<"splash" | "out" | "in">("splash");
+  const [phase, setPhase] = useState<"splash" | "out" | "in">(
+    hasIntent ? "in" : "splash",
+  );
+
 
   const handleBegin = () => {
     if (phase !== "splash") return;
