@@ -57,20 +57,15 @@ const PostSplashRoute = () => {
     return hasPendingDraft ? <Onboarding /> : <Archive />;
   }
   return <Auth />;
-};
-
 const RootRoute = () => {
-  // Phases: "splash" (visible 3s) -> "out" (600ms fade) -> "in" (400ms fade-in app)
+  // Phases: "splash" (waits for tap) -> "out" (600ms fade) -> "in" (400ms fade-in app)
   const [phase, setPhase] = useState<"splash" | "out" | "in">("splash");
 
-  useEffect(() => {
-    const t1 = setTimeout(() => setPhase("out"), 3000);
-    const t2 = setTimeout(() => setPhase("in"), 3600);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, []);
+  const handleBegin = () => {
+    if (phase !== "splash") return;
+    setPhase("out");
+    setTimeout(() => setPhase("in"), 600);
+  };
 
   if (phase !== "in") {
     return (
@@ -80,7 +75,7 @@ const RootRoute = () => {
           opacity: phase === "splash" ? 1 : 0,
         }}
       >
-        <DefinitionSplash />
+        <DefinitionSplash onBegin={handleBegin} />
       </div>
     );
   }
@@ -94,6 +89,9 @@ const RootRoute = () => {
       <style>{`@keyframes ts-root-fade-in { from { opacity: 0 } to { opacity: 1 } }`}</style>
       <PostSplashRoute />
     </div>
+  );
+};
+
   );
 };
 
