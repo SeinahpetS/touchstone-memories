@@ -560,35 +560,34 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                     </div>
                   );
                 }
-                return null;
-              })() || (
-              ) : (
-                <div
-                  aria-hidden
-                  style={{
-                    aspectRatio: "1 / 1",
-                    width: "100%",
-                    backgroundColor: "#E4E2DC",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <span
+                return (
+                  <div
+                    aria-hidden
                     style={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: 12,
-                      backgroundColor: "#2C3E50",
+                      aspectRatio: "1 / 1",
+                      width: "100%",
+                      backgroundColor: "#E4E2DC",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <CategoryIcon category={category} size={34} color="#B8860B" />
-                  </span>
-                </div>
-              )}
+                    <span
+                      style={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: 12,
+                        backgroundColor: "#2C3E50",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <CategoryIcon category={category} size={34} color="#B8860B" />
+                    </span>
+                  </div>
+                );
+              })()}
 
               {/* 3px category bar */}
               <div
