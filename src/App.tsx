@@ -124,6 +124,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
