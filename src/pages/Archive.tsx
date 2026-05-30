@@ -56,6 +56,8 @@ const Archive = () => {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [view, setView] = useState<"grid" | "timeline">("grid");
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
+  const [storyTooltipOpen, setStoryTooltipOpen] = useState(false);
+  const [storyPaywallOpen, setStoryPaywallOpen] = useState(false);
   const [bouncing, setBouncing] = useState(false);
   const [showTimelineTooltip, setShowTimelineTooltip] = useState(false);
   const [dotsVisible, setDotsVisible] = useState(false);
