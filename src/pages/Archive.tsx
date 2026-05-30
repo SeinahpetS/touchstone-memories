@@ -814,6 +814,31 @@ const Archive = () => {
             + Add a Touchstone
           </button>
 
+          <button
+            onClick={() => {
+              const seenKey = user ? `touchstone:story-tooltip-seen:${user.id}` : null;
+              if (seenKey && !localStorage.getItem(seenKey)) {
+                setStoryTooltipOpen(true);
+              } else {
+                // TODO: open Tell Me A Story flow (premium gated downstream)
+                setStoryTooltipOpen(true);
+              }
+            }}
+            className="w-full h-14 mt-3 rounded-full transition-colors flex items-center justify-center gap-2"
+            style={{
+              backgroundColor: "#0E7C86",
+              color: "#FFFFFF",
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 18,
+            }}
+          >
+            <span aria-hidden="true" style={{ color: "#F5D67A", fontSize: 12, letterSpacing: 1 }}>
+              ★★★
+            </span>
+            <span>Tell Me A Story</span>
+          </button>
+
           <QuickCaptureSheet
             open={quickCaptureOpen}
             onClose={() => setQuickCaptureOpen(false)}
@@ -824,6 +849,107 @@ const Archive = () => {
           />
         </div>
       </div>
+
+      {storyTooltipOpen && (
+        <button
+          type="button"
+          onClick={() => {
+            if (user) localStorage.setItem(`touchstone:story-tooltip-seen:${user.id}`, "1");
+            setStoryTooltipOpen(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center px-8"
+          style={{ backgroundColor: "rgba(44,62,80,0.55)" }}
+          aria-label="Dismiss"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="rounded-2xl px-7 py-7 max-w-sm w-full text-left"
+            style={{ backgroundColor: "#F2EEE5", boxShadow: "0 12px 40px rgba(0,0,0,0.25)" }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <span aria-hidden="true" style={{ color: "#B8860B", fontSize: 12, letterSpacing: 1 }}>
+                ★★★
+              </span>
+              <span
+                style={{
+                  fontFamily: "Jost, sans-serif",
+                  fontSize: 10,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "#0E7C86",
+                }}
+              >
+                Vivid feature
+              </span>
+            </div>
+            <h2
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontSize: 24,
+                color: "#2C3E50",
+                margin: 0,
+                lineHeight: 1.25,
+              }}
+            >
+              Tell Me A Story
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Source Sans 3', sans-serif",
+                fontSize: 15,
+                color: "#5B4A3F",
+                lineHeight: 1.55,
+                marginTop: 10,
+              }}
+            >
+              Tell Touchstone a memory in your own words. We'll find everything worth keeping inside it.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                if (user) localStorage.setItem(`touchstone:story-tooltip-seen:${user.id}`, "1");
+                setStoryTooltipOpen(false);
+              }}
+              className="w-full h-12 mt-5 rounded-full transition-colors"
+              style={{
+                backgroundColor: "#0E7C86",
+                color: "#FFFFFF",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 15,
+                letterSpacing: "0.04em",
+              }}
+            >
+              Continue
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (user) localStorage.setItem(`touchstone:story-tooltip-seen:${user.id}`, "1");
+                setStoryTooltipOpen(false);
+                setStoryPaywallOpen(true);
+              }}
+              className="w-full mt-3 text-center"
+              style={{
+                fontFamily: "'Source Sans 3', sans-serif",
+                fontSize: 13,
+                color: "#5B4A3F",
+                textDecoration: "underline",
+                textUnderlineOffset: 3,
+              }}
+            >
+              Become Vivid to unlock
+            </button>
+          </div>
+        </button>
+      )}
+
+      <PaywallSheet
+        open={storyPaywallOpen}
+        onOpenChange={setStoryPaywallOpen}
+        feature="premium_prompt"
+      />
+
 
       {showTimelineTooltip && (
         <button
