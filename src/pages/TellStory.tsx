@@ -90,6 +90,21 @@ const TellStory = () => {
           }
         `}</style>
 
+        {error && (
+          <p
+            role="alert"
+            style={{
+              fontFamily: "'Source Sans 3', sans-serif",
+              fontSize: 14,
+              color: "#8E4585",
+              marginTop: 16,
+              lineHeight: 1.5,
+            }}
+          >
+            {error}
+          </p>
+        )}
+
         <div className="pt-6">
           {loading ? (
             <div
