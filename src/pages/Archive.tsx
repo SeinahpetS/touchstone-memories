@@ -820,8 +820,7 @@ const Archive = () => {
               if (seenKey && !localStorage.getItem(seenKey)) {
                 setStoryTooltipOpen(true);
               } else {
-                // TODO: open Tell Me A Story flow (premium gated downstream)
-                setStoryTooltipOpen(true);
+                navigate("/tell-a-story");
               }
             }}
             className="w-full h-14 mt-3 rounded-full transition-colors flex items-center justify-center gap-2"
