@@ -909,6 +909,7 @@ const Archive = () => {
               onClick={() => {
                 if (user) localStorage.setItem(`touchstone:story-tooltip-seen:${user.id}`, "1");
                 setStoryTooltipOpen(false);
+                navigate("/tell-a-story");
               }}
               className="w-full h-12 mt-5 rounded-full transition-colors"
               style={{
