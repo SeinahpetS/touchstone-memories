@@ -11,6 +11,7 @@ import Onboarding from "./pages/Onboarding.tsx";
 import Auth from "./pages/Auth.tsx";
 import Archive from "./pages/Archive.tsx";
 import Profile from "./pages/Profile.tsx";
+import TellStory from "./pages/TellStory.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
 
