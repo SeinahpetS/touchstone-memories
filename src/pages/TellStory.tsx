@@ -1,23 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const TellStory = () => {
   const navigate = useNavigate();
   const [story, setStory] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canSubmit = story.trim().length > 0 && !loading;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setLoading(true);
-    // TODO: wire to Anthropic-powered extraction edge function
-    // For now, simulate processing and bounce back.
+    setError(null);
     try {
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "extract-story-artifacts",
+        { body: { story } },
+      );
+      if (fnError) throw fnError;
+      const artifacts = (data as any)?.artifacts;
+      if (!Array.isArray(artifacts) || artifacts.length === 0) {
+        throw new Error("No artifacts returned");
+      }
       sessionStorage.setItem("ts_story_draft", story);
-      await new Promise((r) => setTimeout(r, 1400));
-      // Placeholder: return to archive until extraction screen is built.
-      navigate("/archive");
+      sessionStorage.setItem("ts_story_artifacts", JSON.stringify(artifacts));
+      navigate("/tell-a-story/results");
+    } catch (e) {
+      console.error("extract-story-artifacts failed", e);
+      setError("Something went wrong. Your story is still here — try again.");
     } finally {
       setLoading(false);
     }
