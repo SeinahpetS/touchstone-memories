@@ -1,22 +1,61 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
-const SYSTEM_PROMPT = `You are a warm, careful memory archivist. A user has shared a personal memory with you. Your job is to extract discrete memory artifacts from their story. Always extract one Moment first — this is the anchor of the story. Then extract any Objects, Places, People, Food, or Sound artifacts that appear in the story. Return only a JSON array. Each artifact should have: category (moment / object / place / person / food / sound), title (short, human, 2–5 words), and note (one warm sentence capturing the meaning, written in second person as if speaking to the user). The Moment always appears first in the array. Never extract more than 6 artifacts total. Never add artifacts that are not clearly present in the story.`;
+const VALID_CATEGORIES = new Set([
+  "moment",
+  "person",
+  "object",
+  "place",
+  "food",
+  "sound",
+  "imprint",
+]);
 
-const VALID_CATEGORIES = new Set(["moment", "object", "place", "person", "food", "sound"]);
+function buildSystemPrompt(cap: number) {
+  return `You are a warm, careful memory archivist. A user has shared a personal memory transcript with you. Your job is to extract discrete, meaningful memory artifacts from their story.
 
-function extractJsonArray(text: string): unknown {
-  // Try direct parse first
+CATEGORIES (use exactly these): Moment, Person, Object, Place, Food, Sound, Imprint.
+
+RULES:
+- Always extract a Moment artifact FIRST — it is the anchor of the story.
+- Extract only artifacts that are clearly present in the transcript. Never invent.
+- Return AT MOST ${cap} artifacts total (including the Moment). Fewer is fine.
+- For each artifact return: category, title (2–5 words, human, warm), note (one warm sentence in second person), and source_phrase (the EXACT substring from the transcript that triggered this artifact, copied verbatim so it can be highlighted).
+- Respond with STRICT JSON ONLY. No preamble. No markdown. No code fences.
+
+JSON SHAPE:
+{
+  "artifacts": [
+    {
+      "category": "Moment",
+      "title": "Sunday visits to grandmother's house",
+      "note": "Every Sunday after church, driving out to the yellow house on Elm Street.",
+      "source_phrase": "Every Sunday we'd drive out there after church"
+    }
+  ]
+}`;
+}
+
+function extractJson(text: string): any {
   try {
     return JSON.parse(text);
   } catch (_) {
-    // Fallback: pull the first [...] block
-    const start = text.indexOf("[");
-    const end = text.lastIndexOf("]");
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
     if (start !== -1 && end > start) {
       return JSON.parse(text.slice(start, end + 1));
     }
-    throw new Error("No JSON array found in model output");
+    throw new Error("No JSON object found in model output");
   }
+}
+
+function findSpan(transcript: string, phrase: string): { start: number; end: number } | null {
+  if (!phrase) return null;
+  const lowerT = transcript.toLowerCase();
+  const lowerP = phrase.toLowerCase();
+  const idx = lowerT.indexOf(lowerP);
+  if (idx === -1) return null;
+  return { start: idx, end: idx + phrase.length };
 }
 
 Deno.serve(async (req) => {
@@ -33,13 +72,43 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { story } = await req.json().catch(() => ({}));
-    if (typeof story !== "string" || story.trim().length === 0) {
-      return new Response(JSON.stringify({ error: "Missing story text" }), {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userId = claimsData.claims.sub as string;
+
+    const body = await req.json().catch(() => ({}));
+    const transcript: string = (body?.transcript ?? body?.story ?? "").toString();
+    if (!transcript || transcript.trim().length === 0) {
+      return new Response(JSON.stringify({ error: "Missing transcript" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Determine tier — Vivid = 7, Free = 5
+    const { data: isVividData } = await supabase.rpc("has_active_vivid", { _user_id: userId });
+    const isVivid = Boolean(isVividData);
+    const cap = isVivid ? 7 : 5;
 
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -50,9 +119,9 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 1024,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: story }],
+        max_tokens: 1500,
+        system: buildSystemPrompt(cap),
+        messages: [{ role: "user", content: transcript }],
       }),
     });
 
@@ -68,9 +137,9 @@ Deno.serve(async (req) => {
     const payload = await anthropicRes.json();
     const text: string = payload?.content?.[0]?.text ?? "";
 
-    let parsed: unknown;
+    let parsed: any;
     try {
-      parsed = extractJsonArray(text);
+      parsed = extractJson(text);
     } catch (e) {
       console.error("Parse error", e, "raw:", text);
       return new Response(
@@ -79,14 +148,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!Array.isArray(parsed)) {
-      return new Response(
-        JSON.stringify({ error: "Model did not return an array" }),
-        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
+    const rawArtifacts: any[] = Array.isArray(parsed?.artifacts)
+      ? parsed.artifacts
+      : Array.isArray(parsed)
+        ? parsed
+        : [];
 
-    const artifacts = (parsed as any[])
+    let artifacts = rawArtifacts
       .filter(
         (a) =>
           a &&
@@ -98,10 +166,11 @@ Deno.serve(async (req) => {
       )
       .map((a) => ({
         category: a.category.toLowerCase(),
-        title: a.title.trim(),
-        note: a.note.trim(),
-      }))
-      .slice(0, 6);
+        title: String(a.title).trim(),
+        note: String(a.note).trim(),
+        source_phrase:
+          typeof a.source_phrase === "string" ? a.source_phrase.trim() : "",
+      }));
 
     if (artifacts.length === 0) {
       return new Response(
@@ -110,16 +179,58 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Ensure a Moment leads if present
+    // Ensure a Moment leads
     const momentIdx = artifacts.findIndex((a) => a.category === "moment");
     if (momentIdx > 0) {
       const [m] = artifacts.splice(momentIdx, 1);
       artifacts.unshift(m);
     }
 
-    return new Response(JSON.stringify({ artifacts }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    // Enforce server-side cap
+    artifacts = artifacts.slice(0, cap);
+
+    // Compute highlight spans from source_phrase
+    const highlightSpans = artifacts
+      .map((a, i) => {
+        const span = findSpan(transcript, a.source_phrase);
+        return span ? { artifact_index: i, ...span, phrase: a.source_phrase } : null;
+      })
+      .filter(Boolean);
+
+    // Persist session
+    const { data: session, error: insertErr } = await supabase
+      .from("story_sessions")
+      .insert({
+        user_id: userId,
+        transcript,
+        extracted_artifacts: artifacts,
+        highlight_spans: highlightSpans,
+        status: "incomplete",
+      })
+      .select("id, title, expires_at, status")
+      .single();
+
+    if (insertErr) {
+      console.error("story_sessions insert error", insertErr);
+      return new Response(
+        JSON.stringify({ error: "Could not save session", detail: insertErr.message }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        session_id: session.id,
+        title: session.title,
+        status: session.status,
+        expires_at: session.expires_at,
+        artifacts,
+        highlight_spans: highlightSpans,
+        cap,
+        tier: isVivid ? "vivid" : "free",
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     console.error("extract-story-artifacts error", e);
     return new Response(
