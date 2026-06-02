@@ -346,7 +346,7 @@ const Profile = () => {
             <div>
               <p className="text-sm font-medium">{planLabel}</p>
               {planSubtitle && (
-                <p className="text-[13px] text-[#2C3E50]" style={{ fontFamily: "'Jost', sans-serif" }}>
+                <p className="text-[13px] text-muted-foreground" style={{ fontFamily: "'Jost', sans-serif" }}>
                   {planSubtitle}
                 </p>
               )}
@@ -355,7 +355,7 @@ const Profile = () => {
               <button
                 onClick={handleManageSubscription}
                 disabled={portalLoading}
-                className="inline-flex items-center rounded-full border border-[#2C3E50] px-3 py-1 text-[13px] font-medium text-[#2C3E50] disabled:opacity-60"
+                className="inline-flex items-center rounded-full border border-foreground/40 px-3 py-1 text-[13px] font-medium text-foreground hover:bg-foreground/5 transition-colors disabled:opacity-60"
                 style={{ fontFamily: "'Jost', sans-serif" }}
               >
                 {portalLoading ? "…" : "Manage"}
@@ -369,20 +369,21 @@ const Profile = () => {
                 {entitlement.isTrialing ? "Become Vivid" : "Upgrade"}
               </button>
             )}
+
           </div>
         </section>
 
         {/* Your Data */}
-        <section className="space-y-3" style={{ borderTop: "1px solid #E8E4D8", paddingTop: 24 }}>
+        <section className="space-y-3 border-t border-border pt-6">
           <h2 className="font-playfair text-lg">Your Data</h2>
-          <p style={{ fontFamily: "'Jost', sans-serif", color: "#2C3E50", fontSize: 14 }}>
+          <p className="text-sm text-foreground/90" style={{ fontFamily: "'Jost', sans-serif" }}>
             Your memories belong to you — always. Request a copy of your archive and we'll email you a download link.
           </p>
-          <p style={{ fontFamily: "'Jost', sans-serif", color: "#5B4A3F", fontSize: 12 }}>
+          <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Jost', sans-serif" }}>
             The download link expires in 7 days.
           </p>
           {exportSent ? (
-            <p style={{ fontFamily: "'Jost', sans-serif", color: "#2E7D5E", fontSize: 13 }}>
+            <p style={{ fontFamily: "'Jost', sans-serif", color: "#7FCBA4", fontSize: 13 }}>
               Check your inbox — your download link is on its way.
             </p>
           ) : (
@@ -391,9 +392,8 @@ const Profile = () => {
                 type="button"
                 onClick={handleExport}
                 disabled={exporting}
+                className="border border-foreground/50 text-foreground hover:bg-foreground/5 transition-colors"
                 style={{
-                  border: "1px solid #1E2E3E",
-                  color: "#1E2E3E",
                   background: "transparent",
                   fontFamily: "'Jost', sans-serif",
                   fontSize: 14,
@@ -406,13 +406,14 @@ const Profile = () => {
                 {exporting ? "Preparing your archive…" : "Email me my archive"}
               </button>
               {exportError && (
-                <p style={{ color: "#C2714F", fontSize: 12, fontFamily: "'Jost', sans-serif" }}>
+                <p style={{ color: "#E8916F", fontSize: 12, fontFamily: "'Jost', sans-serif" }}>
                   {exportError}
                 </p>
               )}
             </>
           )}
         </section>
+
 
         {/* Actions */}
         <div className="space-y-3 pt-2">
