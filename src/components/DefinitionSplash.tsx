@@ -24,7 +24,7 @@ const DefinitionSplash = ({ onBegin }: Props) => (
       .ts-def-begin  { animation: ts-def-in 0.7s ease-out 1.25s both; }
     `}</style>
 
-    <div className="flex flex-1 flex-col items-center justify-center" style={{ transform: 'translateY(-5vh)' }}>
+    <div className="flex flex-1 flex-col items-center justify-center" style={{ transform: 'translateY(-2vh)' }}>
       <img
         src={touchstoneLogo}
         alt="Touchstone"
@@ -141,7 +141,7 @@ const DefinitionSplash = ({ onBegin }: Props) => (
       </div>
 
       <p
-        className="ts-def-sub mt-12 text-center mx-auto"
+        className="ts-def-sub mt-16 text-center mx-auto"
         style={{
           fontFamily: "'Playfair Display', serif",
           fontStyle: "italic",
