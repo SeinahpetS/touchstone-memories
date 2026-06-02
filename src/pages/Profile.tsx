@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { PricingSheet } from "@/components/PricingSheet";
 import { PaywallSheet } from "@/components/PaywallSheet";
 import { VividUpgradeCard } from "@/components/VividUpgradeCard";
+import { ManageSubscriptionModal } from "@/components/ManageSubscriptionModal";
 
 interface ProfileRow {
   id: string;
