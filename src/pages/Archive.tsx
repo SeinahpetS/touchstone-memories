@@ -820,6 +820,10 @@ const Archive = () => {
 
           <button
             onClick={() => {
+              if (!entitlement.hasAccess) {
+                setStoryVividOpen(true);
+                return;
+              }
               const seenKey = user ? `touchstone:story-tooltip-seen:${user.id}` : null;
               if (seenKey && !localStorage.getItem(seenKey)) {
                 setStoryTooltipOpen(true);
