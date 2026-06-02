@@ -355,7 +355,7 @@ const Profile = () => {
               <button
                 onClick={handleManageSubscription}
                 disabled={portalLoading}
-                className="inline-flex items-center rounded-full border border-foreground/40 px-3 py-1 text-[13px] font-medium text-foreground hover:bg-foreground/5 transition-colors disabled:opacity-60 bg-teal-500 text-slate-100"
+                className="inline-flex items-center rounded-full border border-foreground/40 px-3 py-1 text-[13px] font-medium text-foreground hover:bg-foreground/5 transition-colors disabled:opacity-60 text-slate-100 bg-teal-500"
                 style={{ fontFamily: "'Jost', sans-serif" }}
               >
                 {portalLoading ? "…" : "Manage"}
@@ -392,7 +392,7 @@ const Profile = () => {
                 type="button"
                 onClick={handleExport}
                 disabled={exporting}
-                className="border border-foreground/50 text-foreground hover:bg-foreground/5 transition-colors bg-teal-600"
+                className="border border-foreground/50 text-foreground hover:bg-foreground/5 transition-colors bg-teal-500"
                 style={{
                   background: "transparent",
                   fontFamily: "'Jost', sans-serif",
