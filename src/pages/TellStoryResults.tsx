@@ -126,53 +126,38 @@ const TellStoryResults = () => {
   }
 
   if (done) {
-    const keptCount = decisions.filter((d) => d === "kept").length;
     return (
       <div
         className="min-h-screen flex flex-col items-center justify-center px-6"
         style={{ backgroundColor: IVORY }}
       >
-        <h1
+        <p
           style={{
             fontFamily: "'Playfair Display', serif",
+            fontStyle: "italic",
             color: NAVY,
-            fontSize: 32,
+            fontSize: 28,
             textAlign: "center",
             margin: 0,
           }}
         >
-          {keptCount > 0 ? `${keptCount} kept.` : "All set."}
-        </h1>
-        <p
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            color: SECONDARY,
-            marginTop: 10,
-            textAlign: "center",
-          }}
-        >
-          {keptCount > 0
-            ? "Your memories are safe in the archive."
-            : "Nothing saved this time."}
+          That's everything we found.
         </p>
         <button
-          onClick={() => {
-            sessionStorage.removeItem("ts_story_draft");
-            sessionStorage.removeItem("ts_story_artifacts");
-            navigate("/archive");
-          }}
+          onClick={() => navigate("/tell-a-story")}
           style={{
-            marginTop: 28,
-            background: NAVY,
-            color: GOLD,
+            marginTop: 32,
+            background: "transparent",
+            color: SECONDARY,
+            border: `1.5px solid ${SECONDARY}`,
             borderRadius: 9999,
             padding: "14px 32px",
             fontFamily: "'Jost', sans-serif",
-            fontSize: 16,
-            border: "none",
+            fontSize: 15,
+            cursor: "pointer",
           }}
         >
-          Back to archive
+          Something's missing — add another
         </button>
       </div>
     );
