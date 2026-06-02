@@ -256,7 +256,7 @@ const Profile = () => {
             />
           </div>
           {uploading && (
-            <p className="text-xs text-muted-foreground">Uploading…</p>
+            <p className="text-muted-foreground text-sm">Uploading…</p>
           )}
         </div>
 
@@ -321,7 +321,7 @@ const Profile = () => {
             <div className="flex items-center justify-between px-4 py-3">
               <div>
                 <p className="text-sm font-medium">Email</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Reminders and weekly recap
                 </p>
               </div>
@@ -330,7 +330,7 @@ const Profile = () => {
             <div className="flex items-center justify-between px-4 py-3">
               <div>
                 <p className="text-sm font-medium">In-app</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Prompts and gentle nudges
                 </p>
               </div>
@@ -346,7 +346,7 @@ const Profile = () => {
             <div>
               <p className="text-sm font-medium">{planLabel}</p>
               {planSubtitle && (
-                <p className="text-[13px] text-muted-foreground" style={{ fontFamily: "'Jost', sans-serif" }}>
+                <p className="text-muted-foreground text-sm" style={{ fontFamily: "'Jost', sans-serif" }}>
                   {planSubtitle}
                 </p>
               )}
@@ -355,7 +355,7 @@ const Profile = () => {
               <button
                 onClick={handleManageSubscription}
                 disabled={portalLoading}
-                className="inline-flex items-center rounded-full border border-foreground/40 px-3 py-1 text-[13px] font-medium text-foreground hover:bg-foreground/5 transition-colors disabled:opacity-60"
+                className="inline-flex items-center rounded-full border border-foreground/40 px-3 py-1 text-[13px] font-medium text-foreground hover:bg-foreground/5 transition-colors disabled:opacity-60 bg-teal-500 text-slate-100"
                 style={{ fontFamily: "'Jost', sans-serif" }}
               >
                 {portalLoading ? "…" : "Manage"}
@@ -376,10 +376,10 @@ const Profile = () => {
         {/* Your Data */}
         <section className="space-y-3 border-t border-border pt-6">
           <h2 className="font-playfair text-lg">Your Data</h2>
-          <p className="text-sm text-foreground/90" style={{ fontFamily: "'Jost', sans-serif" }}>
+          <p className="text-foreground/90 text-base" style={{ fontFamily: "'Jost', sans-serif" }}>
             Your memories belong to you — always. Request a copy of your archive and we'll email you a download link.
           </p>
-          <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Jost', sans-serif" }}>
+          <p className="text-muted-foreground text-sm" style={{ fontFamily: "'Jost', sans-serif" }}>
             The download link expires in 7 days.
           </p>
           {exportSent ? (
@@ -392,7 +392,7 @@ const Profile = () => {
                 type="button"
                 onClick={handleExport}
                 disabled={exporting}
-                className="border border-foreground/50 text-foreground hover:bg-foreground/5 transition-colors"
+                className="border border-foreground/50 text-foreground hover:bg-foreground/5 transition-colors bg-teal-600"
                 style={{
                   background: "transparent",
                   fontFamily: "'Jost', sans-serif",
