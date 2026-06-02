@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookOpen, MessageSquareText, Palette, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
 
