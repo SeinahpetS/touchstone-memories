@@ -113,6 +113,17 @@ const RootRoute = () => {
 
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { VividCelebrationGate } from "@/components/VividCelebrationGate";
+import BottomNav from "@/components/BottomNav";
+import { useLocation } from "react-router-dom";
+
+const NAV_PATHS = ["/archive", "/profile", "/tell-a-story", "/vivid"];
+
+const BottomNavGate = () => {
+  const { pathname } = useLocation();
+  const show = NAV_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  if (!show) return null;
+  return <BottomNav />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -133,6 +144,7 @@ const App = () => (
           <Route path="/vivid" element={<Vivid />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <BottomNavGate />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
