@@ -70,10 +70,17 @@ const StoryUnfold = () => {
       );
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      console.log("Extracted session", data);
-      toast(`Found ${data?.artifacts?.length ?? 0} artifacts.`);
+      const extracted = (data?.artifacts ?? []) as any[];
+      if (extracted.length === 0) throw new Error("No artifacts extracted");
       setSheetOpen(false);
       setText("");
+      navigate("/story-unfold/review", {
+        state: {
+          sessionId: data.session_id,
+          artifacts: extracted,
+          transcript: transcript,
+        },
+      });
     } catch (e: any) {
       console.error("Extraction failed", e);
       toast(e?.message ?? "Something went wrong. Try again.");
