@@ -11,17 +11,24 @@ const VALID_CATEGORIES = new Set([
   "imprint",
 ]);
 
-function buildSystemPrompt(cap: number) {
+function buildSystemPrompt(cap: number, excludeTitles: string[] = []) {
+  const excludeBlock = excludeTitles.length
+    ? `
+
+ALREADY EXTRACTED — DO NOT REPEAT these titles or anything that would clearly duplicate them. Look harder for what is *new* in the transcript:
+${excludeTitles.map((t) => `- ${t}`).join("\n")}`
+    : "";
+
   return `You are a warm, careful memory archivist. A user has shared a personal memory transcript with you. Your job is to extract discrete, meaningful memory artifacts from their story.
 
 CATEGORIES (use exactly these): Moment, Person, Object, Place, Food, Sound, Imprint.
 
 RULES:
-- Always extract a Moment artifact FIRST — it is the anchor of the story.
+- ${excludeTitles.length ? "Surface NEW artifacts that were missed on the first pass. A second Moment is fine only if it is clearly distinct." : "Always extract a Moment artifact FIRST — it is the anchor of the story."}
 - Extract only artifacts that are clearly present in the transcript. Never invent.
-- Return AT MOST ${cap} artifacts total (including the Moment). Fewer is fine.
+- Return AT MOST ${cap} artifacts total. Fewer is fine.
 - For each artifact return: category, title (2–5 words, human, warm), note (one warm sentence in second person), and source_phrase (the EXACT substring from the transcript that triggered this artifact, copied verbatim so it can be highlighted).
-- Respond with STRICT JSON ONLY. No preamble. No markdown. No code fences.
+- Respond with STRICT JSON ONLY. No preamble. No markdown. No code fences.${excludeBlock}
 
 JSON SHAPE:
 {
