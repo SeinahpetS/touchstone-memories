@@ -34,6 +34,47 @@ const StoryUnfold = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [text, setText] = useState("");
   const [extracting, setExtracting] = useState(false);
+  const [rows, setRows] = useState<StoryRow[]>([]);
+
+  const loadRows = async () => {
+    const { data: userRes } = await supabase.auth.getUser();
+    const user = userRes?.user;
+    if (!user) {
+      setRows([]);
+      return;
+    }
+    const { data: sessions, error } = await supabase
+      .from("story_sessions")
+      .select("id, title, status, created_at, extracted_artifacts, confirmed_artifact_ids")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(8);
+    if (error) {
+      console.error("load sessions failed", error);
+      return;
+    }
+    const mapped: StoryRow[] = (sessions ?? []).map((s: any) => {
+      const total = Array.isArray(s.extracted_artifacts) ? s.extracted_artifacts.length : 0;
+      const confirmed = Array.isArray(s.confirmed_artifact_ids)
+        ? s.confirmed_artifact_ids.length
+        : 0;
+      const isComplete = s.status === "complete";
+      return {
+        id: s.id,
+        title: s.title || "Untitled story",
+        date: isComplete
+          ? `${formatDate(s.created_at)} · ${confirmed} touchstone${confirmed === 1 ? "" : "s"} saved`
+          : formatDate(s.created_at),
+        progressText: isComplete ? undefined : `${confirmed} of ${total} saved`,
+        complete: isComplete,
+      };
+    });
+    setRows(mapped);
+  };
+
+  useEffect(() => {
+    void loadRows();
+  }, []);
 
   useEffect(() => {
     if (sheetOpen) {
