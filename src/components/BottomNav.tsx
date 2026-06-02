@@ -53,7 +53,7 @@ const TABS: Tab[] = [
   },
   {
     key: "settings",
-    path: "/profile",
+    path: "/settings",
     icon: SettingsIcon,
     label: "Settings",
     activeColor: ACTIVE,

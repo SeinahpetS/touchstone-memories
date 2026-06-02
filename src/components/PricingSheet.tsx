@@ -52,7 +52,7 @@ export function PricingSheet({ open, onOpenChange, defaultPlan = "vivid_annual",
 
   const fallbackReturn =
     typeof window !== "undefined"
-      ? `${window.location.origin}/profile?checkout=success&session_id={CHECKOUT_SESSION_ID}`
+      ? `${window.location.origin}/settings?checkout=success&session_id={CHECKOUT_SESSION_ID}`
       : "";
 
   return (
