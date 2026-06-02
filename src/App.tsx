@@ -100,7 +100,7 @@ const RootRoute = () => {
           opacity: phase === "splash" ? 1 : 0,
         }}
       >
-        <DefinitionSplash onBegin={handleBegin} />
+        <DefinitionSplash />
       </div>
     );
   }
