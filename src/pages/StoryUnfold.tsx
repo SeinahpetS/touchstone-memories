@@ -78,6 +78,7 @@ const StoryUnfold = () => {
         {/* CTA Button */}
         <button
           type="button"
+          onClick={() => setSheetOpen(true)}
           className="w-full flex items-center justify-center gap-3 mt-6"
           style={{
             backgroundColor: BRAND_NAVY,
