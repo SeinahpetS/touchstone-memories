@@ -221,7 +221,7 @@ const Profile = () => {
           <div className="relative">
             <Avatar className="h-24 w-24 ring-2 ring-[hsl(var(--gold)/0.6)] ring-offset-4 ring-offset-background">
               {profile?.avatar_url ? (
-                <AvatarImage src={profile.avatar_url} alt={name || "Profile"} />
+                <AvatarImage src={profile.avatar_url} alt={name || "​"} />
               ) : null}
               <AvatarFallback className="bg-[hsl(var(--dark-card))] text-[hsl(var(--label-color))] text-2xl">
                 {initial}
