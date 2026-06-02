@@ -957,6 +957,11 @@ const Archive = () => {
         onOpenChange={setStoryPaywallOpen}
         feature="premium_prompt"
       />
+      <VividUpgradeCard
+        open={storyVividOpen}
+        triggeredBy="tell_me_a_story"
+        onDismiss={() => setStoryVividOpen(false)}
+      />
 
 
       {showTimelineTooltip && (
