@@ -147,6 +147,8 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/story-unfold" element={<StoryUnfold />} />
           <Route path="/story-unfold/review" element={<StoryReview />} />
+          <Route path="/story-unfold/session/:id" element={<StorySessionView />} />
+          <Route path="/story-unfold/session/:id/transcript" element={<StoryTranscriptView />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
           <Route path="/vivid" element={<Vivid />} />
