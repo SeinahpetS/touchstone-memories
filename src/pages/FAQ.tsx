@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+
 
 const FAQ = () => {
   const navigate = useNavigate();
