@@ -639,21 +639,13 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               color: "#B8860B",
               marginTop: "3.2rem",
               minHeight: "1.4em",
+              textAlign: "center",
+              maxWidth: "32rem",
+              opacity: everythingVisible ? 1 : 0,
+              transition: `opacity ${EVERYTHING_FADE_MS}ms ease`,
             }}
           >
-            <span style={{ whiteSpace: "pre" }}>
-              {EVERYTHING_TEXT.split("").map((ch, i) => (
-                <span
-                  key={i}
-                  style={{
-                    opacity: i < everythingChars ? 1 : 0,
-                    transition: "opacity 120ms ease",
-                  }}
-                >
-                  {ch}
-                </span>
-              ))}
-            </span>
+            {EVERYTHING_TEXT}
           </div>
           <button
             onClick={onBegin}
