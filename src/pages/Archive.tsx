@@ -9,6 +9,8 @@ import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import ShareMemorySheet from "@/components/ShareMemorySheet";
 import { PaywallSheet } from "@/components/PaywallSheet";
+import { VividUpgradeCard } from "@/components/VividUpgradeCard";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import TimelineView from "@/components/TimelineView";
 import CategoryIcon, { CategoryIconCard, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
