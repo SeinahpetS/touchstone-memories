@@ -395,13 +395,14 @@ const Profile = () => {
                 type="button"
                 onClick={handleExport}
                 disabled={exporting}
-                className="border border-foreground/50 text-foreground hover:bg-foreground/5 transition-colors bg-teal-500"
+                className="text-white hover:opacity-90 transition-opacity"
                 style={{
-                  background: "transparent",
+                  background: "#0E7C86",
                   fontFamily: "'Jost', sans-serif",
                   fontSize: 14,
                   borderRadius: 6,
                   padding: "10px 20px",
+                  border: "none",
                   opacity: exporting ? 0.7 : 1,
                   cursor: exporting ? "not-allowed" : "pointer",
                 }}
