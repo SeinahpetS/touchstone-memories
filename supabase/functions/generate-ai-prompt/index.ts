@@ -153,9 +153,11 @@ Deno.serve(async (req) => {
       _user_id: userData.user.id,
     });
     if (!allowed) {
+      // Return 200 with a skip signal so the client doesn't surface a runtime
+      // error overlay. Non-entitled users are gated client-side via the paywall.
       return new Response(
-        JSON.stringify({ error: "subscription_required", code: "vivid_required" }),
-        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({ skipped: true, reason: "subscription_required", code: "vivid_required" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
