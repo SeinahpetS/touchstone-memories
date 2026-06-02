@@ -1,4 +1,5 @@
-import { FilePen, ChevronRight } from "lucide-react";
+import { FilePen, ChevronRight, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const BRAND_NAVY = "#1E2E3E";
 const SOFT_IVORY = "#F2EEE5";
