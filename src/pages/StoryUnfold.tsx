@@ -40,6 +40,7 @@ const PLACEHOLDER_ROWS: StoryRow[] = [
 ];
 
 const StoryUnfold = () => {
+  const navigate = useNavigate();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [text, setText] = useState("");
   const [extracting, setExtracting] = useState(false);
