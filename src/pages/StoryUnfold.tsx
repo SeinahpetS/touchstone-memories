@@ -41,6 +41,7 @@ const PLACEHOLDER_ROWS: StoryRow[] = [
 const StoryUnfold = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [text, setText] = useState("");
+  const [extracting, setExtracting] = useState(false);
 
   useEffect(() => {
     if (sheetOpen) {
@@ -51,6 +52,33 @@ const StoryUnfold = () => {
       };
     }
   }, [sheetOpen]);
+
+  const handleExtract = async () => {
+    if (extracting) return;
+    const transcript = text.trim();
+    if (!transcript) {
+      toast("Tell a bit of a story first.");
+      return;
+    }
+    setExtracting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "extract-story-artifacts",
+        { body: { transcript } },
+      );
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      console.log("Extracted session", data);
+      toast(`Found ${data?.artifacts?.length ?? 0} artifacts.`);
+      setSheetOpen(false);
+      setText("");
+    } catch (e: any) {
+      console.error("Extraction failed", e);
+      toast(e?.message ?? "Something went wrong. Try again.");
+    } finally {
+      setExtracting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
