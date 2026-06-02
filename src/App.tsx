@@ -12,6 +12,7 @@ import Auth from "./pages/Auth.tsx";
 import Archive from "./pages/Archive.tsx";
 import Profile from "./pages/Profile.tsx";
 import FAQ from "./pages/FAQ.tsx";
+import StoryUnfold from "./pages/StoryUnfold.tsx";
 import TellStory from "./pages/TellStory.tsx";
 import TellStoryResults from "./pages/TellStoryResults.tsx";
 import Vivid from "./pages/Vivid.tsx";
@@ -117,7 +118,7 @@ import { VividCelebrationGate } from "@/components/VividCelebrationGate";
 import BottomNav from "@/components/BottomNav";
 import { useLocation } from "react-router-dom";
 
-const NAV_PATHS = ["/archive", "/settings", "/tell-a-story", "/vivid"];
+const NAV_PATHS = ["/archive", "/settings", "/story-unfold", "/vivid"];
 
 const BottomNavGate = () => {
   const { pathname } = useLocation();
@@ -141,6 +142,7 @@ const App = () => (
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/story-unfold" element={<StoryUnfold />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
           <Route path="/vivid" element={<Vivid />} />
