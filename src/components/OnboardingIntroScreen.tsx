@@ -456,9 +456,20 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     [],
   );
 
+  const revealAllNow = () => {
+    if (quotesDone || advancing) return;
+    const all = new Set<string>();
+    placements.forEach((p) => {
+      all.add(p.kind === "quote" ? `q-${p.idx}` : `s-${p.idx}`);
+    });
+    setRevealedIds(all);
+    setQuotesDone(true);
+  };
+
   return (
     <div
       ref={screenRef}
+      onClick={revealAllNow}
       style={{
         position: "relative",
         width: "100%",
