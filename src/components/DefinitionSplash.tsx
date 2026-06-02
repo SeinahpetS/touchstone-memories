@@ -132,7 +132,7 @@ const DefinitionSplash = () => {
                 >
                   {i + 1}.
                 </span>
-                <span>{d}</span>
+                <span className="text-base">{d}</span>
               </li>
             ))}
           </ol>
