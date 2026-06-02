@@ -460,6 +460,19 @@ const Profile = () => {
             Delete My Archive
           </button>
         </section>
+
+        {/* Version */}
+        <div className="pt-8 pb-4 text-center">
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 12,
+              color: "#8C8880",
+            }}
+          >
+            Version 1.0.0
+          </p>
+        </div>
       </div>
 
       {deleteOpen && (
