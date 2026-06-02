@@ -66,6 +66,17 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  // Reserve space at the bottom of the page so content never slides under the
+  // floating tab bar. Nav height ≈ 70px + 12px bottom offset + safe area + breathing room.
+  useEffect(() => {
+    const prev = document.body.style.paddingBottom;
+    document.body.style.paddingBottom =
+      "calc(env(safe-area-inset-bottom, 0px) + 110px)";
+    return () => {
+      document.body.style.paddingBottom = prev;
+    };
+  }, []);
+
   return (
     <nav
       aria-label="Primary"
