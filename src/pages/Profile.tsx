@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PricingSheet } from "@/components/PricingSheet";
 import { PaywallSheet } from "@/components/PaywallSheet";
+import { VividUpgradeCard } from "@/components/VividUpgradeCard";
 
 interface ProfileRow {
   id: string;
