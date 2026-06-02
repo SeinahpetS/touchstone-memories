@@ -416,7 +416,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   //   stage 3 — "Everything that made you." letter-by-letter reveal
   //   stage 4 — "Still here." + Begin button fade in
   const [everythingVisible, setEverythingVisible] = useState(false);
-  const EVERYTHING_TEXT = "The pieces you want to remember, \nand the things you don\u2019t want to forget.";
+  const EVERYTHING_TEXT = "The pieces you want to remember, \n\u2026.the things you don\u2019t want to forget.";
   const EVERYTHING_FADE_MS = 1400;
 
   useEffect(() => {
