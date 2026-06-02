@@ -13,7 +13,7 @@ type Tab = {
 
 const ACTIVE = "#F2EEE5";
 const INACTIVE = "#8C8880";
-const AEGEAN = "#0E7C86";
+const OLD_GOLD = "#B8860B";
 
 const TABS: Tab[] = [
   {
