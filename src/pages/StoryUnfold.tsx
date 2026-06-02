@@ -37,6 +37,19 @@ const PLACEHOLDER_ROWS: StoryRow[] = [
 ];
 
 const StoryUnfold = () => {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (sheetOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [sheetOpen]);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
       <div className="mx-auto w-full max-w-lg px-5 pt-8 pb-6">
