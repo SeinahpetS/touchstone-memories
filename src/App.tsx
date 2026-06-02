@@ -91,22 +91,6 @@ const RootRoute = () => {
   );
 
 
-  const handleBegin = async () => {
-    if (phase !== "splash") return;
-    setPhase("out");
-    const { data: { session } } = await supabase.auth.getSession();
-    const hasPendingDraft =
-      typeof window !== "undefined" &&
-      !!localStorage.getItem("ts_onboarding_draft_v1");
-    const dest = session
-      ? hasPendingDraft
-        ? "/welcome"
-        : "/archive"
-      : "/auth";
-    setTimeout(() => {
-      window.location.assign(dest);
-    }, 600);
-  };
 
   if (phase !== "in") {
     return (
@@ -116,7 +100,7 @@ const RootRoute = () => {
           opacity: phase === "splash" ? 1 : 0,
         }}
       >
-        <DefinitionSplash onBegin={handleBegin} />
+        <DefinitionSplash />
       </div>
     );
   }
