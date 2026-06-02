@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import ConstellationIntro from "./pages/ConstellationIntro.tsx";
