@@ -604,6 +604,12 @@ const Profile = () => {
       )}
 
       <PricingSheet open={pricingOpen} onOpenChange={setPricingOpen} />
+      <ManageSubscriptionModal
+        open={manageOpen}
+        onClose={() => setManageOpen(false)}
+        onSaveOfferApplied={() => setSaveOfferNote(true)}
+        onCancelScheduled={() => void entitlement.refresh()}
+      />
       <PaywallSheet
         open={exportPaywallOpen}
         onOpenChange={setExportPaywallOpen}
