@@ -63,6 +63,9 @@ const StoryReview = () => {
   const [artifacts, setArtifacts] = useState<Artifact[]>(locState.artifacts ?? []);
   const [index, setIndex] = useState(0);
   const [confirmedIds, setConfirmedIds] = useState<string[]>([]);
+  const [savedCount, setSavedCount] = useState(0);
+  const [phase, setPhase] = useState<"cards" | "complete">("cards");
+  const [continuing, setContinuing] = useState(false);
   const [savingOverlay, setSavingOverlay] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingNote, setEditingNote] = useState(false);
