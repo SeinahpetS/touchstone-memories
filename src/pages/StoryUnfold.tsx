@@ -251,21 +251,35 @@ const StoryUnfold = () => {
             </button>
           </div>
 
-          {/* Textarea */}
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Start typing, or use your keyboard's dictation button to speak your story."
-            className="flex-1 w-full px-5 py-4 resize-none focus:outline-none"
-            style={{
-              backgroundColor: SOFT_IVORY,
-              border: "none",
-              fontFamily: "'Jost', sans-serif",
-              fontSize: 14,
-              color: BRAND_NAVY,
-              lineHeight: 1.5,
-            }}
-          />
+          {/* Textarea or loading state */}
+          {extracting ? (
+            <div className="flex-1 w-full flex items-center justify-center px-5">
+              <p
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 14,
+                  color: MUTED,
+                }}
+              >
+                Finding what's there…
+              </p>
+            </div>
+          ) : (
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Start typing, or use your keyboard's dictation button to speak your story."
+              className="flex-1 w-full px-5 py-4 resize-none focus:outline-none"
+              style={{
+                backgroundColor: SOFT_IVORY,
+                border: "none",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                color: BRAND_NAVY,
+                lineHeight: 1.5,
+              }}
+            />
+          )}
 
           {/* Bottom CTA */}
           <div
@@ -277,6 +291,8 @@ const StoryUnfold = () => {
           >
             <button
               type="button"
+              onClick={handleExtract}
+              disabled={extracting}
               className="w-full"
               style={{
                 backgroundColor: AEGEAN,
@@ -286,10 +302,11 @@ const StoryUnfold = () => {
                 padding: "0.95rem",
                 borderRadius: 12,
                 border: "none",
-                cursor: "pointer",
+                cursor: extracting ? "not-allowed" : "pointer",
+                opacity: extracting ? 0.7 : 1,
               }}
             >
-              See What's There
+              {extracting ? "Finding what's there…" : "See What's There"}
             </button>
           </div>
         </div>
