@@ -13,37 +13,68 @@ const CARD_SURFACE = "#E8E4D8";
 const DIVIDER = "#D4D0C4";
 
 interface StoryRow {
+  id: string;
   title: string;
   date: string;
   progressText?: string;
   complete: boolean;
 }
 
-const PLACEHOLDER_ROWS: StoryRow[] = [
-  {
-    title: "My grandmother's Sunday visits",
-    date: "June 1",
-    progressText: "3 of 7 saved",
-    complete: false,
-  },
-  {
-    title: "The summer we drove to Montana",
-    date: "May 30",
-    progressText: "5 of 7 saved",
-    complete: false,
-  },
-  {
-    title: "The record player in the front room",
-    date: "May 24 · 7 touchstones saved",
-    complete: true,
-  },
-];
+function formatDate(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  } catch {
+    return "";
+  }
+}
 
 const StoryUnfold = () => {
   const navigate = useNavigate();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [text, setText] = useState("");
   const [extracting, setExtracting] = useState(false);
+  const [rows, setRows] = useState<StoryRow[]>([]);
+
+  const loadRows = async () => {
+    const { data: userRes } = await supabase.auth.getUser();
+    const user = userRes?.user;
+    if (!user) {
+      setRows([]);
+      return;
+    }
+    const { data: sessions, error } = await supabase
+      .from("story_sessions")
+      .select("id, title, status, created_at, extracted_artifacts, confirmed_artifact_ids")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(8);
+    if (error) {
+      console.error("load sessions failed", error);
+      return;
+    }
+    const mapped: StoryRow[] = (sessions ?? []).map((s: any) => {
+      const total = Array.isArray(s.extracted_artifacts) ? s.extracted_artifacts.length : 0;
+      const confirmed = Array.isArray(s.confirmed_artifact_ids)
+        ? s.confirmed_artifact_ids.length
+        : 0;
+      const isComplete = s.status === "complete";
+      return {
+        id: s.id,
+        title: s.title || "Untitled story",
+        date: isComplete
+          ? `${formatDate(s.created_at)} · ${confirmed} touchstone${confirmed === 1 ? "" : "s"} saved`
+          : formatDate(s.created_at),
+        progressText: isComplete ? undefined : `${confirmed} of ${total} saved`,
+        complete: isComplete,
+      };
+    });
+    setRows(mapped);
+  };
+
+  useEffect(() => {
+    void loadRows();
+  }, []);
 
   useEffect(() => {
     if (sheetOpen) {
@@ -160,77 +191,98 @@ const StoryUnfold = () => {
 
         {/* Story rows */}
         <div className="mt-3 space-y-3">
-          {PLACEHOLDER_ROWS.map((row, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-3 px-4 py-3"
+          {rows.length === 0 && (
+            <p
               style={{
-                backgroundColor: CARD_SURFACE,
-                borderRadius: 10,
-                border: `0.5px solid ${DIVIDER}`,
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: MUTED,
               }}
             >
-              {/* Status dot */}
+              No stories yet. Tell your first one above.
+            </p>
+          )}
+          {rows.map((row) => {
+            const tappable = row.complete;
+            return (
               <div
-                className="flex-shrink-0 rounded-full"
+                key={row.id}
+                onClick={
+                  tappable
+                    ? () => navigate(`/story-unfold/session/${row.id}`)
+                    : undefined
+                }
+                className="flex items-center gap-3 px-4 py-3"
                 style={{
-                  width: 8,
-                  height: 8,
-                  backgroundColor: row.complete ? MUTED : AEGEAN,
+                  backgroundColor: CARD_SURFACE,
+                  borderRadius: 10,
+                  border: `0.5px solid ${DIVIDER}`,
+                  cursor: tappable ? "pointer" : "default",
                 }}
-              />
-
-              {/* Text content */}
-              <div className="flex-1 min-w-0">
-                <p
+              >
+                {/* Status dot */}
+                <div
+                  className="flex-shrink-0 rounded-full"
                   style={{
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: 14,
-                    color: row.complete ? MUTED : BRAND_NAVY,
-                    fontWeight: row.complete ? 400 : 700,
-                    lineHeight: 1.3,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    width: 8,
+                    height: 8,
+                    backgroundColor: row.complete ? MUTED : AEGEAN,
                   }}
-                >
-                  {row.title}
-                </p>
-                {row.progressText ? (
+                />
+
+                {/* Text content */}
+                <div className="flex-1 min-w-0">
                   <p
                     style={{
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: 11,
-                      color: AEGEAN,
-                      marginTop: 2,
+                      fontSize: 14,
+                      color: row.complete ? MUTED : BRAND_NAVY,
+                      fontWeight: row.complete ? 400 : 700,
                       lineHeight: 1.3,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    {row.progressText}
+                    {row.title}
                   </p>
-                ) : (
-                  <p
-                    style={{
-                      fontFamily: "'Jost', sans-serif",
-                      fontSize: 11,
-                      color: MUTED,
-                      marginTop: 2,
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {row.date}
-                  </p>
+                  {row.progressText ? (
+                    <p
+                      style={{
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: 11,
+                        color: AEGEAN,
+                        marginTop: 2,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {row.progressText}
+                    </p>
+                  ) : (
+                    <p
+                      style={{
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: 11,
+                        color: MUTED,
+                        marginTop: 2,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {row.date}
+                    </p>
+                  )}
+                </div>
+
+                {/* Chevron (only when tappable / complete) */}
+                {tappable && (
+                  <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
                 )}
               </div>
-
-              {/* Chevron (only for incomplete) */}
-              {!row.complete && (
-                <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
+
 
       {/* Tell Me A Story sheet */}
       {sheetOpen && (

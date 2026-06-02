@@ -11,17 +11,24 @@ const VALID_CATEGORIES = new Set([
   "imprint",
 ]);
 
-function buildSystemPrompt(cap: number) {
+function buildSystemPrompt(cap: number, excludeTitles: string[] = []) {
+  const excludeBlock = excludeTitles.length
+    ? `
+
+ALREADY EXTRACTED — DO NOT REPEAT these titles or anything that would clearly duplicate them. Look harder for what is *new* in the transcript:
+${excludeTitles.map((t) => `- ${t}`).join("\n")}`
+    : "";
+
   return `You are a warm, careful memory archivist. A user has shared a personal memory transcript with you. Your job is to extract discrete, meaningful memory artifacts from their story.
 
 CATEGORIES (use exactly these): Moment, Person, Object, Place, Food, Sound, Imprint.
 
 RULES:
-- Always extract a Moment artifact FIRST — it is the anchor of the story.
+- ${excludeTitles.length ? "Surface NEW artifacts that were missed on the first pass. A second Moment is fine only if it is clearly distinct." : "Always extract a Moment artifact FIRST — it is the anchor of the story."}
 - Extract only artifacts that are clearly present in the transcript. Never invent.
-- Return AT MOST ${cap} artifacts total (including the Moment). Fewer is fine.
+- Return AT MOST ${cap} artifacts total. Fewer is fine.
 - For each artifact return: category, title (2–5 words, human, warm), note (one warm sentence in second person), and source_phrase (the EXACT substring from the transcript that triggered this artifact, copied verbatim so it can be highlighted).
-- Respond with STRICT JSON ONLY. No preamble. No markdown. No code fences.
+- Respond with STRICT JSON ONLY. No preamble. No markdown. No code fences.${excludeBlock}
 
 JSON SHAPE:
 {
@@ -97,18 +104,49 @@ Deno.serve(async (req) => {
     const userId = claimsData.claims.sub as string;
 
     const body = await req.json().catch(() => ({}));
-    const transcript: string = (body?.transcript ?? body?.story ?? "").toString();
+    const existingSessionId: string | undefined = body?.session_id;
+    let transcript: string = (body?.transcript ?? body?.story ?? "").toString();
+    const clientExclude: string[] = Array.isArray(body?.exclude_titles)
+      ? body.exclude_titles.filter((s: unknown): s is string => typeof s === "string")
+      : [];
+
+    // Determine tier — Vivid = 7, Free = 5
+    const { data: isVividData } = await supabase.rpc("has_active_vivid", { _user_id: userId });
+    const isVivid = Boolean(isVividData);
+    const cap = isVivid ? 7 : 5;
+
+    // If continuing an existing session, fetch transcript + previously extracted titles
+    let existingArtifacts: any[] = [];
+    let existingSpans: any[] = [];
+    let excludeTitles: string[] = [...clientExclude];
+
+    if (existingSessionId) {
+      const { data: sess, error: sessErr } = await supabase
+        .from("story_sessions")
+        .select("transcript, extracted_artifacts, highlight_spans")
+        .eq("id", existingSessionId)
+        .single();
+      if (sessErr || !sess) {
+        return new Response(JSON.stringify({ error: "Session not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      transcript = sess.transcript ?? transcript;
+      existingArtifacts = Array.isArray(sess.extracted_artifacts) ? sess.extracted_artifacts : [];
+      existingSpans = Array.isArray(sess.highlight_spans) ? sess.highlight_spans : [];
+      const prevTitles = existingArtifacts
+        .map((a: any) => (typeof a?.title === "string" ? a.title : ""))
+        .filter(Boolean);
+      excludeTitles = Array.from(new Set([...excludeTitles, ...prevTitles]));
+    }
+
     if (!transcript || transcript.trim().length === 0) {
       return new Response(JSON.stringify({ error: "Missing transcript" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Determine tier — Vivid = 7, Free = 5
-    const { data: isVividData } = await supabase.rpc("has_active_vivid", { _user_id: userId });
-    const isVivid = Boolean(isVividData);
-    const cap = isVivid ? 7 : 5;
 
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -120,7 +158,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 1500,
-        system: buildSystemPrompt(cap),
+        system: buildSystemPrompt(cap, excludeTitles),
         messages: [{ role: "user", content: transcript }],
       }),
     });
@@ -172,62 +210,95 @@ Deno.serve(async (req) => {
           typeof a.source_phrase === "string" ? a.source_phrase.trim() : "",
       }));
 
+    // Drop anything that obviously matches an already-known title
+    const lowerExclude = new Set(excludeTitles.map((t) => t.toLowerCase()));
+    artifacts = artifacts.filter((a) => !lowerExclude.has(a.title.toLowerCase()));
+
     if (artifacts.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No artifacts extracted" }),
+        JSON.stringify({ error: "No new artifacts found", artifacts: [], highlight_spans: [] }),
         { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    // Ensure a Moment leads
-    const momentIdx = artifacts.findIndex((a) => a.category === "moment");
-    if (momentIdx > 0) {
-      const [m] = artifacts.splice(momentIdx, 1);
-      artifacts.unshift(m);
+    // On a fresh pass, ensure a Moment leads. On a continuation, keep model order.
+    if (!existingSessionId) {
+      const momentIdx = artifacts.findIndex((a) => a.category === "moment");
+      if (momentIdx > 0) {
+        const [m] = artifacts.splice(momentIdx, 1);
+        artifacts.unshift(m);
+      }
     }
 
-    // Enforce server-side cap
+    // Enforce per-pass cap
     artifacts = artifacts.slice(0, cap);
 
-    // Compute highlight spans from source_phrase
-    const highlightSpans = artifacts
+    // Compute highlight spans (indexed against the merged artifact list)
+    const indexOffset = existingArtifacts.length;
+    const newSpans = artifacts
       .map((a, i) => {
         const span = findSpan(transcript, a.source_phrase);
-        return span ? { artifact_index: i, ...span, phrase: a.source_phrase } : null;
+        return span
+          ? { artifact_index: indexOffset + i, ...span, phrase: a.source_phrase }
+          : null;
       })
       .filter(Boolean);
 
-    // Persist session
-    const { data: session, error: insertErr } = await supabase
-      .from("story_sessions")
-      .insert({
-        user_id: userId,
-        transcript,
-        extracted_artifacts: artifacts,
-        highlight_spans: highlightSpans,
-        status: "incomplete",
-      })
-      .select("id, title, expires_at, status")
-      .single();
+    let sessionRow: any;
 
-    if (insertErr) {
-      console.error("story_sessions insert error", insertErr);
-      return new Response(
-        JSON.stringify({ error: "Could not save session", detail: insertErr.message }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    if (existingSessionId) {
+      const mergedArtifacts = [...existingArtifacts, ...artifacts];
+      const mergedSpans = [...existingSpans, ...newSpans];
+      const { data: updated, error: updateErr } = await supabase
+        .from("story_sessions")
+        .update({
+          extracted_artifacts: mergedArtifacts,
+          highlight_spans: mergedSpans,
+        })
+        .eq("id", existingSessionId)
+        .select("id, title, expires_at, status")
+        .single();
+      if (updateErr) {
+        console.error("story_sessions update error", updateErr);
+        return new Response(
+          JSON.stringify({ error: "Could not update session", detail: updateErr.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      sessionRow = updated;
+    } else {
+      const { data: inserted, error: insertErr } = await supabase
+        .from("story_sessions")
+        .insert({
+          user_id: userId,
+          transcript,
+          extracted_artifacts: artifacts,
+          highlight_spans: newSpans,
+          status: "incomplete",
+        })
+        .select("id, title, expires_at, status")
+        .single();
+      if (insertErr) {
+        console.error("story_sessions insert error", insertErr);
+        return new Response(
+          JSON.stringify({ error: "Could not save session", detail: insertErr.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      sessionRow = inserted;
     }
 
     return new Response(
       JSON.stringify({
-        session_id: session.id,
-        title: session.title,
-        status: session.status,
-        expires_at: session.expires_at,
+        session_id: sessionRow.id,
+        title: sessionRow.title,
+        status: sessionRow.status,
+        expires_at: sessionRow.expires_at,
         artifacts,
-        highlight_spans: highlightSpans,
+        highlight_spans: newSpans,
         cap,
         tier: isVivid ? "vivid" : "free",
+        continuation: Boolean(existingSessionId),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );

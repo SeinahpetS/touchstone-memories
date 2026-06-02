@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const AEGEAN = "#0E7C86";
+
 const BRAND_NAVY = "#1E2E3E";
 const SOFT_IVORY = "#F2EEE5";
 const MUTED = "#8C8880";
@@ -61,6 +63,9 @@ const StoryReview = () => {
   const [artifacts, setArtifacts] = useState<Artifact[]>(locState.artifacts ?? []);
   const [index, setIndex] = useState(0);
   const [confirmedIds, setConfirmedIds] = useState<string[]>([]);
+  const [savedCount, setSavedCount] = useState(0);
+  const [phase, setPhase] = useState<"cards" | "complete">("cards");
+  const [continuing, setContinuing] = useState(false);
   const [savingOverlay, setSavingOverlay] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingNote, setEditingNote] = useState(false);
@@ -93,11 +98,21 @@ const StoryReview = () => {
 
   const advance = () => {
     if (index + 1 >= total) {
-      // Finished — return to Story Unfold
-      navigate("/story-unfold", { replace: true });
+      // End of stack — mark session complete and show summary
+      void markSessionComplete();
+      setPhase("complete");
     } else {
       setIndex((i) => i + 1);
     }
+  };
+
+  const markSessionComplete = async () => {
+    if (!sessionId) return;
+    const { error } = await supabase
+      .from("story_sessions")
+      .update({ status: "complete" })
+      .eq("id", sessionId);
+    if (error) console.error("story_sessions complete update failed", error);
   };
 
   const persistArtifact = async (a: Artifact): Promise<string | null> => {
@@ -128,15 +143,43 @@ const StoryReview = () => {
 
   const updateSessionConfirmed = async (newIds: string[]) => {
     if (!sessionId) return;
-    const allConfirmed = newIds.length >= total;
     const { error } = await supabase
       .from("story_sessions")
-      .update({
-        confirmed_artifact_ids: newIds,
-        status: allConfirmed ? "complete" : "incomplete",
-      })
+      .update({ confirmed_artifact_ids: newIds })
       .eq("id", sessionId);
     if (error) console.error("story_sessions update failed", error);
+  };
+
+  const handleTellMeMore = async () => {
+    if (!sessionId || continuing) return;
+    setContinuing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "extract-story-artifacts",
+        { body: { session_id: sessionId } },
+      );
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const more = (data?.artifacts ?? []) as Artifact[];
+      if (more.length === 0) {
+        toast("Nothing else to surface.");
+        return;
+      }
+      // Append new cards to the stack and continue
+      setArtifacts((arr) => [...arr, ...more]);
+      setIndex(total); // jump to first newly added card
+      setPhase("cards");
+      // Reset session back to incomplete since there are new cards to confirm
+      await supabase
+        .from("story_sessions")
+        .update({ status: "incomplete" })
+        .eq("id", sessionId);
+    } catch (e: any) {
+      console.error("Tell Me More failed", e);
+      toast(e?.message ?? "Couldn't find more.");
+    } finally {
+      setContinuing(false);
+    }
   };
 
   const handleSave = async () => {
@@ -145,6 +188,7 @@ const StoryReview = () => {
     if (!newId) return;
     const newIds = [...confirmedIds, newId];
     setConfirmedIds(newIds);
+    setSavedCount((c) => c + 1);
     void updateSessionConfirmed(newIds);
 
     playChime();
@@ -184,6 +228,73 @@ const StoryReview = () => {
   const dots = useMemo(() => {
     return Array.from({ length: total }, (_, i) => i);
   }, [total]);
+
+  if (phase === "complete") {
+    return (
+      <div
+        className="fixed inset-0 z-40 flex flex-col items-center justify-center px-6"
+        style={{ backgroundColor: SOFT_IVORY }}
+      >
+        <h2
+          className="text-center"
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 22,
+            color: BRAND_NAVY,
+            lineHeight: 1.3,
+          }}
+        >
+          {savedCount} {savedCount === 1 ? "touchstone" : "touchstones"} saved.
+        </h2>
+        <p
+          className="text-center mt-3"
+          style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            color: MUTED,
+          }}
+        >
+          Feel like something's missing?
+        </p>
+
+        <button
+          type="button"
+          onClick={handleTellMeMore}
+          disabled={continuing}
+          className="mt-6"
+          style={{
+            background: "none",
+            border: "none",
+            color: AEGEAN,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 14,
+            cursor: continuing ? "not-allowed" : "pointer",
+            opacity: continuing ? 0.6 : 1,
+            padding: 6,
+          }}
+        >
+          {continuing ? "Looking again…" : "Tell Me More →"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate("/archive")}
+          className="mt-3"
+          style={{
+            background: "none",
+            border: "none",
+            color: MUTED,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            cursor: "pointer",
+            padding: 6,
+          }}
+        >
+          Back to your archive →
+        </button>
+      </div>
+    );
+  }
 
   if (done || !current) return null;
 
