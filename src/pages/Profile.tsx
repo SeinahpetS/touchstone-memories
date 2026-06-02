@@ -35,6 +35,7 @@ const Profile = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [pricingOpen, setPricingOpen] = useState(false);
   const [exportPaywallOpen, setExportPaywallOpen] = useState(false);
+  const [exportVividOpen, setExportVividOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
 
   const [profile, setProfile] = useState<ProfileRow | null>(null);
