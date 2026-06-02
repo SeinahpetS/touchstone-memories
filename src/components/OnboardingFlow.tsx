@@ -721,6 +721,18 @@ const OnboardingFlow = ({
               onSelect={(loc) => setLocation(loc)}
               onClear={() => setLocation(null)}
             />
+            <p
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontStyle: "italic",
+                fontSize: 14,
+                color: "#4A6B8A",
+                textAlign: "center",
+                margin: "0.5rem 0 0",
+              }}
+            >
+              We only use your city, never your precise location.
+            </p>
             <p className="text-sm font-thin" style={privacyStyle}>
               Your information is yours.<br />We will never share or sell it.
             </p>
