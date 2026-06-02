@@ -1,5 +1,6 @@
 import { FilePen, ChevronRight, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -39,6 +40,7 @@ const PLACEHOLDER_ROWS: StoryRow[] = [
 ];
 
 const StoryUnfold = () => {
+  const navigate = useNavigate();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [text, setText] = useState("");
   const [extracting, setExtracting] = useState(false);
@@ -68,10 +70,17 @@ const StoryUnfold = () => {
       );
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      console.log("Extracted session", data);
-      toast(`Found ${data?.artifacts?.length ?? 0} artifacts.`);
+      const extracted = (data?.artifacts ?? []) as any[];
+      if (extracted.length === 0) throw new Error("No artifacts extracted");
       setSheetOpen(false);
       setText("");
+      navigate("/story-unfold/review", {
+        state: {
+          sessionId: data.session_id,
+          artifacts: extracted,
+          transcript: transcript,
+        },
+      });
     } catch (e: any) {
       console.error("Extraction failed", e);
       toast(e?.message ?? "Something went wrong. Try again.");

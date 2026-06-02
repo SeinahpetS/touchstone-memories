@@ -13,6 +13,7 @@ import Archive from "./pages/Archive.tsx";
 import Profile from "./pages/Profile.tsx";
 import FAQ from "./pages/FAQ.tsx";
 import StoryUnfold from "./pages/StoryUnfold.tsx";
+import StoryReview from "./pages/StoryReview.tsx";
 import TellStory from "./pages/TellStory.tsx";
 import TellStoryResults from "./pages/TellStoryResults.tsx";
 import Vivid from "./pages/Vivid.tsx";
@@ -143,6 +144,7 @@ const App = () => (
           <Route path="/settings" element={<Profile />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/story-unfold" element={<StoryUnfold />} />
+          <Route path="/story-unfold/review" element={<StoryReview />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
           <Route path="/vivid" element={<Vivid />} />
