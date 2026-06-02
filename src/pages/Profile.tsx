@@ -599,6 +599,11 @@ const Profile = () => {
         onOpenChange={setExportPaywallOpen}
         feature="export"
       />
+      <VividUpgradeCard
+        open={exportVividOpen}
+        triggeredBy="export_archive"
+        onDismiss={() => setExportVividOpen(false)}
+      />
     </div>
   );
 };
