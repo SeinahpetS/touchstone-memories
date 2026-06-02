@@ -32,7 +32,6 @@ import {
 type Step =
   | "intro"
   | "flow"
-  | "splash"
   | "resume"
   | "definition"
   | "category"
@@ -290,7 +289,7 @@ const Onboarding = () => {
   const location = useLocation();
   const { user, loading } = useAuth();
   const skipToWalkthrough = (location.state as { skipToWalkthrough?: boolean } | null)?.skipToWalkthrough === true;
-  const [step, setStep] = useState<Step>(skipToWalkthrough ? "splash" : "intro");
+  const [step, setStep] = useState<Step>(skipToWalkthrough ? "definition" : "intro");
   const [draft, setDraft] = useState<OnboardingDraft>(emptyOnboardingDraft());
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -502,14 +501,10 @@ const Onboarding = () => {
             lat: data.location?.lat ?? null,
             lng: data.location?.lng ?? null,
           });
-          setStep("splash");
+          handleAfterSplash();
         }}
       />
     );
-  }
-
-  if (step === "splash") {
-    return <Splash onDone={handleAfterSplash} />;
   }
 
   if (step === "resume") {
@@ -1395,84 +1390,9 @@ const Onboarding = () => {
 // ---------- Sub-components ----------
 
 /**
- * Splash — full-screen ink intro. Holds 2.5s, then dissolves ivory and advances.
- * Wordmark fades in immediately; gold diamond mark fades in 0.5s after.
- * A static placeholder for the eventual Lottie animation.
+ * Definition — ivory, full-bleed dictionary entry. Playfair throughout.
+ * Sub-copy fades in 1s after the entry; quiet gold text CTA below.
  */
-const Splash = ({ onDone }: { onDone: () => void }) => {
-  const [dissolving, setDissolving] = useState(false);
-
-  useEffect(() => {
-    // Begin dissolve at 2.5s, advance once the 0.8s fade completes.
-    const startDissolve = window.setTimeout(() => setDissolving(true), 2500);
-    const advance = window.setTimeout(() => onDone(), 2500 + 800);
-    return () => {
-      window.clearTimeout(startDissolve);
-      window.clearTimeout(advance);
-    };
-  }, [onDone]);
-
-  return (
-    <div
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
-      style={{ backgroundColor: "#2C3E50" }}
-    >
-      <style>{`
-        @keyframes ts-splash-wordmark {
-          from { opacity: 0; letter-spacing: 0.36em; }
-          to { opacity: 1; letter-spacing: 0.28em; }
-        }
-        @keyframes ts-splash-diamond {
-          from { opacity: 0; transform: rotate(45deg) scale(0.6); }
-          to { opacity: 1; transform: rotate(45deg) scale(1); }
-        }
-        .ts-splash-wordmark { animation: ts-splash-wordmark 1.1s ease-out both; }
-        .ts-splash-diamond  { animation: ts-splash-diamond 0.9s ease-out 0.5s both; }
-      `}</style>
-
-      <div className="flex flex-col items-center gap-7">
-        <h1
-          className="ts-splash-wordmark"
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontWeight: 900,
-            fontSize: "clamp(37px, 8.8vw, 57px)",
-            letterSpacing: "0.28em",
-            color: "#F2EEE5",
-            textTransform: "lowercase",
-            margin: 0,
-          }}
-        >
-          touchstone
-        </h1>
-        <span
-          aria-hidden
-          className="ts-splash-diamond"
-          style={{
-            display: "inline-block",
-            width: 14,
-            height: 14,
-            backgroundColor: "#B8860B",
-            boxShadow: "0 0 18px rgba(184,134,11,0.5)",
-          }}
-        />
-      </div>
-
-      {/* Ivory dissolve overlay */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: "#F2EEE5",
-          opacity: dissolving ? 1 : 0,
-          transition: "opacity 0.8s ease-in-out",
-          pointerEvents: "none",
-        }}
-      />
-    </div>
-  );
-};
 
 /**
  * Definition — ivory, full-bleed dictionary entry. Playfair throughout.
