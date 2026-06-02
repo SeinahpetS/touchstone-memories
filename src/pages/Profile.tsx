@@ -154,7 +154,7 @@ const Profile = () => {
   const handleExport = async () => {
     // Export is gated on Vivid (active subscription or trial).
     if (!entitlement.hasAccess) {
-      setExportPaywallOpen(true);
+      setExportVividOpen(true);
       return;
     }
     setExporting(true);
