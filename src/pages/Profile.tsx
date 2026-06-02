@@ -358,8 +358,8 @@ const Profile = () => {
               <button
                 onClick={handleManageSubscription}
                 disabled={portalLoading}
-                className="inline-flex items-center rounded-full border border-foreground/40 px-3 py-1 text-[13px] font-medium text-foreground hover:bg-foreground/5 transition-colors disabled:opacity-60 text-slate-100 bg-teal-500"
-                style={{ fontFamily: "'Jost', sans-serif" }}
+                className="inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-medium text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                style={{ fontFamily: "'Jost', sans-serif", backgroundColor: "#0E7C86" }}
               >
                 {portalLoading ? "…" : "Manage"}
               </button>
