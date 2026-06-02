@@ -146,7 +146,7 @@ const DefinitionSplash = ({ onBegin }: Props) => (
       </div>
 
       <p
-        className="ts-def-sub mt-16 text-center mx-auto"
+        className="ts-dissolve-1 mt-16 text-center mx-auto"
         style={{
           fontFamily: "'Playfair Display', serif",
           fontStyle: "italic",
@@ -154,10 +154,23 @@ const DefinitionSplash = ({ onBegin }: Props) => (
           lineHeight: 1.5,
           color: "rgba(44,62,80,0.78)",
           maxWidth: 390,
-          whiteSpace: "pre-line",
         }}
       >
-        A touchstone tests what's real.{"\n"}Some things are too valuable to leave only to memory.
+        The pieces you want to remember,
+      </p>
+
+      <p
+        className="ts-dissolve-2 text-center mx-auto"
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          fontStyle: "italic",
+          fontSize: 17,
+          lineHeight: 1.5,
+          color: "rgba(44,62,80,0.78)",
+          maxWidth: 390,
+        }}
+      >
+        and the things you don't want to forget.
       </p>
 
       <button
