@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Camera, LogOut, Moon, Sun, Trash2 } from "lucide-react";
+import { Camera, ChevronRight, LogOut, Moon, Sun, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -411,6 +411,20 @@ const Profile = () => {
           )}
         </section>
 
+        {/* Help & FAQ */}
+        <button
+          type="button"
+          onClick={() => navigate("/faq")}
+          className="flex w-full items-center justify-between border-t border-border pt-6 pb-2 text-left"
+        >
+          <span
+            className="font-playfair text-lg"
+            style={{ color: "#1E2E3E" }}
+          >
+            Help & FAQ
+          </span>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </button>
 
         {/* Actions */}
         <div className="space-y-3 pt-2">
