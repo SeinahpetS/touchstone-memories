@@ -14,6 +14,8 @@ import Profile from "./pages/Profile.tsx";
 import FAQ from "./pages/FAQ.tsx";
 import StoryUnfold from "./pages/StoryUnfold.tsx";
 import StoryReview from "./pages/StoryReview.tsx";
+import StorySessionView from "./pages/StorySessionView.tsx";
+import StoryTranscriptView from "./pages/StoryTranscriptView.tsx";
 import TellStory from "./pages/TellStory.tsx";
 import TellStoryResults from "./pages/TellStoryResults.tsx";
 import Vivid from "./pages/Vivid.tsx";
