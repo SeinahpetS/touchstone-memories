@@ -30,9 +30,7 @@ import {
 } from "@/lib/onboardingDraft";
 
 type Step =
-  | "intro"
   | "flow"
-  | "splash"
   | "resume"
   | "definition"
   | "category"
