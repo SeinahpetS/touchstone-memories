@@ -13,31 +13,21 @@ const CARD_SURFACE = "#E8E4D8";
 const DIVIDER = "#D4D0C4";
 
 interface StoryRow {
+  id: string;
   title: string;
   date: string;
   progressText?: string;
   complete: boolean;
 }
 
-const PLACEHOLDER_ROWS: StoryRow[] = [
-  {
-    title: "My grandmother's Sunday visits",
-    date: "June 1",
-    progressText: "3 of 7 saved",
-    complete: false,
-  },
-  {
-    title: "The summer we drove to Montana",
-    date: "May 30",
-    progressText: "5 of 7 saved",
-    complete: false,
-  },
-  {
-    title: "The record player in the front room",
-    date: "May 24 · 7 touchstones saved",
-    complete: true,
-  },
-];
+function formatDate(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  } catch {
+    return "";
+  }
+}
 
 const StoryUnfold = () => {
   const navigate = useNavigate();
