@@ -281,8 +281,8 @@ const StoryUnfold = () => {
             );
           })}
         </div>
-        </div>
       </div>
+
 
       {/* Tell Me A Story sheet */}
       {sheetOpen && (
