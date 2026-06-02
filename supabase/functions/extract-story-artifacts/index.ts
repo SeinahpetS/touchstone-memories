@@ -210,62 +210,95 @@ Deno.serve(async (req) => {
           typeof a.source_phrase === "string" ? a.source_phrase.trim() : "",
       }));
 
+    // Drop anything that obviously matches an already-known title
+    const lowerExclude = new Set(excludeTitles.map((t) => t.toLowerCase()));
+    artifacts = artifacts.filter((a) => !lowerExclude.has(a.title.toLowerCase()));
+
     if (artifacts.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No artifacts extracted" }),
+        JSON.stringify({ error: "No new artifacts found", artifacts: [], highlight_spans: [] }),
         { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    // Ensure a Moment leads
-    const momentIdx = artifacts.findIndex((a) => a.category === "moment");
-    if (momentIdx > 0) {
-      const [m] = artifacts.splice(momentIdx, 1);
-      artifacts.unshift(m);
+    // On a fresh pass, ensure a Moment leads. On a continuation, keep model order.
+    if (!existingSessionId) {
+      const momentIdx = artifacts.findIndex((a) => a.category === "moment");
+      if (momentIdx > 0) {
+        const [m] = artifacts.splice(momentIdx, 1);
+        artifacts.unshift(m);
+      }
     }
 
-    // Enforce server-side cap
+    // Enforce per-pass cap
     artifacts = artifacts.slice(0, cap);
 
-    // Compute highlight spans from source_phrase
-    const highlightSpans = artifacts
+    // Compute highlight spans (indexed against the merged artifact list)
+    const indexOffset = existingArtifacts.length;
+    const newSpans = artifacts
       .map((a, i) => {
         const span = findSpan(transcript, a.source_phrase);
-        return span ? { artifact_index: i, ...span, phrase: a.source_phrase } : null;
+        return span
+          ? { artifact_index: indexOffset + i, ...span, phrase: a.source_phrase }
+          : null;
       })
       .filter(Boolean);
 
-    // Persist session
-    const { data: session, error: insertErr } = await supabase
-      .from("story_sessions")
-      .insert({
-        user_id: userId,
-        transcript,
-        extracted_artifacts: artifacts,
-        highlight_spans: highlightSpans,
-        status: "incomplete",
-      })
-      .select("id, title, expires_at, status")
-      .single();
+    let sessionRow: any;
 
-    if (insertErr) {
-      console.error("story_sessions insert error", insertErr);
-      return new Response(
-        JSON.stringify({ error: "Could not save session", detail: insertErr.message }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    if (existingSessionId) {
+      const mergedArtifacts = [...existingArtifacts, ...artifacts];
+      const mergedSpans = [...existingSpans, ...newSpans];
+      const { data: updated, error: updateErr } = await supabase
+        .from("story_sessions")
+        .update({
+          extracted_artifacts: mergedArtifacts,
+          highlight_spans: mergedSpans,
+        })
+        .eq("id", existingSessionId)
+        .select("id, title, expires_at, status")
+        .single();
+      if (updateErr) {
+        console.error("story_sessions update error", updateErr);
+        return new Response(
+          JSON.stringify({ error: "Could not update session", detail: updateErr.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      sessionRow = updated;
+    } else {
+      const { data: inserted, error: insertErr } = await supabase
+        .from("story_sessions")
+        .insert({
+          user_id: userId,
+          transcript,
+          extracted_artifacts: artifacts,
+          highlight_spans: newSpans,
+          status: "incomplete",
+        })
+        .select("id, title, expires_at, status")
+        .single();
+      if (insertErr) {
+        console.error("story_sessions insert error", insertErr);
+        return new Response(
+          JSON.stringify({ error: "Could not save session", detail: insertErr.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      sessionRow = inserted;
     }
 
     return new Response(
       JSON.stringify({
-        session_id: session.id,
-        title: session.title,
-        status: session.status,
-        expires_at: session.expires_at,
+        session_id: sessionRow.id,
+        title: sessionRow.title,
+        status: sessionRow.status,
+        expires_at: sessionRow.expires_at,
         artifacts,
-        highlight_spans: highlightSpans,
+        highlight_spans: newSpans,
         cap,
         tier: isVivid ? "vivid" : "free",
+        continuation: Boolean(existingSessionId),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
