@@ -191,75 +191,96 @@ const StoryUnfold = () => {
 
         {/* Story rows */}
         <div className="mt-3 space-y-3">
-          {PLACEHOLDER_ROWS.map((row, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-3 px-4 py-3"
+          {rows.length === 0 && (
+            <p
               style={{
-                backgroundColor: CARD_SURFACE,
-                borderRadius: 10,
-                border: `0.5px solid ${DIVIDER}`,
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: MUTED,
               }}
             >
-              {/* Status dot */}
+              No stories yet. Tell your first one above.
+            </p>
+          )}
+          {rows.map((row) => {
+            const tappable = row.complete;
+            return (
               <div
-                className="flex-shrink-0 rounded-full"
+                key={row.id}
+                onClick={
+                  tappable
+                    ? () => navigate(`/story-unfold/session/${row.id}`)
+                    : undefined
+                }
+                className="flex items-center gap-3 px-4 py-3"
                 style={{
-                  width: 8,
-                  height: 8,
-                  backgroundColor: row.complete ? MUTED : AEGEAN,
+                  backgroundColor: CARD_SURFACE,
+                  borderRadius: 10,
+                  border: `0.5px solid ${DIVIDER}`,
+                  cursor: tappable ? "pointer" : "default",
                 }}
-              />
-
-              {/* Text content */}
-              <div className="flex-1 min-w-0">
-                <p
+              >
+                {/* Status dot */}
+                <div
+                  className="flex-shrink-0 rounded-full"
                   style={{
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: 14,
-                    color: row.complete ? MUTED : BRAND_NAVY,
-                    fontWeight: row.complete ? 400 : 700,
-                    lineHeight: 1.3,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    width: 8,
+                    height: 8,
+                    backgroundColor: row.complete ? MUTED : AEGEAN,
                   }}
-                >
-                  {row.title}
-                </p>
-                {row.progressText ? (
+                />
+
+                {/* Text content */}
+                <div className="flex-1 min-w-0">
                   <p
                     style={{
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: 11,
-                      color: AEGEAN,
-                      marginTop: 2,
+                      fontSize: 14,
+                      color: row.complete ? MUTED : BRAND_NAVY,
+                      fontWeight: row.complete ? 400 : 700,
                       lineHeight: 1.3,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    {row.progressText}
+                    {row.title}
                   </p>
-                ) : (
-                  <p
-                    style={{
-                      fontFamily: "'Jost', sans-serif",
-                      fontSize: 11,
-                      color: MUTED,
-                      marginTop: 2,
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {row.date}
-                  </p>
+                  {row.progressText ? (
+                    <p
+                      style={{
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: 11,
+                        color: AEGEAN,
+                        marginTop: 2,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {row.progressText}
+                    </p>
+                  ) : (
+                    <p
+                      style={{
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: 11,
+                        color: MUTED,
+                        marginTop: 2,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {row.date}
+                    </p>
+                  )}
+                </div>
+
+                {/* Chevron (only when tappable / complete) */}
+                {tappable && (
+                  <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
                 )}
               </div>
-
-              {/* Chevron (only for incomplete) */}
-              {!row.complete && (
-                <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
-              )}
-            </div>
-          ))}
+            );
+          })}
+        </div>
         </div>
       </div>
 
