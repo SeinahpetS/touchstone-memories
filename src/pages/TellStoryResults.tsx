@@ -311,7 +311,7 @@ const TellStoryResults = () => {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 color: NAVY,
-                margin: "8px 0 14px",
+                margin: "0 0 14px",
               }}
             >
               {current.category}
@@ -320,9 +320,9 @@ const TellStoryResults = () => {
               style={{
                 fontFamily: "'Playfair Display', serif",
                 color: NAVY,
-                fontSize: 28,
+                fontSize: 32,
                 lineHeight: 1.15,
-                margin: "0 0 14px",
+                margin: "0 0 16px",
               }}
             >
               {current.title}
@@ -330,6 +330,7 @@ const TellStoryResults = () => {
             <p
               style={{
                 fontFamily: "'Jost', sans-serif",
+                fontWeight: 400,
                 color: "#2C3E50",
                 fontSize: 16,
                 lineHeight: 1.55,
