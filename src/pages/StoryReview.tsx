@@ -188,6 +188,7 @@ const StoryReview = () => {
     if (!newId) return;
     const newIds = [...confirmedIds, newId];
     setConfirmedIds(newIds);
+    setSavedCount((c) => c + 1);
     void updateSessionConfirmed(newIds);
 
     playChime();
