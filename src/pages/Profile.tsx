@@ -38,6 +38,8 @@ const Profile = () => {
   const [exportPaywallOpen, setExportPaywallOpen] = useState(false);
   const [exportVividOpen, setExportVividOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
+  const [saveOfferNote, setSaveOfferNote] = useState(false);
 
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [name, setName] = useState("");
