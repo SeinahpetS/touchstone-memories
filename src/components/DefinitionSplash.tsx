@@ -18,10 +18,15 @@ const DefinitionSplash = ({ onBegin }: Props) => (
         from { opacity: 0; transform: translateY(8px); }
         to   { opacity: 1; transform: translateY(0); }
       }
+      @keyframes ts-dissolve {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
       .ts-def-logo   { animation: ts-def-in 0.7s ease-out 0s both; }
       .ts-def-entry  { animation: ts-def-in 0.7s ease-out 0.1s both; }
-      .ts-def-sub    { animation: ts-def-in 0.7s ease-out 1s both; }
       .ts-def-begin  { animation: ts-def-in 0.7s ease-out 1.25s both; }
+      .ts-dissolve-1 { animation: ts-dissolve 1.2s ease-in 1.0s both; }
+      .ts-dissolve-2 { animation: ts-dissolve 1.2s ease-in 2.4s both; }
     `}</style>
 
     <div className="flex flex-1 flex-col items-center justify-center" style={{ transform: 'translateY(-2vh)' }}>
