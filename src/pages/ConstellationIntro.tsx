@@ -19,7 +19,8 @@ const SCREEN1_LINES = [
   "...until you see what it's part of.",
   "Your touchstones are the same.",
   "Each one a point of light...",
-  "...all of them quietly forming a constellation entirely your own.",
+  "...all of them quietly forming a constellation",
+  "entirely your own.",
 ];
 
 type Phase = "s1" | "s2" | "s3" | "s4" | "s5";
