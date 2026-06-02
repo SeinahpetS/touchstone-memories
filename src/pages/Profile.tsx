@@ -45,6 +45,9 @@ const Profile = () => {
   const [exporting, setExporting] = useState(false);
   const [exportSent, setExportSent] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
