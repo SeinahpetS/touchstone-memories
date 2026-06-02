@@ -145,7 +145,7 @@ const Auth = () => {
             lng: data.location?.lng ?? null,
           });
           if (data.firstName) setName(data.firstName);
-          navigate("/onboarding", { state: { skipToWalkthrough: true } });
+          navigate("/welcome", { state: { skipToWalkthrough: true } });
         }}
       />
     );
