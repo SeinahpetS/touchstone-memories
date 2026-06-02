@@ -13,6 +13,7 @@ import Archive from "./pages/Archive.tsx";
 import Profile from "./pages/Profile.tsx";
 import TellStory from "./pages/TellStory.tsx";
 import TellStoryResults from "./pages/TellStoryResults.tsx";
+import Vivid from "./pages/Vivid.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
 
@@ -129,6 +130,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
+          <Route path="/vivid" element={<Vivid />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

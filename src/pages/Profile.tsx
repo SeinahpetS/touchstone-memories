@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PricingSheet } from "@/components/PricingSheet";
 import { PaywallSheet } from "@/components/PaywallSheet";
+import { VividUpgradeCard } from "@/components/VividUpgradeCard";
 
 interface ProfileRow {
   id: string;
@@ -34,6 +35,7 @@ const Profile = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [pricingOpen, setPricingOpen] = useState(false);
   const [exportPaywallOpen, setExportPaywallOpen] = useState(false);
+  const [exportVividOpen, setExportVividOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
 
   const [profile, setProfile] = useState<ProfileRow | null>(null);
@@ -152,7 +154,7 @@ const Profile = () => {
   const handleExport = async () => {
     // Export is gated on Vivid (active subscription or trial).
     if (!entitlement.hasAccess) {
-      setExportPaywallOpen(true);
+      setExportVividOpen(true);
       return;
     }
     setExporting(true);
@@ -596,6 +598,11 @@ const Profile = () => {
         open={exportPaywallOpen}
         onOpenChange={setExportPaywallOpen}
         feature="export"
+      />
+      <VividUpgradeCard
+        open={exportVividOpen}
+        triggeredBy="export_archive"
+        onDismiss={() => setExportVividOpen(false)}
       />
     </div>
   );

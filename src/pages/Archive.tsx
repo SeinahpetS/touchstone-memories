@@ -9,6 +9,8 @@ import MemoryCard from "@/components/MemoryCard";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import ShareMemorySheet from "@/components/ShareMemorySheet";
 import { PaywallSheet } from "@/components/PaywallSheet";
+import { VividUpgradeCard } from "@/components/VividUpgradeCard";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import TimelineView from "@/components/TimelineView";
 import CategoryIcon, { CategoryIconCard, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
@@ -59,6 +61,8 @@ const Archive = () => {
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
   const [storyTooltipOpen, setStoryTooltipOpen] = useState(false);
   const [storyPaywallOpen, setStoryPaywallOpen] = useState(false);
+  const [storyVividOpen, setStoryVividOpen] = useState(false);
+  const entitlement = useEntitlement();
   const [bouncing, setBouncing] = useState(false);
   const [showTimelineTooltip, setShowTimelineTooltip] = useState(false);
   const [dotsVisible, setDotsVisible] = useState(false);
@@ -816,6 +820,10 @@ const Archive = () => {
 
           <button
             onClick={() => {
+              if (!entitlement.hasAccess) {
+                setStoryVividOpen(true);
+                return;
+              }
               const seenKey = user ? `touchstone:story-tooltip-seen:${user.id}` : null;
               if (seenKey && !localStorage.getItem(seenKey)) {
                 setStoryTooltipOpen(true);
@@ -948,6 +956,11 @@ const Archive = () => {
         open={storyPaywallOpen}
         onOpenChange={setStoryPaywallOpen}
         feature="premium_prompt"
+      />
+      <VividUpgradeCard
+        open={storyVividOpen}
+        triggeredBy="tell_me_a_story"
+        onDismiss={() => setStoryVividOpen(false)}
       />
 
 
