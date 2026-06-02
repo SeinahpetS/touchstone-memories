@@ -467,7 +467,7 @@ const Onboarding = () => {
     if (existing) {
       setStep("resume");
     } else {
-      setStep("definition");
+      setStep("category");
     }
   };
 
