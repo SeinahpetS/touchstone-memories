@@ -481,30 +481,7 @@ const Onboarding = () => {
   }
 
   if (step === "flow") {
-    return (
-      <OnboardingFlow
-        initialFirstName={draft.firstName ?? ""}
-        initialBirthMonth={draft.birthMonth ?? null}
-        initialBirthYear={draft.birthYear ?? null}
-        initialCity={draft.city ?? ""}
-        initialState={draft.state ?? ""}
-        onComplete={(data) => {
-          update({
-            firstName: data.firstName,
-            birthMonth: data.birthMonth,
-            birthYear: data.birthYear,
-            city: data.location?.city ?? data.city,
-            state: data.location?.region ?? data.state,
-            region: data.location?.region ?? "",
-            country: data.location?.country ?? "",
-            locationDisplay: data.location?.locationDisplay ?? "",
-            lat: data.location?.lat ?? null,
-            lng: data.location?.lng ?? null,
-          });
-          handleAfterSplash();
-        }}
-      />
-    );
+    return <ConstellationIntro />;
   }
 
   if (step === "resume") {
