@@ -18,6 +18,7 @@ import MemoryDateInput from "@/components/MemoryDateInput";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
+import ConstellationIntro from "@/pages/ConstellationIntro";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import {
   clearOnboardingDraft,
