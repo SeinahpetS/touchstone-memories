@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, MessageSquareText, Palette, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
+import { BookOpen, FilePen, Palette, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
 
 type Tab = {
   key: string;
@@ -26,8 +26,8 @@ const TABS: Tab[] = [
   },
   {
     key: "story",
-    path: "/tell-a-story",
-    icon: MessageSquareText,
+    path: "/story-unfold",
+    icon: FilePen,
     label: (
       <>
         Story
@@ -35,7 +35,7 @@ const TABS: Tab[] = [
         Unfold
       </>
     ),
-    activeColor: AEGEAN,
+    activeColor: OLD_GOLD,
     activeLabelColor: ACTIVE,
   },
   {
