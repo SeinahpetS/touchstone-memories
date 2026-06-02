@@ -229,6 +229,73 @@ const StoryReview = () => {
     return Array.from({ length: total }, (_, i) => i);
   }, [total]);
 
+  if (phase === "complete") {
+    return (
+      <div
+        className="fixed inset-0 z-40 flex flex-col items-center justify-center px-6"
+        style={{ backgroundColor: SOFT_IVORY }}
+      >
+        <h2
+          className="text-center"
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 22,
+            color: BRAND_NAVY,
+            lineHeight: 1.3,
+          }}
+        >
+          {savedCount} {savedCount === 1 ? "touchstone" : "touchstones"} saved.
+        </h2>
+        <p
+          className="text-center mt-3"
+          style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            color: MUTED,
+          }}
+        >
+          Feel like something's missing?
+        </p>
+
+        <button
+          type="button"
+          onClick={handleTellMeMore}
+          disabled={continuing}
+          className="mt-6"
+          style={{
+            background: "none",
+            border: "none",
+            color: AEGEAN,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 14,
+            cursor: continuing ? "not-allowed" : "pointer",
+            opacity: continuing ? 0.6 : 1,
+            padding: 6,
+          }}
+        >
+          {continuing ? "Looking again…" : "Tell Me More →"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate("/archive")}
+          className="mt-3"
+          style={{
+            background: "none",
+            border: "none",
+            color: MUTED,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            cursor: "pointer",
+            padding: 6,
+          }}
+        >
+          Back to your archive →
+        </button>
+      </div>
+    );
+  }
+
   if (done || !current) return null;
 
   return (
