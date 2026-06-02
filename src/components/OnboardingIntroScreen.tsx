@@ -398,8 +398,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
   //   stage 2 — Touchstone wordmark fades in slowly
   //   stage 3 — "Everything that made you." letter-by-letter reveal
   //   stage 4 — "Still here." + Begin button fade in
-  const [everythingChars, setEverythingChars] = useState(0);
-  const EVERYTHING_TEXT = "Where stories meet and memories last.";
+  const [everythingVisible, setEverythingVisible] = useState(false);
+  const EVERYTHING_TEXT = "The pieces you want to remember, and the things you don\u2019t want to forget.";
+  const EVERYTHING_FADE_MS = 1400;
 
   useEffect(() => {
     if (!advancing) return;
@@ -410,18 +411,13 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     timers.push(
       window.setTimeout(() => {
         setClosingStage(3);
-        // letter-by-letter reveal of "Everything that made you."
-        for (let i = 1; i <= EVERYTHING_TEXT.length; i++) {
-          timers.push(
-            window.setTimeout(() => setEverythingChars(i), i * 75),
-          );
-        }
+        setEverythingVisible(true);
       }, 3400),
     );
     timers.push(
       window.setTimeout(
         () => setClosingStage(4),
-        3400 + EVERYTHING_TEXT.length * 75 + 400,
+        3400 + EVERYTHING_FADE_MS + 400,
       ),
     );
     return () => timers.forEach((t) => clearTimeout(t));
@@ -643,21 +639,13 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               color: "#B8860B",
               marginTop: "3.2rem",
               minHeight: "1.4em",
+              textAlign: "center",
+              maxWidth: "32rem",
+              opacity: everythingVisible ? 1 : 0,
+              transition: `opacity ${EVERYTHING_FADE_MS}ms ease`,
             }}
           >
-            <span style={{ whiteSpace: "pre" }}>
-              {EVERYTHING_TEXT.split("").map((ch, i) => (
-                <span
-                  key={i}
-                  style={{
-                    opacity: i < everythingChars ? 1 : 0,
-                    transition: "opacity 120ms ease",
-                  }}
-                >
-                  {ch}
-                </span>
-              ))}
-            </span>
+            {EVERYTHING_TEXT}
           </div>
           <button
             onClick={onBegin}
