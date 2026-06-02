@@ -11,6 +11,7 @@ import Onboarding from "./pages/Onboarding.tsx";
 import Auth from "./pages/Auth.tsx";
 import Archive from "./pages/Archive.tsx";
 import Profile from "./pages/Profile.tsx";
+import FAQ from "./pages/FAQ.tsx";
 import TellStory from "./pages/TellStory.tsx";
 import TellStoryResults from "./pages/TellStoryResults.tsx";
 import Vivid from "./pages/Vivid.tsx";
@@ -139,6 +140,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
           <Route path="/vivid" element={<Vivid />} />
