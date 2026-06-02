@@ -130,6 +130,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
+          <Route path="/vivid" element={<Vivid />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
