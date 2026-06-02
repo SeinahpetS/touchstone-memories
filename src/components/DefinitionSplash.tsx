@@ -170,7 +170,7 @@ const DefinitionSplash = ({ onBegin }: Props) => (
           maxWidth: 390,
         }}
       >
-        and the things you don't want to forget.
+        the things you don't want to forget.
       </p>
 
       <button
