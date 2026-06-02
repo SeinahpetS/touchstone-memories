@@ -665,7 +665,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               pointerEvents: closingStage >= 4 ? "auto" : "none",
             }}
           >
-            Begin →
+            Show Me
           </button>
         </div>
       )}
