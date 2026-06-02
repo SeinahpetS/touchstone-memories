@@ -144,6 +144,7 @@ const App = () => (
           <Route path="/settings" element={<Profile />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/story-unfold" element={<StoryUnfold />} />
+          <Route path="/story-unfold/review" element={<StoryReview />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
           <Route path="/vivid" element={<Vivid />} />
