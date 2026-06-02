@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Camera, ChevronRight, LogOut, Moon, Sun, Trash2 } from "lucide-react";
+import { Camera, ChevronRight, Instagram, LogOut, Moon, Sun, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -475,8 +475,115 @@ const Profile = () => {
           </button>
         </section>
 
+        {/* About Touchstone */}
+        <section className="pt-8 text-center">
+          <p
+            className="mx-auto max-w-sm"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              lineHeight: 1.6,
+              color: "#8C8880",
+            }}
+          >
+            Touchstone is a living personal archive — built to capture the people, places, objects, moments, and memories that made you who you are.
+            <br />
+            <br />
+            Made by one person, for everyone. To remember so you never forget.
+          </p>
+
+          <div className="mt-6 flex items-center justify-center gap-8">
+            <a
+              href="https://www.instagram.com/usetouchstoneapp"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              style={{ color: "#1E2E3E" }}
+            >
+              <Instagram className="h-6 w-6" strokeWidth={1.5} />
+            </a>
+            <a
+              href="https://www.threads.net/@usetouchstoneapp"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Threads"
+              style={{ color: "#1E2E3E" }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 7.5c-1.333 -3 -3.667 -4.5 -7 -4.5c-5 0 -8 2.5 -8 9s3.5 9 8 9c4 0 6.5 -2 6.5 -5c0 -3 -2 -4.5 -6 -4.5c-2 0 -3.5 1 -3.5 2.5c0 1.5 1 2.5 3 2.5c2.5 0 4 -1.5 4 -6c0 -3 -1.5 -4.5 -3.5 -4.5" />
+              </svg>
+            </a>
+            <a
+              href="https://www.tiktok.com/@touchstone.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              style={{ color: "#1E2E3E" }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 7.917v4.034a9.948 9.948 0 0 1 -5 -1.951v4.5a6.5 6.5 0 1 1 -8 -6.326v4.326a2.5 2.5 0 1 0 4 2v-11.5h4.083a6.005 6.005 0 0 0 4.917 4.917z" />
+              </svg>
+            </a>
+          </div>
+
+          <div className="mt-5">
+            <a
+              href="#"
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#8C8880",
+                textDecoration: "none",
+              }}
+            >
+              Privacy Policy
+            </a>
+            <span
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#8C8880",
+                margin: "0 8px",
+              }}
+            >
+              ·
+            </span>
+            <a
+              href="#"
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: "#8C8880",
+                textDecoration: "none",
+              }}
+            >
+              Terms of Service
+            </a>
+          </div>
+        </section>
+
         {/* Version */}
-        <div className="pt-8 pb-4 text-center">
+        <div className="pt-6 pb-4 text-center">
           <p
             style={{
               fontFamily: "'Jost', sans-serif",
