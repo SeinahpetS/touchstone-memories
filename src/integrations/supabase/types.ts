@@ -57,6 +57,7 @@ export type Database = {
           notification_preferences: Json
           onboarding_complete: boolean
           region: string | null
+          save_offer_redeemed: boolean
           state: string | null
           stripe_customer_id: string | null
           stripe_env: string | null
@@ -87,6 +88,7 @@ export type Database = {
           notification_preferences?: Json
           onboarding_complete?: boolean
           region?: string | null
+          save_offer_redeemed?: boolean
           state?: string | null
           stripe_customer_id?: string | null
           stripe_env?: string | null
@@ -117,6 +119,7 @@ export type Database = {
           notification_preferences?: Json
           onboarding_complete?: boolean
           region?: string | null
+          save_offer_redeemed?: boolean
           state?: string | null
           stripe_customer_id?: string | null
           stripe_env?: string | null

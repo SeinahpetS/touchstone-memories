@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useEntitlement } from "@/hooks/useEntitlement";
-import { getStripeEnvironment } from "@/lib/stripe";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { PricingSheet } from "@/components/PricingSheet";
 import { PaywallSheet } from "@/components/PaywallSheet";
 import { VividUpgradeCard } from "@/components/VividUpgradeCard";
+import { ManageSubscriptionModal } from "@/components/ManageSubscriptionModal";
 
 interface ProfileRow {
   id: string;
@@ -36,7 +37,9 @@ const Profile = () => {
   const [pricingOpen, setPricingOpen] = useState(false);
   const [exportPaywallOpen, setExportPaywallOpen] = useState(false);
   const [exportVividOpen, setExportVividOpen] = useState(false);
-  const [portalLoading, setPortalLoading] = useState(false);
+  
+  const [manageOpen, setManageOpen] = useState(false);
+  const [saveOfferNote, setSaveOfferNote] = useState(false);
 
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [name, setName] = useState("");
@@ -172,25 +175,6 @@ const Profile = () => {
     }
   };
 
-  const handleManageSubscription = async () => {
-    setPortalLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-portal-session", {
-        body: {
-          returnUrl: `${window.location.origin}/profile`,
-          environment: getStripeEnvironment(),
-        },
-      });
-      if (error) throw error;
-      const url = (data as any)?.url;
-      if (!url) throw new Error("Portal URL missing");
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch (err: any) {
-      toast.error(err?.message ?? "Couldn't open billing portal.");
-    } finally {
-      setPortalLoading(false);
-    }
-  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -358,16 +342,15 @@ const Profile = () => {
             </div>
             {entitlement.isSubscribed ? (
               <button
-                onClick={handleManageSubscription}
-                disabled={portalLoading}
-                className="inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-medium text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                onClick={() => setManageOpen(true)}
+                className="inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-medium text-white hover:opacity-90 transition-opacity"
                 style={{ fontFamily: "'Jost', sans-serif", backgroundColor: "#0E7C86" }}
               >
-                {portalLoading ? "…" : "Manage"}
+                Manage
               </button>
             ) : (
               <button
-                onClick={() => setPricingOpen(true)}
+                onClick={() => setManageOpen(true)}
                 className="inline-flex items-center rounded-full bg-[#B8860B] px-3 py-1 text-[13px] font-medium text-[#F2EEE5]"
                 style={{ fontFamily: "'Jost', sans-serif" }}
               >
@@ -376,6 +359,14 @@ const Profile = () => {
             )}
 
           </div>
+          {saveOfferNote && (
+            <p
+              className="text-muted-foreground text-sm"
+              style={{ fontFamily: "'Jost', sans-serif" }}
+            >
+              30% discount applied to your next billing cycle.
+            </p>
+          )}
         </section>
 
         {/* Your Data */}
@@ -594,6 +585,12 @@ const Profile = () => {
       )}
 
       <PricingSheet open={pricingOpen} onOpenChange={setPricingOpen} />
+      <ManageSubscriptionModal
+        open={manageOpen}
+        onClose={() => setManageOpen(false)}
+        onSaveOfferApplied={() => setSaveOfferNote(true)}
+        onCancelScheduled={() => void entitlement.refresh()}
+      />
       <PaywallSheet
         open={exportPaywallOpen}
         onOpenChange={setExportPaywallOpen}
