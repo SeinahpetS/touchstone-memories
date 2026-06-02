@@ -643,6 +643,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               maxWidth: "32rem",
               opacity: everythingVisible ? 1 : 0,
               transition: `opacity ${EVERYTHING_FADE_MS}ms ease`,
+              whiteSpace: "pre-wrap",
             }}
           >
             {EVERYTHING_TEXT}
