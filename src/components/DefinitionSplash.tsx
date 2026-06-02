@@ -145,10 +145,10 @@ const DefinitionSplash = ({ onBegin }: Props) => (
         style={{
           fontFamily: "'Playfair Display', serif",
           fontStyle: "italic",
-          fontSize: 19,
+          fontSize: 17,
           lineHeight: 1.5,
           color: "rgba(44,62,80,0.78)",
-          maxWidth: 360,
+          maxWidth: 390,
           whiteSpace: "pre-line",
         }}
       >
