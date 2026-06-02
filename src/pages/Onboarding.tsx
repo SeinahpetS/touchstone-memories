@@ -287,8 +287,10 @@ const CATEGORIES: CategoryKey[] = [
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading } = useAuth();
-  const [step, setStep] = useState<Step>("intro");
+  const skipToWalkthrough = (location.state as { skipToWalkthrough?: boolean } | null)?.skipToWalkthrough === true;
+  const [step, setStep] = useState<Step>(skipToWalkthrough ? "splash" : "intro");
   const [draft, setDraft] = useState<OnboardingDraft>(emptyOnboardingDraft());
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
