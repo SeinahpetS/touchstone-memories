@@ -289,7 +289,7 @@ const Onboarding = () => {
   const location = useLocation();
   const { user, loading } = useAuth();
   const skipToWalkthrough = (location.state as { skipToWalkthrough?: boolean } | null)?.skipToWalkthrough === true;
-  const [step, setStep] = useState<Step>(skipToWalkthrough ? "definition" : "intro");
+  const [step, setStep] = useState<Step>(skipToWalkthrough ? "category" : "intro");
   const [draft, setDraft] = useState<OnboardingDraft>(emptyOnboardingDraft());
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
