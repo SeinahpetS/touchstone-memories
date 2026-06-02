@@ -79,7 +79,9 @@ const RootRoute = () => {
   const handleBegin = () => {
     if (phase !== "splash") return;
     setPhase("out");
-    setTimeout(() => setPhase("in"), 600);
+    setTimeout(() => {
+      window.location.assign("/auth");
+    }, 600);
   };
 
   if (phase !== "in") {
