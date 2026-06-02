@@ -175,25 +175,6 @@ const Profile = () => {
     }
   };
 
-  const handleManageSubscription = async () => {
-    setPortalLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-portal-session", {
-        body: {
-          returnUrl: `${window.location.origin}/profile`,
-          environment: getStripeEnvironment(),
-        },
-      });
-      if (error) throw error;
-      const url = (data as any)?.url;
-      if (!url) throw new Error("Portal URL missing");
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch (err: any) {
-      toast.error(err?.message ?? "Couldn't open billing portal.");
-    } finally {
-      setPortalLoading(false);
-    }
-  };
 
   const handleSignOut = async () => {
     await signOut();
