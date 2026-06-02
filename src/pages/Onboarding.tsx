@@ -619,9 +619,10 @@ const Onboarding = () => {
                 fontSize: 15,
                 color: "rgba(44,62,80,0.65)",
                 margin: 0,
+                whiteSpace: "pre-line",
               }}
             >
-              Your archive starts with one memory.
+              A touchstone tests what's real.{"\n"}Some things are too valuable to leave only to memory.
             </p>
             <h2
               style={{
@@ -1533,9 +1534,10 @@ const Definition = ({ onContinue, onSignIn }: { onContinue: () => void; onSignIn
           lineHeight: 1.5,
           color: "rgba(44,62,80,0.78)",
           maxWidth: 360,
+          whiteSpace: "pre-line",
         }}
       >
-        Your archive starts with one memory.
+        A touchstone tests what's real.{"\n"}Some things are too valuable to leave only to memory.
       </p>
     </div>
 
