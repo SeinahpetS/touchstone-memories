@@ -833,7 +833,7 @@ const Archive = () => {
             }}
           >
             <span aria-hidden="true" style={{ color: "#F5D67A", fontSize: 12, letterSpacing: 1 }}>
-              ★★★
+              ​
             </span>
             <span>Tell Me A Story</span>
           </button>
@@ -867,7 +867,7 @@ const Archive = () => {
           >
             <div className="flex items-center gap-2 mb-3">
               <span aria-hidden="true" style={{ color: "#B8860B", fontSize: 12, letterSpacing: 1 }}>
-                ★★★
+                ​
               </span>
               <span
                 style={{
