@@ -141,6 +141,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<RootRoute />} />
           <Route path="/welcome" element={<Onboarding />} />
+          <Route path="/constellation" element={<ConstellationIntro />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
