@@ -171,7 +171,7 @@ const DefinitionSplash = ({ onBegin }: Props) => (
           color: "#FAFAF8",
         }}
       >
-        Begin
+        Show Me
       </button>
     </div>
   </div>
