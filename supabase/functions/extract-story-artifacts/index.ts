@@ -104,18 +104,49 @@ Deno.serve(async (req) => {
     const userId = claimsData.claims.sub as string;
 
     const body = await req.json().catch(() => ({}));
-    const transcript: string = (body?.transcript ?? body?.story ?? "").toString();
+    const existingSessionId: string | undefined = body?.session_id;
+    let transcript: string = (body?.transcript ?? body?.story ?? "").toString();
+    const clientExclude: string[] = Array.isArray(body?.exclude_titles)
+      ? body.exclude_titles.filter((s: unknown): s is string => typeof s === "string")
+      : [];
+
+    // Determine tier — Vivid = 7, Free = 5
+    const { data: isVividData } = await supabase.rpc("has_active_vivid", { _user_id: userId });
+    const isVivid = Boolean(isVividData);
+    const cap = isVivid ? 7 : 5;
+
+    // If continuing an existing session, fetch transcript + previously extracted titles
+    let existingArtifacts: any[] = [];
+    let existingSpans: any[] = [];
+    let excludeTitles: string[] = [...clientExclude];
+
+    if (existingSessionId) {
+      const { data: sess, error: sessErr } = await supabase
+        .from("story_sessions")
+        .select("transcript, extracted_artifacts, highlight_spans")
+        .eq("id", existingSessionId)
+        .single();
+      if (sessErr || !sess) {
+        return new Response(JSON.stringify({ error: "Session not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      transcript = sess.transcript ?? transcript;
+      existingArtifacts = Array.isArray(sess.extracted_artifacts) ? sess.extracted_artifacts : [];
+      existingSpans = Array.isArray(sess.highlight_spans) ? sess.highlight_spans : [];
+      const prevTitles = existingArtifacts
+        .map((a: any) => (typeof a?.title === "string" ? a.title : ""))
+        .filter(Boolean);
+      excludeTitles = Array.from(new Set([...excludeTitles, ...prevTitles]));
+    }
+
     if (!transcript || transcript.trim().length === 0) {
       return new Response(JSON.stringify({ error: "Missing transcript" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Determine tier — Vivid = 7, Free = 5
-    const { data: isVividData } = await supabase.rpc("has_active_vivid", { _user_id: userId });
-    const isVivid = Boolean(isVividData);
-    const cap = isVivid ? 7 : 5;
 
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -127,7 +158,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 1500,
-        system: buildSystemPrompt(cap),
+        system: buildSystemPrompt(cap, excludeTitles),
         messages: [{ role: "user", content: transcript }],
       }),
     });
