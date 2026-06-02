@@ -37,7 +37,7 @@ const Profile = () => {
   const [pricingOpen, setPricingOpen] = useState(false);
   const [exportPaywallOpen, setExportPaywallOpen] = useState(false);
   const [exportVividOpen, setExportVividOpen] = useState(false);
-  const [portalLoading, setPortalLoading] = useState(false);
+  
   const [manageOpen, setManageOpen] = useState(false);
   const [saveOfferNote, setSaveOfferNote] = useState(false);
 
