@@ -8,12 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
-import OnboardingFlow from "@/components/OnboardingFlow";
-import {
-  loadOnboardingDraft,
-  saveOnboardingDraft,
-  emptyOnboardingDraft,
-} from "@/lib/onboardingDraft";
+import ConstellationIntro from "@/pages/ConstellationIntro";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
