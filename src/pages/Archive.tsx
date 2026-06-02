@@ -833,7 +833,7 @@ const Archive = () => {
             }}
           >
             <span aria-hidden="true" style={{ color: "#F5D67A", fontSize: 12, letterSpacing: 1 }}>
-              ★★★
+              ​
             </span>
             <span>Tell Me A Story</span>
           </button>
