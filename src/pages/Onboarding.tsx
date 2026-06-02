@@ -529,7 +529,7 @@ const Onboarding = () => {
       setDraft(emptyOnboardingDraft());
       setPhotoFile(null);
       setPhotoPreview(null);
-      setStep("definition");
+      setStep("category");
     };
 
     return (
