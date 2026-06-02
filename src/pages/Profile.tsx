@@ -124,7 +124,7 @@ const Profile = () => {
         .eq("id", user.id);
       if (updErr) throw updErr;
       setProfile((p) => (p ? { ...p, avatar_url: url } : p));
-      toast.success("Profile photo updated.");
+      toast.success("​ photo updated.");
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message ?? "Couldn't upload photo.");
