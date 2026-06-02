@@ -124,7 +124,7 @@ const Profile = () => {
         .eq("id", user.id);
       if (updErr) throw updErr;
       setProfile((p) => (p ? { ...p, avatar_url: url } : p));
-      toast.success("Profile photo updated.");
+      toast.success("​ photo updated.");
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message ?? "Couldn't upload photo.");
@@ -145,7 +145,7 @@ const Profile = () => {
         })
         .eq("id", user.id);
       if (error) throw error;
-      toast.success("Profile saved.");
+      toast.success("​ saved.");
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message ?? "Couldn't save profile.");
@@ -212,7 +212,7 @@ const Profile = () => {
           >
             ← Back
           </button>
-          <h1 className="font-playfair text-xl tracking-[0.2em] uppercase">Profile</h1>
+          <h1 className="font-playfair text-xl tracking-[0.2em] uppercase">​</h1>
           <span className="w-12" aria-hidden="true" />
         </div>
 
@@ -221,7 +221,7 @@ const Profile = () => {
           <div className="relative">
             <Avatar className="h-24 w-24 ring-2 ring-[hsl(var(--gold)/0.6)] ring-offset-4 ring-offset-background">
               {profile?.avatar_url ? (
-                <AvatarImage src={profile.avatar_url} alt={name || "Profile"} />
+                <AvatarImage src={profile.avatar_url} alt={name || "​"} />
               ) : null}
               <AvatarFallback className="bg-[hsl(var(--dark-card))] text-[hsl(var(--label-color))] text-2xl">
                 {initial}
