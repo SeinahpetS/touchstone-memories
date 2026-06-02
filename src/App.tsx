@@ -75,8 +75,15 @@ const PostSplashRoute = () => {
 
 const RootRoute = () => {
   // Skip splash entirely when arriving with intent (e.g. /?edit=<id>).
-  const hasIntent =
-    typeof window !== "undefined" && window.location.search.length > 0;
+  // Ignore Lovable preview params like __lovable_sha that aren't user intent.
+  const hasIntent = (() => {
+    if (typeof window === "undefined") return false;
+    const params = new URLSearchParams(window.location.search);
+    for (const key of Array.from(params.keys())) {
+      if (!key.startsWith("__lovable") && !key.startsWith("__cf")) return true;
+    }
+    return false;
+  })();
 
   // Phases: "splash" (waits for tap) -> "out" (600ms fade) -> "in" (400ms fade-in app)
   const [phase, setPhase] = useState<"splash" | "out" | "in">(
