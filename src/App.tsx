@@ -117,7 +117,7 @@ import { VividCelebrationGate } from "@/components/VividCelebrationGate";
 import BottomNav from "@/components/BottomNav";
 import { useLocation } from "react-router-dom";
 
-const NAV_PATHS = ["/archive", "/profile", "/tell-a-story", "/vivid"];
+const NAV_PATHS = ["/archive", "/settings", "/tell-a-story", "/vivid"];
 
 const BottomNavGate = () => {
   const { pathname } = useLocation();
@@ -139,7 +139,7 @@ const App = () => (
           <Route path="/welcome" element={<Onboarding />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Profile />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />

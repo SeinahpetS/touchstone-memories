@@ -37,7 +37,7 @@ const ProfileAvatarButton = () => {
   return (
     <button
       type="button"
-      onClick={() => navigate("/profile")}
+      onClick={() => navigate("/settings")}
       aria-label="Open profile"
       className="rounded-full ring-2 ring-[hsl(var(--gold)/0.6)] ring-offset-2 ring-offset-background hover:ring-[hsl(var(--gold))] transition-all"
     >

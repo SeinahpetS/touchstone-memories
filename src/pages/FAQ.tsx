@@ -191,7 +191,7 @@ const FAQ = () => {
         {/* Header */}
         <div className="relative mb-8 flex items-center justify-center">
           <Link
-            to="/profile"
+            to="/settings"
             className="absolute left-0 top-1/2 -translate-y-1/2"
             style={{
               fontFamily: "'Jost', sans-serif",
