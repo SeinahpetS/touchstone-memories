@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -7,6 +7,11 @@ const TellStory = () => {
   const [story, setStory] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const draft = sessionStorage.getItem("ts_story_draft");
+    if (draft) setStory(draft);
+  }, []);
 
   const canSubmit = story.trim().length > 0 && !loading;
 
