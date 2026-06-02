@@ -158,7 +158,7 @@ const DefinitionSplash = ({ onBegin }: Props) => (
       <button
         type="button"
         onClick={onBegin}
-        className="ts-def-begin py-[59px]"
+        className="ts-def-begin"
         style={{
           marginTop: 16,
           background: "#B8860B",
