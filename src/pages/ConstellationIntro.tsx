@@ -20,7 +20,7 @@ const SCREEN1_LINES = [
   "Your touchstones are the same.",
   "Each one a point of light...",
   "...all of them quietly forming a constellation",
-  "entirely your own.",
+  "that is entirely your own.",
 ];
 
 type Phase = "s1" | "s2" | "s3" | "s4" | "s5";
