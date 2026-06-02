@@ -217,8 +217,9 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     if (!el) return;
     const W = el.offsetWidth;
     const H = el.offsetHeight;
-    // Scale quotes/stars up on larger screens. Baseline is ~390px wide phone.
-    const scale = Math.min(2.6, Math.max(1, W / 420));
+    // Baseline scale from viewport width (no upper cap — we want quotes to
+    // grow with the canvas so the screen never feels empty).
+    const baseScale = Math.max(1, W / 420);
 
     const occupied: Rect[] = [];
     // Center reservation
@@ -234,14 +235,27 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     const minX = SIDE_EXCLUDE;
     const maxX = W - SIDE_EXCLUDE;
     const usableW = maxX - minX;
+    const usableH = maxY - minY;
 
     const quoteOrder = shuffle(QUOTES.map((_, i) => i));
-    const starAssignment = shuffle(STARS.slice());
 
     const placed: Placed[] = [];
 
-    // Build a balanced grid covering the full screen, then assign quotes + stars
-    // to cells so the two are interleaved spatially rather than clustered.
+    // Decide grid first so we can scale items to fill their cells. We want
+    // quotes to take spatial priority, so we pick a column count keyed off the
+    // number of quotes and the viewport aspect ratio.
+    const qCount = QUOTES.length;
+    const aspect = W / Math.max(1, usableH);
+    const cols = Math.max(2, Math.round(Math.sqrt(qCount * aspect * 2)));
+    const quoteRows = Math.max(2, Math.ceil(qCount / cols));
+    // Add extra rows of stars so the full canvas is covered.
+    const rows = Math.max(quoteRows, Math.ceil((qCount + STARS.length) / cols));
+    const cellW = usableW / cols;
+    const cellH = usableH / rows;
+
+    // Rescale quotes so each one approximately fills its cell width.
+    // This eliminates the "tiny quotes lost in big empty cells" problem on
+    // wide viewports.
     type Item =
       | { kind: "quote"; idx: number; quote: QuoteSpec; fontSize: number; w: number; h: number }
       | { kind: "star"; idx: number; star: StarSpec; w: number; h: number };
@@ -249,15 +263,23 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
     const items: Item[] = [];
     quoteOrder.forEach((qi) => {
       const quote = QUOTES[qi];
-      const fontSize = computeFontSize(quote) * scale;
-      const width = quote.width * scale;
+      const targetW = Math.min(cellW * 0.88, 520);
+      const widthScale = Math.max(baseScale, targetW / quote.width);
+      const width = quote.width * widthScale;
+      const fontSize = computeFontSize(quote) * widthScale;
       const h = estimateQuoteHeight({ ...quote, width }, fontSize);
       items.push({ kind: "quote", idx: qi, quote, fontSize, w: width, h });
     });
-    starAssignment.forEach((baseStar, i) => {
-      const star = { ...baseStar, size: baseStar.size * scale };
+
+    // Fill remaining cells with stars (cycle through STARS list as needed).
+    const totalCells = rows * cols;
+    const starsNeeded = Math.max(STARS.length, totalCells - qCount + 4);
+    const starScale = baseScale;
+    for (let i = 0; i < starsNeeded; i++) {
+      const base = STARS[i % STARS.length];
+      const star = { ...base, size: base.size * starScale };
       items.push({ kind: "star", idx: i, star, w: star.size, h: star.size });
-    });
+    }
 
     // Interleave: alternate quote, star, quote, star ... so neighbors in the
     // placement order (which gets cells in sequence) mix the two kinds.
@@ -268,13 +290,6 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
       if (quotesQ.length) interleaved.push(quotesQ.shift()!);
       if (starsQ.length) interleaved.push(starsQ.shift()!);
     }
-
-    const total = interleaved.length;
-    const usableH = maxY - minY;
-    const cols = Math.max(2, Math.round(Math.sqrt(total * (W / Math.max(1, usableH)))));
-    const rows = Math.max(2, Math.ceil(total / cols));
-    const cellW = usableW / cols;
-    const cellH = usableH / rows;
     const cells: { cx: number; cy: number }[] = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) cells.push({ cx: c, cy: r });
