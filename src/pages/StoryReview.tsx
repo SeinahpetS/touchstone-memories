@@ -98,11 +98,21 @@ const StoryReview = () => {
 
   const advance = () => {
     if (index + 1 >= total) {
-      // Finished — return to Story Unfold
-      navigate("/story-unfold", { replace: true });
+      // End of stack — mark session complete and show summary
+      void markSessionComplete();
+      setPhase("complete");
     } else {
       setIndex((i) => i + 1);
     }
+  };
+
+  const markSessionComplete = async () => {
+    if (!sessionId) return;
+    const { error } = await supabase
+      .from("story_sessions")
+      .update({ status: "complete" })
+      .eq("id", sessionId);
+    if (error) console.error("story_sessions complete update failed", error);
   };
 
   const persistArtifact = async (a: Artifact): Promise<string | null> => {
@@ -133,15 +143,43 @@ const StoryReview = () => {
 
   const updateSessionConfirmed = async (newIds: string[]) => {
     if (!sessionId) return;
-    const allConfirmed = newIds.length >= total;
     const { error } = await supabase
       .from("story_sessions")
-      .update({
-        confirmed_artifact_ids: newIds,
-        status: allConfirmed ? "complete" : "incomplete",
-      })
+      .update({ confirmed_artifact_ids: newIds })
       .eq("id", sessionId);
     if (error) console.error("story_sessions update failed", error);
+  };
+
+  const handleTellMeMore = async () => {
+    if (!sessionId || continuing) return;
+    setContinuing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "extract-story-artifacts",
+        { body: { session_id: sessionId } },
+      );
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const more = (data?.artifacts ?? []) as Artifact[];
+      if (more.length === 0) {
+        toast("Nothing else to surface.");
+        return;
+      }
+      // Append new cards to the stack and continue
+      setArtifacts((arr) => [...arr, ...more]);
+      setIndex(total); // jump to first newly added card
+      setPhase("cards");
+      // Reset session back to incomplete since there are new cards to confirm
+      await supabase
+        .from("story_sessions")
+        .update({ status: "incomplete" })
+        .eq("id", sessionId);
+    } catch (e: any) {
+      console.error("Tell Me More failed", e);
+      toast(e?.message ?? "Couldn't find more.");
+    } finally {
+      setContinuing(false);
+    }
   };
 
   const handleSave = async () => {
