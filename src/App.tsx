@@ -140,6 +140,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/tell-a-story" element={<TellStory />} />
           <Route path="/tell-a-story/results" element={<TellStoryResults />} />
           <Route path="/vivid" element={<Vivid />} />
