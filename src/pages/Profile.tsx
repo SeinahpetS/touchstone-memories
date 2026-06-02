@@ -212,7 +212,7 @@ const Profile = () => {
           >
             ← Back
           </button>
-          <h1 className="font-playfair text-xl tracking-[0.2em] uppercase">Profile</h1>
+          <h1 className="font-playfair text-xl tracking-[0.2em] uppercase">​</h1>
           <span className="w-12" aria-hidden="true" />
         </div>
 
