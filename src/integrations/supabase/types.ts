@@ -199,6 +199,7 @@ export type Database = {
           photo_url: string | null
           relationship_type: string | null
           sentiment: string | null
+          source_session_id: string | null
           source_url: string | null
           spotify_id: string | null
           still_in_touch: boolean | null
@@ -234,6 +235,7 @@ export type Database = {
           photo_url?: string | null
           relationship_type?: string | null
           sentiment?: string | null
+          source_session_id?: string | null
           source_url?: string | null
           spotify_id?: string | null
           still_in_touch?: boolean | null
@@ -269,6 +271,7 @@ export type Database = {
           photo_url?: string | null
           relationship_type?: string | null
           sentiment?: string | null
+          source_session_id?: string | null
           source_url?: string | null
           spotify_id?: string | null
           still_in_touch?: boolean | null
@@ -279,7 +282,15 @@ export type Database = {
           when_text?: string | null
           who_was_there?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "touchstones_source_session_id_fkey"
+            columns: ["source_session_id"]
+            isOneToOne: false
+            referencedRelation: "story_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
