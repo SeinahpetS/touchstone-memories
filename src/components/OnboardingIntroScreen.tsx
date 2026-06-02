@@ -345,8 +345,10 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
       for (const qi of remaining) {
         if (placedQuoteIdx.size >= MIN_QUOTES) break;
         const quote = QUOTES[qi];
-        const fontSize = computeFontSize(quote) * scale;
-        let width = quote.width * scale;
+        const targetW = Math.min(cellW * 0.88, 520);
+        const widthScale = Math.max(baseScale, targetW / quote.width);
+        const fontSize = computeFontSize(quote) * widthScale;
+        let width = quote.width * widthScale;
         let rect: Rect | null = null;
         for (let shrink = 0; shrink < 4 && !rect; shrink++) {
           const h = estimateQuoteHeight({ ...quote, width }, fontSize);
