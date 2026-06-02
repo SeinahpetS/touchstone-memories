@@ -682,7 +682,7 @@ const OnboardingIntroScreen = ({ onBegin, onSkip }: OnboardingIntroScreenProps) 
               pointerEvents: closingStage >= 4 ? "auto" : "none",
             }}
           >
-            Start Keeping Them
+            Give Them a Home
           </button>
         </div>
       )}
