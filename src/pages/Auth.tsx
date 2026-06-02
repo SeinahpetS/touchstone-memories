@@ -145,8 +145,7 @@ const Auth = () => {
             lng: data.location?.lng ?? null,
           });
           if (data.firstName) setName(data.firstName);
-          setShowFlow(false);
-          setIsSignUp(true);
+          navigate("/onboarding", { state: { skipToWalkthrough: true } });
         }}
       />
     );

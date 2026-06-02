@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
@@ -287,8 +287,10 @@ const CATEGORIES: CategoryKey[] = [
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading } = useAuth();
-  const [step, setStep] = useState<Step>("intro");
+  const skipToWalkthrough = (location.state as { skipToWalkthrough?: boolean } | null)?.skipToWalkthrough === true;
+  const [step, setStep] = useState<Step>(skipToWalkthrough ? "splash" : "intro");
   const [draft, setDraft] = useState<OnboardingDraft>(emptyOnboardingDraft());
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
