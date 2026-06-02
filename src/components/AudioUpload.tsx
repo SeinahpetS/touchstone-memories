@@ -1,18 +1,63 @@
 import { useRef, useState } from "react";
 import { AudioLines, X } from "lucide-react";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { VividUpgradeCard } from "@/components/VividUpgradeCard";
 
 interface Props {
   file: File | null;
   onSelect: (file: File | null) => void;
 }
 
+const FREE_MAX_SECONDS = 10;
+
+async function probeDuration(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const audio = document.createElement("audio");
+      audio.preload = "metadata";
+      audio.src = url;
+      const cleanup = () => URL.revokeObjectURL(url);
+      audio.onloadedmetadata = () => {
+        const d = audio.duration;
+        cleanup();
+        resolve(Number.isFinite(d) ? d : 0);
+      };
+      audio.onerror = () => {
+        cleanup();
+        resolve(0);
+      };
+    } catch {
+      resolve(0);
+    }
+  });
+}
+
 const AudioUpload = ({ file, onSelect }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [vividOpen, setVividOpen] = useState(false);
+  const entitlement = useEntitlement();
+
+  const acceptFile = async (f: File | null) => {
+    if (!f) {
+      onSelect(null);
+      return;
+    }
+    if (!entitlement.hasAccess) {
+      const duration = await probeDuration(f);
+      if (duration > FREE_MAX_SECONDS) {
+        setVividOpen(true);
+        if (inputRef.current) inputRef.current.value = "";
+        return;
+      }
+    }
+    onSelect(f);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
-    onSelect(f);
+    void acceptFile(f);
   };
 
   const clear = () => {
@@ -24,7 +69,7 @@ const AudioUpload = ({ file, onSelect }: Props) => {
     e.preventDefault();
     setIsDragging(false);
     const f = e.dataTransfer.files?.[0];
-    if (f && f.type.startsWith("audio/")) onSelect(f);
+    if (f && f.type.startsWith("audio/")) void acceptFile(f);
   };
 
   return (
@@ -102,6 +147,12 @@ const AudioUpload = ({ file, onSelect }: Props) => {
       >
         Record directly — coming soon
       </p>
+
+      <VividUpgradeCard
+        open={vividOpen}
+        triggeredBy="audio_length"
+        onDismiss={() => setVividOpen(false)}
+      />
     </div>
   );
 };
