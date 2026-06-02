@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
+import ConstellationIntro from "./pages/ConstellationIntro.tsx";
 import Auth from "./pages/Auth.tsx";
 import Archive from "./pages/Archive.tsx";
 import Profile from "./pages/Profile.tsx";
@@ -141,6 +142,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<RootRoute />} />
           <Route path="/welcome" element={<Onboarding />} />
+          <Route path="/constellation" element={<ConstellationIntro />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
