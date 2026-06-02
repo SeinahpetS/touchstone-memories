@@ -363,7 +363,7 @@ const TellStoryResults = () => {
             onClick={() => advance("kept")}
             style={{
               background: NAVY,
-              color: GOLD,
+              color: "#fff",
               border: "none",
               borderRadius: 9999,
               padding: "12px 28px",
