@@ -134,6 +134,45 @@ export type Database = {
         }
         Relationships: []
       }
+      story_sessions: {
+        Row: {
+          confirmed_artifact_ids: string[]
+          created_at: string
+          expires_at: string
+          extracted_artifacts: Json
+          highlight_spans: Json
+          id: string
+          status: string
+          title: string | null
+          transcript: string
+          user_id: string
+        }
+        Insert: {
+          confirmed_artifact_ids?: string[]
+          created_at?: string
+          expires_at?: string
+          extracted_artifacts?: Json
+          highlight_spans?: Json
+          id?: string
+          status?: string
+          title?: string | null
+          transcript?: string
+          user_id: string
+        }
+        Update: {
+          confirmed_artifact_ids?: string[]
+          created_at?: string
+          expires_at?: string
+          extracted_artifacts?: Json
+          highlight_spans?: Json
+          id?: string
+          status?: string
+          title?: string | null
+          transcript?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       touchstones: {
         Row: {
           ai_answer: string | null

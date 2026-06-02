@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.set_story_session_defaults() FROM PUBLIC, anon, authenticated;
