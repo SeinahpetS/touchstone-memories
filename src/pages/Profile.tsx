@@ -145,7 +145,7 @@ const Profile = () => {
         })
         .eq("id", user.id);
       if (error) throw error;
-      toast.success("Profile saved.");
+      toast.success("​ saved.");
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message ?? "Couldn't save profile.");
