@@ -42,7 +42,7 @@ const ProfileAvatarButton = () => {
       className="rounded-full ring-2 ring-[hsl(var(--gold)/0.6)] ring-offset-2 ring-offset-background hover:ring-[hsl(var(--gold))] transition-all"
     >
       <Avatar className="h-9 w-9">
-        {avatarUrl ? <AvatarImage src={avatarUrl} alt={name ?? "Profile"} /> : null}
+        {avatarUrl ? <AvatarImage src={avatarUrl} alt={name ?? "​"} /> : null}
         <AvatarFallback className="bg-[hsl(var(--dark-card))] text-[hsl(var(--label-color))] text-sm">
           {avatarUrl ? <UserIcon className="h-4 w-4" /> : initial}
         </AvatarFallback>
