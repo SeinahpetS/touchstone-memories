@@ -361,16 +361,15 @@ const Profile = () => {
             </div>
             {entitlement.isSubscribed ? (
               <button
-                onClick={handleManageSubscription}
-                disabled={portalLoading}
-                className="inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-medium text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                onClick={() => setManageOpen(true)}
+                className="inline-flex items-center rounded-full px-4 py-1.5 text-[13px] font-medium text-white hover:opacity-90 transition-opacity"
                 style={{ fontFamily: "'Jost', sans-serif", backgroundColor: "#0E7C86" }}
               >
-                {portalLoading ? "…" : "Manage"}
+                Manage
               </button>
             ) : (
               <button
-                onClick={() => setPricingOpen(true)}
+                onClick={() => setManageOpen(true)}
                 className="inline-flex items-center rounded-full bg-[#B8860B] px-3 py-1 text-[13px] font-medium text-[#F2EEE5]"
                 style={{ fontFamily: "'Jost', sans-serif" }}
               >
@@ -379,6 +378,14 @@ const Profile = () => {
             )}
 
           </div>
+          {saveOfferNote && (
+            <p
+              className="text-muted-foreground text-sm"
+              style={{ fontFamily: "'Jost', sans-serif" }}
+            >
+              30% discount applied to your next billing cycle.
+            </p>
+          )}
         </section>
 
         {/* Your Data */}
