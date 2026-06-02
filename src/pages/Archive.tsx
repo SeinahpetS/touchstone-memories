@@ -61,6 +61,8 @@ const Archive = () => {
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
   const [storyTooltipOpen, setStoryTooltipOpen] = useState(false);
   const [storyPaywallOpen, setStoryPaywallOpen] = useState(false);
+  const [storyVividOpen, setStoryVividOpen] = useState(false);
+  const entitlement = useEntitlement();
   const [bouncing, setBouncing] = useState(false);
   const [showTimelineTooltip, setShowTimelineTooltip] = useState(false);
   const [dotsVisible, setDotsVisible] = useState(false);
