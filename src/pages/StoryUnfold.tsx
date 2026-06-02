@@ -192,6 +192,78 @@ const StoryUnfold = () => {
           ))}
         </div>
       </div>
+
+      {/* Tell Me A Story sheet */}
+      {sheetOpen && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col"
+          style={{ backgroundColor: SOFT_IVORY }}
+        >
+          {/* Header */}
+          <div className="relative flex items-center justify-center px-5 pt-6 pb-4">
+            <h2
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 20,
+                color: BRAND_NAVY,
+              }}
+            >
+              Tell Me A Story
+            </h2>
+            <button
+              type="button"
+              onClick={() => setSheetOpen(false)}
+              aria-label="Close"
+              className="absolute right-4 top-5 p-2"
+              style={{ background: "none", border: "none", cursor: "pointer" }}
+            >
+              <X size={22} color={MUTED} strokeWidth={1.75} />
+            </button>
+          </div>
+
+          {/* Textarea */}
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Start typing, or use your keyboard's dictation button to speak your story."
+            className="flex-1 w-full px-5 py-4 resize-none focus:outline-none"
+            style={{
+              backgroundColor: SOFT_IVORY,
+              border: "none",
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              color: BRAND_NAVY,
+              lineHeight: 1.5,
+            }}
+          />
+
+          {/* Bottom CTA */}
+          <div
+            className="w-full"
+            style={{
+              padding: "12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px)",
+              backgroundColor: SOFT_IVORY,
+            }}
+          >
+            <button
+              type="button"
+              className="w-full"
+              style={{
+                backgroundColor: AEGEAN,
+                color: "#FFFFFF",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 15,
+                padding: "0.95rem",
+                borderRadius: 12,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              See What's There
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
