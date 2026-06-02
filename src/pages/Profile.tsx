@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Camera, LogOut, Moon, Sun } from "lucide-react";
+import { Camera, LogOut, Moon, Sun, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -45,6 +45,9 @@ const Profile = () => {
   const [exporting, setExporting] = useState(false);
   const [exportSent, setExportSent] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
@@ -427,7 +430,166 @@ const Profile = () => {
             <LogOut className="h-4 w-4" /> Log out
           </button>
         </div>
+
+        {/* Danger Zone */}
+        <section className="pt-8">
+          <div
+            className="h-px w-full mb-4"
+            style={{ backgroundColor: "rgba(192, 57, 43, 0.3)" }}
+          />
+          <p
+            className="mb-3 uppercase"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              color: "#C0392B",
+            }}
+          >
+            Danger Zone
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setDeleteConfirm("");
+              setDeleteOpen(true);
+            }}
+            className="flex items-center gap-2 bg-transparent border-0 p-0"
+            style={{
+              color: "#C0392B",
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              cursor: "pointer",
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete My Archive
+          </button>
+        </section>
       </div>
+
+      {deleteOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="w-full max-w-md"
+            style={{
+              backgroundColor: "#E8E4D8",
+              borderRadius: 12,
+              padding: 32,
+            }}
+          >
+            <h2
+              className="font-playfair"
+              style={{ fontSize: 24, color: "#1E2E3E", marginBottom: 12 }}
+            >
+              This cannot be undone.
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                fontWeight: 400,
+                color: "#1E2E3E",
+                marginBottom: 20,
+                lineHeight: 1.5,
+              }}
+            >
+              Deleting your archive permanently removes every memory, photo,
+              and audio clip you have saved. Nothing can be retrieved after
+              this point.
+            </p>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder="Type DELETE to confirm"
+              autoFocus
+              disabled={deleting}
+              style={{
+                width: "100%",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                padding: "10px 12px",
+                borderRadius: 6,
+                border: "1px solid rgba(30,46,62,0.2)",
+                backgroundColor: "#F2EEE5",
+                color: "#1E2E3E",
+                marginBottom: 20,
+                outline: "none",
+              }}
+            />
+            <button
+              type="button"
+              disabled={deleteConfirm !== "DELETE" || deleting}
+              onClick={async () => {
+                if (deleteConfirm !== "DELETE") return;
+                setDeleting(true);
+                try {
+                  const { error } = await supabase.functions.invoke(
+                    "delete-account",
+                  );
+                  if (error) throw error;
+                  await supabase.auth.signOut();
+                  navigate("/", { replace: true });
+                } catch (err: any) {
+                  console.error(err);
+                  toast.error(err?.message ?? "Couldn't delete account.");
+                  setDeleting(false);
+                }
+              }}
+              style={{
+                width: "100%",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                letterSpacing: "0.1em",
+                fontWeight: 500,
+                padding: "12px 20px",
+                borderRadius: 6,
+                border: "none",
+                backgroundColor:
+                  deleteConfirm === "DELETE" && !deleting
+                    ? "#C0392B"
+                    : "#B8B0A6",
+                color:
+                  deleteConfirm === "DELETE" && !deleting
+                    ? "#FFFFFF"
+                    : "#7A736B",
+                cursor:
+                  deleteConfirm === "DELETE" && !deleting
+                    ? "pointer"
+                    : "not-allowed",
+                marginBottom: 12,
+              }}
+            >
+              {deleting ? "DELETING…" : "DELETE FOREVER"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeleteOpen(false)}
+              disabled={deleting}
+              style={{
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                color: "#1E2E3E",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                padding: "8px",
+                cursor: deleting ? "not-allowed" : "pointer",
+                textAlign: "center",
+              }}
+            >
+              Whoops. Nevermind.
+            </button>
+          </div>
+        </div>
+      )}
+
       <PricingSheet open={pricingOpen} onOpenChange={setPricingOpen} />
       <PaywallSheet
         open={exportPaywallOpen}
