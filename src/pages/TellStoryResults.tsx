@@ -362,7 +362,10 @@ const TellStoryResults = () => {
               width: "100%",
               background: CARD_BG,
               borderRadius: 16,
-              padding: 28,
+              padding: "28px 28px 24px",
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 340,
               boxShadow: confirming
                 ? `0 12px 30px rgba(30,46,62,0.12), 0 0 0 3px ${GOLD}`
                 : "0 12px 30px rgba(30,46,62,0.12)",
@@ -461,6 +464,74 @@ const TellStoryResults = () => {
               {current.note}
             </p>
 
+            {/* Buttons */}
+            <div
+              style={{
+                marginTop: "auto",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                paddingTop: 20,
+              }}
+            >
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  onClick={handleSkip}
+                  disabled={confirming}
+                  style={{
+                    flex: 1,
+                    height: 44,
+                    background: "transparent",
+                    color: NAVY,
+                    border: `1.5px solid ${NAVY}`,
+                    borderRadius: 8,
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 15,
+                    cursor: confirming ? "not-allowed" : "pointer",
+                    opacity: confirming ? 0.5 : 1,
+                  }}
+                >
+                  Skip
+                </button>
+                <button
+                  onClick={openEdit}
+                  disabled={confirming}
+                  style={{
+                    flex: 1,
+                    height: 44,
+                    background: "transparent",
+                    color: NAVY,
+                    border: `1.5px solid ${NAVY}`,
+                    borderRadius: 8,
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 15,
+                    cursor: confirming ? "not-allowed" : "pointer",
+                    opacity: confirming ? 0.5 : 1,
+                  }}
+                >
+                  Edit
+                </button>
+              </div>
+              <button
+                onClick={() => runKeepConfirmation()}
+                disabled={confirming}
+                style={{
+                  width: "100%",
+                  height: 48,
+                  background: NAVY,
+                  color: IVORY,
+                  border: "none",
+                  borderRadius: 8,
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 15,
+                  cursor: confirming ? "not-allowed" : "pointer",
+                  opacity: confirming ? 0.7 : 1,
+                }}
+              >
+                Keep this Touchstone
+              </button>
+            </div>
+
             {/* Center checkmark on confirmation */}
             {confirming && (
               <div
@@ -515,60 +586,6 @@ const TellStoryResults = () => {
           {Math.min(decidedCount + 1, originalCount)} of {originalCount}
         </p>
 
-        {/* Actions */}
-        <div className="flex items-center justify-center gap-3 mt-6 flex-wrap">
-          <button
-            onClick={handleSkip}
-            disabled={confirming}
-            style={{
-              background: "transparent",
-              color: NAVY,
-              border: `1.5px solid ${NAVY}`,
-              borderRadius: 8,
-              padding: "12px 22px",
-              fontFamily: "'Jost', sans-serif",
-              fontSize: 15,
-              cursor: confirming ? "not-allowed" : "pointer",
-              opacity: confirming ? 0.5 : 1,
-            }}
-          >
-            Skip
-          </button>
-          <button
-            onClick={openEdit}
-            disabled={confirming}
-            style={{
-              background: "transparent",
-              color: NAVY,
-              border: `1.5px solid ${NAVY}`,
-              borderRadius: 8,
-              padding: "12px 22px",
-              fontFamily: "'Jost', sans-serif",
-              fontSize: 15,
-              cursor: confirming ? "not-allowed" : "pointer",
-              opacity: confirming ? 0.5 : 1,
-            }}
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => runKeepConfirmation()}
-            disabled={confirming}
-            style={{
-              background: NAVY,
-              color: IVORY,
-              border: "none",
-              borderRadius: 8,
-              padding: "12px 24px",
-              fontFamily: "'Jost', sans-serif",
-              fontSize: 15,
-              cursor: confirming ? "not-allowed" : "pointer",
-              opacity: confirming ? 0.7 : 1,
-            }}
-          >
-            Keep this Touchstone
-          </button>
-        </div>
       </div>
 
       {/* Edit overlay */}
