@@ -8,7 +8,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
-import ConstellationIntro from "@/pages/ConstellationIntro";
+import OnboardingFlow from "@/components/OnboardingFlow";
+import {
+  loadOnboardingDraft,
+  saveOnboardingDraft,
+  emptyOnboardingDraft,
+} from "@/lib/onboardingDraft";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -117,7 +122,33 @@ const Auth = () => {
   }
 
   if (showFlow) {
-    return <ConstellationIntro />;
+    const draft = loadOnboardingDraft() ?? emptyOnboardingDraft();
+    return (
+      <OnboardingFlow
+        initialFirstName={draft.firstName ?? ""}
+        initialBirthMonth={draft.birthMonth ?? null}
+        initialBirthYear={draft.birthYear ?? null}
+        initialCity={draft.city ?? ""}
+        initialState={draft.state ?? ""}
+        onComplete={(data) => {
+          saveOnboardingDraft({
+            ...draft,
+            firstName: data.firstName,
+            birthMonth: data.birthMonth,
+            birthYear: data.birthYear,
+            city: data.location?.city ?? data.city ?? "",
+            state: data.location?.region ?? data.state ?? "",
+            region: data.location?.region ?? "",
+            country: data.location?.country ?? "",
+            locationDisplay: data.location?.locationDisplay ?? "",
+            lat: data.location?.lat ?? null,
+            lng: data.location?.lng ?? null,
+          });
+          if (data.firstName) setName(data.firstName);
+          navigate("/welcome", { state: { skipToWalkthrough: true } });
+        }}
+      />
+    );
   }
 
   return (

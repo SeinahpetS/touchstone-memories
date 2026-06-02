@@ -19,7 +19,7 @@ const SCREEN1_LINES = [
   "...until you see what it's part of.",
   "Your touchstones are the same.",
   "Each one a point of light...",
-  "...all of them quietly forming a constellation\nentirely your own.",
+  "...all of them quietly forming a constellation entirely your own.",
 ];
 
 type Phase = "s1" | "s2" | "s3" | "s4" | "s5";
@@ -49,7 +49,7 @@ const Dissolve = ({
 const ConstellationIntro = () => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("s1");
-  const [linesShown, setLinesShown] = useState(1);
+  const [linesShown, setLinesShown] = useState(0);
   const [ghostHidden, setGhostHidden] = useState(false);
   // dissolve-in state for full-screen screens
   const [s2In, setS2In] = useState(false);
@@ -133,7 +133,6 @@ const ConstellationIntro = () => {
                       lineHeight: 1.5,
                       color: TEXT,
                       margin: 0,
-                      whiteSpace: "pre-line",
                     }}
                   >
                     {line}
