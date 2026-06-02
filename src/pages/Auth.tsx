@@ -8,10 +8,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
+import OnboardingFlow from "@/components/OnboardingFlow";
+import {
+  loadOnboardingDraft,
+  saveOnboardingDraft,
+  emptyOnboardingDraft,
+} from "@/lib/onboardingDraft";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
+  const [showFlow, setShowFlow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
