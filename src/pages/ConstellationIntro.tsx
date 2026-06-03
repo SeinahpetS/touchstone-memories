@@ -47,7 +47,9 @@ const Dissolve = ({
   </div>
 );
 
-const ConstellationIntro = () => {
+type ConstellationIntroProps = { onComplete?: () => void };
+
+const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("s1");
   const [linesShown, setLinesShown] = useState(0);
@@ -77,8 +79,13 @@ const ConstellationIntro = () => {
   const advance = (next: Phase) => () => setPhase(next);
 
   const startSave = () => {
-    navigate("/welcome", { state: { skipToWalkthrough: true } });
+    if (onComplete) {
+      onComplete();
+    } else {
+      navigate("/welcome", { state: { skipToWalkthrough: true } });
+    }
   };
+
 
   return (
     <div

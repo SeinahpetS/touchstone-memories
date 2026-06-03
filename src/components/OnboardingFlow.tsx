@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/useDebounce";
+import ConstellationIntro from "@/pages/ConstellationIntro";
 
 export interface OnboardingLocation {
   city: string;
@@ -393,6 +394,7 @@ const OnboardingFlow = ({
   onComplete,
 }: OnboardingFlowProps) => {
   const [screen, setScreen] = useState<Screen>(0);
+  const [showConstellation, setShowConstellation] = useState(true);
   const [firstName, setFirstName] = useState(initialFirstName);
   const [birthMonth, setBirthMonth] = useState<number | null>(initialBirthMonth);
   const [birthYear, setBirthYear] = useState<number | null>(initialBirthYear);
@@ -422,6 +424,10 @@ const OnboardingFlow = ({
       location: loc,
     });
   };
+
+  if (showConstellation) {
+    return <ConstellationIntro onComplete={() => setShowConstellation(false)} />;
+  }
 
   // Crossfade wrapper
   return (
