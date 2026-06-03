@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
 
 type ConstellationIntroProps = { onComplete?: () => void };
 
