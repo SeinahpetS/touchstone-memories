@@ -184,6 +184,17 @@ const ConstellationIntro = () => {
             >
               A living archive of the moments, people, and things that shaped you.
             </p>
+            <img
+              src="/tile-cards-dealt.svg"
+              alt=""
+              style={{
+                width: "100%",
+                maxWidth: 552,
+                height: "auto",
+                display: "block",
+                margin: "16px auto 0",
+              }}
+            />
           </Dissolve>
         )}
 
