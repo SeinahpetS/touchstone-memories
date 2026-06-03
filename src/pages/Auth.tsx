@@ -165,6 +165,7 @@ const Auth = () => {
       className="flex min-h-screen items-center justify-center bg-background px-6"
       style={{ animation: "ts-auth-fade-in 400ms ease forwards", opacity: 0 }}
     >
+      <OnboardingDotIndicator current={6} />
       <style>{`@keyframes ts-auth-fade-in { from { opacity: 0 } to { opacity: 1 } }`}</style>
       <div className="w-full max-w-sm flex flex-col items-center space-y-8">
         {/* Wordmark */}
