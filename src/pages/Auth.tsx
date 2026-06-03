@@ -236,7 +236,7 @@ const Auth = () => {
         </div>
 
         {/* Email form */}
-        <form onSubmit={handleEmail} className="space-y-4">
+        <form onSubmit={handleEmail} className="w-full space-y-4">
           {isSignUp && (
             <Input
               type="text"
