@@ -532,7 +532,7 @@ const OnboardingFlow = ({
               Your information is yours.<br />We will never share or sell it.
             </p>
             <button
-              onClick={() => birthMonth && birthYear && advance(5)}
+              onClick={() => birthMonth && birthYear && advance(2)}
               disabled={!(birthMonth && birthYear)}
               style={continueBtnStyle(!!(birthMonth && birthYear))}
             >
