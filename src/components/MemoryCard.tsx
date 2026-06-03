@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CategoryIcon, { CATEGORY_LABELS, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
+import MemoryPhoto from "@/components/MemoryPhoto";
 import {
   DropdownMenu,
   DropdownMenuContent,
