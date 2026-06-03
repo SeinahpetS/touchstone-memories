@@ -37,6 +37,10 @@ const StoryUnfold = () => {
   const [extracting, setExtracting] = useState(false);
   const [rows, setRows] = useState<StoryRow[]>([]);
 
+  const isOnboarding =
+    typeof window !== "undefined" &&
+    localStorage.getItem("ts_onboarding_complete") !== "1";
+
   const loadRows = async () => {
     const { data: userRes } = await supabase.auth.getUser();
     const user = userRes?.user;
