@@ -155,6 +155,7 @@ const TellStoryResults = () => {
       }));
       const { error } = await (supabase as any).from("touchstones").insert(rows);
       if (error) throw error;
+      sessionStorage.setItem("ts_welcome_artifacts", JSON.stringify(kept));
       sessionStorage.removeItem("ts_story_artifacts");
       navigate(`/welcome-touchstones?kept=${kept.length}`, { replace: true });
     } catch (err: any) {
