@@ -28,7 +28,7 @@ const OnboardingStoryReady = () => {
         transition: "opacity 400ms ease",
       }}
     >
-      <OnboardingDotIndicator current={5} />
+      <OnboardingDotIndicator current={6} />
 
       <p
         style={{
