@@ -72,7 +72,7 @@ const Wordmark = () => (
 );
 
 const ProgressDots = ({ screen }: { screen: Screen }) => {
-  const total = 6;
+  const total = 3;
   return (
     <div
       style={{
