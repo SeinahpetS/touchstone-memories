@@ -36,7 +36,6 @@ const DefinitionSplash = ({ onBegin }: Props) => {
         }
         .ts-def-entry { animation: ts-def-in 0.7s ease-out 0.1s both; }
         .ts-def-logo  { animation: ts-def-in 0.7s ease-out 0s both; }
-        .ts-def-sub   { animation: ts-def-in 0.7s ease-out 1s both; }
 
         @keyframes ts-def-pulse-text {
           0%   { color: #2C3E50; }
