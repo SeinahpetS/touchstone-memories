@@ -501,7 +501,7 @@ const Onboarding = () => {
             lat: data.location?.lat ?? null,
             lng: data.location?.lng ?? null,
           });
-          handleAfterSplash();
+          navigate("/story-unfold");
         }}
       />
     );
