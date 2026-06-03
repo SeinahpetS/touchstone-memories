@@ -449,12 +449,8 @@ const OnboardingFlow = ({
         }
       `}</style>
 
-      {screen === 0 && <Slide index={0} screen={0} onNext={() => advance(1)} />}
-      {screen === 1 && <Slide index={1} screen={1} onNext={() => advance(2)} />}
-      {screen === 2 && <Slide index={2} screen={2} onNext={() => advance(3)} />}
-
-      {screen === 3 && (
-        <ScreenShell screen={3}>
+      {screen === 0 && (
+        <ScreenShell screen={0}>
           <CenteredCard>
             <p
               style={{
