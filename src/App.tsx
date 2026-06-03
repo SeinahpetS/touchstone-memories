@@ -105,14 +105,14 @@ const RootRoute = () => {
       : "/auth";
     setTimeout(() => {
       window.location.assign(dest);
-    }, 600);
+    }, 300);
   };
 
   if (phase !== "in") {
     return (
       <div
         style={{
-          transition: "opacity 600ms ease",
+          transition: "opacity 300ms ease",
           opacity: phase === "splash" ? 1 : 0,
         }}
       >
@@ -124,7 +124,7 @@ const RootRoute = () => {
   return (
     <div
       style={{
-        animation: "ts-root-fade-in 400ms ease forwards",
+        animation: "ts-root-fade-in 300ms ease forwards",
       }}
     >
       <style>{`@keyframes ts-root-fade-in { from { opacity: 0 } to { opacity: 1 } }`}</style>
