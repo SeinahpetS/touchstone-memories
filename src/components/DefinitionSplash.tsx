@@ -3,7 +3,7 @@ import touchstoneLogo from "@/assets/touchstone-logo.svg";
 
 /**
  * DefinitionSplash — definition card shown on app launch.
- * Auto-advances after 3s; tap anywhere to skip.
+ * Auto-advances after 5s; tap anywhere to skip.
  */
 type Props = {
   onBegin?: () => void;
