@@ -162,7 +162,7 @@ const Auth = () => {
       style={{ animation: "ts-auth-fade-in 400ms ease forwards", opacity: 0 }}
     >
       <style>{`@keyframes ts-auth-fade-in { from { opacity: 0 } to { opacity: 1 } }`}</style>
-      <div className="w-full max-w-sm space-y-8">
+      <div className="w-full max-w-sm flex flex-col items-center space-y-8">
         {/* Wordmark */}
         <div className="text-center">
           <div style={{ opacity: fontReady ? 1 : 0, transition: 'opacity 600ms ease' }}>
@@ -179,7 +179,7 @@ const Auth = () => {
 
         {unconfirmedEmail && (
           <div
-            className="rounded-md p-4 space-y-2"
+            className="w-full rounded-md p-4 space-y-2 text-center"
             style={{ backgroundColor: "#E8E4D8", border: "1px solid hsl(var(--border))" }}
           >
             <p
