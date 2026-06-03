@@ -123,7 +123,7 @@ const StoryUnfold = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
-      <OnboardingDotIndicator current={5} />
+      <OnboardingDotIndicator current={2} />
       <div className="mx-auto w-full max-w-lg px-5 pt-8 pb-6">
         {/* Header */}
         <h1

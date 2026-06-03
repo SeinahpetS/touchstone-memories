@@ -171,7 +171,7 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
       setLeaving(true);
       setTimeout(() => {
         if (onComplete) onComplete();
-        else navigate("/welcome");
+        else navigate("/story-unfold");
       }, 400);
       return;
     }
