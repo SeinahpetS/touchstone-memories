@@ -304,7 +304,8 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
             flexDirection: "column",
             alignItems: "center",
             gap: 10,
-            minHeight: 120,
+            minHeight: 220,
+            justifyContent: "flex-start",
           }}
         >
           {revealedTexts.map((t, i) => (
