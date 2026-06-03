@@ -153,6 +153,7 @@ const DefinitionSplash = ({ onBegin }: Props) => {
               }}
             >
               <span
+                className={i === 1 ? "ts-def-pulse-num" : undefined}
                 style={{
                   flexShrink: 0,
                   width: 18,
@@ -162,9 +163,10 @@ const DefinitionSplash = ({ onBegin }: Props) => {
               >
                 {i + 1}.
               </span>
-              <span>{d}</span>
+              <span className={i === 1 ? "ts-def-pulse-text" : undefined}>{d}</span>
             </li>
           ))}
+
         </ol>
       </div>
 
