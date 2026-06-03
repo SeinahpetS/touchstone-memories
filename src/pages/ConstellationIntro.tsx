@@ -1,299 +1,334 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-/**
- * 5-screen constellation onboarding. Sits between sign-up and the archive.
- * All transitions are pure opacity dissolves. Mobile-first, max-width 600px.
- *
- * Screen 1: tap-to-reveal 5 lines, then tap to advance.
- * Screens 2-4: full-screen dissolve, single tap advances.
- * Screen 5: CTA to save first touchstone.
- */
-
-const BG = "#1E2E3E";
-const TEXT = "#F2EEE5";
-const GOLD = "#B8860B";
-
-const SCREEN1_LINES = [
-  "Every star looks like just a star...",
-  "...until you see what it's part of.",
-  "Your touchstones are the same.",
-  "Each one a point of light...",
-  "...all of them quietly forming a constellation",
-  "that is entirely your own.",
-];
-
-type Phase = "s1" | "s2" | "s3" | "s4" | "s5";
-
-const Dissolve = ({
-  show,
-  children,
-  delay = 0,
-  className = "",
-}: {
-  show: boolean;
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) => (
-  <div
-    className={className}
-    style={{
-      opacity: show ? 1 : 0,
-      transition: `opacity 900ms ease-out ${delay}ms`,
-    }}
-  >
-    {children}
-  </div>
-);
 
 type ConstellationIntroProps = { onComplete?: () => void };
 
+const BG = "#F2EEE5";
+const NAVY = "#1E2E3E";
+const IVORY = "#F2EEE5";
+const GOLD = "#B8860B";
+const INK = "#2C3E50";
+
+type StarKey =
+  | "Alkaid"
+  | "Mizar"
+  | "Alioth"
+  | "Megrez"
+  | "Dubhe"
+  | "Merak"
+  | "Phecda";
+
+const STARS: Record<StarKey, { cx: number; cy: number; r: number }> = {
+  Alkaid: { cx: 96, cy: 225, r: 5 },
+  Mizar: { cx: 160, cy: 182, r: 4.5 },
+  Alioth: { cx: 203, cy: 190, r: 5.5 },
+  Megrez: { cx: 296, cy: 190, r: 3.5 },
+  Dubhe: { cx: 441, cy: 133, r: 5.5 },
+  Merak: { cx: 450, cy: 208, r: 3.5 },
+  Phecda: { cx: 340, cy: 236, r: 3.5 },
+};
+
+const LINES: Array<{ id: string; from: StarKey; to: StarKey }> = [
+  { id: "l1", from: "Alkaid", to: "Mizar" },
+  { id: "l2", from: "Mizar", to: "Alioth" },
+  { id: "l3", from: "Alioth", to: "Megrez" },
+  { id: "l4", from: "Megrez", to: "Dubhe" },
+  { id: "l5", from: "Dubhe", to: "Merak" },
+  { id: "l6", from: "Merak", to: "Phecda" },
+  { id: "l7", from: "Phecda", to: "Megrez" },
+];
+
+const REVEAL: Array<{ star: StarKey; text: string | null }> = [
+  { star: "Alkaid", text: "Every star looks like just a star..." },
+  { star: "Dubhe", text: "...until you see what it's part of." },
+  { star: "Mizar", text: "Your touchstones are the same." },
+  { star: "Merak", text: "Each one a point of light..." },
+  { star: "Alioth", text: "...all of them quietly forming a constellation" },
+  { star: "Phecda", text: "entirely your own." },
+  { star: "Megrez", text: null },
+];
+
+// Deterministic pseudo-random scatter for background stars.
+const makeBgStars = (count: number) => {
+  let seed = 1337;
+  const rand = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+  const stars: Array<{ cx: number; cy: number; r: number; o: number }> = [];
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      cx: rand() * 552,
+      cy: rand() * 340,
+      r: 0.7 + rand() * 1.2,
+      o: 0.15 + rand() * 0.15,
+    });
+  }
+  return stars;
+};
+
 const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   const navigate = useNavigate();
-  const [phase, setPhase] = useState<Phase>("s1");
-  const [linesShown, setLinesShown] = useState(0);
-  const [ghostHidden, setGhostHidden] = useState(false);
-  // dissolve-in state for full-screen screens
-  const [s2In, setS2In] = useState(false);
-  const [s3In, setS3In] = useState(false);
-  const [s4In, setS4In] = useState(false);
-  const [s5In, setS5In] = useState(false);
+  const bgStars = useMemo(() => makeBgStars(80), []);
 
+  // step = number of taps consumed. 0..7 reveals stars/text. 8 = draw lines. 9 = pulsing.
+  const [step, setStep] = useState(0);
+  const [linesDrawn, setLinesDrawn] = useState(0);
+  const [pulsing, setPulsing] = useState(false);
+
+  const lineRefs = useRef<Record<string, SVGLineElement | null>>({});
+  const blurRef = useRef<SVGFEGaussianBlurElement | null>(null);
+  const groupRef = useRef<SVGGElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const pulseStartRef = useRef<number>(0);
+
+  const revealedStars = new Set(REVEAL.slice(0, step).map((r) => r.star));
+  const revealedTexts = REVEAL.slice(0, step)
+    .map((r) => r.text)
+    .filter((t): t is string => !!t);
+
+  // Trigger line-draw sequence after the 7th tap.
   useEffect(() => {
-    if (phase === "s2") setTimeout(() => setS2In(true), 30);
-    if (phase === "s3") setTimeout(() => setS3In(true), 30);
-    if (phase === "s4") setTimeout(() => setS4In(true), 30);
-    if (phase === "s5") setTimeout(() => setS5In(true), 30);
-  }, [phase]);
+    if (step !== REVEAL.length) return;
+    let cancelled = false;
+    LINES.forEach((line, i) => {
+      setTimeout(() => {
+        if (cancelled) return;
+        setLinesDrawn(i + 1);
+      }, i * 250);
+    });
+    const totalDraw = LINES.length * 250 + 400 + 300;
+    const t = setTimeout(() => {
+      if (!cancelled) setPulsing(true);
+    }, totalDraw);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [step]);
 
-  const handleS1Tap = () => {
-    if (!ghostHidden) setGhostHidden(true);
-    if (linesShown < SCREEN1_LINES.length) {
-      setLinesShown((n) => n + 1);
-    } else {
-      setPhase("s2");
+  // Pulse loop.
+  useEffect(() => {
+    if (!pulsing) return;
+    pulseStartRef.current = performance.now();
+    const REST_OPACITY = 0.45;
+    const PEAK_OPACITY = 1;
+    const REST_WIDTH = 1.5;
+    const PEAK_WIDTH = 2.5;
+    const REST_BLUR = 0;
+    const PEAK_BLUR = 4.5;
+
+    const tick = (now: number) => {
+      const t = (now - pulseStartRef.current) % 3000;
+      let k: number;
+      if (t < 1000) {
+        const p = t / 1000;
+        k = p * p; // ease in
+      } else if (t < 2500) {
+        k = 1;
+      } else {
+        const p = (t - 2500) / 500;
+        k = 1 - p * (2 - p); // ease out
+      }
+      const op = REST_OPACITY + (PEAK_OPACITY - REST_OPACITY) * k;
+      const w = REST_WIDTH + (PEAK_WIDTH - REST_WIDTH) * k;
+      const b = REST_BLUR + (PEAK_BLUR - REST_BLUR) * k;
+      Object.values(lineRefs.current).forEach((el) => {
+        if (!el) return;
+        el.setAttribute("stroke-opacity", String(op));
+        el.setAttribute("stroke-width", String(w));
+      });
+      if (blurRef.current) {
+        blurRef.current.setAttribute("stdDeviation", String(b));
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [pulsing]);
+
+  const handleTap = () => {
+    if (pulsing) {
+      // Final tap: stop pulse, reset, navigate.
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      Object.values(lineRefs.current).forEach((el) => {
+        if (!el) return;
+        el.setAttribute("stroke-opacity", "0.45");
+        el.setAttribute("stroke-width", "1.5");
+      });
+      if (blurRef.current) blurRef.current.setAttribute("stdDeviation", "0");
+      setPulsing(false);
+      if (onComplete) onComplete();
+      else navigate("/welcome", { state: { skipToWalkthrough: true } });
+      return;
+    }
+    if (step < REVEAL.length) {
+      setStep((s) => s + 1);
     }
   };
-
-  const advance = (next: Phase) => () => setPhase(next);
-
-  const startSave = () => {
-    if (onComplete) {
-      onComplete();
-    } else {
-      navigate("/welcome", { state: { skipToWalkthrough: true } });
-    }
-  };
-
 
   return (
     <div
-      onClick={
-        phase === "s1"
-          ? handleS1Tap
-          : phase === "s2"
-          ? advance("s3")
-          : phase === "s3"
-          ? advance("s4")
-          : phase === "s4"
-          ? advance("s5")
-          : undefined
-      }
+      onClick={handleTap}
       style={{
         background: BG,
-        color: TEXT,
         minHeight: "100dvh",
         width: "100%",
-        cursor: phase === "s5" ? "default" : "pointer",
+        padding: "24px 16px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        userSelect: "none",
         WebkitTapHighlightColor: "transparent",
       }}
-      className="flex items-center justify-center"
     >
       <div
-        className="w-full flex flex-col items-center justify-center px-6 py-10"
-        style={{ maxWidth: 600, minHeight: "100dvh" }}
+        style={{
+          background: NAVY,
+          borderRadius: 16,
+          width: "100%",
+          maxWidth: 552,
+          height: 340,
+          overflow: "hidden",
+          pointerEvents: "none",
+          flexShrink: 0,
+        }}
       >
-        {phase === "s1" && (
-          <div className="flex flex-col items-center w-full">
-            <div
-              aria-label="constellation-placeholder"
-              data-testid="constellation-placeholder"
-              style={{
-                width: 240,
-                height: 240,
-                borderRadius: "50%",
-                background: BG,
-                border: `1px solid ${GOLD}55`,
-                marginBottom: 56,
-              }}
-            />
-            <div
-              className="flex flex-col items-center text-center"
-              style={{ gap: 18, minHeight: 280 }}
+        <svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 552 340"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <defs>
+            <filter
+              id="line-glow"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
             >
-              {SCREEN1_LINES.map((line, i) => (
-                <Dissolve key={i} show={i < linesShown}>
-                  <p
-                    style={{
-                      fontFamily: "'Playfair Display', serif",
-                      fontSize: 20,
-                      lineHeight: 1.5,
-                      color: TEXT,
-                      margin: 0,
-                    }}
-                  >
-                    {line}
-                  </p>
-                </Dissolve>
-              ))}
-            </div>
-            <div
-              style={{
-                marginTop: 40,
-                opacity: ghostHidden ? 0 : 0.4,
-                transition: "opacity 600ms ease-out",
-                fontFamily: "Jost, sans-serif",
-                fontSize: 12,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: TEXT,
-              }}
-            >
-              tap to continue
-            </div>
-          </div>
-        )}
+              <feGaussianBlur
+                id="glow-blur"
+                ref={blurRef}
+                stdDeviation="0"
+                result="blur"
+              />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
 
-        {phase === "s2" && (
-          <div className="w-full text-center">
-            <Dissolve show={s2In}>
-              <h1
+          {bgStars.map((s, i) => (
+            <circle
+              key={i}
+              cx={s.cx}
+              cy={s.cy}
+              r={s.r}
+              fill={IVORY}
+              opacity={s.o}
+            />
+          ))}
+
+          <g ref={groupRef} filter="url(#line-glow)">
+            {LINES.map((line, i) => {
+              const a = STARS[line.from];
+              const b = STARS[line.to];
+              const visible = i < linesDrawn;
+              return (
+                <line
+                  key={line.id}
+                  ref={(el) => (lineRefs.current[line.id] = el)}
+                  x1={a.cx}
+                  y1={a.cy}
+                  x2={b.cx}
+                  y2={b.cy}
+                  stroke={GOLD}
+                  strokeWidth={1.5}
+                  strokeOpacity={visible ? 0.5 : 0}
+                  style={{ transition: "stroke-opacity 400ms ease" }}
+                />
+              );
+            })}
+          </g>
+
+          {(Object.keys(STARS) as StarKey[]).map((k) => {
+            const s = STARS[k];
+            return (
+              <circle
+                key={k}
+                cx={s.cx}
+                cy={s.cy}
+                r={s.r}
+                fill={IVORY}
                 style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: 26,
-                  lineHeight: 1.45,
-                  color: TEXT,
-                  margin: 0,
-                  fontWeight: 500,
-                }}
-              >
-                Touchstone holds everything that made you who you are, and reveals why it still matters.
-              </h1>
-              <img
-                src="/tile-cards-dealt.svg"
-                alt=""
-                style={{
-                  width: "100%",
-                  maxWidth: 552,
-                  height: "auto",
-                  display: "block",
-                  margin: "16px auto 0",
+                  opacity: revealedStars.has(k) ? 1 : 0,
+                  transition: "opacity 400ms ease",
                 }}
               />
-            </Dissolve>
-            <Dissolve show={s2In} delay={1200}>
-              <p
-                style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: 26,
-                  lineHeight: 1.45,
-                  color: TEXT,
-                  opacity: 0.6,
-                  margin: "28px 0 0",
-                  fontWeight: 500,
-                }}
-              >
-                A living archive of the moments, people, and things that shaped you.
-              </p>
-            </Dissolve>
-          </div>
-        )}
-
-
-        {phase === "s3" && (
-          <Dissolve show={s3In} className="w-full text-center">
-            <p
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: 21,
-                lineHeight: 1.7,
-                color: TEXT,
-                margin: 0,
-                fontWeight: 400,
-              }}
-            >
-              A meal you'd travel back for. The light on a specific afternoon you almost forgot to look up and see. The conversation that changed the way you thought. A voice you're afraid of forgetting. The moment just before everything was different.
-            </p>
-            <p
-              style={{
-                marginTop: 32,
-                fontFamily: "Jost, sans-serif",
-                fontSize: 14,
-                lineHeight: 1.6,
-                color: TEXT,
-                opacity: 0.6,
-              }}
-            >
-              If it moved you, it belongs here.
-            </p>
-          </Dissolve>
-        )}
-
-        {phase === "s4" && (
-          <Dissolve show={s4In} className="w-full text-center">
-            <p
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: 23,
-                lineHeight: 1.55,
-                color: TEXT,
-                margin: 0,
-                fontWeight: 400,
-              }}
-            >
-              No rules. No streaks. No right way to do this. Some weeks you'll save ten things. Some weeks, one. Touchstone keeps them all, patiently.
-            </p>
-          </Dissolve>
-        )}
-
-        {phase === "s5" && (
-          <Dissolve show={s5In} className="w-full text-center flex flex-col items-center">
-            <h2
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: 28,
-                lineHeight: 1.4,
-                color: TEXT,
-                margin: 0,
-                fontWeight: 500,
-              }}
-            >
-              What's one thing from today worth keeping?
-            </h2>
-            <button
-              type="button"
-              onClick={startSave}
-              style={{
-                marginTop: 48,
-                width: "100%",
-                maxWidth: 420,
-                background: GOLD,
-                color: "#FFFFFF",
-                fontFamily: "Jost, sans-serif",
-                fontSize: 15,
-                letterSpacing: "0.06em",
-                padding: "16px 20px",
-                borderRadius: 6,
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Save your first touchstone.
-            </button>
-          </Dissolve>
-        )}
+            );
+          })}
+        </svg>
       </div>
+
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 552,
+          padding: "24px 24px 0",
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          id="text-area"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 10,
+            minHeight: 120,
+          }}
+        >
+          {revealedTexts.map((t, i) => (
+            <p
+              key={i}
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontSize: 17,
+                color: INK,
+                textAlign: "center",
+                lineHeight: 1.6,
+                margin: 0,
+                animation: "ts-ci-fade 400ms ease forwards",
+                opacity: 0,
+              }}
+            >
+              {t}
+            </p>
+          ))}
+        </div>
+        <p
+          style={{
+            fontFamily: "Jost, sans-serif",
+            fontSize: 12,
+            color: INK,
+            opacity: 0.4,
+            letterSpacing: "0.08em",
+            textAlign: "center",
+            marginTop: 24,
+          }}
+        >
+          tap anywhere to continue
+        </p>
+      </div>
+      <style>{`@keyframes ts-ci-fade { from { opacity: 0 } to { opacity: 1 } }`}</style>
     </div>
   );
 };
