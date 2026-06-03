@@ -542,7 +542,7 @@ const OnboardingFlow = ({
               onClick={() => {
                 setBirthMonth(null);
                 setBirthYear(null);
-                advance(5);
+                advance(2);
               }}
               style={skipLinkStyle}
             >
