@@ -174,6 +174,7 @@ const App = () => (
           <Route path="/welcome" element={<Onboarding />} />
           <Route path="/constellation" element={<ConstellationIntro />} />
           <Route path="/onboarding/name" element={<OnboardingName />} />
+          <Route path="/onboarding/birth" element={<OnboardingBirthYear />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
