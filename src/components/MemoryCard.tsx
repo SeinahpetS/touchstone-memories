@@ -118,7 +118,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         {/* Photo / icon-fallback frame — 1:1 square */}
         {memory.photo_url ? (
           <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
-            <img
+            <MemoryPhoto
               src={memory.photo_url}
               alt={memory.title || "Memory"}
               style={{
@@ -128,7 +128,6 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 objectPosition: "center",
                 display: "block",
               }}
-              loading="lazy"
             />
           </div>
         ) : (
