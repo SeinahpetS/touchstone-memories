@@ -394,6 +394,7 @@ const OnboardingFlow = ({
   onComplete,
 }: OnboardingFlowProps) => {
   const [screen, setScreen] = useState<Screen>(0);
+  const [showConstellation, setShowConstellation] = useState(true);
   const [firstName, setFirstName] = useState(initialFirstName);
   const [birthMonth, setBirthMonth] = useState<number | null>(initialBirthMonth);
   const [birthYear, setBirthYear] = useState<number | null>(initialBirthYear);
