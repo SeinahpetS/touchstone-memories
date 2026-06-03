@@ -26,6 +26,7 @@ import OnboardingName from "./pages/OnboardingName.tsx";
 import OnboardingBirthYear from "./pages/OnboardingBirthYear.tsx";
 import OnboardingLocation from "./pages/OnboardingLocation.tsx";
 import OnboardingStoryReady from "./pages/OnboardingStoryReady.tsx";
+import OnboardingCreateAccount from "./pages/OnboardingCreateAccount.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
 
 const queryClient = new QueryClient();
@@ -179,6 +180,7 @@ const App = () => (
           <Route path="/onboarding/birth" element={<OnboardingBirthYear />} />
           <Route path="/onboarding/location" element={<OnboardingLocation />} />
           <Route path="/onboarding/ready" element={<OnboardingStoryReady />} />
+          <Route path="/onboarding/create-account" element={<OnboardingCreateAccount />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
