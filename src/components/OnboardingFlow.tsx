@@ -45,7 +45,7 @@ const US_STATES = [
   "VA","WA","WV","WI","WY","DC",
 ];
 
-type Screen = 0 | 1 | 2 | 3 | 4 | 5;
+type Screen = 0 | 1 | 2;
 
 const Wordmark = () => (
   <div
@@ -72,7 +72,7 @@ const Wordmark = () => (
 );
 
 const ProgressDots = ({ screen }: { screen: Screen }) => {
-  const total = 6;
+  const total = 3;
   return (
     <div
       style={{
@@ -131,159 +131,6 @@ const ScreenShell = ({
   </div>
 );
 
-const SLIDES: { img: string; copy: string; nextLabel: string }[] = [
-  {
-    img: "/images/constellations/orion-placeholder.png",
-    copy: "Touchstone holds everything that made you who you are, and reveals why it still matters.",
-    nextLabel: "Next →",
-  },
-  {
-    img: "/images/constellations/big-dipper-placeholder.png",
-    copy: "One tap saves it. Touchstone asks the question you didn't know you needed to answer.",
-    nextLabel: "Next →",
-  },
-  {
-    img: "/images/constellations/cassiopeia-placeholder.png",
-    copy: "You don't need to remember everything. Just start with one thing.",
-    nextLabel: "Let's go →",
-  },
-];
-
-const Slide = ({
-  index,
-  screen,
-  onNext,
-}: {
-  index: 0 | 1 | 2;
-  screen: Screen;
-  onNext: () => void;
-}) => {
-  const slide = SLIDES[index];
-  return (
-    <ScreenShell screen={screen} hideDots>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100dvh",
-          background: IVORY,
-        }}
-      >
-        {/* Section 1 — Wordmark spacer (Wordmark itself is absolutely positioned in ScreenShell) */}
-        <div
-          style={{
-            flexShrink: 0,
-            padding: "1.2rem 0 0.8rem",
-            textAlign: "center",
-            // reserve vertical room equivalent to the wordmark
-            minHeight: "3.2rem",
-          }}
-        />
-        {/* Section 2 — Sky panel */}
-        <div
-          style={{
-            flex: "0 0 45vh",
-            minHeight: 200,
-            maxHeight: 360,
-            background: "#1A2535",
-            width: "100%",
-            overflow: "hidden",
-          }}
-        >
-          <img
-            src={slide.img}
-            alt=""
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              padding: 24,
-              opacity: 0.85,
-              boxSizing: "border-box",
-            }}
-          />
-        </div>
-        {/* Section 3 — Copy + navigation */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "2rem 2rem 2.5rem",
-          }}
-        >
-          <div style={{ maxWidth: 340, display: "flex", flexDirection: "column", gap: "1rem" }}>
-            {slide.copy
-              .split(/(?<=\.)\s+/)
-              .filter(Boolean)
-              .map((line, i) => (
-                <p
-                  key={i}
-                  style={{
-                    fontFamily: '"Playfair Display", Georgia, serif',
-                    fontStyle: "normal",
-                    fontSize: "clamp(18px, 4vw, 22px)",
-                    color: INK,
-                    lineHeight: 1.5,
-                    textAlign: "center",
-                    margin: 0,
-                  }}
-                >
-                  {line}
-                </p>
-              ))}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "1rem",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-              {[0, 1, 2, 3].map((i) => {
-                const activeDot = screen <= 2 ? screen : 3;
-                const active = i === activeDot;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      width: active ? 24 : 6,
-                      height: 6,
-                      borderRadius: 999,
-                      background: MUTED,
-                      opacity: active ? 1 : 0.3,
-                      transition: "width 300ms ease, opacity 300ms ease",
-                    }}
-                  />
-                );
-              })}
-            </div>
-            <button
-              onClick={onNext}
-              style={{
-                background: GOLD,
-                border: "none",
-                cursor: "pointer",
-                fontFamily: '"Playfair Display", Georgia, serif',
-                fontStyle: "italic",
-                fontSize: 14,
-                color: IVORY,
-                borderRadius: 999,
-                padding: "0.6rem 1.6rem",
-              }}
-            >
-              {slide.nextLabel}
-            </button>
-          </div>
-        </div>
-      </div>
-    </ScreenShell>
-  );
-};
 
 const inputBaseStyle: React.CSSProperties = {
   width: "100%",
@@ -602,12 +449,8 @@ const OnboardingFlow = ({
         }
       `}</style>
 
-      {screen === 0 && <Slide index={0} screen={0} onNext={() => advance(1)} />}
-      {screen === 1 && <Slide index={1} screen={1} onNext={() => advance(2)} />}
-      {screen === 2 && <Slide index={2} screen={2} onNext={() => advance(3)} />}
-
-      {screen === 3 && (
-        <ScreenShell screen={3}>
+      {screen === 0 && (
+        <ScreenShell screen={0}>
           <CenteredCard>
             <p
               style={{
@@ -642,7 +485,7 @@ const OnboardingFlow = ({
               autoFocus
             />
             <button
-              onClick={() => firstName.trim() && advance(4)}
+              onClick={() => firstName.trim() && advance(1)}
               disabled={!firstName.trim()}
               style={continueBtnStyle(!!firstName.trim())}
             >
@@ -652,8 +495,8 @@ const OnboardingFlow = ({
         </ScreenShell>
       )}
 
-      {screen === 4 && (
-        <ScreenShell screen={4}>
+      {screen === 1 && (
+        <ScreenShell screen={1}>
           <CenteredCard>
             <h2 style={headlineStyle}>When were you born?</h2>
             <p style={subLineStyle}>(Helps us understand your era.)</p>
@@ -689,7 +532,7 @@ const OnboardingFlow = ({
               Your information is yours.<br />We will never share or sell it.
             </p>
             <button
-              onClick={() => birthMonth && birthYear && advance(5)}
+              onClick={() => birthMonth && birthYear && advance(2)}
               disabled={!(birthMonth && birthYear)}
               style={continueBtnStyle(!!(birthMonth && birthYear))}
             >
@@ -699,7 +542,7 @@ const OnboardingFlow = ({
               onClick={() => {
                 setBirthMonth(null);
                 setBirthYear(null);
-                advance(5);
+                advance(2);
               }}
               style={skipLinkStyle}
             >
@@ -709,8 +552,8 @@ const OnboardingFlow = ({
         </ScreenShell>
       )}
 
-      {screen === 5 && (
-        <ScreenShell screen={5}>
+      {screen === 2 && (
+        <ScreenShell screen={2}>
           <CenteredCard>
             <h2 style={headlineStyle}>Where are you?</h2>
             <p style={subLineStyle}>
