@@ -30,7 +30,10 @@ const Auth = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) navigate("/archive", { replace: true });
+    if (!loading && user) {
+      markOnboardingComplete();
+      navigate("/archive", { replace: true });
+    }
   }, [user, loading, navigate]);
 
   useEffect(() => {
