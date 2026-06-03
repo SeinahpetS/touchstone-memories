@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/useDebounce";
 import ConstellationIntro from "@/pages/ConstellationIntro";
+import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
 
 export interface OnboardingLocation {
   city: string;
