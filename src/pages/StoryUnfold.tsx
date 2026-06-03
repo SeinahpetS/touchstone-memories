@@ -287,6 +287,34 @@ const StoryUnfold = () => {
             );
           })}
         </div>
+
+        {/* Onboarding: continue to next step */}
+        {isOnboarding && (
+          <button
+            type="button"
+            onClick={() => navigate("/onboarding/name")}
+            className="w-full flex items-center justify-center gap-2 mt-6"
+            style={{
+              backgroundColor: "transparent",
+              border: `1.5px solid ${BRAND_NAVY}`,
+              borderRadius: 12,
+              padding: "0.85rem",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                color: BRAND_NAVY,
+                fontWeight: 500,
+              }}
+            >
+              Continue
+            </span>
+            <ArrowRight size={16} color={BRAND_NAVY} strokeWidth={1.75} />
+          </button>
+        )}
       </div>
 
 
