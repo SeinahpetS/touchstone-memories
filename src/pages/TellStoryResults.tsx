@@ -12,12 +12,15 @@ type Artifact = {
   note: string;
 };
 
+type Decision = "kept" | "removed" | null;
+
 const NAVY = "#1E2E3E";
 const IVORY = "#F2EEE5";
 const CARD_BG = "#E8E4D8";
 const MUTED = "#C9C3B5";
-const GOLD = "#B8860B";
+const AEGEAN = "#0E7C86";
 const SECONDARY = "#5B4A3F";
+const INK = "#2C3E50";
 
 const CATEGORY_KEYS: CategoryKey[] = [
   "moment", "person", "object", "place", "food", "sound", "imprint", "digital_traces",
@@ -34,143 +37,145 @@ const TellStoryResults = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Mutable deck — front of deck is deck[0].
-  const [deck, setDeck] = useState<Artifact[]>([]);
-  const [originalCount, setOriginalCount] = useState(0);
-  const [decisions, setDecisions] = useState<("kept" | "skipped")[]>([]);
-  // Number of right-swipes (navigation forward) that can still be undone via swipe-left.
-  const [historyCount, setHistoryCount] = useState(0);
+  const [cards, setCards] = useState<Artifact[]>([]);
+  const [decisions, setDecisions] = useState<Decision[]>([]);
+  const [index, setIndex] = useState(0);
+  const [phase, setPhase] = useState<"reveal" | "decide" | "saving">("reveal");
+  const [saving, setSaving] = useState(false);
 
-  // Card drag/exit animation state.
+  // Swipe state for horizontal carousel
   const [drag, setDrag] = useState(0);
-  const [exiting, setExiting] = useState<null | "left" | "right" | "decided">(null);
   const startX = useRef<number | null>(null);
-
-  // Keep-this-touchstone confirmation state.
-  const [confirming, setConfirming] = useState(false);
-
-  // Edit overlay state.
-  const [editing, setEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState("");
-  const [editNote, setEditNote] = useState("");
-  const [editCategory, setEditCategory] = useState<CategoryKey>("moment");
-  const [editPrivate, setEditPrivate] = useState(false);
-  const [editPerson, setEditPerson] = useState("");
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [trackWidth, setTrackWidth] = useState(0);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("ts_story_artifacts");
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          const moments = parsed.filter((a: Artifact) => a.category?.toLowerCase() === "moment");
-          const others = parsed.filter((a: Artifact) => a.category?.toLowerCase() !== "moment");
-          const ordered = [...moments, ...others];
-          setDeck(ordered);
-          setOriginalCount(ordered.length);
-        }
-      } catch {
-        // ignore
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Order moments first, others after
+        const moments = parsed.filter((a: Artifact) => a.category?.toLowerCase() === "moment");
+        const others = parsed.filter((a: Artifact) => a.category?.toLowerCase() !== "moment");
+        const ordered = [...moments, ...others].slice(0, 3); // first session = up to 3
+        setCards(ordered);
+        setDecisions(new Array(ordered.length).fill(null));
       }
-    }
+    } catch { /* ignore */ }
   }, []);
 
-  const current = deck[0];
-  const done = originalCount > 0 && deck.length === 0;
+  // Measure track width for swipe math
+  useEffect(() => {
+    if (!trackRef.current) return;
+    const measure = () => setTrackWidth(trackRef.current?.offsetWidth ?? 0);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [cards.length]);
 
-  // Swipe right: rotate front card to back of deck (navigation only).
-  const swipeRight = () => {
-    if (exiting || confirming || deck.length <= 1) return;
-    setExiting("right");
-    setTimeout(() => {
-      setDeck((d) => (d.length > 1 ? [...d.slice(1), d[0]] : d));
-      setHistoryCount((h) => h + 1);
-      setDrag(0);
-      setExiting(null);
-    }, 220);
-  };
+  // Reveal → decide phase transition (after stagger settles)
+  useEffect(() => {
+    if (phase !== "reveal" || cards.length === 0) return;
+    const totalStagger = 380 + cards.length * 220 + 420; // last card fades in + breathing room
+    const t = window.setTimeout(() => setPhase("decide"), totalStagger);
+    return () => window.clearTimeout(t);
+  }, [phase, cards.length]);
 
-  // Swipe left: undo last forward swipe — bring card from back to front.
-  const swipeLeft = () => {
-    if (exiting || confirming || historyCount <= 0 || deck.length <= 1) return;
-    setExiting("left");
-    setTimeout(() => {
-      setDeck((d) =>
-        d.length > 1 ? [d[d.length - 1], ...d.slice(0, -1)] : d
-      );
-      setHistoryCount((h) => Math.max(0, h - 1));
-      setDrag(0);
-      setExiting(null);
-    }, 220);
-  };
+  const total = cards.length;
+  const current = cards[index];
+  const allDecided = decisions.length > 0 && decisions.every((d) => d !== null);
 
-  const removeFrontCard = () => {
-    setDeck((d) => d.slice(1));
-    // After removal, historyCount no longer applies to a previous card from this position.
-    setHistoryCount(0);
+  const goTo = (next: number) => {
+    if (next < 0 || next >= total) return;
+    setIndex(next);
     setDrag(0);
-    setExiting(null);
   };
 
-  // Skip — remove card, no save.
-  const handleSkip = () => {
-    if (exiting || confirming || !current) return;
-    setExiting("decided");
-    setTimeout(() => {
-      setDecisions((d) => [...d, "skipped"]);
-      removeFrontCard();
-    }, 220);
+  const setDecision = (i: number, d: Decision) => {
+    setDecisions((prev) => {
+      const copy = [...prev];
+      copy[i] = d;
+      return copy;
+    });
   };
 
-  // Keep this Touchstone — confirmation animation, save to Supabase, advance.
-  const runKeepConfirmation = async (artifactOverride?: Artifact) => {
-    const artifact = artifactOverride ?? current;
-    if (!artifact || !user) {
-      toast.error("Sign in to save your Touchstones.");
-      return;
+  const advanceAfterDecision = (i: number) => {
+    // Find next undecided card; if none, stay (the finish CTA will appear).
+    const after = decisions
+      .map((d, idx) => ({ d, idx }))
+      .find((x) => x.idx > i && x.d === null);
+    if (after) {
+      window.setTimeout(() => goTo(after.idx), 240);
+    } else {
+      const beforeUndecided = decisions
+        .map((d, idx) => ({ d, idx }))
+        .find((x) => x.idx < i && x.d === null);
+      if (beforeUndecided) {
+        window.setTimeout(() => goTo(beforeUndecided.idx), 240);
+      }
     }
-    setConfirming(true);
+  };
+
+  const handleKeep = () => {
+    if (phase !== "decide") return;
     playSaveFeedback();
+    setDecision(index, "kept");
+    advanceAfterDecision(index);
+  };
 
-    // Persist to Supabase during the confirmation animation.
-    try {
-      const payload: Record<string, any> = {
-        user_id: user.id,
-        category: normalizeCategory(artifact.category),
-        title: artifact.title?.trim() || null,
-        note: artifact.note?.trim() || null,
-      };
-      const { error } = await (supabase as any).from("touchstones").insert(payload);
-      if (error) throw error;
-    } catch (err: any) {
-      toast.error(err?.message || "Couldn't save that Touchstone.");
-      setConfirming(false);
+  const handleRemove = () => {
+    if (phase !== "decide") return;
+    setDecision(index, "removed");
+    advanceAfterDecision(index);
+  };
+
+  const handleFinish = async () => {
+    if (!user) {
+      toast.error("Sign in to keep your Touchstones.");
+      return;
+    }
+    const kept = cards.filter((_, i) => decisions[i] === "kept");
+
+    if (kept.length === 0) {
+      // All removed → archive empty state path
+      sessionStorage.removeItem("ts_story_artifacts");
+      navigate("/archive?firstrun_empty=1", { replace: true });
       return;
     }
 
-    // Confirmation duration: 800ms checkmark, then slide away.
-    setTimeout(() => {
-      setExiting("decided");
-      setTimeout(() => {
-        setDecisions((d) => [...d, "kept"]);
-        setConfirming(false);
-        removeFrontCard();
-      }, 260);
-    }, 850);
+    setPhase("saving");
+    setSaving(true);
+    try {
+      const rows = kept.map((a) => ({
+        user_id: user.id,
+        category: normalizeCategory(a.category),
+        title: a.title?.trim() || null,
+        note: a.note?.trim() || null,
+      }));
+      const { error } = await (supabase as any).from("touchstones").insert(rows);
+      if (error) throw error;
+      sessionStorage.removeItem("ts_story_artifacts");
+      navigate(`/welcome-touchstones?kept=${kept.length}`, { replace: true });
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't save your Touchstones.");
+      setSaving(false);
+      setPhase("decide");
+    }
   };
 
-  // Pointer handlers — direction is navigation only.
+  // Pointer handlers for horizontal swipe between cards
   const onPointerDown = (e: React.PointerEvent) => {
-    if (exiting || confirming) return;
+    if (phase !== "decide") return;
     startX.current = e.clientX;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (startX.current === null) return;
     const dx = e.clientX - startX.current;
-    // Block leftward drag past 0 on the first (no-previous) card.
-    if (dx < 0 && historyCount <= 0) {
-      setDrag(Math.max(dx * 0.2, -24)); // small resistance
+    // Resist at edges
+    if ((dx > 0 && index === 0) || (dx < 0 && index === total - 1)) {
+      setDrag(dx * 0.25);
     } else {
       setDrag(dx);
     }
@@ -179,55 +184,13 @@ const TellStoryResults = () => {
     if (startX.current === null) return;
     const d = drag;
     startX.current = null;
-    if (d > 100) swipeRight();
-    else if (d < -100 && historyCount > 0) swipeLeft();
+    const threshold = Math.max(60, trackWidth * 0.18);
+    if (d < -threshold && index < total - 1) goTo(index + 1);
+    else if (d > threshold && index > 0) goTo(index - 1);
     else setDrag(0);
   };
 
-  // Edit flow.
-  const openEdit = () => {
-    if (!current) return;
-    setEditTitle(current.title || "");
-    setEditNote(current.note || "");
-    setEditCategory(normalizeCategory(current.category));
-    setEditPrivate(false);
-    setEditPerson("");
-    setEditing(true);
-  };
-
-  const handleEditSave = async () => {
-    const updated: Artifact = {
-      category: editCategory,
-      title: editTitle.trim(),
-      note: editNote.trim(),
-    };
-    // Update the front card with revised content, then trigger keep confirmation.
-    setDeck((d) => (d.length > 0 ? [updated, ...d.slice(1)] : d));
-    setEditing(false);
-    // Slight delay so the user sees the revised card before the pulse begins.
-    setTimeout(() => {
-      void runKeepConfirmation(updated);
-    }, 80);
-  };
-
-  const dots = useMemo(() => {
-    const decided = decisions.length;
-    return Array.from({ length: originalCount }).map((_, i) => (
-      <span
-        key={i}
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: 9999,
-          background: i < decided ? NAVY : MUTED,
-          opacity: i < decided ? 1 : 0.7,
-          transition: "background 200ms",
-        }}
-      />
-    ));
-  }, [originalCount, decisions]);
-
-  if (originalCount === 0) {
+  if (cards.length === 0) {
     return (
       <div
         className="min-h-screen flex flex-col items-center justify-center px-6"
@@ -237,7 +200,7 @@ const TellStoryResults = () => {
           style={{
             fontFamily: "'Playfair Display', serif",
             fontStyle: "italic",
-            color: "#2C3E50",
+            color: INK,
             fontSize: 20,
             textAlign: "center",
           }}
@@ -249,7 +212,7 @@ const TellStoryResults = () => {
           style={{
             marginTop: 20,
             background: NAVY,
-            color: GOLD,
+            color: "#D4B36A",
             borderRadius: 9999,
             padding: "12px 28px",
             fontFamily: "'Jost', sans-serif",
@@ -262,499 +225,306 @@ const TellStoryResults = () => {
     );
   }
 
-  if (done) {
-    return (
-      <div
-        className="min-h-screen flex flex-col items-center justify-center px-6"
-        style={{ backgroundColor: IVORY }}
-      >
-        <p
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic",
-            color: NAVY,
-            fontSize: 28,
-            textAlign: "center",
-            margin: 0,
-          }}
-        >
-          That's everything we found.
-        </p>
-        <button
-          onClick={() => navigate("/tell-a-story")}
-          style={{
-            marginTop: 32,
-            background: "transparent",
-            color: SECONDARY,
-            border: `1.5px solid ${SECONDARY}`,
-            borderRadius: 9999,
-            padding: "14px 32px",
-            fontFamily: "'Jost', sans-serif",
-            fontSize: 15,
-            cursor: "pointer",
-          }}
-        >
-          Something's missing — add another
-        </button>
-      </div>
-    );
-  }
-
-  const remaining = deck.length;
-  const rotation = drag * 0.05;
-  const exitX =
-    exiting === "right" || exiting === "decided"
-      ? 600
-      : exiting === "left"
-        ? -600
-        : drag;
-  const exitRot = exiting && exiting !== "decided" ? (exiting === "right" ? 18 : -18) : rotation;
-  const currentCatKey = normalizeCategory(current.category);
-  const decidedCount = decisions.length;
+  // Card width = full track; offset slides whole strip
+  const cardOffsetPx = -index * trackWidth + drag;
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: IVORY }}>
-      <div className="mx-auto w-full max-w-lg px-5 pt-8 pb-10 flex-1 flex flex-col">
-        {/* Card stack */}
-        <div
-          className="relative flex-1 flex items-center justify-center"
-          style={{ minHeight: 380, marginTop: 24 }}
-        >
-          {remaining > 2 && (
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                width: "86%",
-                height: 300,
-                background: CARD_BG,
-                borderRadius: 16,
-                opacity: 0.5,
-                transform: "translateY(20px) scale(0.92)",
-                boxShadow: "0 4px 16px rgba(30,46,62,0.06)",
-              }}
-            />
-          )}
-          {remaining > 1 && (
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                width: "92%",
-                height: 320,
-                background: CARD_BG,
-                borderRadius: 16,
-                opacity: 0.75,
-                transform: "translateY(10px) scale(0.96)",
-                boxShadow: "0 6px 18px rgba(30,46,62,0.08)",
-              }}
-            />
-          )}
+      <style>{`
+        @keyframes ts-reveal-in {
+          from { opacity: 0; transform: translateY(16px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes ts-fade-up {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-          {/* Active card */}
-          <div
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            onPointerCancel={onPointerUp}
+      <div className="mx-auto w-full max-w-lg px-5 pt-10 pb-10 flex-1 flex flex-col">
+        {/* Header copy — fades in early */}
+        <div
+          style={{
+            opacity: phase === "reveal" ? 1 : 1,
+            animation: "ts-fade-up 500ms ease both",
+            textAlign: "center",
+            marginBottom: 28,
+          }}
+        >
+          <p
             style={{
-              position: "relative",
-              width: "100%",
-              background: CARD_BG,
-              borderRadius: 16,
-              padding: "28px 28px 24px",
-              display: "flex",
-              flexDirection: "column",
-              minHeight: 340,
-              boxShadow: confirming
-                ? `0 12px 30px rgba(30,46,62,0.12), 0 0 0 3px ${GOLD}`
-                : "0 12px 30px rgba(30,46,62,0.12)",
-              transform: `translateX(${exitX}px) rotate(${exitRot}deg)`,
-              transition:
-                exiting || drag === 0
-                  ? "transform 220ms ease-out, box-shadow 600ms ease-in-out"
-                  : "box-shadow 600ms ease-in-out",
-              touchAction: "pan-y",
-              cursor: "grab",
-              userSelect: "none",
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 11,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: SECONDARY,
+              margin: 0,
             }}
           >
-            {/* Navigation hints */}
-            <div
-              style={{
-                position: "absolute",
-                top: 18,
-                right: 18,
-                padding: "4px 10px",
-                border: `2px solid ${NAVY}`,
-                color: NAVY,
-                borderRadius: 6,
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 11,
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                opacity: drag > 30 ? Math.min(1, drag / 120) : 0,
-                transform: "rotate(8deg)",
-              }}
-            >
-              Next →
-            </div>
-            {historyCount > 0 && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 18,
-                  left: 18,
-                  padding: "4px 10px",
-                  border: `2px solid ${SECONDARY}`,
-                  color: SECONDARY,
-                  borderRadius: 6,
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: 11,
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  opacity: drag < -30 ? Math.min(1, -drag / 120) : 0,
-                  transform: "rotate(-8deg)",
-                }}
-              >
-                ← Back
-              </div>
-            )}
+            Here's what we found
+          </p>
+          <h1
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic",
+              fontSize: 26,
+              color: INK,
+              margin: "10px 0 0",
+              lineHeight: 1.25,
+            }}
+          >
+            Your first Touchstones.
+          </h1>
+        </div>
 
-            {/* Category icon + label (top left of card content area) */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, marginBottom: 16 }}>
-              <CategoryIcon category={currentCatKey} size={20} color={NAVY} />
-              <p
-                style={{
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: 11,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: NAVY,
-                  margin: 0,
-                }}
-              >
-                {CATEGORY_LABELS[currentCatKey] ?? current.category}
-              </p>
-            </div>
-
-            <h2
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                color: NAVY,
-                fontSize: 32,
-                lineHeight: 1.15,
-                margin: "0 0 16px",
-                textAlign: "left",
-              }}
-            >
-              {current.title}
-            </h2>
-            <p
-              style={{
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 400,
-                color: "#2C3E50",
-                fontSize: 16,
-                lineHeight: 1.55,
-                margin: 0,
-                textAlign: "left",
-              }}
-            >
-              {current.note}
-            </p>
-
-            {/* Buttons */}
-            <div
-              style={{
-                marginTop: "auto",
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-                paddingTop: 20,
-              }}
-            >
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  onClick={handleSkip}
-                  disabled={confirming}
+        {/* Card carousel track */}
+        <div
+          ref={trackRef}
+          className="relative flex-1"
+          style={{ minHeight: 360, overflow: "hidden", touchAction: "pan-y" }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: `${100 * Math.max(total, 1)}%`,
+              transform: `translateX(${cardOffsetPx}px)`,
+              transition: drag === 0 ? "transform 320ms cubic-bezier(.22,.61,.36,1)" : "none",
+              height: "100%",
+            }}
+          >
+            {cards.map((a, i) => {
+              const catKey = normalizeCategory(a.category);
+              const decision = decisions[i];
+              const revealDelay = 380 + i * 220;
+              return (
+                <div
+                  key={i}
                   style={{
-                    flex: 1,
-                    height: 44,
-                    background: "transparent",
-                    color: NAVY,
-                    border: `1.5px solid ${NAVY}`,
-                    borderRadius: 8,
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: 15,
-                    cursor: confirming ? "not-allowed" : "pointer",
-                    opacity: confirming ? 0.5 : 1,
+                    width: trackWidth || "100%",
+                    flexShrink: 0,
+                    paddingRight: 0,
+                    display: "flex",
+                    alignItems: "stretch",
                   }}
                 >
-                  Skip
-                </button>
-                <button
-                  onClick={openEdit}
-                  disabled={confirming}
-                  style={{
-                    flex: 1,
-                    height: 44,
-                    background: "transparent",
-                    color: NAVY,
-                    border: `1.5px solid ${NAVY}`,
-                    borderRadius: 8,
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: 15,
-                    cursor: confirming ? "not-allowed" : "pointer",
-                    opacity: confirming ? 0.5 : 1,
-                  }}
-                >
-                  Edit
-                </button>
-              </div>
+                  <div
+                    style={{
+                      width: "100%",
+                      background: CARD_BG,
+                      borderRadius: 16,
+                      padding: "26px 26px 24px",
+                      display: "flex",
+                      flexDirection: "column",
+                      boxShadow: "0 10px 26px rgba(30,46,62,0.10)",
+                      opacity: 0,
+                      animation: `ts-reveal-in 520ms ease ${revealDelay}ms forwards`,
+                      position: "relative",
+                      borderLeft:
+                        decision === "kept"
+                          ? `4px solid ${AEGEAN}`
+                          : decision === "removed"
+                            ? `4px solid ${MUTED}`
+                            : `4px solid transparent`,
+                      transition: "border-color 240ms ease, opacity 240ms ease",
+                      filter: decision === "removed" ? "opacity(0.55)" : "none",
+                      userSelect: "none",
+                    }}
+                  >
+                    {decision && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: 14,
+                          right: 14,
+                          fontFamily: "'Jost', sans-serif",
+                          fontSize: 10,
+                          letterSpacing: "0.18em",
+                          textTransform: "uppercase",
+                          color: decision === "kept" ? AEGEAN : SECONDARY,
+                          opacity: 0.85,
+                        }}
+                      >
+                        {decision === "kept" ? "Kept" : "Removed"}
+                      </span>
+                    )}
+
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, marginBottom: 14 }}>
+                      <CategoryIcon category={catKey} size={20} color={NAVY} />
+                      <p
+                        style={{
+                          fontFamily: "'Jost', sans-serif",
+                          fontSize: 11,
+                          letterSpacing: "0.18em",
+                          textTransform: "uppercase",
+                          color: NAVY,
+                          margin: 0,
+                        }}
+                      >
+                        {CATEGORY_LABELS[catKey] ?? a.category}
+                      </p>
+                    </div>
+
+                    <h2
+                      style={{
+                        fontFamily: "'Playfair Display', serif",
+                        color: NAVY,
+                        fontSize: 28,
+                        lineHeight: 1.18,
+                        margin: "0 0 14px",
+                        textAlign: "left",
+                      }}
+                    >
+                      {a.title}
+                    </h2>
+                    <p
+                      style={{
+                        fontFamily: "'Jost', sans-serif",
+                        color: INK,
+                        fontSize: 16,
+                        lineHeight: 1.55,
+                        margin: 0,
+                        textAlign: "left",
+                      }}
+                    >
+                      {a.note}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Progress + edit hint */}
+        <div style={{ marginTop: 18, textAlign: "center" }}>
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 12,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: SECONDARY,
+              margin: 0,
+            }}
+          >
+            {index + 1} of {total}
+          </p>
+          <div
+            aria-hidden
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 6,
+              marginTop: 8,
+            }}
+          >
+            {cards.map((_, i) => (
+              <span
+                key={i}
+                style={{
+                  width: i === index ? 18 : 6,
+                  height: 6,
+                  borderRadius: 999,
+                  background:
+                    decisions[i] === "kept"
+                      ? AEGEAN
+                      : decisions[i] === "removed"
+                        ? MUTED
+                        : INK,
+                  opacity: i === index ? 1 : 0.35,
+                  transition: "width 220ms ease, background 220ms ease, opacity 220ms ease",
+                }}
+              />
+            ))}
+          </div>
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontStyle: "italic",
+              fontSize: 12,
+              color: SECONDARY,
+              opacity: 0.7,
+              margin: "12px 0 0",
+            }}
+          >
+            You can edit any of these later.
+          </p>
+        </div>
+
+        {/* Action row */}
+        <div
+          style={{
+            marginTop: 22,
+            opacity: phase === "decide" ? 1 : 0,
+            transform: phase === "decide" ? "translateY(0)" : "translateY(6px)",
+            transition: "opacity 360ms ease, transform 360ms ease",
+            pointerEvents: phase === "decide" ? "auto" : "none",
+          }}
+        >
+          {!allDecided ? (
+            <div style={{ display: "flex", gap: 10 }}>
               <button
-                onClick={() => runKeepConfirmation()}
-                disabled={confirming}
+                onClick={handleRemove}
                 style={{
-                  width: "100%",
+                  flex: 1,
                   height: 48,
-                  background: NAVY,
-                  color: IVORY,
-                  border: "none",
-                  borderRadius: 8,
+                  background: "transparent",
+                  color: SECONDARY,
+                  border: `1.5px solid ${SECONDARY}`,
+                  borderRadius: 10,
                   fontFamily: "'Jost', sans-serif",
                   fontSize: 15,
-                  cursor: confirming ? "not-allowed" : "pointer",
-                  opacity: confirming ? 0.7 : 1,
-                }}
-              >
-                Keep this Touchstone
-              </button>
-            </div>
-
-            {/* Center checkmark on confirmation */}
-            {confirming && (
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  pointerEvents: "none",
-                  animation: "ts-check-fade 800ms ease forwards",
-                }}
-              >
-                <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
-                  <circle cx="36" cy="36" r="32" stroke={GOLD} strokeWidth="3" fill="none" opacity="0.4" />
-                  <polyline
-                    points="22,38 32,48 52,26"
-                    stroke={GOLD}
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                </svg>
-                <style>{`@keyframes ts-check-fade {
-                  0% { opacity: 0; transform: scale(0.85); }
-                  30% { opacity: 1; transform: scale(1); }
-                  80% { opacity: 1; transform: scale(1); }
-                  100% { opacity: 0; transform: scale(1.02); }
-                }`}</style>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Progress dots — now below the card stack */}
-        <div className="flex items-center justify-center gap-2 mt-8">
-          {dots}
-        </div>
-        <p
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            color: SECONDARY,
-            fontSize: 12,
-            textAlign: "center",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            margin: "8px 0 0",
-          }}
-        >
-          {Math.min(decidedCount + 1, originalCount)} of {originalCount}
-        </p>
-
-      </div>
-
-      {/* Edit overlay */}
-      {editing && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.55)",
-            zIndex: 60,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 20,
-          }}
-          onClick={() => setEditing(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "100%",
-              maxWidth: 520,
-              background: IVORY,
-              borderRadius: 16,
-              padding: 28,
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
-          >
-            <h3
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                color: NAVY,
-                fontSize: 24,
-                margin: "0 0 18px",
-              }}
-            >
-              Edit Touchstone
-            </h3>
-
-            <label style={{ display: "block", fontFamily: "'Jost', sans-serif", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: SECONDARY, marginBottom: 6 }}>
-              Title
-            </label>
-            <input
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                borderRadius: 8,
-                border: `1px solid ${MUTED}`,
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 15,
-                marginBottom: 16,
-                background: "#fff",
-                color: NAVY,
-              }}
-            />
-
-            <label style={{ display: "block", fontFamily: "'Jost', sans-serif", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: SECONDARY, marginBottom: 6 }}>
-              Description
-            </label>
-            <textarea
-              value={editNote}
-              onChange={(e) => setEditNote(e.target.value)}
-              rows={5}
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                borderRadius: 8,
-                border: `1px solid ${MUTED}`,
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 15,
-                marginBottom: 16,
-                background: "#fff",
-                color: NAVY,
-                resize: "vertical",
-              }}
-            />
-
-            <label style={{ display: "block", fontFamily: "'Jost', sans-serif", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: SECONDARY, marginBottom: 6 }}>
-              Category
-            </label>
-            <select
-              value={editCategory}
-              onChange={(e) => setEditCategory(e.target.value as CategoryKey)}
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                borderRadius: 8,
-                border: `1px solid ${MUTED}`,
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 15,
-                marginBottom: 16,
-                background: "#fff",
-                color: NAVY,
-              }}
-            >
-              {CATEGORY_KEYS.map((k) => (
-                <option key={k} value={k}>{CATEGORY_LABELS[k]}</option>
-              ))}
-            </select>
-
-            <label style={{ display: "block", fontFamily: "'Jost', sans-serif", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: SECONDARY, marginBottom: 6 }}>
-              Person association
-            </label>
-            <input
-              value={editPerson}
-              onChange={(e) => setEditPerson(e.target.value)}
-              placeholder="Optional"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                borderRadius: 8,
-                border: `1px solid ${MUTED}`,
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 15,
-                marginBottom: 16,
-                background: "#fff",
-                color: NAVY,
-              }}
-            />
-
-            <label style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'Jost', sans-serif", fontSize: 14, color: NAVY, marginBottom: 24 }}>
-              <input
-                type="checkbox"
-                checked={editPrivate}
-                onChange={(e) => setEditPrivate(e.target.checked)}
-              />
-              Private
-            </label>
-
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-              <button
-                onClick={() => setEditing(false)}
-                style={{
-                  background: "transparent",
-                  color: NAVY,
-                  border: `1.5px solid ${NAVY}`,
-                  borderRadius: 8,
-                  padding: "10px 20px",
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: 14,
                   cursor: "pointer",
+                  opacity: 0.85,
                 }}
               >
-                Cancel
+                Remove
               </button>
               <button
-                onClick={handleEditSave}
+                onClick={handleKeep}
                 style={{
-                  background: NAVY,
+                  flex: 1.4,
+                  height: 48,
+                  background: AEGEAN,
                   color: IVORY,
                   border: "none",
-                  borderRadius: 8,
-                  padding: "10px 20px",
+                  borderRadius: 10,
                   fontFamily: "'Jost', sans-serif",
-                  fontSize: 14,
+                  fontSize: 15,
                   cursor: "pointer",
+                  letterSpacing: "0.02em",
                 }}
               >
-                Save
+                Keep This
               </button>
             </div>
-          </div>
+          ) : (
+            <button
+              onClick={handleFinish}
+              disabled={saving}
+              style={{
+                width: "100%",
+                height: 52,
+                background: NAVY,
+                color: "#D4B36A",
+                border: "none",
+                borderRadius: 10,
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 16,
+                letterSpacing: "0.04em",
+                cursor: saving ? "not-allowed" : "pointer",
+                opacity: saving ? 0.7 : 1,
+              }}
+            >
+              {saving ? "Saving…" : "Continue"}
+            </button>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
