@@ -485,7 +485,7 @@ const OnboardingFlow = ({
               autoFocus
             />
             <button
-              onClick={() => firstName.trim() && advance(4)}
+              onClick={() => firstName.trim() && advance(1)}
               disabled={!firstName.trim()}
               style={continueBtnStyle(!!firstName.trim())}
             >
