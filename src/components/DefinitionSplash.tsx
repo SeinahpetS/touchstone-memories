@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import touchstoneLogo from "@/assets/touchstone-logo.svg";
 
 /**
- * DefinitionSplash — definition card shown on app launch.
- * Auto-advances after 5s; tap anywhere to skip.
+ * Splash — Screen 1 of onboarding.
+ * Centered "touchstone" wordmark on #F2EEE5.
+ * No dot indicator. Auto-advances after 5s; outer crossfade is 400ms.
  */
 type Props = {
   onBegin?: () => void;
@@ -18,150 +18,22 @@ const DefinitionSplash = ({ onBegin }: Props) => {
 
   return (
     <div
-      className="flex min-h-screen flex-col px-6 py-12"
+      className="flex min-h-screen items-center justify-center"
       style={{ backgroundColor: "#F2EEE5" }}
-      onClick={() => onBegin?.()}
     >
-    <style>{`
-      @keyframes ts-def-in {
-        from { opacity: 0; transform: translateY(8px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes ts-def-pulse-text {
-        0%   { color: #2C3E50; }
-        35%  { color: #B8860B; }
-        60%  { color: #B8860B; }
-        100% { color: #2C3E50; }
-      }
-      @keyframes ts-def-pulse-num {
-        0%   { color: rgba(44,62,80,0.45); }
-        35%  { color: #B8860B; }
-        60%  { color: #B8860B; }
-        100% { color: rgba(44,62,80,0.45); }
-      }
-      .ts-def-logo        { animation: ts-def-in 0.7s ease-out 0s both; }
-      .ts-def-entry       { animation: ts-def-in 0.7s ease-out 0.1s both; }
-      .ts-def-pulse-text  { animation: ts-def-pulse-text 3.8s ease-in-out 1.2s 1 forwards; }
-      .ts-def-pulse-num   { animation: ts-def-pulse-num 3.8s ease-in-out 1.2s 1 forwards; }
-    `}</style>
-
-    <div className="flex flex-1 flex-col items-center justify-center" style={{ transform: 'translateY(-2vh)' }}>
-      <img
-        src={touchstoneLogo}
-        alt="Touchstone"
-        width={156}
-        height={156}
-        className="ts-def-logo"
-        style={{ width: 156, height: 156, marginBottom: 24, objectFit: "contain" }}
-      />
-
-      <div
-        className="ts-def-entry w-full max-w-md"
+      <h1
         style={{
-          color: "#2C3E50",
-          backgroundColor: "#FAFAF8",
-          borderRadius: 12,
-          padding: 32,
-          boxShadow:
-            "0 1px 2px rgba(91,74,63,0.08), 0 12px 28px rgba(91,74,63,0.16), 0 32px 64px -16px rgba(91,74,63,0.18)",
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontSize: 64,
+          fontWeight: 700,
+          letterSpacing: "0.15em",
+          color: "#1E2E3E",
+          margin: 0,
+          lineHeight: 1,
         }}
       >
-        <div className="flex items-baseline flex-nowrap gap-x-3 gap-y-1 whitespace-nowrap">
-          <h1
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(36px, 7.4vw, 48px)",
-              fontWeight: 700,
-              letterSpacing: "-0.005em",
-              margin: 0,
-              lineHeight: 1.1,
-              color: "#2C3E50",
-            }}
-          >
-            touch
-            <span
-              aria-hidden
-              style={{
-                display: "inline-block",
-                width: "0.132em",
-                height: "0.132em",
-                margin: "0 0.12em",
-                verticalAlign: "0.32em",
-                backgroundColor: "#B8860B",
-                transform: "rotate(45deg)",
-              }}
-            />
-            stone
-          </h1>
-          <span
-            style={{
-              fontFamily: "'Jost', sans-serif",
-              fontSize: 18,
-              color: "rgba(44,62,80,0.55)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            (təch-stōn)
-          </span>
-        </div>
-
-        <p
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontStyle: "italic",
-            fontSize: 18,
-            color: "rgba(44,62,80,0.55)",
-            margin: "8px 0 24px",
-            letterSpacing: "0.01em",
-          }}
-        >
-          noun
-        </p>
-
-        <ol
-          style={{
-            listStyle: "none",
-            padding: 0,
-            margin: 0,
-            display: "flex",
-            flexDirection: "column",
-            gap: 18,
-          }}
-        >
-          {[
-            "a fundamental or quintessential part or feature.",
-            "a test or criterion for determining the quality or genuineness of a thing.",
-            "a black siliceous stone used to test the purity of precious metals by the streak left on the stone.",
-          ].map((d, i) => (
-            <li
-              key={i}
-              style={{
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 400,
-                fontSize: 16,
-                lineHeight: 1.6,
-                color: "#2C3E50",
-                display: "flex",
-                gap: 12,
-              }}
-            >
-              <span
-                className={i === 1 ? "ts-def-pulse-num" : undefined}
-                style={{
-                  flexShrink: 0,
-                  width: 18,
-                  fontSize: 14,
-                  color: "rgba(44,62,80,0.45)",
-                }}
-              >
-                {i + 1}.
-              </span>
-              <span className={i === 1 ? "ts-def-pulse-text" : undefined}>{d}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </div>
+        touchstone
+      </h1>
     </div>
   );
 };
