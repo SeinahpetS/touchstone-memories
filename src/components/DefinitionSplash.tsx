@@ -12,7 +12,7 @@ type Props = {
 const DefinitionSplash = ({ onBegin }: Props) => {
   useEffect(() => {
     if (!onBegin) return;
-    const t = setTimeout(() => onBegin(), 3000);
+    const t = setTimeout(() => onBegin(), 5000);
     return () => clearTimeout(t);
   }, [onBegin]);
 
