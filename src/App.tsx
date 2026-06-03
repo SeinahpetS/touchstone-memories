@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound.tsx";
 import WelcomeTouchstones from "./pages/WelcomeTouchstones.tsx";
 import OnboardingName from "./pages/OnboardingName.tsx";
 import OnboardingBirthYear from "./pages/OnboardingBirthYear.tsx";
+import OnboardingLocation from "./pages/OnboardingLocation.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
 
 const queryClient = new QueryClient();
@@ -175,6 +176,7 @@ const App = () => (
           <Route path="/constellation" element={<ConstellationIntro />} />
           <Route path="/onboarding/name" element={<OnboardingName />} />
           <Route path="/onboarding/birth" element={<OnboardingBirthYear />} />
+          <Route path="/onboarding/location" element={<OnboardingLocation />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
