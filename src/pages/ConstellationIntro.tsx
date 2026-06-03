@@ -75,6 +75,7 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   const [step, setStep] = useState(0);
   const [linesDrawn, setLinesDrawn] = useState(0);
   const [pulsing, setPulsing] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   const lineRefs = useRef<Record<string, SVGLineElement | null>>({});
   const blurRef = useRef<SVGFEGaussianBlurElement | null>(null);
