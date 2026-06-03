@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
-import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import OnboardingDotIndicator, {
+  markOnboardingComplete,
+} from "@/components/OnboardingDotIndicator";
 import {
+  clearOnboardingDraft,
   emptyOnboardingDraft,
   loadOnboardingDraft,
   saveOnboardingDraft,
 } from "@/lib/onboardingDraft";
 
-type SubStep = "email" | "password" | "confirm";
+type SubStep = "email" | "password";
 
 const emailSchema = z
   .string()
@@ -16,10 +21,20 @@ const emailSchema = z
   .email({ message: "Please enter a valid email." })
   .max(255);
 
+const SIGN_IN_LINK_STYLE: React.CSSProperties = {
+  fontFamily: "'Jost', sans-serif",
+  fontSize: 12,
+  color: "#9E9585",
+  marginTop: 20,
+  textAlign: "center",
+  textDecoration: "none",
+};
+
 /**
  * Screen 8 — Create Account (dot 6).
- * Three sub-steps share a single screen: email → password → confirm.
- * Only 8a (email) is implemented so far.
+ * Two sub-steps: email → password. Final tap creates the account, migrates
+ * the onboarding draft to the new profile, marks onboarding complete, and
+ * crossfades to /archive.
  */
 const OnboardingCreateAccount = () => {
   const navigate = useNavigate();
@@ -28,6 +43,8 @@ const OnboardingCreateAccount = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [fadingOut, setFadingOut] = useState(false);
 
   const handleEmailContinue = () => {
     const parsed = emailSchema.safeParse(email);
@@ -36,35 +53,86 @@ const OnboardingCreateAccount = () => {
       return;
     }
     setError(null);
+    setEmail(parsed.data);
     saveOnboardingDraft({ ...existing });
-    try {
-      sessionStorage.setItem("ts_signup_email", parsed.data);
-    } catch {
-      /* ignore */
-    }
     setStep("password");
   };
 
-  const handlePasswordContinue = () => {
+  const migrateDraftToProfile = async (userId: string) => {
+    const d = loadOnboardingDraft();
+    if (!d) return;
+    const patch: Record<string, any> = { onboarding_complete: true };
+    if (d.firstName && d.firstName.trim()) {
+      patch.first_name = d.firstName.trim();
+      patch.name = d.firstName.trim();
+    }
+    if (d.birthMonth) patch.birth_month = d.birthMonth;
+    if (d.birthYear) patch.birth_year = d.birthYear;
+    if (d.city && d.city.trim()) patch.city = d.city.trim();
+    if (d.state) patch.state = d.state;
+    if (d.region) patch.region = d.region;
+    if (d.country) patch.country = d.country;
+    if (d.locationDisplay) patch.location_display = d.locationDisplay;
+    if (typeof d.lat === "number") patch.lat = d.lat;
+    if (typeof d.lng === "number") patch.lng = d.lng;
+    try {
+      await (supabase as any).from("profiles").update(patch).eq("id", userId);
+    } catch {
+      /* non-fatal */
+    }
+  };
+
+  const handleCreateAccount = async () => {
     if (password.length < 8) {
       setError("Password must be at least 8 characters.");
       return;
     }
     setError(null);
+    setSubmitting(true);
     try {
-      sessionStorage.setItem("ts_signup_password", password);
-    } catch {
-      /* ignore */
+      const draftName = (existing.firstName ?? "").trim();
+      const { data, error: signUpErr } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: draftName ? { name: draftName } : undefined,
+          emailRedirectTo: window.location.origin,
+        },
+      });
+      if (signUpErr) throw signUpErr;
+
+      const userId = data.user?.id;
+      if (data.session && userId) {
+        await migrateDraftToProfile(userId);
+      }
+
+      markOnboardingComplete();
+      clearOnboardingDraft();
+
+      // 400ms crossfade to /archive.
+      setFadingOut(true);
+      window.setTimeout(() => navigate("/archive"), 400);
+    } catch (err: any) {
+      setSubmitting(false);
+      const msg = err?.message || "Couldn't create your account. Try again.";
+      setError(msg);
+      toast.error(msg);
     }
-    setStep("confirm");
   };
+
+  // Dot 6 fills solid on success — pass current=7 so all six dots render filled.
+  const dotCurrent = (fadingOut ? 7 : 6) as 1 | 2 | 3 | 4 | 5 | 6;
 
   return (
     <div
       className="min-h-screen flex flex-col items-center px-6"
-      style={{ backgroundColor: "#F2EEE5" }}
+      style={{
+        backgroundColor: "#F2EEE5",
+        opacity: fadingOut ? 0 : 1,
+        transition: "opacity 400ms ease",
+      }}
     >
-      <OnboardingDotIndicator current={6} />
+      <OnboardingDotIndicator current={dotCurrent} />
 
       <h1
         style={{
@@ -160,6 +228,10 @@ const OnboardingCreateAccount = () => {
           >
             Continue
           </button>
+
+          <Link to="/auth" style={SIGN_IN_LINK_STYLE}>
+            Already have an account? Sign in
+          </Link>
         </div>
       )}
 
@@ -192,7 +264,7 @@ const OnboardingCreateAccount = () => {
               if (error) setError(null);
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter") handlePasswordContinue();
+              if (e.key === "Enter") handleCreateAccount();
             }}
             placeholder="At least 8 characters"
             autoFocus
@@ -225,7 +297,8 @@ const OnboardingCreateAccount = () => {
 
           <button
             type="button"
-            onClick={handlePasswordContinue}
+            onClick={handleCreateAccount}
+            disabled={submitting}
             className="w-full"
             style={{
               marginTop: 40,
@@ -236,26 +309,18 @@ const OnboardingCreateAccount = () => {
               borderRadius: 12,
               fontFamily: "'Playfair Display', Georgia, serif",
               fontSize: 16,
-              cursor: "pointer",
+              cursor: submitting ? "not-allowed" : "pointer",
+              opacity: submitting ? 0.7 : 1,
+              transition: "opacity 200ms ease",
             }}
           >
-            Create My Archive
+            {submitting ? "Creating…" : "Create My Archive"}
           </button>
-        </div>
-      )}
 
-      {step === "confirm" && (
-        <p
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: 12,
-            color: "#9E9585",
-            marginTop: 40,
-            textAlign: "center",
-          }}
-        >
-          Next sub-step coming soon.
-        </p>
+          <Link to="/auth" style={SIGN_IN_LINK_STYLE}>
+            Already have an account? Sign in
+          </Link>
+        </div>
       )}
 
       <style>{`
