@@ -45,7 +45,7 @@ const US_STATES = [
   "VA","WA","WV","WI","WY","DC",
 ];
 
-type Screen = 0 | 1 | 2 | 3 | 4 | 5;
+type Screen = 0 | 1 | 2;
 
 const Wordmark = () => (
   <div
