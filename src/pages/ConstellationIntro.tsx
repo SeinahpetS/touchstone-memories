@@ -151,8 +151,9 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   }, [pulsing]);
 
   const handleTap = () => {
+    if (leaving) return;
     if (pulsing) {
-      // Final tap: stop pulse, reset, navigate.
+      // Final tap: stop pulse, reset, fade out, navigate.
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       Object.values(lineRefs.current).forEach((el) => {
         if (!el) return;
@@ -161,8 +162,11 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
       });
       if (blurRef.current) blurRef.current.setAttribute("stdDeviation", "0");
       setPulsing(false);
-      if (onComplete) onComplete();
-      else navigate("/welcome", { state: { skipToWalkthrough: true } });
+      setLeaving(true);
+      setTimeout(() => {
+        if (onComplete) onComplete();
+        else navigate("/auth");
+      }, 400);
       return;
     }
     if (step < REVEAL.length) {
