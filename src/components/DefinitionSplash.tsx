@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import touchstoneLogo from "@/assets/touchstone-logo.svg";
+
 
 /**
  * Splash — Screen 1 of onboarding.
@@ -33,8 +35,33 @@ const DefinitionSplash = ({ onBegin }: Props) => {
           to   { opacity: 1; transform: translateY(0); }
         }
         .ts-def-entry { animation: ts-def-in 0.7s ease-out 0.1s both; }
+        .ts-def-logo  { animation: ts-def-in 0.7s ease-out 0s both; }
         .ts-def-sub   { animation: ts-def-in 0.7s ease-out 1s both; }
+
+        @keyframes ts-def-pulse-text {
+          0%   { color: #2C3E50; }
+          35%  { color: #B8860B; }
+          60%  { color: #B8860B; }
+          100% { color: #2C3E50; }
+        }
+        @keyframes ts-def-pulse-num {
+          0%   { color: rgba(44,62,80,0.45); }
+          35%  { color: #B8860B; }
+          60%  { color: #B8860B; }
+          100% { color: rgba(44,62,80,0.45); }
+        }
+        .ts-def-pulse-text { animation: ts-def-pulse-text 3.8s ease-in-out 1.2s 1 both; }
+        .ts-def-pulse-num  { animation: ts-def-pulse-num 3.8s ease-in-out 1.2s 1 both; }
       `}</style>
+
+      <img
+        src={touchstoneLogo}
+        alt="Touchstone"
+        className="ts-def-logo"
+        style={{ width: 140, height: "auto", marginBottom: 28 }}
+      />
+
+
 
       <div
         className="ts-def-entry w-full max-w-md"
@@ -126,6 +153,7 @@ const DefinitionSplash = ({ onBegin }: Props) => {
               }}
             >
               <span
+                className={i === 1 ? "ts-def-pulse-num" : undefined}
                 style={{
                   flexShrink: 0,
                   width: 18,
@@ -135,9 +163,10 @@ const DefinitionSplash = ({ onBegin }: Props) => {
               >
                 {i + 1}.
               </span>
-              <span>{d}</span>
+              <span className={i === 1 ? "ts-def-pulse-text" : undefined}>{d}</span>
             </li>
           ))}
+
         </ol>
       </div>
 
