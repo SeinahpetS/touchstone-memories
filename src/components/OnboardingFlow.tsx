@@ -425,6 +425,10 @@ const OnboardingFlow = ({
     });
   };
 
+  if (showConstellation) {
+    return <ConstellationIntro onComplete={() => setShowConstellation(false)} />;
+  }
+
   // Crossfade wrapper
   return (
     <div
