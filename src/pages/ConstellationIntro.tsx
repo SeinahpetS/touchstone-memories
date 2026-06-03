@@ -109,19 +109,18 @@ const ConstellationIntro = () => {
       >
         {phase === "s1" && (
           <div className="flex flex-col items-center w-full">
-            <img
-              src="/tile-cards-dealt.svg"
-              alt=""
+            <div
+              aria-label="constellation-placeholder"
+              data-testid="constellation-placeholder"
               style={{
-                display: "block",
-                margin: "0 auto",
-                width: "100%",
-                maxWidth: 552,
-                height: "auto",
+                width: 240,
+                height: 240,
+                borderRadius: "50%",
+                background: BG,
+                border: `1px solid ${GOLD}55`,
                 marginBottom: 56,
               }}
             />
-
             <div
               className="flex flex-col items-center text-center"
               style={{ gap: 18, minHeight: 280 }}
