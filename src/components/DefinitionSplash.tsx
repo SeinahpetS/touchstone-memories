@@ -18,15 +18,9 @@ const DefinitionSplash = ({ onBegin }: Props) => (
         from { opacity: 0; transform: translateY(8px); }
         to   { opacity: 1; transform: translateY(0); }
       }
-      @keyframes ts-dissolve {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-      }
       .ts-def-logo   { animation: ts-def-in 0.7s ease-out 0s both; }
       .ts-def-entry  { animation: ts-def-in 0.7s ease-out 0.1s both; }
       .ts-def-begin  { animation: ts-def-in 0.7s ease-out 1.25s both; }
-      .ts-dissolve-1 { animation: ts-dissolve 1.2s ease-in 1.0s both; }
-      .ts-dissolve-2 { animation: ts-dissolve 1.2s ease-in 2.4s both; }
     `}</style>
 
     <div className="flex flex-1 flex-col items-center justify-center" style={{ transform: 'translateY(-2vh)' }}>
@@ -145,40 +139,12 @@ const DefinitionSplash = ({ onBegin }: Props) => (
         </ol>
       </div>
 
-      <p
-        className="ts-dissolve-1 mt-16 text-center mx-auto"
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontStyle: "italic",
-          fontSize: 17,
-          lineHeight: 1.5,
-          color: "rgba(44,62,80,0.78)",
-          maxWidth: 390,
-        }}
-      >
-        The pieces you want to remember,
-      </p>
-
-      <p
-        className="ts-dissolve-2 text-center mx-auto"
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontStyle: "italic",
-          fontSize: 17,
-          lineHeight: 1.5,
-          color: "rgba(44,62,80,0.78)",
-          maxWidth: 390,
-        }}
-      >
-        the things you don't want to forget.
-      </p>
-
       <button
         type="button"
         onClick={onBegin}
         className="ts-def-begin"
         style={{
-          marginTop: 16,
+          marginTop: 24,
           background: "#B8860B",
           border: "none",
           borderRadius: 9999,
