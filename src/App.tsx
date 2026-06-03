@@ -178,6 +178,7 @@ const App = () => (
           <Route path="/onboarding/name" element={<OnboardingName />} />
           <Route path="/onboarding/birth" element={<OnboardingBirthYear />} />
           <Route path="/onboarding/location" element={<OnboardingLocation />} />
+          <Route path="/onboarding/ready" element={<OnboardingStoryReady />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
