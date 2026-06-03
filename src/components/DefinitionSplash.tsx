@@ -1,18 +1,27 @@
+import { useEffect } from "react";
 import touchstoneLogo from "@/assets/touchstone-logo.svg";
 
 /**
  * DefinitionSplash — definition card shown on app launch.
- * Waits for the user to tap "Begin" before advancing.
+ * Auto-advances after 3s; tap anywhere to skip.
  */
 type Props = {
   onBegin?: () => void;
 };
 
-const DefinitionSplash = (_props: Props) => (
-  <div
-    className="flex min-h-screen flex-col px-6 py-12"
-    style={{ backgroundColor: "#F2EEE5" }}
-  >
+const DefinitionSplash = ({ onBegin }: Props) => {
+  useEffect(() => {
+    if (!onBegin) return;
+    const t = setTimeout(() => onBegin(), 3000);
+    return () => clearTimeout(t);
+  }, [onBegin]);
+
+  return (
+    <div
+      className="flex min-h-screen flex-col px-6 py-12"
+      style={{ backgroundColor: "#F2EEE5" }}
+      onClick={() => onBegin?.()}
+    >
     <style>{`
       @keyframes ts-def-in {
         from { opacity: 0; transform: translateY(8px); }
@@ -153,7 +162,8 @@ const DefinitionSplash = (_props: Props) => (
         </ol>
       </div>
     </div>
-  </div>
-);
+    </div>
+  );
+};
 
 export default DefinitionSplash;
