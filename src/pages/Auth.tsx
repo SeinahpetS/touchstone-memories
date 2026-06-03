@@ -24,12 +24,17 @@ const Auth = () => {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
+  const [fontReady, setFontReady] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
   useEffect(() => {
     if (!loading && user) navigate("/archive", { replace: true });
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    document.fonts.ready.then(() => setFontReady(true));
+  }, []);
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,9 +165,11 @@ const Auth = () => {
       <div className="w-full max-w-sm space-y-8">
         {/* Wordmark */}
         <div className="text-center">
-          <h1 className="font-playfair text-[1.65rem] font-black tracking-[0.2em] text-foreground lowercase">
-            touchstone
-          </h1>
+          <div style={{ opacity: fontReady ? 1 : 0, transition: 'opacity 600ms ease' }}>
+            <h1 className="font-playfair text-[1.65rem] font-black tracking-[0.2em] text-foreground lowercase">
+              touchstone
+            </h1>
+          </div>
           {isSignUp && (
             <p className="mt-2 text-base text-muted-foreground">
               Everything that made you, still here.
