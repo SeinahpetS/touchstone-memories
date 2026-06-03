@@ -552,8 +552,8 @@ const OnboardingFlow = ({
         </ScreenShell>
       )}
 
-      {screen === 5 && (
-        <ScreenShell screen={5}>
+      {screen === 2 && (
+        <ScreenShell screen={2}>
           <CenteredCard>
             <h2 style={headlineStyle}>Where are you?</h2>
             <p style={subLineStyle}>
