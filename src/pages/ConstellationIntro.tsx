@@ -159,46 +159,50 @@ const ConstellationIntro = () => {
         )}
 
         {phase === "s2" && (
-          <Dissolve show={s2In} className="w-full text-center">
-            <h1
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: 26,
-                lineHeight: 1.45,
-                color: TEXT,
-                margin: 0,
-                fontWeight: 500,
-              }}
-            >
-              Touchstone holds everything that made you who you are, and reveals why it still matters.
-            </h1>
-            <p
-              style={{
-                marginTop: 28,
-                fontFamily: "'Playfair Display', serif",
-                fontSize: 26,
-                lineHeight: 1.45,
-                color: TEXT,
-                opacity: 0.6,
-                margin: "28px 0 0",
-                fontWeight: 500,
-              }}
-            >
-              A living archive of the moments, people, and things that shaped you.
-            </p>
-            <img
-              src="/tile-cards-dealt.svg"
-              alt=""
-              style={{
-                width: "100%",
-                maxWidth: 552,
-                height: "auto",
-                display: "block",
-                margin: "16px auto 0",
-              }}
-            />
-          </Dissolve>
+          <div className="w-full text-center">
+            <Dissolve show={s2In}>
+              <h1
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 26,
+                  lineHeight: 1.45,
+                  color: TEXT,
+                  margin: 0,
+                  fontWeight: 500,
+                }}
+              >
+                Touchstone holds everything that made you who you are, and reveals why it still matters.
+              </h1>
+              <img
+                src="/tile-cards-dealt.svg"
+                alt=""
+                style={{
+                  width: "100%",
+                  maxWidth: 552,
+                  height: "auto",
+                  display: "block",
+                  margin: "16px auto 0",
+                }}
+              />
+            </Dissolve>
+            <Dissolve show={s2In} delay={1200}>
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 26,
+                  lineHeight: 1.45,
+                  color: TEXT,
+                  opacity: 0.6,
+                  margin: "28px 0 0",
+                  fontWeight: 500,
+                }}
+              >
+                A living archive of the moments, people, and things that shaped you.
+              </p>
+            </Dissolve>
+          </div>
         )}
+
 
         {phase === "s3" && (
           <Dissolve show={s3In} className="w-full text-center">
