@@ -162,7 +162,8 @@ const DefinitionSplash = ({ onBegin }: Props) => {
         </ol>
       </div>
     </div>
-  </div>
-);
+    </div>
+  );
+};
 
 export default DefinitionSplash;
