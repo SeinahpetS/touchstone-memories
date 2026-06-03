@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound.tsx";
 import WelcomeTouchstones from "./pages/WelcomeTouchstones.tsx";
 import OnboardingName from "./pages/OnboardingName.tsx";
 import OnboardingBirthYear from "./pages/OnboardingBirthYear.tsx";
+import OnboardingLocation from "./pages/OnboardingLocation.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
 
 const queryClient = new QueryClient();
