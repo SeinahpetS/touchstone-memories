@@ -138,26 +138,6 @@ const DefinitionSplash = ({ onBegin }: Props) => (
           ))}
         </ol>
       </div>
-
-      <button
-        type="button"
-        onClick={onBegin}
-        className="ts-def-begin"
-        style={{
-          marginTop: 24,
-          background: "#B8860B",
-          border: "none",
-          borderRadius: 9999,
-          padding: "10px 28px",
-          cursor: "pointer",
-          fontFamily: "'Playfair Display', serif",
-          fontStyle: "italic",
-          fontSize: 18,
-          color: "#FAFAF8",
-        }}
-      >
-        Give Them a Home
-      </button>
     </div>
   </div>
 );
