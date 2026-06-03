@@ -128,8 +128,10 @@ const ScreenShell = ({
     }}
   >
     <Wordmark />
+    {!hideDots && (
+      <OnboardingDotIndicator current={(screen + 2) as 2 | 3 | 4} />
+    )}
     {children}
-    {!hideDots && <ProgressDots screen={screen} />}
   </div>
 );
 
