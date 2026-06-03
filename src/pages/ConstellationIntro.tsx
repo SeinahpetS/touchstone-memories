@@ -194,9 +194,8 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
         cursor: "pointer",
         userSelect: "none",
         WebkitTapHighlightColor: "transparent",
-        opacity: leaving ? 0 : 1,
+        opacity: leaving ? 0 : mounted ? 1 : 0,
         transition: "opacity 400ms ease",
-        animation: "ts-ci-page-in 400ms ease forwards",
       }}
     >
       <div
