@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
+import OnboardingDotIndicator, { markOnboardingComplete } from "@/components/OnboardingDotIndicator";
 import {
   loadOnboardingDraft,
   saveOnboardingDraft,
@@ -29,7 +30,10 @@ const Auth = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) navigate("/archive", { replace: true });
+    if (!loading && user) {
+      markOnboardingComplete();
+      navigate("/archive", { replace: true });
+    }
   }, [user, loading, navigate]);
 
   useEffect(() => {
@@ -161,6 +165,7 @@ const Auth = () => {
       className="flex min-h-screen items-center justify-center bg-background px-6"
       style={{ animation: "ts-auth-fade-in 400ms ease forwards", opacity: 0 }}
     >
+      <OnboardingDotIndicator current={6} />
       <style>{`@keyframes ts-auth-fade-in { from { opacity: 0 } to { opacity: 1 } }`}</style>
       <div className="w-full max-w-sm flex flex-col items-center space-y-8">
         {/* Wordmark */}

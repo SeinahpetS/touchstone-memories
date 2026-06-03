@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
 
 type ConstellationIntroProps = { onComplete?: () => void };
 
@@ -198,6 +199,7 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
         transition: "opacity 400ms ease",
       }}
     >
+      <OnboardingDotIndicator current={1} />
       <div
         style={{
           background: NAVY,

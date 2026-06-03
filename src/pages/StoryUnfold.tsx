@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
 
 const BRAND_NAVY = "#1E2E3E";
 const SOFT_IVORY = "#F2EEE5";
@@ -122,6 +123,7 @@ const StoryUnfold = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
+      <OnboardingDotIndicator current={5} />
       <div className="mx-auto w-full max-w-lg px-5 pt-8 pb-6">
         {/* Header */}
         <h1

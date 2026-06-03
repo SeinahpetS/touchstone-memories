@@ -96,14 +96,25 @@ const RootRoute = () => {
     if (phase !== "splash") return;
     setPhase("out");
     const { data: { session } } = await supabase.auth.getSession();
-    const hasPendingDraft =
+    const onboardingComplete =
       typeof window !== "undefined" &&
-      !!localStorage.getItem("ts_onboarding_draft_v1");
-    const dest = session
-      ? hasPendingDraft
-        ? "/welcome"
-        : "/archive"
-      : "/constellation";
+      localStorage.getItem("ts_onboarding_complete") === "1";
+
+    let dest: string;
+    if (onboardingComplete) {
+      // Returning user: skip all onboarding screens.
+      dest = session ? "/archive" : "/auth";
+    } else {
+      // First-time user: enter the onboarding flow at the constellation intro.
+      const hasPendingDraft =
+        typeof window !== "undefined" &&
+        !!localStorage.getItem("ts_onboarding_draft_v1");
+      dest = session
+        ? hasPendingDraft
+          ? "/welcome"
+          : "/archive"
+        : "/constellation";
+    }
     setTimeout(() => {
       window.location.assign(dest);
     }, 400);
