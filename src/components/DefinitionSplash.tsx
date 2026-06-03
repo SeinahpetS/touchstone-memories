@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import touchstoneLogo from "@/assets/touchstone-logo.svg";
+
 
 /**
  * Splash — Screen 1 of onboarding.
