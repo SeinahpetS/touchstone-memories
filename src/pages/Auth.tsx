@@ -152,7 +152,11 @@ const Auth = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div
+      className="flex min-h-screen items-center justify-center bg-background px-6"
+      style={{ animation: "ts-auth-fade-in 400ms ease forwards", opacity: 0 }}
+    >
+      <style>{`@keyframes ts-auth-fade-in { from { opacity: 0 } to { opacity: 1 } }`}</style>
       <div className="w-full max-w-sm space-y-8">
         {/* Wordmark */}
         <div className="text-center">
