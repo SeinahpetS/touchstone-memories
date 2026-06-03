@@ -12,7 +12,7 @@ const OnboardingStoryReady = () => {
 
   useEffect(() => {
     const tStart = window.setTimeout(() => setFadingOut(true), 2000);
-    const tNav = window.setTimeout(() => navigate("/onboarding/done"), 2400);
+    const tNav = window.setTimeout(() => navigate("/onboarding/create-account"), 2400);
     return () => {
       window.clearTimeout(tStart);
       window.clearTimeout(tNav);
