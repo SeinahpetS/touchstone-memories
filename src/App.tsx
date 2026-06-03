@@ -172,6 +172,7 @@ const App = () => (
           <Route path="/" element={<RootRoute />} />
           <Route path="/welcome" element={<Onboarding />} />
           <Route path="/constellation" element={<ConstellationIntro />} />
+          <Route path="/onboarding/name" element={<OnboardingName />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />
