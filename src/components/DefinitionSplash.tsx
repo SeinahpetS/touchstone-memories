@@ -3,7 +3,7 @@ import touchstoneLogo from "@/assets/touchstone-logo.svg";
 
 /**
  * DefinitionSplash — definition card shown on app launch.
- * Auto-advances after 3s; tap anywhere to skip.
+ * Auto-advances after 5s; tap anywhere to skip.
  */
 type Props = {
   onBegin?: () => void;
@@ -12,7 +12,7 @@ type Props = {
 const DefinitionSplash = ({ onBegin }: Props) => {
   useEffect(() => {
     if (!onBegin) return;
-    const t = setTimeout(() => onBegin(), 3000);
+    const t = setTimeout(() => onBegin(), 5000);
     return () => clearTimeout(t);
   }, [onBegin]);
 
