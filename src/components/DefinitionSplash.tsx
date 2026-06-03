@@ -8,7 +8,7 @@ type Props = {
   onBegin?: () => void;
 };
 
-const DefinitionSplash = ({ onBegin }: Props) => (
+const DefinitionSplash = (_props: Props) => (
   <div
     className="flex min-h-screen flex-col px-6 py-12"
     style={{ backgroundColor: "#F2EEE5" }}
@@ -20,7 +20,6 @@ const DefinitionSplash = ({ onBegin }: Props) => (
       }
       .ts-def-logo   { animation: ts-def-in 0.7s ease-out 0s both; }
       .ts-def-entry  { animation: ts-def-in 0.7s ease-out 0.1s both; }
-      .ts-def-begin  { animation: ts-def-in 0.7s ease-out 1.25s both; }
     `}</style>
 
     <div className="flex flex-1 flex-col items-center justify-center" style={{ transform: 'translateY(-2vh)' }}>
