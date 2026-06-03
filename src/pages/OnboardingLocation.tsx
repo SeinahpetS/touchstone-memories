@@ -17,7 +17,7 @@ const OnboardingLocation = () => {
   const [city, setCity] = useState<string>(existing.city ?? "");
   const [submitting, setSubmitting] = useState(false);
 
-  const advance = () => navigate("/onboarding/welcome");
+  const advance = () => navigate("/onboarding/ready");
 
   const handleContinue = async () => {
     setSubmitting(true);
