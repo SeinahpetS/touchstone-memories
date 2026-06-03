@@ -102,17 +102,17 @@ const RootRoute = () => {
       ? hasPendingDraft
         ? "/welcome"
         : "/archive"
-      : "/auth";
+      : "/constellation";
     setTimeout(() => {
       window.location.assign(dest);
-    }, 300);
+    }, 400);
   };
 
   if (phase !== "in") {
     return (
       <div
         style={{
-          transition: "opacity 300ms ease",
+          transition: "opacity 400ms ease",
           opacity: phase === "splash" ? 1 : 0,
         }}
       >
@@ -124,7 +124,7 @@ const RootRoute = () => {
   return (
     <div
       style={{
-        animation: "ts-root-fade-in 300ms ease forwards",
+        animation: "ts-root-fade-in 400ms ease forwards",
       }}
     >
       <style>{`@keyframes ts-root-fade-in { from { opacity: 0 } to { opacity: 1 } }`}</style>

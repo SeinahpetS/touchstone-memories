@@ -75,6 +75,12 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   const [step, setStep] = useState(0);
   const [linesDrawn, setLinesDrawn] = useState(0);
   const [pulsing, setPulsing] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 20);
+    return () => clearTimeout(t);
+  }, []);
 
   const lineRefs = useRef<Record<string, SVGLineElement | null>>({});
   const blurRef = useRef<SVGFEGaussianBlurElement | null>(null);
@@ -150,8 +156,9 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   }, [pulsing]);
 
   const handleTap = () => {
+    if (leaving) return;
     if (pulsing) {
-      // Final tap: stop pulse, reset, navigate.
+      // Final tap: stop pulse, reset, fade out, navigate.
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       Object.values(lineRefs.current).forEach((el) => {
         if (!el) return;
@@ -160,8 +167,11 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
       });
       if (blurRef.current) blurRef.current.setAttribute("stdDeviation", "0");
       setPulsing(false);
-      if (onComplete) onComplete();
-      else navigate("/welcome", { state: { skipToWalkthrough: true } });
+      setLeaving(true);
+      setTimeout(() => {
+        if (onComplete) onComplete();
+        else navigate("/auth");
+      }, 400);
       return;
     }
     if (step < REVEAL.length) {
@@ -184,6 +194,8 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
         cursor: "pointer",
         userSelect: "none",
         WebkitTapHighlightColor: "transparent",
+        opacity: leaving ? 0 : mounted ? 1 : 0,
+        transition: "opacity 400ms ease",
       }}
     >
       <div
