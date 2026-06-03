@@ -199,6 +199,7 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
         transition: "opacity 400ms ease",
       }}
     >
+      <OnboardingDotIndicator current={1} />
       <div
         style={{
           background: NAVY,
