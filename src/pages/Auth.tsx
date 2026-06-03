@@ -150,7 +150,7 @@ const Auth = () => {
             lng: data.location?.lng ?? null,
           });
           if (data.firstName) setName(data.firstName);
-          navigate("/welcome", { state: { skipToWalkthrough: true } });
+          navigate("/story-unfold");
         }}
       />
     );
