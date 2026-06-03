@@ -175,11 +175,13 @@ const ConstellationIntro = () => {
             <p
               style={{
                 marginTop: 28,
-                fontFamily: "Jost, sans-serif",
-                fontSize: 14,
-                lineHeight: 1.6,
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 26,
+                lineHeight: 1.45,
                 color: TEXT,
                 opacity: 0.6,
+                margin: "28px 0 0",
+                fontWeight: 500,
               }}
             >
               A living archive of the moments, people, and things that shaped you.
