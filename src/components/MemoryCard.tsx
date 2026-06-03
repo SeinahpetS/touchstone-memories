@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import CategoryIcon, { CATEGORY_LABELS, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
+import MemoryPhoto from "@/components/MemoryPhoto";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -118,7 +119,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         {/* Photo / icon-fallback frame — 1:1 square */}
         {memory.photo_url ? (
           <div style={{ aspectRatio: "1 / 1", width: "100%", overflow: "hidden" }}>
-            <img
+            <MemoryPhoto
               src={memory.photo_url}
               alt={memory.title || "Memory"}
               style={{
@@ -128,7 +129,6 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 objectPosition: "center",
                 display: "block",
               }}
-              loading="lazy"
             />
           </div>
         ) : (

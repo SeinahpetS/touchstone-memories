@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
+import MemoryPhoto from "@/components/MemoryPhoto";
 
 interface Props {
   photoUrl?: string | null;
@@ -42,7 +43,7 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
 
 
       {photoUrl && (
-        <img src={photoUrl} alt={title || "Memory"} className="w-full rounded-lg object-cover max-h-72" />
+        <MemoryPhoto src={photoUrl} alt={title || "Memory"} className="w-full rounded-lg object-cover max-h-72" />
       )}
 
       {title && <h2 className="font-playfair text-xl font-semibold text-foreground">{title}</h2>}
