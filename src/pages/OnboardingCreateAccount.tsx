@@ -26,6 +26,7 @@ const OnboardingCreateAccount = () => {
   const existing = loadOnboardingDraft() ?? emptyOnboardingDraft();
   const [step, setStep] = useState<SubStep>("email");
   const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   const handleEmailContinue = () => {
@@ -35,14 +36,27 @@ const OnboardingCreateAccount = () => {
       return;
     }
     setError(null);
-    saveOnboardingDraft({ ...existing, /* email kept in component state */ });
-    // Persist email into draft via a side channel until 8b/8c are defined.
+    saveOnboardingDraft({ ...existing });
     try {
       sessionStorage.setItem("ts_signup_email", parsed.data);
     } catch {
       /* ignore */
     }
     setStep("password");
+  };
+
+  const handlePasswordContinue = () => {
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    setError(null);
+    try {
+      sessionStorage.setItem("ts_signup_password", password);
+    } catch {
+      /* ignore */
+    }
+    setStep("confirm");
   };
 
   return (
@@ -149,7 +163,88 @@ const OnboardingCreateAccount = () => {
         </div>
       )}
 
-      {step !== "email" && (
+      {step === "password" && (
+        <div
+          className="w-full max-w-sm flex flex-col items-center"
+          style={{ animation: "ts-screen8-fade-in 400ms ease both" }}
+        >
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 12,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#9E9585",
+              margin: 0,
+              marginBottom: 28,
+              textAlign: "center",
+            }}
+          >
+            Create a password
+          </p>
+
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handlePasswordContinue();
+            }}
+            placeholder="At least 8 characters"
+            autoFocus
+            className="w-full text-center bg-transparent focus:outline-none"
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontStyle: "italic",
+              fontSize: 20,
+              color: "#1E2E3E",
+              border: "none",
+              borderBottom: "1px solid #B8860B",
+              padding: "8px 0",
+              borderRadius: 0,
+            }}
+          />
+
+          {error && (
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 12,
+                color: "#B05242",
+                marginTop: 12,
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={handlePasswordContinue}
+            className="w-full"
+            style={{
+              marginTop: 40,
+              height: 52,
+              backgroundColor: "#1E2E3E",
+              color: "#F2EEE5",
+              border: "none",
+              borderRadius: 12,
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontSize: 16,
+              cursor: "pointer",
+            }}
+          >
+            Create My Archive
+          </button>
+        </div>
+      )}
+
+      {step === "confirm" && (
         <p
           style={{
             fontFamily: "'Jost', sans-serif",
