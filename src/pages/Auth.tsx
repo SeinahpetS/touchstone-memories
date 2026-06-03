@@ -166,7 +166,7 @@ const Auth = () => {
         {/* Wordmark */}
         <div className="text-center">
           <div style={{ opacity: fontReady ? 1 : 0, transition: 'opacity 600ms ease' }}>
-            <h1 className="font-playfair text-[52px] md:text-[64px] font-black tracking-[-0.005em] text-foreground lowercase">
+            <h1 className="font-playfair text-[52px] md:text-[64px] font-black tracking-[0.15em] text-foreground lowercase">
               touchstone
             </h1>
           </div>
