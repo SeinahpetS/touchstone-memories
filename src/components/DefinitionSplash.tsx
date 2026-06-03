@@ -168,23 +168,6 @@ const DefinitionSplash = ({ onBegin }: Props) => {
 
         </ol>
       </div>
-
-      {/* Sub-copy */}
-      <p
-        className="ts-def-sub mt-12 text-center mx-auto"
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontStyle: "italic",
-          fontSize: 19,
-          lineHeight: 1.5,
-          color: "rgba(44,62,80,0.78)",
-          maxWidth: 360,
-          whiteSpace: "pre-line",
-          margin: 0,
-        }}
-      >
-        A touchstone tests what's real.{"\n"}Some things are too valuable to leave only to memory.
-      </p>
     </div>
   );
 };
