@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
+import OnboardingDotIndicator, { markOnboardingComplete } from "@/components/OnboardingDotIndicator";
 import {
   loadOnboardingDraft,
   saveOnboardingDraft,
