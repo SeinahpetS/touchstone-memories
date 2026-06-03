@@ -23,6 +23,7 @@ import Vivid from "./pages/Vivid.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import WelcomeTouchstones from "./pages/WelcomeTouchstones.tsx";
 import OnboardingName from "./pages/OnboardingName.tsx";
+import OnboardingBirthYear from "./pages/OnboardingBirthYear.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
 
 const queryClient = new QueryClient();
@@ -173,6 +174,7 @@ const App = () => (
           <Route path="/welcome" element={<Onboarding />} />
           <Route path="/constellation" element={<ConstellationIntro />} />
           <Route path="/onboarding/name" element={<OnboardingName />} />
+          <Route path="/onboarding/birth" element={<OnboardingBirthYear />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/settings" element={<Profile />} />

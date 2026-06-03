@@ -1,4 +1,4 @@
-import { FilePen, ChevronRight, X } from "lucide-react";
+import { FilePen, ChevronRight, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +36,10 @@ const StoryUnfold = () => {
   const [text, setText] = useState("");
   const [extracting, setExtracting] = useState(false);
   const [rows, setRows] = useState<StoryRow[]>([]);
+
+  const isOnboarding =
+    typeof window !== "undefined" &&
+    localStorage.getItem("ts_onboarding_complete") !== "1";
 
   const loadRows = async () => {
     const { data: userRes } = await supabase.auth.getUser();
@@ -283,6 +287,34 @@ const StoryUnfold = () => {
             );
           })}
         </div>
+
+        {/* Onboarding: continue to next step */}
+        {isOnboarding && (
+          <button
+            type="button"
+            onClick={() => navigate("/onboarding/name")}
+            className="w-full flex items-center justify-center gap-2 mt-6"
+            style={{
+              backgroundColor: "transparent",
+              border: `1.5px solid ${BRAND_NAVY}`,
+              borderRadius: 12,
+              padding: "0.85rem",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                color: BRAND_NAVY,
+                fontWeight: 500,
+              }}
+            >
+              Continue
+            </span>
+            <ArrowRight size={16} color={BRAND_NAVY} strokeWidth={1.75} />
+          </button>
+        )}
       </div>
 
 
