@@ -22,6 +22,7 @@ import TellStoryResults from "./pages/TellStoryResults.tsx";
 import Vivid from "./pages/Vivid.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import WelcomeTouchstones from "./pages/WelcomeTouchstones.tsx";
+import OnboardingName from "./pages/OnboardingName.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
 
 const queryClient = new QueryClient();
