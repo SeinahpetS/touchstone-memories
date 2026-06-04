@@ -80,40 +80,45 @@ Deno.serve(async (req) => {
     }
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const body = await req.json().catch(() => ({}));
+    const existingSessionId: string | undefined = body?.session_id;
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
+      authHeader ? { global: { headers: { Authorization: authHeader } } } : {},
     );
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(token);
-    if (claimsErr || !claimsData?.claims) {
+    // Authenticated path validates JWT. Anonymous calls are allowed only for
+    // the pre-signup onboarding flow (no session_id, no DB persistence).
+    let userId: string | null = null;
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: claimsData } = await supabase.auth.getClaims(token);
+      const sub = claimsData?.claims?.sub;
+      if (typeof sub === "string") userId = sub;
+    }
+    const isAnonymous = !userId;
+    if (isAnonymous && existingSessionId) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const userId = claimsData.claims.sub as string;
 
-    const body = await req.json().catch(() => ({}));
-    const existingSessionId: string | undefined = body?.session_id;
     let transcript: string = (body?.transcript ?? body?.story ?? "").toString();
     const clientExclude: string[] = Array.isArray(body?.exclude_titles)
       ? body.exclude_titles.filter((s: unknown): s is string => typeof s === "string")
       : [];
 
-    // Determine tier — Vivid = 7, Free = 5
-    const { data: isVividData } = await supabase.rpc("has_active_vivid", { _user_id: userId });
-    const isVivid = Boolean(isVividData);
+    // Determine tier — Vivid = 7, Free = 5. Anonymous users get the free cap.
+    let isVivid = false;
+    if (userId) {
+      const { data: isVividData } = await supabase.rpc("has_active_vivid", { _user_id: userId });
+      isVivid = Boolean(isVividData);
+    }
     const cap = isVivid ? 7 : 5;
+
 
     // If continuing an existing session, fetch transcript + previously extracted titles
     let existingArtifacts: any[] = [];
@@ -244,7 +249,25 @@ Deno.serve(async (req) => {
       })
       .filter(Boolean);
 
-    let sessionRow: any;
+    let sessionRow: any = null;
+
+    if (isAnonymous) {
+      // Pre-signup onboarding: return artifacts without persisting.
+      return new Response(
+        JSON.stringify({
+          session_id: null,
+          title: null,
+          status: "anonymous",
+          expires_at: null,
+          artifacts,
+          highlight_spans: newSpans,
+          cap,
+          tier: "free",
+          continuation: false,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     if (existingSessionId) {
       const mergedArtifacts = [...existingArtifacts, ...artifacts];
@@ -302,6 +325,7 @@ Deno.serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
+
   } catch (e) {
     console.error("extract-story-artifacts error", e);
     return new Response(
