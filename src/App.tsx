@@ -178,7 +178,9 @@ const App = () => (
           <Route path="/welcome" element={<Onboarding />} />
           <Route path="/constellation" element={<ConstellationIntro />} />
           <Route path="/onboarding/story-unfold" element={<OnboardingStoryUnfold />} />
+          <Route path="/onboarding-story" element={<OnboardingStoryUnfold />} />
           <Route path="/onboarding/name" element={<OnboardingName />} />
+          <Route path="/onboarding-name" element={<OnboardingName />} />
           <Route path="/onboarding/birth" element={<OnboardingBirthYear />} />
           <Route path="/onboarding/location" element={<OnboardingLocation />} />
           <Route path="/onboarding/ready" element={<OnboardingStoryReady />} />
