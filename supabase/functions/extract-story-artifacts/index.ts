@@ -249,7 +249,25 @@ Deno.serve(async (req) => {
       })
       .filter(Boolean);
 
-    let sessionRow: any;
+    let sessionRow: any = null;
+
+    if (isAnonymous) {
+      // Pre-signup onboarding: return artifacts without persisting.
+      return new Response(
+        JSON.stringify({
+          session_id: null,
+          title: null,
+          status: "anonymous",
+          expires_at: null,
+          artifacts,
+          highlight_spans: newSpans,
+          cap,
+          tier: "free",
+          continuation: false,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     if (existingSessionId) {
       const mergedArtifacts = [...existingArtifacts, ...artifacts];
@@ -307,6 +325,7 @@ Deno.serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
+
   } catch (e) {
     console.error("extract-story-artifacts error", e);
     return new Response(
