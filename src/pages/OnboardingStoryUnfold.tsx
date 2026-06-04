@@ -13,7 +13,7 @@ const OnboardingStoryUnfold = () => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const advance = () => navigate("/onboarding/name");
+  const advance = () => navigate("/onboarding-name");
 
   const handleSubmit = async () => {
     if (loading) return;
