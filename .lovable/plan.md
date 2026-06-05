@@ -1,135 +1,50 @@
+## Context
 
+This Lovable project is wired to the **Lovable Cloud–managed** Supabase project (ref `molmsqlnngtusxeggeij`, URL `https://molmsqlnngtusxeggeij.supabase.co`). All your app data — `profiles`, `story_sessions`, `touchstones`, `events`, storage buckets, edge functions — lives there. Your self-owned "touchstone" Supabase project has never been connected, which is why it looks empty.
 
-# Touchstone MVP — Build Plan
+**Hard constraint:** Lovable Cloud cannot be disconnected from a project once enabled, and rolling back to a pre-Cloud version does not undo it. So this project itself cannot be re-pointed at your own Supabase. The clean path is: export everything out of Cloud, import into your Supabase, then (when you're ready) create a fresh Lovable project with Cloud disabled and wire it to your Supabase.
 
-## Phase 1: Design System
+This plan covers **the export half only** — done from inside this project, no app changes, no risk to live data.
 
-Update `index.css` and `tailwind.config.ts` with the Touchstone palette, typography, and tokens.
+## What I'll produce in `/mnt/documents/touchstone-export/`
 
-- **Google Fonts**: Import Playfair Display (serif) and Source Sans 3 (sans-serif) in `index.html`
-- **CSS variables** in `index.css`: Convert all hex values to HSL for Tailwind compatibility
-  - Background: `#F2EEE5`, Card: `#E8E4D8`, Ink: `#2C3E50`, Espresso: `#5B4A3F`
-  - Gold: `#B8860B`, Plum: `#8B3A62`, Terracotta: `#C2714F`, Malachite: `#2E7D5E`, Blueprint: `#4A6B8A`
-- **tailwind.config.ts**: Add custom color tokens (`ivory`, `card`, `ink`, `espresso`, `gold`, `plum`, `terracotta`, `malachite`, `blueprint`) and font families (`playfair`, `source`)
-- **Base styles**: 16px minimum body text, generous spacing defaults
-- Remove `src/App.css` (unused boilerplate)
+1. **`schema.sql`** — full Postgres dump of the `public` schema:
+   - All tables (`profiles`, `story_sessions`, `touchstones`, `events`) with columns, defaults, constraints
+   - The `app_role` / category enums
+   - All RLS policies
+   - All `GRANT`s
+   - Database functions (`has_active_vivid`, `handle_new_user`, `set_story_session_defaults`, `set_default_trial`, `prevent_profile_billing_updates`)
+   - Triggers
+2. **`data/`** — one CSV per table with every row (`profiles.csv`, `story_sessions.csv`, `touchstones.csv`, `events.csv`).
+3. **`storage-manifest.json`** — listing of objects in the `avatars`, `exports`, and `memory-photos` buckets so you can re-download and re-upload them on the other side.
+4. **`edge-functions/`** — copies of each `supabase/functions/*/index.ts` plus a short README mapping which secrets each function needs (so you know what to set in your own project's Edge Function secrets).
+5. **`README.md`** — step-by-step import instructions for your own Supabase project:
+   - Run `schema.sql` in the SQL editor
+   - `COPY ... FROM` each CSV (with notes on auth.users — see caveats)
+   - Recreate the 3 storage buckets and re-upload from the manifest
+   - Redeploy edge functions and re-add the secrets they need (Anthropic, Stripe, Spotify, TMDB, Listen Notes, Resend, Lovable AI, Google)
 
-## Phase 2: Database Schema
+## Caveats I'll flag in the README
 
-Create via migration tool:
+- **`auth.users` cannot be exported/imported as plain rows** (password hashes, identities, etc. live in protected schemas). For a real cutover you either (a) keep the same user IDs and have Supabase support migrate auth, or (b) have users re-sign-up and re-link by email. `profiles.id` is the auth user id — re-importing profiles without matching auth.users will leave them orphaned until users sign up again.
+- **Storage object bytes** must be downloaded client-side (signed URLs) — I'll generate a download script, but actual file transfer happens on your machine, not in the sandbox.
+- **Lovable AI Gateway** (`LOVABLE_API_KEY`) only works on Lovable-hosted projects. On your own Supabase you'll need to swap calls to Anthropic/OpenAI/Google directly using your own API keys.
+- **Stripe webhooks** point at the current Cloud edge function URL — you'll need to update the webhook endpoint in Stripe after cutover.
 
-```sql
--- Categories enum
-CREATE TYPE public.memory_category AS ENUM (
-  'moment', 'person', 'object', 'place', 'food', 'sound', 'imprint'
-);
+## Technical steps (what I'll run after approval)
 
--- Profiles table (public mirror of auth.users)
-CREATE TABLE public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT,
-  avatar_url TEXT,
-  tier TEXT NOT NULL DEFAULT 'free' CHECK (tier IN ('free', 'paid')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
--- Users can read/update only their own profile
-CREATE POLICY "Users read own profile" ON public.profiles
-  FOR SELECT TO authenticated USING (auth.uid() = id);
-CREATE POLICY "Users update own profile" ON public.profiles
-  FOR UPDATE TO authenticated USING (auth.uid() = id);
-CREATE POLICY "Users insert own profile" ON public.profiles
-  FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
+1. `psql` against the Cloud DB (env vars already present):
+   - `pg_dump --schema-only --schema=public` → `schema.sql`
+   - `\copy (SELECT * FROM <table>) TO '...csv' WITH CSV HEADER` for each table
+2. Use the Supabase Storage API with the service role key to list objects in each bucket → `storage-manifest.json` + a `download-storage.sh` script you run locally.
+3. Copy `supabase/functions/*/index.ts` into the export folder and grep each file for `Deno.env.get(...)` calls to build the per-function secret list.
+4. Write the README tying it all together.
 
--- Auto-create profile on signup
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER
-SET search_path = public AS $$
-BEGIN
-  INSERT INTO public.profiles (id, name)
-  VALUES (NEW.id, NEW.raw_user_meta_data->>'name');
-  RETURN NEW;
-END;
-$$;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+## What this plan does NOT do
 
--- Memories table
-CREATE TABLE public.memories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  category memory_category NOT NULL,
-  title TEXT,
-  note TEXT,
-  ai_prompt TEXT,
-  ai_answer TEXT,
-  photo_url TEXT,
-  sentiment TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-ALTER TABLE public.memories ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users CRUD own memories" ON public.memories
-  FOR ALL TO authenticated USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-```
+- Does not modify the running app
+- Does not touch the Cloud-managed database
+- Does not create a new Lovable project (you'll do that when ready, with Cloud disabled, and remix/rebuild against your own Supabase)
+- Does not migrate `auth.users` automatically
 
-**Storage bucket**: Create `memory-photos` bucket (public read, authenticated upload) for photo storage.
-
-## Phase 3: Auth
-
-- Create `src/pages/Auth.tsx` — simple sign-up / sign-in page with email + Google OAuth
-- Add auth route to `App.tsx`
-- Create `src/hooks/useAuth.ts` for session management
-- Protect capture flow behind auth (redirect to `/auth` if not signed in)
-
-## Phase 4: Capture Flow (Index Page)
-
-Build the single-screen capture loop as the home page:
-
-- **Wordmark component** — "TOUCHSTONE" in Playfair Display, small caps, letter-spaced, `#2C3E50`
-- **Prompt card** — One hardcoded gentle prompt displayed in Playfair Display
-- **Photo upload** — File picker with camera capture support on mobile, uploads to storage bucket
-- **Category selector** — 3 active (Moment, Object, Person) + 4 coming-soon with disabled state
-- **Title input** — Optional, placeholder text encouraging but not demanding
-- **Note textarea** — Freeform, generous sizing
-- **Sentiment pill** — Optional row of pill buttons (safe, complicated, like home, like loss, like freedom)
-- **Save button** — Gold `#B8860B`, large tap target, full width on mobile
-- **Confirmation view** — After save, show the memory artifact: full-bleed photo, 6px category stripe, title, date, note, warm message
-
-## Phase 5: Archive View
-
-- **Archive page** (`/archive`) — Grid of memory cards, most recent first
-- **Category filter** — Horizontal pill filters
-- **Memory card** — Photo thumbnail, title, date, 6px top stripe in category color
-- **Tap to open** — Full artifact view
-
-## Files Created/Modified
-
-| File | Action |
-|------|--------|
-| `index.html` | Add Google Fonts links, PWA meta tags |
-| `src/index.css` | Replace with Touchstone design tokens |
-| `tailwind.config.ts` | Add custom colors, fonts |
-| `src/App.css` | Delete |
-| `src/App.tsx` | Add routes for `/auth`, `/archive` |
-| `src/pages/Index.tsx` | Capture flow |
-| `src/pages/Auth.tsx` | New — sign in/up |
-| `src/pages/Archive.tsx` | New — memory grid |
-| `src/components/Wordmark.tsx` | New |
-| `src/components/PromptCard.tsx` | New |
-| `src/components/PhotoUpload.tsx` | New |
-| `src/components/CategorySelector.tsx` | New |
-| `src/components/SentimentPill.tsx` | New |
-| `src/components/MemoryArtifact.tsx` | New |
-| `src/components/MemoryCard.tsx` | New |
-| `src/hooks/useAuth.ts` | New |
-| Migration SQL | Profiles, memories tables, RLS, trigger, storage bucket |
-
-## Design Rules Enforced
-- No shadows, no gradients — flat clean surfaces
-- Minimum 16px body text, large tap targets
-- Art deco warmth: Playfair Display headings, geometric but quiet
-- Artifact is a rendered object, never a form
-- Category stripe: 6px top border in category color on every card
-
+After you've confirmed the export looks complete on your end, we can talk about the second half (spinning up a fresh Lovable project pointed at your own Supabase and porting the UI code over).
