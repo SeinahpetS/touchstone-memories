@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Lottie from "lottie-react";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
+// Placeholder Lottie — swap this import for the real wordmark animation JSON.
+import WORDMARK_ANIMATION_SRC from "@/assets/wordmark-placeholder.lottie.json";
+
+const LOTTIE_DURATION_MS = 2500;
+const WORDMARK_HOLD_MS = 800;
 
 type ConstellationIntroProps = { onComplete?: () => void };
 
