@@ -371,6 +371,53 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
         </p>
       </div>
       <style>{`@keyframes ts-ci-fade { from { opacity: 0 } to { opacity: 1 } }`}</style>
+
+      {introPhase !== "reveal" && (
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: NAVY,
+            zIndex: 50,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            paddingTop: "22vh",
+            opacity: 1,
+            transition: "opacity 600ms ease",
+            pointerEvents: "none",
+          }}
+        >
+          {introPhase === "lottie" && WORDMARK_ANIMATION_SRC && (
+            <div style={{ width: "min(70vw, 360px)", marginTop: "8vh" }}>
+              <Lottie
+                animationData={WORDMARK_ANIMATION_SRC}
+                loop={false}
+                autoplay
+              />
+            </div>
+          )}
+          {introPhase === "wordmark" && (
+            <h1
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: "clamp(36px, 8vw, 56px)",
+                color: IVORY,
+                margin: 0,
+                letterSpacing: "0.01em",
+                animation: "ts-ci-fade 500ms ease forwards",
+                opacity: 0,
+              }}
+            >
+              touchstone
+            </h1>
+          )}
+        </div>
+      )}
     </div>
   );
 };
