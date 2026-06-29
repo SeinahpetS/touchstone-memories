@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Lottie from "lottie-react";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
+// Placeholder Lottie — swap this import for the real wordmark animation JSON.
+import WORDMARK_ANIMATION_SRC from "@/assets/wordmark-placeholder.lottie.json";
+
+const LOTTIE_DURATION_MS = 2500;
+const WORDMARK_HOLD_MS = 800;
 
 type ConstellationIntroProps = { onComplete?: () => void };
 
@@ -78,10 +84,30 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   const [pulsing, setPulsing] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [mounted, setMounted] = useState(false);
+  // Intro pre-roll: "lottie" → "wordmark" → "reveal" (existing flow).
+  const [introPhase, setIntroPhase] = useState<"lottie" | "wordmark" | "reveal">(
+    WORDMARK_ANIMATION_SRC ? "lottie" : "reveal"
+  );
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 20);
     return () => clearTimeout(t);
   }, []);
+
+  // Drive the intro pre-roll timing, then auto-advance to step 1 so the
+  // anchor star + opening copy fade in alongside the constellation card.
+  useEffect(() => {
+    if (introPhase === "lottie") {
+      const t = setTimeout(() => setIntroPhase("wordmark"), LOTTIE_DURATION_MS);
+      return () => clearTimeout(t);
+    }
+    if (introPhase === "wordmark") {
+      const t = setTimeout(() => {
+        setIntroPhase("reveal");
+        setStep((s) => (s === 0 ? 1 : s));
+      }, WORDMARK_HOLD_MS);
+      return () => clearTimeout(t);
+    }
+  }, [introPhase]);
 
   const lineRefs = useRef<Record<string, SVGLineElement | null>>({});
   const blurRef = useRef<SVGFEGaussianBlurElement | null>(null);
@@ -158,6 +184,7 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
 
   const handleTap = () => {
     if (leaving) return;
+    if (introPhase !== "reveal") return;
     if (pulsing) {
       // Final tap: stop pulse, reset, fade out, navigate.
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
@@ -344,6 +371,53 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
         </p>
       </div>
       <style>{`@keyframes ts-ci-fade { from { opacity: 0 } to { opacity: 1 } }`}</style>
+
+      {introPhase !== "reveal" && (
+        <div
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: NAVY,
+            zIndex: 50,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            paddingTop: "22vh",
+            opacity: 1,
+            transition: "opacity 600ms ease",
+            pointerEvents: "none",
+          }}
+        >
+          {introPhase === "lottie" && WORDMARK_ANIMATION_SRC && (
+            <div style={{ width: "min(70vw, 360px)", marginTop: "8vh" }}>
+              <Lottie
+                animationData={WORDMARK_ANIMATION_SRC}
+                loop={false}
+                autoplay
+              />
+            </div>
+          )}
+          {introPhase === "wordmark" && (
+            <h1
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: "clamp(36px, 8vw, 56px)",
+                color: IVORY,
+                margin: 0,
+                letterSpacing: "0.01em",
+                animation: "ts-ci-fade 500ms ease forwards",
+                opacity: 0,
+              }}
+            >
+              touchstone
+            </h1>
+          )}
+        </div>
+      )}
     </div>
   );
 };
