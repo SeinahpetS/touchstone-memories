@@ -184,6 +184,7 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
 
   const handleTap = () => {
     if (leaving) return;
+    if (introPhase !== "reveal") return;
     if (pulsing) {
       // Final tap: stop pulse, reset, fade out, navigate.
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
