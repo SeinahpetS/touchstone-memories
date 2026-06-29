@@ -84,10 +84,30 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
   const [pulsing, setPulsing] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [mounted, setMounted] = useState(false);
+  // Intro pre-roll: "lottie" → "wordmark" → "reveal" (existing flow).
+  const [introPhase, setIntroPhase] = useState<"lottie" | "wordmark" | "reveal">(
+    WORDMARK_ANIMATION_SRC ? "lottie" : "reveal"
+  );
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 20);
     return () => clearTimeout(t);
   }, []);
+
+  // Drive the intro pre-roll timing, then auto-advance to step 1 so the
+  // anchor star + opening copy fade in alongside the constellation card.
+  useEffect(() => {
+    if (introPhase === "lottie") {
+      const t = setTimeout(() => setIntroPhase("wordmark"), LOTTIE_DURATION_MS);
+      return () => clearTimeout(t);
+    }
+    if (introPhase === "wordmark") {
+      const t = setTimeout(() => {
+        setIntroPhase("reveal");
+        setStep((s) => (s === 0 ? 1 : s));
+      }, WORDMARK_HOLD_MS);
+      return () => clearTimeout(t);
+    }
+  }, [introPhase]);
 
   const lineRefs = useRef<Record<string, SVGLineElement | null>>({});
   const blurRef = useRef<SVGFEGaussianBlurElement | null>(null);
