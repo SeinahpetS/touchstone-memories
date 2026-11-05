@@ -6,6 +6,10 @@
 
 @layer base {
   :root {
+    --globe-ocean: 210 35% 18%;
+    --globe-land: 45 26% 88%;
+    --globe-line: 209 30% 42%;
+    --globe-selection: 43 89% 38%;
     /* Touchstone palette — all HSL */
     --background: 39 33% 92%;        /* #F2EEE5 Soft Ivory */
     --foreground: 207 31% 24%;       /* #2C3E50 Ink */
@@ -102,6 +106,30 @@
     --sidebar-ring: 43 88% 38%;
   }
 }
+
+.onboarding-globe {
+  display: block;
+  width: 300px;
+  height: 300px;
+  max-width: 100%;
+  flex-shrink: 0;
+  margin-bottom: 24px;
+  touch-action: none;
+  cursor: grab;
+  overflow: hidden;
+}
+.onboarding-globe:active { cursor: grabbing; }
+.onboarding-globe:focus-visible { outline: 2px solid hsl(var(--globe-selection)); outline-offset: 4px; }
+.globe-ocean { fill: hsl(var(--globe-ocean)); }
+.globe-country, .globe-region {
+  fill: hsl(var(--globe-land));
+  stroke: hsl(var(--globe-line));
+  stroke-width: 0.75px;
+  stroke-linejoin: round;
+}
+.globe-graticule { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 1px; }
+.globe-selected { fill: hsl(var(--globe-selection)); }
+.onboarding-city-results { border-color: hsl(var(--globe-line)); }
 
 @layer base {
   * {
