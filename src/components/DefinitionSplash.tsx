@@ -26,7 +26,7 @@ const DefinitionSplash = ({ onBegin }: Props) => {
 
   return (
     <div
-      className="flex min-h-screen flex-col items-center justify-center px-6 py-12"
+      className="flex min-h-screen flex-col items-center justify-center px-6 pt-12 pb-[33vh]"
       style={{ backgroundColor: "#F2EEE5" }}
     >
       <style>{`
