@@ -69,7 +69,7 @@ const PostSplashRoute = () => {
   if (user && sessionFresh) {
     const hasPendingDraft =
       typeof window !== "undefined" &&
-      !!localStorage.getItem("ts_onboarding_draft_v1");
+      !!localStorage.getItem("ts_onboarding_draft_v1") && !localStorage.getItem("ts_onboarding_draft");
     const isEditing =
       typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).has("edit");
@@ -114,7 +114,7 @@ const RootRoute = () => {
       // First-time user: enter the onboarding flow at the constellation intro.
       const hasPendingDraft =
         typeof window !== "undefined" &&
-        !!localStorage.getItem("ts_onboarding_draft_v1");
+        !!localStorage.getItem("ts_onboarding_draft_v1") && !localStorage.getItem("ts_onboarding_draft");
       dest = session
         ? hasPendingDraft
           ? "/welcome"
@@ -181,6 +181,7 @@ const App = () => (
           <Route path="/constellation" element={<ConstellationIntro />} />
           <Route path="/onboarding/story-unfold" element={<OnboardingStoryUnfold />} />
           <Route path="/onboarding-story" element={<OnboardingStoryUnfold />} />
+          <Route path="/onboarding/story-review" element={<StoryReview />} />
           <Route path="/onboarding/name" element={<OnboardingName />} />
           <Route path="/onboarding-name" element={<OnboardingName />} />
           <Route path="/onboarding/birth" element={<OnboardingBirthYear />} />

@@ -12,6 +12,7 @@ import {
   loadOnboardingDraft,
   saveOnboardingDraft,
 } from "@/lib/onboardingDraft";
+import { migrateOnboardingStory } from "@/lib/onboardingStoryDraft";
 
 type SubStep = "email" | "password";
 
@@ -76,10 +77,9 @@ const OnboardingCreateAccount = () => {
     if (typeof d.lat === "number") patch.lat = d.lat;
     if (typeof d.lng === "number") patch.lng = d.lng;
     try {
-      await (supabase as any).from("profiles").update(patch).eq("id", userId);
-    } catch {
-      /* non-fatal */
-    }
+      const { error } = await (supabase as any).from("profiles").update(patch).eq("id", userId);
+      if (error) throw error;
+    } catch (error) { throw error; }
   };
 
   const handleCreateAccount = async () => {
@@ -102,8 +102,14 @@ const OnboardingCreateAccount = () => {
       if (signUpErr) throw signUpErr;
 
       const userId = data.user?.id;
+      if (!data.session || !userId) {
+        toast.success("Check your email to confirm your account. Your kept cards are safe on this device.");
+        navigate("/auth", { replace: true });
+        return;
+      }
       if (data.session && userId) {
         await migrateDraftToProfile(userId);
+        await migrateOnboardingStory(userId);
       }
 
       markOnboardingComplete();

@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { saveOnboardingStoryDraft, type StoryArtifact } from "@/lib/onboardingStoryDraft";
 
 /**
  * Onboarding Screen — Story Unfold (dot 2).
@@ -23,48 +26,31 @@ const OnboardingStoryUnfold = () => {
       return;
     }
     setLoading(true);
-    let artifacts: any[] = [];
     try {
       const { data, error } = await supabase.functions.invoke(
         "extract-story-artifacts",
         { body: { story: trimmed } },
       );
-      artifacts = Array.isArray((data as any)?.artifacts)
-        ? (data as any).artifacts
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const artifacts: StoryArtifact[] = Array.isArray(data?.artifacts)
+        ? data.artifacts
         : [];
+      if (!artifacts.length) throw new Error("No cards appeared. Please try again or skip for now.");
       const payload = {
         story: trimmed,
         artifacts,
         capturedAt: Date.now(),
       };
-      try {
-        localStorage.setItem("ts_onboarding_draft", JSON.stringify(payload));
-      } catch {
-        /* ignore */
-      }
-      if (error) {
-        // Pre-signup users won't have a session; still advance with raw text saved.
-        console.warn("extract-story-artifacts unavailable:", error.message);
-      }
-    } catch (e) {
-      console.warn("extract-story-artifacts failed", e);
-      try {
-        localStorage.setItem(
-          "ts_onboarding_draft",
-          JSON.stringify({ story: trimmed, artifacts: [], capturedAt: Date.now() }),
-        );
-      } catch {
-        /* ignore */
-      }
-    } finally {
-      setLoading(false);
-    }
-    if (artifacts.length > 0) {
-      navigate("/story-unfold/review", {
+      saveOnboardingStoryDraft(payload);
+      navigate("/onboarding/story-review", {
         state: { artifacts, transcript: trimmed, onboarding: true },
       });
-    } else {
-      advance();
+    } catch (e) {
+      console.warn("extract-story-artifacts failed", e);
+      toast.error("Couldn't show your cards. Your story is still here; please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,7 +131,7 @@ const OnboardingStoryUnfold = () => {
           Type, paste, or use your phone's microphone to speak-to-text.
         </p>
 
-        <button
+        <Button
           type="button"
           onClick={handleSubmit}
           disabled={loading}
@@ -166,9 +152,10 @@ const OnboardingStoryUnfold = () => {
           }}
         >
           {loading ? "Reading…" : "See What's There"}
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant="ghost"
           type="button"
           onClick={advance}
           disabled={loading}
@@ -186,7 +173,7 @@ const OnboardingStoryUnfold = () => {
           }}
         >
           Skip for now
-        </button>
+        </Button>
       </div>
 
       <style>{`

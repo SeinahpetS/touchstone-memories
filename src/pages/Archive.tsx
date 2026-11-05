@@ -21,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { migrateOnboardingStory } from "@/lib/onboardingStoryDraft";
+import { toast } from "sonner";
 
 const FILTER_CATEGORIES: CategoryKey[] = [
   "moment",
@@ -204,6 +206,7 @@ const Archive = () => {
   useEffect(() => {
     if (!user) return;
     (async () => {
+      try { await migrateOnboardingStory(user.id); } catch { /* Fetch still shows existing archive. */ }
       const { data } = await (supabase as any)
         .from("profiles")
         .select("name")
@@ -234,6 +237,13 @@ const Archive = () => {
 
   const fetchTouchstones = async () => {
     if (!user) return;
+    try {
+      await migrateOnboardingStory(user.id);
+    } catch {
+      toast.error("Your onboarding cards aren't saved yet. They're still on this device.", {
+        action: { label: "Try again", onClick: () => { void fetchTouchstones(); } },
+      });
+    }
     let query = (supabase as any)
       .from("touchstones")
       .select("*")
