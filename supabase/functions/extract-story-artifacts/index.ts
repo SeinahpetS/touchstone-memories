@@ -1,6 +1,30 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+// AI_MOCK_MODE: when "true", skip the Anthropic call and return a sample
+// response in the same shape as the real Messages API, after 1200ms.
+async function callAnthropic(init: RequestInit, mockText: string): Promise<Response> {
+  if (Deno.env.get("AI_MOCK_MODE") === "true") {
+    await new Promise((r) => setTimeout(r, 1200));
+    return new Response(
+      JSON.stringify({
+        id: "msg_mock",
+        type: "message",
+        role: "assistant",
+        model: "claude-haiku-4-5-20251001",
+        content: [{ type: "text", text: mockText }],
+        stop_reason: "end_turn",
+        usage: { input_tokens: 0, output_tokens: 0 },
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }
+  return fetch("https://api.anthropic.com/v1/messages", init);
+}
+
+const MOCK_TEXT = "{\"artifacts\": [{\"category\": \"moment\", \"title\": \"Sunday Pancakes\", \"note\": \"Every Sunday morning the kitchen filled with the smell of pancakes and coffee.\", \"source_phrase\": \"Sunday mornings\"}, {\"category\": \"person\", \"title\": \"Grandma June\", \"note\": \"She hummed old songs while she cooked and never measured anything.\", \"source_phrase\": \"my grandma\"}, {\"category\": \"place\", \"title\": \"The Yellow Kitchen\", \"note\": \"Sunlight through the window above the sink, the radio always on.\", \"source_phrase\": \"the kitchen\"}]}";
+
+
 const VALID_CATEGORIES = new Set([
   "moment",
   "person",
@@ -153,7 +177,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+    const anthropicRes = await callAnthropic({
       method: "POST",
       headers: {
         "x-api-key": apiKey,
@@ -166,7 +190,7 @@ Deno.serve(async (req) => {
         system: buildSystemPrompt(cap, excludeTitles),
         messages: [{ role: "user", content: transcript }],
       }),
-    });
+    }, MOCK_TEXT);
 
     if (!anthropicRes.ok) {
       const errText = await anthropicRes.text();

@@ -2,6 +2,30 @@
 // Called after a Touchstone is saved. Gated on active Vivid (trial or paid).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// AI_MOCK_MODE: when "true", skip the Anthropic call and return a sample
+// response in the same shape as the real Messages API, after 1200ms.
+async function callAnthropic(init: RequestInit, mockText: string): Promise<Response> {
+  if (Deno.env.get("AI_MOCK_MODE") === "true") {
+    await new Promise((r) => setTimeout(r, 1200));
+    return new Response(
+      JSON.stringify({
+        id: "msg_mock",
+        type: "message",
+        role: "assistant",
+        model: "claude-haiku-4-5-20251001",
+        content: [{ type: "text", text: mockText }],
+        stop_reason: "end_turn",
+        usage: { input_tokens: 0, output_tokens: 0 },
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }
+  return fetch("https://api.anthropic.com/v1/messages", init);
+}
+
+const MOCK_TEXT = "What did that kitchen smell like on a Sunday morning?";
+
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -171,7 +195,7 @@ Deno.serve(async (req) => {
 
     const { content } = buildUserMessage(body);
 
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    const resp = await callAnthropic({
       method: "POST",
       headers: {
         "x-api-key": apiKey,
@@ -184,7 +208,7 @@ Deno.serve(async (req) => {
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content }],
       }),
-    });
+    }, MOCK_TEXT);
 
     if (!resp.ok) {
       const errText = await resp.text();
