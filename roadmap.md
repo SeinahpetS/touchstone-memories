@@ -1,5 +1,6 @@
 # Onboarding card reliability
-- [ ] Add signed-in city matching and Settings autocomplete without coordinates; test save rules.
+- [x] Add signed-in city matching and Settings autocomplete without coordinates; test save rules.
+- [ ] Validate Google city matching and suggestions on the deployed site; Google live testing is unavailable in the sandbox.
 - [x] Preserve extracted cards and review progress across reloads; show extraction failures without skipping review.
 - [x] Save kept cards after authentication, retain drafts through email confirmation and failed saves, and prevent duplicate saves.
 - [x] Run focused tests and verify the public flow on desktop and phone.
