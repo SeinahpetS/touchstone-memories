@@ -265,12 +265,13 @@ const StoryReview = () => {
       const remaining = artifacts.filter((_, i) => i !== index);
       const draft = loadOnboardingStoryDraft();
       if (!draft) return;
-      const next = Math.min(index, Math.max(0, remaining.length - 1));
-      try { saveOnboardingStoryDraft({ ...draft, artifacts: remaining as StoryArtifact[], reviewIndex: remaining.length ? next : 0 }); }
+      const finished = index >= remaining.length;
+      const next = finished ? remaining.length : index;
+      try { saveOnboardingStoryDraft({ ...draft, artifacts: remaining as StoryArtifact[], reviewIndex: next }); }
       catch { toast.error("Couldn't keep your progress on this device."); return; }
       setArtifacts(remaining);
       setIndex(next);
-      if (!remaining.length) setPhase("complete");
+      if (finished) setPhase("complete");
       return;
     }
     advance();
