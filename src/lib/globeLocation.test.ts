@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
+import { countryGlobeFocus, GLOBE_FOCUS_WIDTH, GLOBE_RADIUS, GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
+import { geoCentroid, geoOrthographic, geoPath } from "d3-geo";
+import { feature } from "topojson-client";
+import type { Topology, GeometryCollection } from "topojson-specification";
+import type { FeatureCollection } from "geojson";
 import countries from "@/assets/geography/countries-110m.json";
 
 describe("onboarding globe rules", () => {
@@ -9,6 +13,28 @@ describe("onboarding globe rules", () => {
     expect(isGlobeTap(12)).toBe(false);
   });
   it("focuses for 600ms", () => expect(GLOBE_FOCUS_MS).toBe(600));
+  const world = feature(countries as unknown as Topology, countries.objects.countries as unknown as GeometryCollection) as FeatureCollection;
+  it("centers the selected country's centroid on the orthographic sphere", () => {
+    const country = world.features.find(f => f.properties?.country_code === "FR");
+    if (!country) throw new Error("France missing");
+    const focus = countryGlobeFocus(country);
+    const projection = geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale);
+    const center = projection(geoCentroid(country));
+    expect(center?.[0]).toBeCloseTo(150);
+    expect(center?.[1]).toBeCloseTo(150);
+  });
+  it("fits country width to 70% of the 300px globe area without shrinking the globe", () => {
+    expect(GLOBE_FOCUS_WIDTH).toBe(210);
+    expect(GLOBE_RADIUS).toBe(146);
+    for (const code of ["US", "IN", "FR"]) {
+      const country = world.features.find(f => f.properties?.country_code === code);
+      if (!country) throw new Error(`${code} missing`);
+      const focus = countryGlobeFocus(country);
+      const bounds = geoPath(geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale)).bounds(country);
+      expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(210);
+      expect(focus.scale).toBeGreaterThanOrEqual(146);
+    }
+  });
   it("rings selections smaller than 24px across on screen", () => {
     expect(SELECTION_RING_MIN_PX).toBe(24);
     expect(SELECTION_RING_RADIUS).toBe(11);

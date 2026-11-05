@@ -1,3 +1,5 @@
+import { geoCentroid, geoOrthographic, geoPath, type GeoPermissibleObjects } from "d3-geo";
+
 export interface GlobeSelection {
   country_code: string | null;
   region_code: string | null;
@@ -5,6 +7,17 @@ export interface GlobeSelection {
 
 export const REGIONAL_COUNTRIES = new Set(["US", "CA", "MX", "BR", "AR", "RU", "CN", "IN", "AU", "ID"]);
 export const GLOBE_FOCUS_MS = 600;
+export const GLOBE_RADIUS = 146;
+export const GLOBE_FOCUS_WIDTH = 300 * 0.7;
+export function countryGlobeFocus(country: GeoPermissibleObjects) {
+  const center = geoCentroid(country);
+  const rotation: [number, number, number] = [-center[0], -center[1], 0];
+  const projection = geoOrthographic().translate([150, 150]).scale(GLOBE_RADIUS).rotate(rotation);
+  const bounds = geoPath(projection).bounds(country);
+  const width = bounds[1][0] - bounds[0][0];
+  return { rotation, scale: Number.isFinite(width) && width > 0
+    ? Math.max(GLOBE_RADIUS, GLOBE_RADIUS * GLOBE_FOCUS_WIDTH / width) : GLOBE_RADIUS };
+}
 export const isGlobeTap = (distance: number) => distance < 6;
 
 export const SELECTION_RING_MIN_PX = 24;
