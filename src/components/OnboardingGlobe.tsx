@@ -134,7 +134,7 @@ export default function OnboardingGlobe({ selection, onSelect }: {
       d={path(country) ?? ""}><title>{country.properties.name}</title></path>)}
     {regions.map((region, index) => <path key={`${region.properties.region_code}-${index}`}
       data-region={region.properties.region_code}
-      className={`globe-region${region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
+      className={`globe-region${!selection.region_code || region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
       d={path(region) ?? ""}><title>{region.properties.name}</title></path>)}
   </svg>;
 }
