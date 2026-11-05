@@ -64,7 +64,7 @@ const OnboardingBirthYear = () => {
             textTransform: "uppercase",
             color: "#9E9585",
             margin: 0,
-            marginBottom: 28,
+            marginBottom: 8,
             textAlign: "center",
           }}
         >
