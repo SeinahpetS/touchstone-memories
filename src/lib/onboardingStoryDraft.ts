@@ -85,7 +85,7 @@ async function persistStory(userId: string) {
 
   // Only discard device photos once every memory and the profile have saved.
   const photoKeys = new Set(draft?.artifacts.concat(kept).flatMap(a => a.photoKey ? [a.photoKey] : []) ?? []);
-  await Promise.all([...photoKeys].map(removeOnboardingPhoto));
+  await Promise.all([...photoKeys].map(key => removeOnboardingPhoto(key)));
   localStorage.removeItem(KEY);
   clearOnboardingDraft();
 }
