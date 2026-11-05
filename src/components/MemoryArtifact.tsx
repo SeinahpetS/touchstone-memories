@@ -11,12 +11,15 @@ interface Props {
   createdAt: string;
   memoryDate?: MemoryDate;
   onClose?: () => void;
+  /** Review photos precede the category and retain a 4:3 frame. */
+  photoFirst?: boolean;
 }
 
-const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate, onClose }: Props) => {
+const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
+      {photoFirst && photoUrl && <MemoryPhoto src={photoUrl} alt={title || "Memory"} className="w-full aspect-[4/3] object-cover" />}
       {/* Inline category label */}
       <div
         className="flex items-center justify-center"
@@ -42,7 +45,7 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
       </div>
 
 
-      {photoUrl && (
+      {!photoFirst && photoUrl && (
         <MemoryPhoto src={photoUrl} alt={title || "Memory"} className="w-full rounded-lg object-cover max-h-72" />
       )}
 

@@ -7,6 +7,7 @@ import type { StoryArtifact } from "@/lib/onboardingStoryDraft";
 import OnboardingCardEditSheet from "@/components/OnboardingCardEditSheet";
 import { Button } from "@/components/ui/button";
 import { readOnboardingPhoto } from "@/lib/onboardingPhotos";
+import MemoryArtifact from "@/components/MemoryArtifact";
 
 const AEGEAN = "#0E7C86";
 
@@ -16,6 +17,7 @@ const MUTED = "#8C8880";
 const DIVIDER = "#D4D0C4";
 
 type Artifact = {
+  id?: string;
   category: string;
   title: string;
   note: string;
@@ -90,6 +92,7 @@ const StoryReview = () => {
   const saveInFlight = useRef(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
   // If nothing in state, kick back to /story-unfold
   useEffect(() => {
@@ -159,9 +162,11 @@ const StoryReview = () => {
       try {
         const draft = loadOnboardingStoryDraft();
         if (!draft) throw new Error("Missing story draft");
-        const id = crypto.randomUUID();
-        const kept = [...(draft.kept ?? []), { ...a, id }];
-        saveOnboardingStoryDraft({ ...draft, artifacts: artifacts as typeof draft.artifacts, kept: kept as typeof draft.kept, reviewIndex: index + 1 });
+        const id = a.id ?? crypto.randomUUID();
+        const updated = artifacts.map((card, i) => i === index ? { ...card, id } : card);
+        const kept = [...(draft.kept ?? []).filter(card => card.id !== id), { ...a, id }];
+        saveOnboardingStoryDraft({ ...draft, artifacts: updated as typeof draft.artifacts, kept: kept as typeof draft.kept, reviewIndex: index + 1 });
+        setArtifacts(updated);
         return id;
       } catch {
         toast.error("Couldn't keep this card on your device. Please try again.");
@@ -256,6 +261,18 @@ const StoryReview = () => {
   };
 
   const handleDismiss = () => {
+    if (isOnboarding) {
+      const remaining = artifacts.filter((_, i) => i !== index);
+      const draft = loadOnboardingStoryDraft();
+      if (!draft) return;
+      const next = Math.min(index, Math.max(0, remaining.length - 1));
+      try { saveOnboardingStoryDraft({ ...draft, artifacts: remaining as StoryArtifact[], reviewIndex: remaining.length ? next : 0 }); }
+      catch { toast.error("Couldn't keep your progress on this device."); return; }
+      setArtifacts(remaining);
+      setIndex(next);
+      if (!remaining.length) setPhase("complete");
+      return;
+    }
     advance();
   };
 
@@ -357,6 +374,39 @@ const StoryReview = () => {
   }
 
   if (done || !current) return null;
+
+  if (isOnboarding) return <div className="onboarding-review-screen">
+    <div className="flex items-center justify-center gap-2 pt-6 pb-4">
+      {dots.map(i => <span key={i} className={`onboarding-review-dot${i === index ? " is-current" : ""}`} />)}
+    </div>
+    <div className="onboarding-review-carousel" aria-label="Extracted memories" aria-roledescription="carousel"
+      onPointerDown={e => { if (savingOverlay) return; swipeStart.current = { x: e.clientX, y: e.clientY }; }}
+      onPointerUp={e => {
+        const start = swipeStart.current; swipeStart.current = null;
+        if (!start || savingOverlay) return;
+        const dx = e.clientX - start.x, dy = e.clientY - start.y;
+        if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
+        setIndex(i => Math.max(0, Math.min(total - 1, i + (dx < 0 ? 1 : -1))));
+      }} onPointerCancel={() => { swipeStart.current = null; }}>
+      <div key={index} className="onboarding-shared-card">
+        <MemoryArtifact photoUrl={photoPreview} photoFirst category={current.category} title={current.title} note={current.note}
+          createdAt={new Date(storedDraft?.capturedAt || Date.now()).toISOString()} />
+      </div>
+    </div>
+    <div className="onboarding-review-actions">
+      <Button className="onboarding-keep-this" disabled={savingOverlay} onClick={handleSave}>Keep this</Button>
+      <Button className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors h-auto" disabled={savingOverlay} onClick={handleEdit}>Edit</Button>
+      <Button variant="ghost" className="onboarding-dismiss" disabled={savingOverlay} onClick={handleDismiss}>Dismiss</Button>
+    </div>
+    {sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
+      const updated = artifacts.map((a, i) => i === index ? edited : a);
+      const draft = loadOnboardingStoryDraft();
+      if (!draft) throw new Error("Missing story draft");
+      saveOnboardingStoryDraft({ ...draft, artifacts: updated as StoryArtifact[] });
+      setArtifacts(updated); setSheetOpen(false);
+    }} />}
+    {savingOverlay && <div className="onboarding-saved-overlay"><p>Saved. Part of your story now.</p></div>}
+  </div>;
 
   return (
     <div

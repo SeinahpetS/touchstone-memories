@@ -5,6 +5,7 @@ import { resolveProfileCity } from '@/lib/profileCity';
 import { removeOnboardingPhoto, uploadOnboardingPhoto } from '@/lib/onboardingPhotos';
 
 export type StoryArtifact = {
+  id?: string;
   category: Database["public"]["Enums"]["memory_category"];
   title: string;
   note: string;
