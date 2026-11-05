@@ -127,7 +127,7 @@
   stroke-width: 0.75px;
   stroke-linejoin: round;
 }
-.globe-graticule { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 1px; }
+.globe-graticule { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 0.75px; opacity: 0.5; }
 .globe-graticule, .globe-edge { pointer-events: none; }
 .globe-edge { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 1px; }
 .globe-selected { fill: hsl(var(--globe-selection)); }
