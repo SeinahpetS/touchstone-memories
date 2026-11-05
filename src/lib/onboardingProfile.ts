@@ -23,6 +23,8 @@ export async function saveOnboardingAnswersToProfile(userId: string): Promise<vo
     patch.location_display = draft?.locationDisplay?.trim() || city;
     patch.region = draft?.region?.trim() || null;
     patch.country = draft?.country?.trim() || null;
+    patch.country_code = draft?.country_code ?? null;
+    patch.region_code = draft?.region_code ?? null;
     patch.place_id = draft?.placeId ?? null;
   }
   const { error } = await (supabase as any).from("profiles").update(patch).eq("id", userId);

@@ -79,6 +79,8 @@ async function persistStory(userId: string) {
     ...(personal?.region ? { region: personal.region } : {}),
     ...(personal?.country ? { country: personal.country } : {}),
     ...(personal?.locationDisplay ? { location_display: personal.locationDisplay } : {}),
+    ...(personal?.country_code ? { country_code: personal.country_code } : {}),
+    ...(personal?.region_code ? { region_code: personal.region_code } : {}),
   }).eq("id", userId);
   if (error) throw error;
 

@@ -8,6 +8,13 @@
       "when": 1793842520988,
       "tag": "0000_profile_city_place",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793922060351,
+      "tag": "0001_add_profile_location_codes",
+      "breakpoints": true
     }
   ]
 }

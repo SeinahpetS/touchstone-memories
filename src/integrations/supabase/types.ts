@@ -47,6 +47,7 @@ export type Database = {
           city: string | null
           city_lookup_done: boolean
           country: string | null
+          country_code: string | null
           created_at: string
           current_period_end: string | null
           first_name: string | null
@@ -59,6 +60,7 @@ export type Database = {
           onboarding_complete: boolean
           place_id: string | null
           region: string | null
+          region_code: string | null
           save_offer_redeemed: boolean
           state: string | null
           stripe_customer_id: string | null
@@ -80,6 +82,7 @@ export type Database = {
           city?: string | null
           city_lookup_done?: boolean
           country?: string | null
+          country_code?: string | null
           created_at?: string
           current_period_end?: string | null
           first_name?: string | null
@@ -92,6 +95,7 @@ export type Database = {
           onboarding_complete?: boolean
           place_id?: string | null
           region?: string | null
+          region_code?: string | null
           save_offer_redeemed?: boolean
           state?: string | null
           stripe_customer_id?: string | null
@@ -113,6 +117,7 @@ export type Database = {
           city?: string | null
           city_lookup_done?: boolean
           country?: string | null
+          country_code?: string | null
           created_at?: string
           current_period_end?: string | null
           first_name?: string | null
@@ -125,6 +130,7 @@ export type Database = {
           onboarding_complete?: boolean
           place_id?: string | null
           region?: string | null
+          region_code?: string | null
           save_offer_redeemed?: boolean
           state?: string | null
           stripe_customer_id?: string | null

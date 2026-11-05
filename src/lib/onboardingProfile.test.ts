@@ -38,6 +38,8 @@ describe("a signed-in visitor's answers go straight to the profile", () => {
       location_display: "Seattle, Washington, US",
       region: "Washington",
       country: "United States",
+      country_code: "US",
+      region_code: "WA",
       place_id: null,
     });
     expect(mocks.eq).toHaveBeenCalledWith("id", "account-1");
