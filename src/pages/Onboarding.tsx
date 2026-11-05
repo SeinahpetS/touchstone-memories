@@ -398,8 +398,6 @@ const Onboarding = () => {
       if (d.region) profilePatch.region = d.region;
       if (d.country) profilePatch.country = d.country;
       if (d.locationDisplay) profilePatch.location_display = d.locationDisplay;
-      if (typeof d.lat === "number") profilePatch.lat = d.lat;
-      if (typeof d.lng === "number") profilePatch.lng = d.lng;
       await (supabase as any).from("profiles").update(profilePatch).eq("id", user.id);
     } catch {
       toast.error("Couldn't save your first memory — try again from the archive.");
@@ -498,8 +496,6 @@ const Onboarding = () => {
             region: data.location?.region ?? "",
             country: data.location?.country ?? "",
             locationDisplay: data.location?.locationDisplay ?? "",
-            lat: data.location?.lat ?? null,
-            lng: data.location?.lng ?? null,
           });
           navigate("/story-unfold");
         }}

@@ -7,19 +7,11 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import OnboardingIntroScreen from "@/components/OnboardingIntroScreen";
-import OnboardingFlow from "@/components/OnboardingFlow";
 import OnboardingDotIndicator, { markOnboardingComplete } from "@/components/OnboardingDotIndicator";
-import {
-  loadOnboardingDraft,
-  saveOnboardingDraft,
-  emptyOnboardingDraft,
-} from "@/lib/onboardingDraft";
+import { ARCHIVE_PATH, resolvePostSignInPath } from "@/lib/postSignInRoute";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [showIntro, setShowIntro] = useState(false);
-  const [showFlow, setShowFlow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -30,10 +22,11 @@ const Auth = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) {
-      markOnboardingComplete();
-      navigate("/archive", { replace: true });
-    }
+    if (loading || !user) return;
+    void resolvePostSignInPath(user.id).then((dest) => {
+      if (dest === ARCHIVE_PATH) markOnboardingComplete();
+      navigate(dest, { replace: true });
+    });
   }, [user, loading, navigate]);
 
   useEffect(() => {
@@ -112,51 +105,6 @@ const Auth = () => {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-muted-foreground">Loading…</p>
       </div>
-    );
-  }
-
-  if (showIntro) {
-    return (
-      <OnboardingIntroScreen
-        onBegin={() => {
-          setShowIntro(false);
-          setShowFlow(true);
-        }}
-        onSkip={() => {
-          setShowIntro(false);
-          setShowFlow(true);
-        }}
-      />
-    );
-  }
-
-  if (showFlow) {
-    const draft = loadOnboardingDraft() ?? emptyOnboardingDraft();
-    return (
-      <OnboardingFlow
-        initialFirstName={draft.firstName ?? ""}
-        initialBirthMonth={draft.birthMonth ?? null}
-        initialBirthYear={draft.birthYear ?? null}
-        initialCity={draft.city ?? ""}
-        initialState={draft.state ?? ""}
-        onComplete={(data) => {
-          saveOnboardingDraft({
-            ...draft,
-            firstName: data.firstName,
-            birthMonth: data.birthMonth,
-            birthYear: data.birthYear,
-            city: data.location?.city ?? data.city ?? "",
-            state: data.location?.region ?? data.state ?? "",
-            region: data.location?.region ?? "",
-            country: data.location?.country ?? "",
-            locationDisplay: data.location?.locationDisplay ?? "",
-            lat: data.location?.lat ?? null,
-            lng: data.location?.lng ?? null,
-          });
-          if (data.firstName) setName(data.firstName);
-          navigate("/story-unfold");
-        }}
-      />
     );
   }
 
@@ -284,7 +232,7 @@ const Auth = () => {
               if (isSignUp) {
                 setIsSignUp(false);
               } else {
-                setShowIntro(true);
+                navigate("/constellation");
               }
             }}
             className="text-foreground underline underline-offset-4"

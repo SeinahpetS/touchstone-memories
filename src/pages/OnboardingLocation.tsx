@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { saveOnboardingAnswersToProfile } from "@/lib/onboardingProfile";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
 import { ChevronLeft, Globe2 } from "lucide-react";
 import world from "@/assets/geography/countries-110m.json";
@@ -47,19 +49,31 @@ const OnboardingLocation = () => {
     setShowSuggestions(false);
     setActiveSuggestion(-1);
   };
-  const advance = () => navigate('/onboarding/ready');
-  const handleSkip = () => advance();
+  // A signed-in visitor never needs the ready or create-account screens: the
+  // answers go straight to the profile and the flow is finished.
+  const advance = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      try {
+        await saveOnboardingAnswersToProfile(session.user.id);
+      } catch {
+        toast.error("Couldn't save your details. We'll try again in your archive.");
+      }
+      navigate('/archive');
+      return;
+    }
+    navigate('/onboarding/ready');
+  };
+  const handleSkip = () => { void advance(); };
   const handleContinue = async () => {
     if (!city.trim() || submitting) return;
     setSubmitting(true);
     try {
       const details = offlineCityDraft(chosenCity, city);
       saveOnboardingDraft({ ...existing, ...details });
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        await supabase.from('profiles').update({ city: details.city, location_display: details.locationDisplay, region: details.region || null, country: details.country || null, place_id: null }).eq('id', session.user.id);
-      }
-    } finally { advance(); }
+    } finally {
+      await advance();
+    }
   };
 
     return (

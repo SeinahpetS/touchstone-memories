@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import OnboardingDotIndicator, {
   markOnboardingComplete,
 } from "@/components/OnboardingDotIndicator";
@@ -81,6 +82,55 @@ const OnboardingCreateAccount = () => {
     } catch (error) { throw error; }
   };
 
+  // Coming back from a Google round-trip: run the same post-sign-up steps the
+  // email path runs, then crossfade to the archive.
+  const resumedRef = useRef(false);
+  useEffect(() => {
+    let cancelled = false;
+    const finish = async (userId: string) => {
+      if (resumedRef.current) return;
+      resumedRef.current = true;
+      try {
+        await migrateDraftToProfile(userId);
+        await migrateOnboardingStory(userId);
+      } catch {
+        /* Archive entry retries the save. */
+      }
+      markOnboardingComplete();
+      clearOnboardingDraft();
+      setFadingOut(true);
+      window.setTimeout(() => navigate("/archive"), 400);
+    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!cancelled && session?.user) void finish(session.user.id);
+    });
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!cancelled && session?.user) void finish(session.user.id);
+    });
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const handleGoogle = async () => {
+    setError(null);
+    setSubmitting(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: `${window.location.origin}/onboarding/create-account`,
+      });
+      if (result.error) throw result.error;
+      // The browser is on its way back to this screen with a session.
+      if (result.redirected) return;
+    } catch (err: any) {
+      setSubmitting(false);
+      const msg = err?.message || "Couldn't sign in with Google. Try again.";
+      setError(msg);
+      toast.error(msg);
+    }
+  };
+
   const handleCreateAccount = async () => {
     if (password.length < 8) {
       setError("Password must be at least 8 characters.");
@@ -127,6 +177,34 @@ const OnboardingCreateAccount = () => {
 
   // Dot 6 fills solid on success — pass current=7 so all six dots render filled.
   const dotCurrent = (fadingOut ? 7 : 6) as 1 | 2 | 3 | 4 | 5 | 6;
+
+  const googleButton = (
+    <button
+      type="button"
+      onClick={handleGoogle}
+      disabled={submitting}
+      className="w-full flex items-center justify-center gap-2"
+      style={{
+        fontFamily: "'Jost', sans-serif",
+        fontSize: 12,
+        color: "#9E9585",
+        marginTop: 20,
+        textAlign: "center",
+        background: "transparent",
+        border: "none",
+        cursor: submitting ? "not-allowed" : "pointer",
+        opacity: submitting ? 0.6 : 1,
+      }}
+    >
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+        <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+      </svg>
+      Continue with Google
+    </button>
+  );
 
   return (
     <div
@@ -234,6 +312,8 @@ const OnboardingCreateAccount = () => {
             Continue
           </button>
 
+          {googleButton}
+
           <Link to="/auth" style={SIGN_IN_LINK_STYLE}>
             Already have an account? Sign in
           </Link>
@@ -321,6 +401,8 @@ const OnboardingCreateAccount = () => {
           >
             {submitting ? "Creating…" : "Create My Archive"}
           </button>
+
+          {googleButton}
 
           <Link to="/auth" style={SIGN_IN_LINK_STYLE}>
             Already have an account? Sign in

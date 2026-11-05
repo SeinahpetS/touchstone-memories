@@ -36,8 +36,6 @@ export interface OnboardingDraft {
   country_code?: string | null;
   region_code?: string | null;
   locationDisplay?: string;
-  lat?: number | null;
-  lng?: number | null;
 }
 
 const KEY = "ts_onboarding_draft_v1";
@@ -70,8 +68,6 @@ export const emptyOnboardingDraft = (): OnboardingDraft => ({
   region: "",
   country: "",
   locationDisplay: "",
-  lat: null,
-  lng: null,
 });
 
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
