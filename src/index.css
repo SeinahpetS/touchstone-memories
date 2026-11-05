@@ -6,10 +6,10 @@
 
 @layer base {
   :root {
-    --globe-ocean: 210 35% 18%;
-    --globe-land: 45 26% 88%;
-    --globe-line: 209 30% 42%;
-    --globe-selection: 43 89% 38%;
+    --globe-ocean: 210 34.782609% 18.039216%;
+    --globe-land: 45 25.806452% 87.843137%;
+    --globe-line: 209.0625 30.188679% 41.568627%;
+    --globe-selection: 42.65896 88.717949% 38.235294%;
     /* Touchstone palette — all HSL */
     --background: 39 33% 92%;        /* #F2EEE5 Soft Ivory */
     --foreground: 207 31% 24%;       /* #2C3E50 Ink */
@@ -111,7 +111,7 @@
   display: block;
   width: 300px;
   height: 300px;
-  max-width: 100%;
+  max-width: none;
   flex-shrink: 0;
   margin-bottom: 24px;
   touch-action: none;

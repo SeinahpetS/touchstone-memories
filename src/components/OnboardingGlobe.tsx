@@ -41,8 +41,8 @@ export default function OnboardingGlobe({ selection, onSelect }: {
     const targetRotation: View["rotation"] = [-center[0], -center[1], 0];
     const fitted = geoOrthographic().translate([150, 150]).scale(146).rotate(targetRotation);
     const bounds = geoPath(fitted).bounds(country);
-    const span = Math.max(bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]);
-    const targetScale = Number.isFinite(span) && span > 0 ? 146 * 270 / span : 146;
+    const radius = Math.max(...bounds.flat().map(value => Math.abs(value - 150)));
+    const targetScale = Number.isFinite(radius) && radius > 0 ? 146 * 135 / radius : 146;
     const start = view;
     const longitudeDelta = ((targetRotation[0] - start.rotation[0] + 540) % 360) - 180;
     const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : GLOBE_FOCUS_MS;
@@ -132,7 +132,7 @@ export default function OnboardingGlobe({ selection, onSelect }: {
       data-country={country.properties.country_code}
       className={`globe-country${country.properties.country_code === selection.country_code ? " globe-selected" : ""}`}
       d={path(country) ?? ""}><title>{country.properties.name}</title></path>)}
-    {regions.map((region, index) => <path key={region.properties.region_code ?? index}
+    {regions.map((region, index) => <path key={`${region.properties.region_code}-${index}`}
       data-region={region.properties.region_code}
       className={`globe-region${region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
       d={path(region) ?? ""}><title>{region.properties.name}</title></path>)}
