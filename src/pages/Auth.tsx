@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import OnboardingDotIndicator, { markOnboardingComplete } from "@/components/OnboardingDotIndicator";
+import { ARCHIVE_PATH, resolvePostSignInPath } from "@/lib/postSignInRoute";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -21,10 +22,11 @@ const Auth = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && user) {
-      markOnboardingComplete();
-      navigate("/archive", { replace: true });
-    }
+    if (loading || !user) return;
+    void resolvePostSignInPath(user.id).then((dest) => {
+      if (dest === ARCHIVE_PATH) markOnboardingComplete();
+      navigate(dest, { replace: true });
+    });
   }, [user, loading, navigate]);
 
   useEffect(() => {
