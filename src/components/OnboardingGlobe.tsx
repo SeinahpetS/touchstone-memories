@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { geoCentroid, geoContains, geoDistance, geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
+import { geoCentroid, geoContains, geoDistance, geoGraticule, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
@@ -14,7 +14,7 @@ function decode(data: unknown): Place[] {
   return (feature(topology, object) as FeatureCollection<Geometry, Place["properties"]>).features;
 }
 const countries = decode(world);
-const graticule = geoGraticule10();
+const graticule = geoGraticule().step([30, 30]).extent([[-180, -60], [180, 60]])();
 const regionFiles = import.meta.glob("../assets/geography/regions/*.json");
 type View = { rotation: [number, number, number]; scale: number };
 const INITIAL_VIEW: View = { rotation: [30, -15, 0], scale: GLOBE_RADIUS };
@@ -137,6 +137,7 @@ export default function OnboardingGlobe({ selection, onSelect }: {
     <defs><clipPath id={clipId}><circle cx={150} cy={150} r={GLOBE_RADIUS} /></clipPath></defs>
     <circle className="globe-ocean" cx={150} cy={150} r={GLOBE_RADIUS} />
     <g clipPath={`url(#${clipId})`}>
+    <path className="globe-graticule" d={path(graticule) ?? ""} />
     {countries.map((country, index) => <path key={country.id ?? index}
       data-country={country.properties.country_code}
       className={`globe-country${country.properties.country_code === selection.country_code ? " globe-selected" : ""}`}
@@ -145,7 +146,6 @@ export default function OnboardingGlobe({ selection, onSelect }: {
       data-region={region.properties.region_code}
       className={`globe-region${!selection.region_code || region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
       d={path(region) ?? ""}><title>{region.properties.name}</title></path>)}
-    <path className="globe-graticule" d={path(graticule) ?? ""} />
     {ring && <circle className="globe-selection-ring" cx={ring.cx} cy={ring.cy} r={SELECTION_RING_RADIUS} aria-hidden="true" />}
     </g>
     <circle className="globe-edge" cx={150} cy={150} r={GLOBE_RADIUS} aria-hidden="true" />
