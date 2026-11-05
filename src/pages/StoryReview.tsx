@@ -21,6 +21,8 @@ type LocationState = {
   sessionId?: string;
   artifacts?: Artifact[];
   transcript?: string;
+  /** Pre-signup onboarding review: keep cards locally, no Supabase saves. */
+  onboarding?: boolean;
 };
 
 // Soft chime using WebAudio — no asset needed
@@ -58,6 +60,7 @@ const StoryReview = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const locState = (state ?? {}) as LocationState;
+  const isOnboarding = !!locState.onboarding;
 
   const [sessionId, setSessionId] = useState<string | undefined>(locState.sessionId);
   const [artifacts, setArtifacts] = useState<Artifact[]>(locState.artifacts ?? []);
@@ -116,6 +119,23 @@ const StoryReview = () => {
   };
 
   const persistArtifact = async (a: Artifact): Promise<string | null> => {
+    if (isOnboarding) {
+      // Pre-signup: stash kept cards in the onboarding draft; they are
+      // persisted to the touchstones table after account creation.
+      try {
+        const raw = localStorage.getItem("ts_onboarding_draft");
+        const draft = raw ? JSON.parse(raw) : {};
+        const kept = Array.isArray(draft.kept) ? draft.kept : [];
+        kept.push(a);
+        localStorage.setItem(
+          "ts_onboarding_draft",
+          JSON.stringify({ ...draft, kept }),
+        );
+      } catch {
+        /* ignore */
+      }
+      return `onboarding-${Date.now()}`;
+    }
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
     if (!user) {
@@ -246,51 +266,55 @@ const StoryReview = () => {
         >
           {savedCount} {savedCount === 1 ? "touchstone" : "touchstones"} saved.
         </h2>
-        <p
-          className="text-center mt-3"
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: 13,
-            color: MUTED,
-          }}
-        >
-          Feel like something's missing?
-        </p>
+        {!isOnboarding && (
+          <p
+            className="text-center mt-3"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 13,
+              color: MUTED,
+            }}
+          >
+            Feel like something's missing?
+          </p>
+        )}
+
+        {!isOnboarding && (
+          <button
+            type="button"
+            onClick={handleTellMeMore}
+            disabled={continuing}
+            className="mt-6"
+            style={{
+              background: "none",
+              border: "none",
+              color: AEGEAN,
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              cursor: continuing ? "not-allowed" : "pointer",
+              opacity: continuing ? 0.6 : 1,
+              padding: 6,
+            }}
+          >
+            {continuing ? "Looking again…" : "Tell Me More →"}
+          </button>
+        )}
 
         <button
           type="button"
-          onClick={handleTellMeMore}
-          disabled={continuing}
-          className="mt-6"
-          style={{
-            background: "none",
-            border: "none",
-            color: AEGEAN,
-            fontFamily: "'Jost', sans-serif",
-            fontSize: 14,
-            cursor: continuing ? "not-allowed" : "pointer",
-            opacity: continuing ? 0.6 : 1,
-            padding: 6,
-          }}
-        >
-          {continuing ? "Looking again…" : "Tell Me More →"}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate("/archive")}
+          onClick={() => navigate(isOnboarding ? "/onboarding-name" : "/archive")}
           className="mt-3"
           style={{
             background: "none",
             border: "none",
-            color: MUTED,
+            color: isOnboarding ? BRAND_NAVY : MUTED,
             fontFamily: "'Jost', sans-serif",
-            fontSize: 13,
+            fontSize: isOnboarding ? 15 : 13,
             cursor: "pointer",
             padding: 6,
           }}
         >
-          Back to your archive →
+          {isOnboarding ? "Continue →" : "Back to your archive →"}
         </button>
       </div>
     );

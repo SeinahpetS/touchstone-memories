@@ -23,15 +23,18 @@ const OnboardingStoryUnfold = () => {
       return;
     }
     setLoading(true);
+    let artifacts: any[] = [];
     try {
       const { data, error } = await supabase.functions.invoke(
         "extract-story-artifacts",
         { body: { story: trimmed } },
       );
-      const artifacts = (data as any)?.artifacts;
+      artifacts = Array.isArray((data as any)?.artifacts)
+        ? (data as any).artifacts
+        : [];
       const payload = {
         story: trimmed,
-        artifacts: Array.isArray(artifacts) ? artifacts : [],
+        artifacts,
         capturedAt: Date.now(),
       };
       try {
@@ -55,6 +58,12 @@ const OnboardingStoryUnfold = () => {
       }
     } finally {
       setLoading(false);
+    }
+    if (artifacts.length > 0) {
+      navigate("/story-unfold/review", {
+        state: { artifacts, transcript: trimmed, onboarding: true },
+      });
+    } else {
       advance();
     }
   };
