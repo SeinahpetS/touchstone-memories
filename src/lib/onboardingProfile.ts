@@ -25,7 +25,7 @@ export async function saveOnboardingAnswersToProfile(userId: string): Promise<vo
     patch.country = draft?.country?.trim() || null;
     patch.place_id = draft?.placeId ?? null;
   }
-  const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+  const { error } = await (supabase as any).from("profiles").update(patch).eq("id", userId);
   if (error) throw error;
   markOnboardingComplete();
   clearOnboardingDraft();
