@@ -1,13 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ upsert: vi.fn(), update: vi.fn(), eq: vi.fn() }));
+const mocks = vi.hoisted(() => ({ upsert: vi.fn(), update: vi.fn(), eq: vi.fn(), invoke: vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { from: (table: string) => table === "touchstones"
+  supabase: { functions: { invoke: mocks.invoke }, from: (table: string) => table === "touchstones"
     ? { upsert: mocks.upsert }
     : { update: mocks.update } },
 }));
 
 import { loadOnboardingStoryDraft, migrateOnboardingStory, saveOnboardingStoryDraft } from "./onboardingStoryDraft";
+import { emptyOnboardingDraft, saveOnboardingDraft } from './onboardingDraft';
 
 const artifacts = [
   { category: "moment" as const, title: "Sunday Pancakes", note: "Pancakes and coffee." },
@@ -21,9 +22,26 @@ beforeEach(() => {
   mocks.upsert.mockResolvedValue({ error: null });
   mocks.eq.mockResolvedValue({ error: null });
   mocks.update.mockReturnValue({ eq: mocks.eq });
+  mocks.invoke.mockResolvedValue({ error: null });
 });
 
 describe("onboarding sample cards", () => {
+  it('resolves city after signed-in migration even when the first story was skipped', async () => {
+    saveOnboardingDraft({ ...emptyOnboardingDraft(), city: 'Seattle, WA', locationDisplay: 'Seattle, WA' });
+    await migrateOnboardingStory('account-1');
+    expect(mocks.update.mock.calls[0][0]).toMatchObject({ city: 'Seattle, WA', place_id: null });
+    expect(mocks.update.mock.calls[0][0]).not.toHaveProperty('lat');
+    expect(mocks.update.mock.calls[0][0]).not.toHaveProperty('lng');
+    expect(mocks.invoke).toHaveBeenCalledExactlyOnceWith('city-places', { body: { mode: 'resolve' } });
+    await migrateOnboardingStory('account-1');
+    expect(mocks.invoke).toHaveBeenCalledTimes(1);
+  });
+  it('keeps onboarding completion working if optional city lookup fails', async () => {
+    saveOnboardingDraft({ ...emptyOnboardingDraft(), city: 'My hometown' });
+    mocks.invoke.mockResolvedValueOnce({ error: new Error('Google unavailable') });
+    await expect(migrateOnboardingStory('account-1')).resolves.toBeUndefined();
+    expect(mocks.update.mock.calls[0][0]).toMatchObject({ city: 'My hometown', place_id: null });
+  });
   it("preserves all three cards and review position across reloads", () => {
     saveOnboardingStoryDraft({ story: "Sunday mornings", artifacts, capturedAt: 1, kept: [artifacts[0]], reviewIndex: 1 });
     expect(loadOnboardingStoryDraft()?.artifacts.map(a => a.title)).toEqual(["Sunday Pancakes", "Grandma June", "The Yellow Kitchen"]);

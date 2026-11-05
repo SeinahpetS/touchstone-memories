@@ -29,6 +29,7 @@ export interface OnboardingDraft {
   birthMonth?: number | null;
   birthYear?: number | null;
   city?: string;
+  placeId?: string | null;
   state?: string;
   region?: string;
   country?: string;

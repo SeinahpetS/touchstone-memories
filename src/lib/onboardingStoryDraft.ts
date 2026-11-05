@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { clearOnboardingDraft, loadOnboardingDraft } from "@/lib/onboardingDraft";
+import { resolveProfileCity } from '@/lib/profileCity';
 
 export type StoryArtifact = {
   category: Database["public"]["Enums"]["memory_category"];
@@ -44,12 +45,12 @@ export function migrateOnboardingStory(userId: string): Promise<void> {
 
 async function persistStory(userId: string) {
   const draft = loadOnboardingStoryDraft();
-  if (!draft) return;
-  const kept = (draft.kept ?? []).map((artifact) => ({
+  if (!draft && !loadOnboardingDraft()) return;
+  const kept = (draft?.kept ?? []).map((artifact) => ({
     ...artifact,
     id: artifact.id ?? crypto.randomUUID(),
   }));
-  saveOnboardingStoryDraft({ ...draft, kept });
+  if (draft) saveOnboardingStoryDraft({ ...draft, kept });
 
   if (kept.length) {
     const { error } = await supabase.from("touchstones").upsert(
@@ -66,12 +67,15 @@ async function persistStory(userId: string) {
     ...(personal?.birthYear ? { birth_year: personal.birthYear } : {}),
     ...(personal?.birthMonth ? { birth_month: personal.birthMonth } : {}),
     ...(personal?.city ? { city: personal.city } : {}),
+    ...(personal?.city ? { place_id: personal.placeId ?? null } : {}),
     ...(personal?.state ? { state: personal.state } : {}),
     ...(personal?.region ? { region: personal.region } : {}),
     ...(personal?.country ? { country: personal.country } : {}),
     ...(personal?.locationDisplay ? { location_display: personal.locationDisplay } : {}),
   }).eq("id", userId);
   if (error) throw error;
+
+  await resolveProfileCity();
 
   localStorage.removeItem(KEY);
   clearOnboardingDraft();

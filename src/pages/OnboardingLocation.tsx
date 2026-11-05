@@ -27,6 +27,9 @@ const OnboardingLocation = () => {
         saveOnboardingDraft({
           ...existing,
           city: trimmed,
+          placeId: null,
+          region: '',
+          country: '',
           locationDisplay: trimmed,
         });
         const {
@@ -35,7 +38,7 @@ const OnboardingLocation = () => {
         if (session?.user) {
           await (supabase as any)
             .from("profiles")
-            .update({ city: trimmed, location_display: trimmed })
+            .update({ city: trimmed, location_display: trimmed, region: null, country: null, place_id: null })
             .eq("id", session.user.id);
         }
       }
