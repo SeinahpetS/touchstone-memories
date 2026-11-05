@@ -1,5 +1,5 @@
 # Onboarding card reliability
-- [ ] Restyle location, add expanded/world globe states and pinch return, lazy country city suggestions, typing focus and city confirmation; test persistence without coordinates.
+- [x] Restyle location, add expanded/world globe states and pinch return, lazy country city suggestions, typing focus and city confirmation; test persistence without coordinates.
 - [x] Keep country focus orthographic with 600ms rotation/zoom, 70% width fitting, and a visible globe edge/graticule; verify desktop and phone.
 - [x] Add and verify the offline onboarding globe, country regions, and ranked local city suggestions.
 - [x] Add signed-in city matching and Settings autocomplete without coordinates; test save rules.

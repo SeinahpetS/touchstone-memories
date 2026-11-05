@@ -124,7 +124,6 @@
 }
 .onboarding-globe:active { cursor: grabbing; }
 .onboarding-globe:focus-visible { outline: none; }
-.onboarding-globe:focus-visible .globe-edge { stroke: hsl(var(--globe-selection)); }
 .globe-ocean { fill: hsl(var(--globe-ocean)); }
 .globe-country, .globe-region {
   fill: hsl(var(--globe-land));
@@ -136,6 +135,7 @@
 .globe-graticule, .globe-edge { pointer-events: none; }
 .globe-edge { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 1.5px; }
 .globe-region { stroke: hsl(var(--globe-ocean)); stroke-width: 1px; }
+.globe-country, .globe-region, .globe-graticule, .globe-edge, .globe-parent-outline, .globe-selection-ring { vector-effect: non-scaling-stroke; }
 .globe-parent-selected { fill: hsl(var(--globe-land)); }
 .globe-parent-outline { fill: none; stroke: hsl(var(--globe-selection)); stroke-width: 1.5px; pointer-events: none; }
 .globe-expanded { width: min(342px, 100vw); height: min(342px, 100vw); }
