@@ -60,6 +60,16 @@ export default forwardRef<GlobeHandle, {
 
   useEffect(() => () => { cancelAnimationFrame(frame.current); loadVersion.current++; }, []);
 
+  useEffect(() => {
+    const code = selection.country_code;
+    if (!code || !REGIONAL_COUNTRIES.has(code)) { setRegions([]); return; }
+    const loader = regionFiles[`../assets/geography/regions/${code}.json`];
+    if (!loader) return;
+    let active = true;
+    void loader().then(module => { if (active) setRegions(decode((module as { default: unknown }).default)); });
+    return () => { active = false; };
+  }, [selection.country_code]);
+
   function animateView(targetRotation: View["rotation"], targetScale: number) {
     cancelAnimationFrame(frame.current);
     const start = view;
