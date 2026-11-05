@@ -310,24 +310,29 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
             justifyContent: "flex-start",
           }}
         >
-          {revealedTexts.map((t, i) => (
-            <p
-              key={i}
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontStyle: "italic",
-                fontSize: 17,
-                color: INK,
-                textAlign: "center",
-                lineHeight: 1.6,
-                margin: 0,
-                animation: "ts-ci-fade 400ms ease forwards",
-                opacity: 0,
-              }}
-            >
-              {t}
-            </p>
-          ))}
+          {revealedTexts.map((t, i) => {
+            const isGold = t === "entirely your own.";
+            return (
+              <p
+                key={i}
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: "italic",
+                  fontSize: 17,
+                  color: INK,
+                  textAlign: "center",
+                  lineHeight: 1.6,
+                  margin: 0,
+                  animation: isGold
+                    ? "ts-gold-reveal 2400ms ease forwards"
+                    : "ts-ci-fade 400ms ease forwards",
+                  opacity: 0,
+                }}
+              >
+                {t}
+              </p>
+            );
+          })}
         </div>
         <p
           style={{
@@ -343,7 +348,7 @@ const ConstellationIntro = ({ onComplete }: ConstellationIntroProps = {}) => {
           tap anywhere to continue
         </p>
       </div>
-      <style>{`@keyframes ts-ci-fade { from { opacity: 0 } to { opacity: 1 } }`}</style>
+      <style>{`@keyframes ts-ci-fade { from { opacity: 0 } to { opacity: 1 } } @keyframes ts-gold-reveal { 0% { opacity: 0; color: ${GOLD}; text-shadow: 0 0 14px rgba(184, 134, 11, 0.65); } 17% { opacity: 1; color: ${GOLD}; text-shadow: 0 0 14px rgba(184, 134, 11, 0.65); } 58% { color: ${GOLD}; text-shadow: 0 0 14px rgba(184, 134, 11, 0.65); } 100% { opacity: 1; color: ${INK}; text-shadow: 0 0 0 rgba(184, 134, 11, 0); } }`}</style>
     </div>
   );
 };
