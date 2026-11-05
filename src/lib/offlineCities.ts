@@ -25,7 +25,7 @@ export function offlineCityDraft(row: CityRow | null, text: string) {
   return {
     city: row?.[0] ?? text.trim(),
     region: row?.[2] ?? "",
-    country: row?.[1] ?? "",
+    country: row ? new Intl.DisplayNames(["en"], { type: "region" }).of(row[1]) ?? row[1] : "",
     country_code: row?.[1] ?? null,
     region_code: row?.[3] ?? null,
     placeId: null,

@@ -4,7 +4,7 @@ import { offlineCityDraft, searchOfflineCities } from "./offlineCities";
 describe("offline onboarding city selection", () => {
   it("saves selected city details and codes without coordinates", () => {
     expect(offlineCityDraft(["Seattle", "US", "Washington", "US-WA", 737015], "Seattle")).toEqual({
-      city: "Seattle", region: "Washington", country: "US", country_code: "US", region_code: "US-WA", placeId: null, locationDisplay: "Seattle, Washington, US",
+      city: "Seattle", region: "Washington", country: "United States", country_code: "US", region_code: "US-WA", placeId: null, locationDisplay: "Seattle, Washington, US",
     });
   });
   it("saves unselected typed text with null codes", () => {
