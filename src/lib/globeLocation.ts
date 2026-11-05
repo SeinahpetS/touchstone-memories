@@ -7,6 +7,14 @@ export const REGIONAL_COUNTRIES = new Set(["US", "CA", "MX", "BR", "AR", "RU", "
 export const GLOBE_FOCUS_MS = 600;
 export const isGlobeTap = (distance: number) => distance < 6;
 
+export const SELECTION_RING_MIN_PX = 24;
+export const SELECTION_RING_RADIUS = 11;
+export function needsSelectionRing(bounds: [[number, number], [number, number]]): boolean {
+  const [minX, minY] = bounds[0];
+  const [maxX, maxY] = bounds[1];
+  return Math.max(maxX - minX, maxY - minY) < SELECTION_RING_MIN_PX;
+}
+
 export type CityRow = [name: string, country: string, region: string, regionCode: string | null, population: number];
 export const normalizeCity = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 

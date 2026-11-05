@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GLOBE_FOCUS_MS, REGIONAL_COUNTRIES, isGlobeTap, rankLocalCities, type CityRow } from "./globeLocation";
+import { GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
 import countries from "@/assets/geography/countries-110m.json";
 
 describe("onboarding globe rules", () => {
@@ -9,6 +9,13 @@ describe("onboarding globe rules", () => {
     expect(isGlobeTap(12)).toBe(false);
   });
   it("focuses for 600ms", () => expect(GLOBE_FOCUS_MS).toBe(600));
+  it("rings selections smaller than 24px across on screen", () => {
+    expect(SELECTION_RING_MIN_PX).toBe(24);
+    expect(SELECTION_RING_RADIUS).toBe(11);
+    expect(needsSelectionRing([[150, 150], [155, 156]])).toBe(true);
+    expect(needsSelectionRing([[150, 150], [174, 160]])).toBe(false);
+    expect(needsSelectionRing([[150, 150], [160, 174]])).toBe(false);
+  });
   it("loads regions for exactly the ten requested countries", () => {
     expect([...REGIONAL_COUNTRIES]).toEqual(["US", "CA", "MX", "BR", "AR", "RU", "CN", "IN", "AU", "ID"]);
     expect(REGIONAL_COUNTRIES.has("FR")).toBe(false);

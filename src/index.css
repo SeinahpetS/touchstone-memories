@@ -129,6 +129,12 @@
 }
 .globe-graticule { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 1px; }
 .globe-selected { fill: hsl(var(--globe-selection)); }
+.globe-selection-ring {
+  fill: none;
+  stroke: hsl(var(--globe-selection));
+  stroke-width: 2px;
+  pointer-events: none;
+}
 .onboarding-city-results { border-color: hsl(var(--globe-line)); }
 
 @layer base {
