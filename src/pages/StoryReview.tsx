@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { loadOnboardingStoryDraft, saveOnboardingStoryDraft } from "@/lib/onboardingStoryDraft";
 
 const AEGEAN = "#0E7C86";
 
@@ -58,16 +59,22 @@ function hapticTap() {
 
 const StoryReview = () => {
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const { state, pathname } = useLocation();
   const locState = (state ?? {}) as LocationState;
-  const isOnboarding = !!locState.onboarding;
+  const isOnboarding = !!locState.onboarding || pathname === "/onboarding/story-review";
+  const [storedDraft] = useState(() => {
+    if (!isOnboarding) return null;
+    try { return loadOnboardingStoryDraft(); } catch { return null; }
+  });
 
   const [sessionId, setSessionId] = useState<string | undefined>(locState.sessionId);
-  const [artifacts, setArtifacts] = useState<Artifact[]>(locState.artifacts ?? []);
-  const [index, setIndex] = useState(0);
+  const [artifacts, setArtifacts] = useState<Artifact[]>(storedDraft?.artifacts ?? locState.artifacts ?? []);
+  const [index, setIndex] = useState(storedDraft?.reviewIndex ?? 0);
   const [confirmedIds, setConfirmedIds] = useState<string[]>([]);
-  const [savedCount, setSavedCount] = useState(0);
-  const [phase, setPhase] = useState<"cards" | "complete">("cards");
+  const [savedCount, setSavedCount] = useState(storedDraft?.kept?.length ?? 0);
+  const [phase, setPhase] = useState<"cards" | "complete">(
+    storedDraft && (storedDraft.reviewIndex ?? 0) >= storedDraft.artifacts.length ? "complete" : "cards",
+  );
   const [continuing, setContinuing] = useState(false);
   const [savingOverlay, setSavingOverlay] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -75,13 +82,14 @@ const StoryReview = () => {
   const [draftTitle, setDraftTitle] = useState("");
   const [draftNote, setDraftNote] = useState("");
   const overlayTimer = useRef<number | null>(null);
+  const saveInFlight = useRef(false);
 
   // If nothing in state, kick back to /story-unfold
   useEffect(() => {
     if (!artifacts || artifacts.length === 0) {
-      navigate("/story-unfold", { replace: true });
+      navigate(isOnboarding ? "/onboarding-story" : "/story-unfold", { replace: true });
     }
-  }, [artifacts, navigate]);
+  }, [artifacts, navigate, isOnboarding]);
 
   // When card changes, reset edits
   useEffect(() => {
@@ -100,6 +108,16 @@ const StoryReview = () => {
   const done = index >= total;
 
   const advance = () => {
+    if (isOnboarding) {
+      try {
+        const draft = loadOnboardingStoryDraft();
+        if (!draft) throw new Error("Missing story draft");
+        saveOnboardingStoryDraft({ ...draft, artifacts: artifacts as typeof draft.artifacts, reviewIndex: index + 1 });
+      } catch {
+        toast.error("Couldn't keep your progress on this device. Please try again.");
+        return;
+      }
+    }
     if (index + 1 >= total) {
       // End of stack — mark session complete and show summary
       void markSessionComplete();
@@ -123,18 +141,16 @@ const StoryReview = () => {
       // Pre-signup: stash kept cards in the onboarding draft; they are
       // persisted to the touchstones table after account creation.
       try {
-        const raw = localStorage.getItem("ts_onboarding_draft");
-        const draft = raw ? JSON.parse(raw) : {};
-        const kept = Array.isArray(draft.kept) ? draft.kept : [];
-        kept.push(a);
-        localStorage.setItem(
-          "ts_onboarding_draft",
-          JSON.stringify({ ...draft, kept }),
-        );
+        const draft = loadOnboardingStoryDraft();
+        if (!draft) throw new Error("Missing story draft");
+        const id = crypto.randomUUID();
+        const kept = [...(draft.kept ?? []), { ...a, id }];
+        saveOnboardingStoryDraft({ ...draft, artifacts: artifacts as typeof draft.artifacts, kept: kept as typeof draft.kept, reviewIndex: index + 1 });
+        return id;
       } catch {
-        /* ignore */
+        toast.error("Couldn't keep this card on your device. Please try again.");
+        return null;
       }
-      return `onboarding-${Date.now()}`;
     }
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
@@ -203,8 +219,11 @@ const StoryReview = () => {
   };
 
   const handleSave = async () => {
-    if (!current || savingOverlay) return;
-    const newId = await persistArtifact(current);
+    if (!current || savingOverlay || saveInFlight.current) return;
+    saveInFlight.current = true;
+    let newId: string | null;
+    try { newId = await persistArtifact(current); }
+    finally { saveInFlight.current = false; }
     if (!newId) return;
     const newIds = [...confirmedIds, newId];
     setConfirmedIds(newIds);

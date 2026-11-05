@@ -1,0 +1,2 @@
+# Project rules
+- Keep pre-account story cards and review progress in the shared onboarding story draft module, and migrate them on authenticated archive entry with stable row IDs; this preserves cards through confirmation and makes retries safe.
