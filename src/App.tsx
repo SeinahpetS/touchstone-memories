@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,14 +29,22 @@ import OnboardingStoryReady from "./pages/OnboardingStoryReady.tsx";
 import OnboardingCreateAccount from "./pages/OnboardingCreateAccount.tsx";
 import OnboardingStoryUnfold from "./pages/OnboardingStoryUnfold.tsx";
 import DefinitionSplash from "./components/DefinitionSplash.tsx";
+import { ARCHIVE_PATH, resolvePostSignInPath } from "@/lib/postSignInRoute";
 
 const queryClient = new QueryClient();
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
+const SplashLoading = () => (
+  <div className="flex min-h-screen items-center justify-center bg-background">
+    <p className="text-muted-foreground">Loading…</p>
+  </div>
+);
+
 const PostSplashRoute = () => {
   const { user, loading } = useAuth();
   const [sessionFresh, setSessionFresh] = useState<boolean | null>(null);
+  const [signedInPath, setSignedInPath] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,13 +66,21 @@ const PostSplashRoute = () => {
     };
   }, []);
 
-  if (loading || sessionFresh === null) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
-    );
-  }
+  // Signed-in with no stored city, no completion flag and nothing waiting on
+  // this device: put them back into onboarding at the name screen.
+  useEffect(() => {
+    if (!user) return;
+    if (new URLSearchParams(window.location.search).has("edit")) return;
+    let cancelled = false;
+    void resolvePostSignInPath(user.id).then((path) => {
+      if (!cancelled) setSignedInPath(path);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  if (loading || sessionFresh === null) return <SplashLoading />;
 
   if (user && sessionFresh) {
     const hasPendingDraft =
@@ -74,7 +90,10 @@ const PostSplashRoute = () => {
       typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).has("edit");
     if (isEditing) return <Index />;
-    return hasPendingDraft ? <Onboarding /> : <Archive />;
+    if (hasPendingDraft) return <Onboarding />;
+    if (signedInPath === null) return <SplashLoading />;
+    if (signedInPath !== ARCHIVE_PATH) return <Navigate to={signedInPath} replace />;
+    return <Archive />;
   }
 
   return <Auth />;
@@ -109,7 +128,7 @@ const RootRoute = () => {
     let dest: string;
     if (onboardingComplete) {
       // Returning user: skip all onboarding screens.
-      dest = session ? "/archive" : "/auth";
+      dest = session ? await resolvePostSignInPath(session.user.id) : "/auth";
     } else {
       // First-time user: enter the onboarding flow at the constellation intro.
       const hasPendingDraft =
@@ -118,7 +137,7 @@ const RootRoute = () => {
       dest = session
         ? hasPendingDraft
           ? "/welcome"
-          : "/archive"
+          : await resolvePostSignInPath(session.user.id)
         : "/constellation";
     }
     setTimeout(() => {
