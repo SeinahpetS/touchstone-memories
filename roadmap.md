@@ -11,3 +11,8 @@
 - [x] Run focused tests and verify the public flow on desktop and phone.
 - [x] Verify cards and privately uploaded photos read back in an authenticated archive.
 - [x] Move the birth-screen privacy line directly below “When were you born”.
+# Sign-in routing and Google onboarding account
+- [ ] Add "Continue with Google" below the email/password form on /onboarding/create-account using lovable.auth.signInWithOAuth with redirect_uri ${origin}/onboarding/create-account; on return run draft migration, kept-card migration, city match, set ts_onboarding_complete, go to /archive.
+- [ ] After any sign-in: no profile city, ts_onboarding_complete unset, no onboarding draft waiting -> /onboarding-name instead of /archive.
+- [ ] Signed-in user finishing /onboarding/location: skip /onboarding/ready and /onboarding/create-account, save name/birth/location straight to profile, set ts_onboarding_complete, go to /archive.
+- [ ] Onboarding location saves only city, country_code, region_code; never lat/lng. Report existing lat/lng columns and whether rows hold values.
