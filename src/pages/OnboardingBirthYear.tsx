@@ -136,6 +136,21 @@ const OnboardingBirthYear = () => {
         >
           Skip for now
         </button>
+
+        <p
+          style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontStyle: "italic",
+            fontSize: 13,
+            color: "#4A6B8A",
+            textAlign: "center",
+            margin: 0,
+            marginTop: 32,
+            animation: "ts-screen5-fade-in 400ms ease both",
+          }}
+        >
+          All your data is private with Touchstone.
+        </p>
       </div>
 
       <style>{`
