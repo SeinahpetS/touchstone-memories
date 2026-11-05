@@ -160,6 +160,8 @@ const NAV_PATHS = ["/archive", "/settings", "/story-unfold", "/vivid"];
 
 const BottomNavGate = () => {
   const { pathname } = useLocation();
+  // The card review stack is a full-screen focused flow — no tab bar there.
+  if (pathname.startsWith("/story-unfold/review")) return null;
   const show = NAV_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
   if (!show) return null;
   return <BottomNav />;
