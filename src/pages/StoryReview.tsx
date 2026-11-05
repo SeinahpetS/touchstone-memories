@@ -21,6 +21,8 @@ type LocationState = {
   sessionId?: string;
   artifacts?: Artifact[];
   transcript?: string;
+  /** Pre-signup onboarding review: keep cards locally, no Supabase saves. */
+  onboarding?: boolean;
 };
 
 // Soft chime using WebAudio — no asset needed
@@ -58,6 +60,7 @@ const StoryReview = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const locState = (state ?? {}) as LocationState;
+  const isOnboarding = !!locState.onboarding;
 
   const [sessionId, setSessionId] = useState<string | undefined>(locState.sessionId);
   const [artifacts, setArtifacts] = useState<Artifact[]>(locState.artifacts ?? []);
