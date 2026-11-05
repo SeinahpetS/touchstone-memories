@@ -24,6 +24,7 @@ type Artifact = {
   note: string;
   source_phrase?: string;
   photoKey?: string;
+  photoFile?: File;
 };
 
 type LocationState = {
@@ -94,6 +95,8 @@ const StoryReview = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
+  const photoInput = useRef<HTMLInputElement>(null);
+  const [livePhotoUrl, setLivePhotoUrl] = useState<string | null>(null);
 
   // If nothing in state, kick back to /story-unfold
   useEffect(() => {
@@ -124,6 +127,12 @@ const StoryReview = () => {
     }).catch(() => toast.error("Couldn't load your photo."));
     return () => { active = false; if (url) URL.revokeObjectURL(url); };
   }, [isOnboarding, current?.photoKey]);
+  useEffect(() => {
+    if (isOnboarding || !current?.photoFile) { setLivePhotoUrl(null); return; }
+    const url = URL.createObjectURL(current.photoFile);
+    setLivePhotoUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [isOnboarding, current?.photoFile]);
   const total = artifacts.length;
   const done = index >= total;
 
@@ -180,10 +189,19 @@ const StoryReview = () => {
       toast("Please sign in to save.");
       return null;
     }
+    let photo_url: string | null = null;
+    if (a.photoFile) {
+      const ext = a.photoFile.name.split(".").pop() || "jpg";
+      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("memory-photos").upload(path, a.photoFile);
+      if (upErr) { console.error("photo upload failed", upErr); toast("Couldn't upload that photo."); return null; }
+      photo_url = supabase.storage.from("memory-photos").getPublicUrl(path).data.publicUrl;
+    }
     const { data, error } = await supabase
       .from("touchstones")
       .insert({
         user_id: user.id,
+        photo_url,
         category: a.category as any,
         title: a.title,
         note: a.note,
@@ -522,9 +540,19 @@ const StoryReview = () => {
         )}
 
         {/* Add a photo */}
+        {!isOnboarding && livePhotoUrl && (
+          <img src={livePhotoUrl} alt={current.title || "Touchstone photo"} className="mt-6 w-full rounded-lg object-cover" style={{ maxHeight: 260 }} />
+        )}
+        {!isOnboarding && <input ref={photoInput} type="file" accept="image/*" className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            if (!file) return;
+            setArtifacts((arr) => arr.map((a, i) => (i === index ? { ...a, photoFile: file } : a)));
+          }} />}
         {!isOnboarding && <button
           type="button"
-          onClick={() => toast("Photo attachments coming soon.")}
+          onClick={() => photoInput.current?.click()}
           className="mt-6 self-start"
           style={{
             background: "none",
@@ -536,7 +564,7 @@ const StoryReview = () => {
             cursor: "pointer",
           }}
         >
-          Add a photo →
+          {current.photoFile ? "Change photo →" : "Add a photo →"}
         </button>}
       </div>
 
