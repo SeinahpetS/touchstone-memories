@@ -398,6 +398,8 @@ const Onboarding = () => {
       if (d.region) profilePatch.region = d.region;
       if (d.country) profilePatch.country = d.country;
       if (d.locationDisplay) profilePatch.location_display = d.locationDisplay;
+      if (d.country_code) profilePatch.country_code = d.country_code;
+      if (d.region_code) profilePatch.region_code = d.region_code;
       await (supabase as any).from("profiles").update(profilePatch).eq("id", user.id);
     } catch {
       toast.error("Couldn't save your first memory — try again from the archive.");
