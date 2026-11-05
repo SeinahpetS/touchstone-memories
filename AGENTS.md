@@ -1,5 +1,5 @@
 # Project rules
-- Keep the onboarding globe and its city ranking isolated in frontend modules with local geography assets; country and region selection must not add Google requests or alter onboarding persistence.
+- Keep onboarding geography and city ranking isolated in frontend modules with lazy local per-country assets; offline selections persist structured city details only on Continue and never add Google requests or coordinates.
 - Use one orthographic projection for countries, regions, and graticule, clipped to a fixed circular globe viewport with an independent edge; scale zoom must not hide the circular frame.
 - Keep Google city requests in the authenticated city-places function using the existing server key; resolve onboarding text once and reuse autocomplete tokens through Details, without requesting or persisting coordinates.
 - Keep pre-account story cards and review progress in the shared onboarding story draft module, and migrate them on authenticated archive entry with stable row IDs; this preserves cards through confirmation and makes retries safe.
