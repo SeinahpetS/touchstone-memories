@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, Crop, ArrowLeftRight, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Cropper, { type Area } from "react-easy-crop";
 import { cropPhotoBlob } from "@/lib/cropPhoto";
@@ -102,9 +102,9 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
           </div>
         </> : <>
         <img src={preview} alt="Touchstone photo preview" className="onboarding-edit-photo" />
-        <div className="flex gap-3"><Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => setAdjusting(true)}>Crop &amp; move</Button>
-          <Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => inputRef.current?.click()}>Replace</Button>
-          <Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => { setPhoto(null); setRemoved(true); }}>Remove</Button></div>
+        <div className="flex justify-center gap-3 mt-3"><Button variant="outline" size="icon" aria-label="Crop and move photo" title="Crop & move" className="rounded-full bg-transparent" disabled={busy} onClick={() => setAdjusting(true)}><Crop size={18} /></Button>
+          <Button variant="outline" size="icon" aria-label="Replace photo" title="Replace" className="rounded-full bg-transparent" disabled={busy} onClick={() => inputRef.current?.click()}><ArrowLeftRight size={18} /></Button>
+          <Button variant="outline" size="icon" aria-label="Remove photo" title="Remove" className="rounded-full bg-transparent" disabled={busy} onClick={() => { setPhoto(null); setRemoved(true); }}><Trash2 size={18} /></Button></div>
         </>}
       </div> : <Button variant="outline" className="onboarding-add-photo" disabled={busy} onClick={() => inputRef.current?.click()}><ImagePlus size={20} />Add a photo</Button>}
       <label className="onboarding-edit-field">Title<input aria-label="Title" className="onboarding-edit-title" value={title} onChange={e => setTitle(e.target.value)} /></label>
