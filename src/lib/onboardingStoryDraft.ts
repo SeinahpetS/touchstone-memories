@@ -2,12 +2,14 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { clearOnboardingDraft, loadOnboardingDraft } from "@/lib/onboardingDraft";
 import { resolveProfileCity } from '@/lib/profileCity';
+import { removeOnboardingPhoto, uploadOnboardingPhoto } from '@/lib/onboardingPhotos';
 
 export type StoryArtifact = {
   category: Database["public"]["Enums"]["memory_category"];
   title: string;
   note: string;
   source_phrase?: string;
+  photoKey?: string;
 };
 
 export type OnboardingStoryDraft = {
@@ -53,8 +55,12 @@ async function persistStory(userId: string) {
   if (draft) saveOnboardingStoryDraft({ ...draft, kept });
 
   if (kept.length) {
+    const rows = await Promise.all(kept.map(async ({ id, category, title, note, photoKey }) => ({
+      id, user_id: userId, category, title, note,
+      ...(photoKey ? { photo_url: await uploadOnboardingPhoto(userId, id, photoKey) } : {}),
+    })));
     const { error } = await supabase.from("touchstones").upsert(
-      kept.map(({ id, category, title, note }) => ({ id, user_id: userId, category, title, note })),
+      rows,
       { onConflict: "id", ignoreDuplicates: true },
     );
     if (error) throw error;
@@ -77,6 +83,9 @@ async function persistStory(userId: string) {
 
   await resolveProfileCity();
 
+  // Only discard device photos once every memory and the profile have saved.
+  const photoKeys = new Set(draft?.artifacts.concat(kept).flatMap(a => a.photoKey ? [a.photoKey] : []) ?? []);
+  await Promise.all([...photoKeys].map(removeOnboardingPhoto));
   localStorage.removeItem(KEY);
   clearOnboardingDraft();
 }

@@ -3,6 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { loadOnboardingStoryDraft, saveOnboardingStoryDraft } from "@/lib/onboardingStoryDraft";
+import type { StoryArtifact } from "@/lib/onboardingStoryDraft";
+import OnboardingCardEditSheet from "@/components/OnboardingCardEditSheet";
+import { Button } from "@/components/ui/button";
+import { readOnboardingPhoto } from "@/lib/onboardingPhotos";
 
 const AEGEAN = "#0E7C86";
 
@@ -16,6 +20,7 @@ type Artifact = {
   title: string;
   note: string;
   source_phrase?: string;
+  photoKey?: string;
 };
 
 type LocationState = {
@@ -83,6 +88,8 @@ const StoryReview = () => {
   const [draftNote, setDraftNote] = useState("");
   const overlayTimer = useRef<number | null>(null);
   const saveInFlight = useRef(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   // If nothing in state, kick back to /story-unfold
   useEffect(() => {
@@ -104,6 +111,15 @@ const StoryReview = () => {
   }, []);
 
   const current = artifacts[index];
+  useEffect(() => {
+    let active = true;
+    let url: string | undefined;
+    setPhotoPreview(null);
+    if (isOnboarding && current?.photoKey) void readOnboardingPhoto(current.photoKey).then(blob => {
+      if (active && blob) { url = URL.createObjectURL(blob); setPhotoPreview(url); }
+    }).catch(() => toast.error("Couldn't load your photo."));
+    return () => { active = false; if (url) URL.revokeObjectURL(url); };
+  }, [isOnboarding, current?.photoKey]);
   const total = artifacts.length;
   const done = index >= total;
 
@@ -244,6 +260,7 @@ const StoryReview = () => {
   };
 
   const handleEdit = () => {
+    if (isOnboarding) { setSheetOpen(true); return; }
     setDraftTitle(current?.title ?? "");
     setDraftNote(current?.note ?? "");
     setEditingTitle(true);
@@ -364,7 +381,9 @@ const StoryReview = () => {
       </div>
 
       {/* Card body */}
-      <div className="flex-1 flex flex-col px-6">
+      <div className={`flex-1 flex flex-col px-6 ${isOnboarding ? "onboarding-review-card" : ""}`}>
+        {isOnboarding && <Button variant="ghost" className="onboarding-card-edit" onClick={handleEdit}>Edit</Button>}
+        {isOnboarding && photoPreview && <img src={photoPreview} alt={current.title || "Touchstone photo"} className="onboarding-review-photo" />}
         <p
           className="uppercase"
           style={{
@@ -399,7 +418,7 @@ const StoryReview = () => {
           />
         ) : (
           <h2
-            onClick={() => {
+            onClick={isOnboarding ? handleEdit : () => {
               setDraftTitle(current.title);
               setEditingTitle(true);
             }}
@@ -435,7 +454,7 @@ const StoryReview = () => {
           />
         ) : (
           <p
-            onClick={() => {
+            onClick={isOnboarding ? handleEdit : () => {
               setDraftNote(current.note);
               setEditingNote(true);
             }}
@@ -453,7 +472,7 @@ const StoryReview = () => {
         )}
 
         {/* Add a photo */}
-        <button
+        {!isOnboarding && <button
           type="button"
           onClick={() => toast("Photo attachments coming soon.")}
           className="mt-6 self-start"
@@ -468,7 +487,7 @@ const StoryReview = () => {
           }}
         >
           Add a photo →
-        </button>
+        </button>}
       </div>
 
       {/* Bottom actions */}
@@ -497,7 +516,7 @@ const StoryReview = () => {
           Save
         </button>
 
-        <button
+        {!isOnboarding && <button
           type="button"
           onClick={handleEdit}
           className="w-full mt-3"
@@ -513,7 +532,7 @@ const StoryReview = () => {
           }}
         >
           Edit
-        </button>
+        </button>}
 
         <div className="flex justify-center mt-3">
           <button
@@ -554,6 +573,14 @@ const StoryReview = () => {
       </div>
 
       {/* Saved overlay */}
+      {isOnboarding && sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
+        const updated = artifacts.map((a, i) => i === index ? edited : a);
+        const draft = loadOnboardingStoryDraft();
+        if (!draft) throw new Error("Missing story draft");
+        saveOnboardingStoryDraft({ ...draft, artifacts: updated as StoryArtifact[] });
+        setArtifacts(updated);
+        setSheetOpen(false);
+      }} />}
       {savingOverlay && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center px-8"
