@@ -266,16 +266,18 @@ const StoryReview = () => {
         >
           {savedCount} {savedCount === 1 ? "touchstone" : "touchstones"} saved.
         </h2>
-        <p
-          className="text-center mt-3"
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: 13,
-            color: MUTED,
-          }}
-        >
-          Feel like something's missing?
-        </p>
+        {!isOnboarding && (
+          <p
+            className="text-center mt-3"
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 13,
+              color: MUTED,
+            }}
+          >
+            Feel like something's missing?
+          </p>
+        )}
 
         {!isOnboarding && (
           <button
