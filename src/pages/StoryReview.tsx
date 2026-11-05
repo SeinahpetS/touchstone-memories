@@ -454,7 +454,7 @@ const StoryReview = () => {
         {isOnboarding && photoPreview && <img src={photoPreview} alt={current.title || "Touchstone photo"} className="onboarding-review-photo" />}
         {!isOnboarding && !editingTitle && !editingNote ? (
           <div role="button" tabIndex={0} aria-label="Edit this Touchstone" onClick={handleEdit} onKeyDown={(e) => { if (e.key === "Enter") handleEdit(); }}
-            className="mt-2 mx-auto w-full max-w-sm cursor-text" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
+            className="mt-2 mx-auto w-full max-w-sm cursor-text overflow-hidden px-5 pb-6" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
             <MemoryArtifact photoUrl={livePhotoUrl} category={current.category} title={current.title} note={current.note} createdAt={new Date().toISOString()} />
           </div>
         ) : (<>
@@ -575,7 +575,7 @@ const StoryReview = () => {
 
       {/* Bottom actions */}
       <div
-        className="w-full px-5"
+        className="w-full max-w-sm mx-auto px-5"
         style={{
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
           paddingTop: 12,
