@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { geoCentroid, geoContains, geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
+import { geoCentroid, geoContains, geoDistance, geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import world from "@/assets/geography/countries-110m.json";
-import { GLOBE_FOCUS_MS, isGlobeTap, REGIONAL_COUNTRIES, type GlobeSelection } from "@/lib/globeLocation";
+import { GLOBE_FOCUS_MS, SELECTION_RING_RADIUS, isGlobeTap, needsSelectionRing, REGIONAL_COUNTRIES, type GlobeSelection } from "@/lib/globeLocation";
 
 type Place = Feature<Geometry, { name: string; country_code: string; region_code?: string }>;
 function decode(data: unknown): Place[] {
@@ -32,6 +32,17 @@ export default function OnboardingGlobe({ selection, onSelect }: {
   const projection = useMemo(() => geoOrthographic().translate([150, 150]).scale(view.scale)
     .rotate(view.rotation).clipAngle(90).clipExtent([[0, 0], [300, 300]]), [view]);
   const path = geoPath(projection);
+  // World view: a selection smaller than 24px across gets a findability ring at its centroid.
+  const ring = useMemo(() => {
+    if (!selection.country_code || regions.length) return null;
+    const country = countries.find(item => item.properties.country_code === selection.country_code);
+    if (!country) return null;
+    const center = geoCentroid(country);
+    if (geoDistance(center, [-view.rotation[0], -view.rotation[1]]) > Math.PI / 2) return null;
+    const projected = projection(center);
+    if (!projected) return null;
+    return needsSelectionRing(path.bounds(country)) ? { cx: projected[0], cy: projected[1] } : null;
+  }, [selection.country_code, regions.length, projection, path]);
 
   useEffect(() => () => { cancelAnimationFrame(frame.current); loadVersion.current++; }, []);
 
@@ -136,5 +147,6 @@ export default function OnboardingGlobe({ selection, onSelect }: {
       data-region={region.properties.region_code}
       className={`globe-region${!selection.region_code || region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
       d={path(region) ?? ""}><title>{region.properties.name}</title></path>)}
+    {ring && <circle className="globe-selection-ring" cx={ring.cx} cy={ring.cy} r={SELECTION_RING_RADIUS} aria-hidden="true" />}
   </svg>;
 }

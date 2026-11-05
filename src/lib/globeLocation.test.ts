@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GLOBE_FOCUS_MS, REGIONAL_COUNTRIES, isGlobeTap, rankLocalCities, type CityRow } from "./globeLocation";
+import { GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
 import countries from "@/assets/geography/countries-110m.json";
 
 describe("onboarding globe rules", () => {
