@@ -119,6 +119,23 @@ const StoryReview = () => {
   };
 
   const persistArtifact = async (a: Artifact): Promise<string | null> => {
+    if (isOnboarding) {
+      // Pre-signup: stash kept cards in the onboarding draft; they are
+      // persisted to the touchstones table after account creation.
+      try {
+        const raw = localStorage.getItem("ts_onboarding_draft");
+        const draft = raw ? JSON.parse(raw) : {};
+        const kept = Array.isArray(draft.kept) ? draft.kept : [];
+        kept.push(a);
+        localStorage.setItem(
+          "ts_onboarding_draft",
+          JSON.stringify({ ...draft, kept }),
+        );
+      } catch {
+        /* ignore */
+      }
+      return `onboarding-${Date.now()}`;
+    }
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
     if (!user) {
