@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ upsert: vi.fn(), update: vi.fn(), eq: vi.fn(), invoke: vi.fn() }));
+const photos = vi.hoisted(() => ({ upload: vi.fn(), remove: vi.fn() }));
+vi.mock("@/lib/onboardingPhotos", () => ({ uploadOnboardingPhoto: photos.upload, removeOnboardingPhoto: photos.remove }));
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { functions: { invoke: mocks.invoke }, from: (table: string) => table === "touchstones"
     ? { upsert: mocks.upsert }
@@ -23,9 +25,33 @@ beforeEach(() => {
   mocks.eq.mockResolvedValue({ error: null });
   mocks.update.mockReturnValue({ eq: mocks.eq });
   mocks.invoke.mockResolvedValue({ error: null });
+  photos.upload.mockImplementation(async (user: string, id: string) => `${user}/${id}.jpg`);
+  photos.remove.mockResolvedValue(undefined);
 });
 
 describe("onboarding sample cards", () => {
+  it("holds photos locally before authentication and attaches each to its own kept memory", async () => {
+    const first = { ...artifacts[0], photoKey: "photo-1" };
+    saveOnboardingStoryDraft({ story: "Sunday", artifacts: [first, artifacts[1]], kept: [first, artifacts[1]], capturedAt: 1 });
+    expect(photos.upload).not.toHaveBeenCalled();
+    await migrateOnboardingStory("account-1");
+    const rows = mocks.upsert.mock.calls[0][0];
+    expect(photos.upload).toHaveBeenCalledExactlyOnceWith("account-1", rows[0].id, "photo-1");
+    expect(rows[0].photo_url).toBe(`account-1/${rows[0].id}.jpg`);
+    expect(rows[1]).not.toHaveProperty("photo_url");
+    expect(photos.remove).toHaveBeenCalledWith("photo-1");
+  });
+  it("retains local photos and stable memory IDs after an upload fails", async () => {
+    const card = { ...artifacts[0], photoKey: "photo-1" };
+    saveOnboardingStoryDraft({ story: "Sunday", artifacts: [card], kept: [card], capturedAt: 1 });
+    photos.upload.mockRejectedValueOnce(new Error("Upload failed"));
+    await expect(migrateOnboardingStory("account-1")).rejects.toThrow("Upload failed");
+    const id = loadOnboardingStoryDraft()?.kept?.[0].id;
+    expect(photos.remove).not.toHaveBeenCalled();
+    expect(mocks.upsert).not.toHaveBeenCalled();
+    await migrateOnboardingStory("account-1");
+    expect(mocks.upsert.mock.calls[0][0][0].id).toBe(id);
+  });
   it('resolves city after signed-in migration even when the first story was skipped', async () => {
     saveOnboardingDraft({ ...emptyOnboardingDraft(), city: 'Seattle, WA', locationDisplay: 'Seattle, WA' });
     await migrateOnboardingStory('account-1');
