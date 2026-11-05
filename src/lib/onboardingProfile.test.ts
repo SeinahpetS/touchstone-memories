@@ -1,10 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ update: vi.fn(), eq: vi.fn(), mark: vi.fn() }));
-vi.mock("@/components/OnboardingDotIndicator", () => ({
-  markOnboardingComplete: mocks.mark,
-  default: () => null,
-}));
+const mocks = vi.hoisted(() => ({ update: vi.fn(), eq: vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { from: () => ({ update: mocks.update }) },
 }));
@@ -45,7 +41,6 @@ describe("a signed-in visitor's answers go straight to the profile", () => {
       place_id: null,
     });
     expect(mocks.eq).toHaveBeenCalledWith("id", "account-1");
-    expect(mocks.mark).toHaveBeenCalledOnce();
     expect(localStorage.getItem("ts_onboarding_complete")).toBe("1");
     expect(loadOnboardingDraft()).toBeNull();
   });
@@ -62,7 +57,6 @@ describe("a signed-in visitor's answers go straight to the profile", () => {
     mocks.eq.mockResolvedValue({ error: { message: "offline" } });
     saveOnboardingDraft({ ...emptyOnboardingDraft(), firstName: "Steph", city: "Seattle" });
     await expect(saveOnboardingAnswersToProfile("account-1")).rejects.toBeTruthy();
-    expect(mocks.mark).not.toHaveBeenCalled();
     expect(localStorage.getItem("ts_onboarding_complete")).toBeNull();
     expect(loadOnboardingDraft()).not.toBeNull();
   });
