@@ -1,5 +1,6 @@
 # Onboarding card reliability
 - [ ] Add onboarding-only card edit sheet and optional photos; store resized copies locally and attach private uploads after signup; verify Save, Cancel and continuation.
+- [ ] Reuse the existing centered memory card in an onboarding swipe carousel with Keep this, gold Edit and Dismiss actions.
 - [x] Restyle location, add expanded/world globe states and pinch return, lazy country city suggestions, typing focus and city confirmation; test persistence without coordinates.
 - [x] Keep country focus orthographic with 600ms rotation/zoom, 70% width fitting, and a visible globe edge/graticule; verify desktop and phone.
 - [x] Add and verify the offline onboarding globe, country regions, and ranked local city suggestions.
