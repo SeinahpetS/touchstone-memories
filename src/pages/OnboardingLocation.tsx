@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
+import OnboardingGlobe from "@/components/OnboardingGlobe";
+import { Button } from "@/components/ui/button";
+import { rankLocalCities, type CityRow, type GlobeSelection } from "@/lib/globeLocation";
 import {
   emptyOnboardingDraft,
   loadOnboardingDraft,
@@ -16,6 +19,27 @@ const OnboardingLocation = () => {
   const existing = loadOnboardingDraft() ?? emptyOnboardingDraft();
   const [city, setCity] = useState<string>(existing.city ?? "");
   const [submitting, setSubmitting] = useState(false);
+  const [selection, setSelection] = useState<GlobeSelection>({ country_code: null, region_code: null });
+  const [cities, setCities] = useState<CityRow[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const suggestions = useMemo(() => rankLocalCities(cities, city, selection), [cities, city, selection]);
+
+  useEffect(() => {
+    let active = true;
+    if (city.trim().length >= 2 && !cities.length) {
+      void import("@/assets/geography/cities.json").then(module => {
+        if (active) setCities(module.default as CityRow[]);
+      });
+    }
+    return () => { active = false; };
+  }, [city, cities.length]);
+
+  const chooseCity = (row: CityRow) => {
+    setCity(`${row[0]}, ${row[2] ? `${row[2]}, ` : ""}${row[1]}`);
+    setShowSuggestions(false);
+    setActiveSuggestion(-1);
+  };
 
   const advance = () => navigate("/onboarding/ready");
 
@@ -51,7 +75,7 @@ const OnboardingLocation = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-6"
+      className="min-h-screen flex flex-col items-center justify-center px-6 py-8"
       style={{ backgroundColor: "#F2EEE5" }}
     >
       <OnboardingDotIndicator current={4} />
@@ -72,12 +96,34 @@ const OnboardingLocation = () => {
           Where are you based
         </p>
 
+        <OnboardingGlobe selection={selection} onSelect={setSelection} />
+        <span id="globe-selection" className="sr-only" aria-live="polite">
+          {selection.country_code ? `${selection.country_code}${selection.region_code ? `, ${selection.region_code}` : ""}` : "No country selected"}
+        </span>
+
+        <div className="relative w-full">
         <input
           type="text"
           value={city}
-          onChange={(e) => setCity(e.target.value)}
+          aria-label="City or town"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={showSuggestions && suggestions.length > 0}
+          aria-controls="onboarding-city-suggestions"
+          aria-activedescendant={activeSuggestion >= 0 ? `onboarding-city-${activeSuggestion}` : undefined}
+          onChange={(e) => { setCity(e.target.value); setShowSuggestions(true); setActiveSuggestion(-1); }}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setShowSuggestions(false)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") handleContinue();
+            if (e.key === "Escape") { setShowSuggestions(false); setActiveSuggestion(-1); }
+            if ((e.key === "ArrowDown" || e.key === "ArrowUp") && suggestions.length) {
+              e.preventDefault(); setShowSuggestions(true);
+              setActiveSuggestion(index => (index + (e.key === "ArrowDown" ? 1 : -1) + suggestions.length) % suggestions.length);
+            }
+            if (e.key === "Enter") {
+              if (showSuggestions && activeSuggestion >= 0 && suggestions[activeSuggestion]) chooseCity(suggestions[activeSuggestion]);
+              else void handleContinue();
+            }
           }}
           placeholder="City or town"
           autoFocus
@@ -93,6 +139,16 @@ const OnboardingLocation = () => {
             borderRadius: 0,
           }}
         />
+        {showSuggestions && suggestions.length > 0 && <div id="onboarding-city-suggestions" role="listbox"
+          className="onboarding-city-results absolute top-full left-0 z-10 mt-1 w-full border rounded-md bg-background overflow-hidden">
+          {suggestions.map((row, index) => <Button key={`${row[0]}-${row[1]}-${row[2]}`} variant="ghost"
+            id={`onboarding-city-${index}`} role="option" aria-selected={activeSuggestion === index}
+            className={`w-full h-auto min-h-11 rounded-none justify-start whitespace-normal text-left font-jost ${activeSuggestion === index ? "bg-accent" : ""}`}
+            onMouseDown={e => e.preventDefault()} onClick={() => chooseCity(row)}>
+            {row[0]}, {row[2] ? `${row[2]}, ` : ""}{row[1]}
+          </Button>)}
+        </div>}
+        </div>
 
         <button
           type="button"

@@ -1,4 +1,5 @@
 # Onboarding card reliability
+- [x] Add and verify the offline onboarding globe, country regions, and ranked local city suggestions.
 - [x] Add signed-in city matching and Settings autocomplete without coordinates; test save rules.
 - [ ] Validate Google city matching and suggestions on the deployed site; Google live testing is unavailable in the sandbox.
 - [x] Preserve extracted cards and review progress across reloads; show extraction failures without skipping review.
