@@ -96,10 +96,10 @@ const StoryReview = () => {
 
   // If nothing in state, kick back to /story-unfold
   useEffect(() => {
-    if (!artifacts || artifacts.length === 0) {
+    if (phase === "cards" && (!artifacts || artifacts.length === 0)) {
       navigate(isOnboarding ? "/onboarding-story" : "/story-unfold", { replace: true });
     }
-  }, [artifacts, navigate, isOnboarding]);
+  }, [artifacts, navigate, isOnboarding, phase]);
 
   // When card changes, reset edits
   useEffect(() => {
