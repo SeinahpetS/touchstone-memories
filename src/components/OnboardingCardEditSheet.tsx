@@ -113,7 +113,7 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
         {categoriesOpen && <div className="onboarding-category-options">{(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map(key =>
           <Button key={key} variant="ghost" aria-pressed={category === key} onClick={() => { setCategory(key); setCategoriesOpen(false); }}>{CATEGORY_LABELS[key]}</Button>)}</div>}
       </div>
-      <label className="onboarding-edit-field">Note<textarea aria-label="Note" rows={5} className="onboarding-edit-note" value={note} onChange={e => setNote(e.target.value)} /></label>
+      <label className="onboarding-edit-field">Note<textarea aria-label="Note" rows={3} className="onboarding-edit-note" value={note} onChange={e => setNote(e.target.value)} /></label>
       <Button className="onboarding-edit-save" disabled={busy || adjusting} onClick={() => void save()}>Save</Button>
       <Button variant="ghost" className="onboarding-edit-cancel" disabled={busy} onClick={onCancel}>Cancel</Button>
     </div>
