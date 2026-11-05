@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ImagePlus } from "lucide-react";
 import { toast } from "sonner";
+import Cropper, { type Area } from "react-easy-crop";
+import { cropPhotoBlob } from "@/lib/cropPhoto";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
 import type { StoryArtifact } from "@/lib/onboardingStoryDraft";
@@ -19,6 +21,17 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
   const [removed, setRemoved] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [adjusting, setAdjusting] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [area, setArea] = useState<Area | null>(null);
+  const applyCrop = async () => {
+    if (!preview || !area) { setAdjusting(false); return; }
+    setBusy(true);
+    try { setPhoto(await cropPhotoBlob(preview, area)); setAdjusting(false); setCrop({ x: 0, y: 0 }); setZoom(1); }
+    catch { toast.error("Couldn't adjust this photo. Please try again."); }
+    finally { setBusy(false); }
+  };
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -76,9 +89,23 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
         finally { setBusy(false); }
       }} />
       {preview && !removed ? <div>
+        {adjusting ? <>
+          <div className="onboarding-crop-frame">
+            <Cropper image={preview} crop={crop} zoom={zoom} aspect={4 / 3} minZoom={1} maxZoom={4}
+              onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(_, px) => setArea(px)} />
+          </div>
+          <p className="onboarding-crop-hint">Drag to move · pinch or slide to zoom</p>
+          <input type="range" aria-label="Zoom" min={1} max={4} step={0.01} value={zoom} onChange={e => setZoom(Number(e.target.value))} className="onboarding-crop-zoom" />
+          <div className="flex gap-3">
+            <Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => void applyCrop()}>Done</Button>
+            <Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => { setAdjusting(false); setCrop({ x: 0, y: 0 }); setZoom(1); }}>Cancel</Button>
+          </div>
+        </> : <>
         <img src={preview} alt="Touchstone photo preview" className="onboarding-edit-photo" />
-        <div className="flex gap-3"><Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => inputRef.current?.click()}>Replace</Button>
+        <div className="flex gap-3"><Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => setAdjusting(true)}>Crop &amp; move</Button>
+          <Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => inputRef.current?.click()}>Replace</Button>
           <Button variant="ghost" className="onboarding-edit-text" disabled={busy} onClick={() => { setPhoto(null); setRemoved(true); }}>Remove</Button></div>
+        </>}
       </div> : <Button variant="outline" className="onboarding-add-photo" disabled={busy} onClick={() => inputRef.current?.click()}><ImagePlus size={20} />Add a photo</Button>}
       <label className="onboarding-edit-field">Title<input aria-label="Title" className="onboarding-edit-title" value={title} onChange={e => setTitle(e.target.value)} /></label>
       <div className="onboarding-edit-field">Category
@@ -87,7 +114,7 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
           <Button key={key} variant="ghost" aria-pressed={category === key} onClick={() => { setCategory(key); setCategoriesOpen(false); }}>{CATEGORY_LABELS[key]}</Button>)}</div>}
       </div>
       <label className="onboarding-edit-field">Note<textarea aria-label="Note" rows={5} className="onboarding-edit-note" value={note} onChange={e => setNote(e.target.value)} /></label>
-      <Button className="onboarding-edit-save" disabled={busy} onClick={() => void save()}>Save</Button>
+      <Button className="onboarding-edit-save" disabled={busy || adjusting} onClick={() => void save()}>Save</Button>
       <Button variant="ghost" className="onboarding-edit-cancel" disabled={busy} onClick={onCancel}>Cancel</Button>
     </div>
   </div>;
