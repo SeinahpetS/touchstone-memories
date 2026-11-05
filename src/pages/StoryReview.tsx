@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { loadOnboardingStoryDraft, saveOnboardingStoryDraft } from "@/lib/onboardingStoryDraft";
@@ -394,6 +395,15 @@ const StoryReview = () => {
   if (done || !current) return null;
 
   if (isOnboarding) return <div className="onboarding-review-screen">
+    <button
+      type="button"
+      aria-label="Dismiss this card"
+      className="onboarding-review-close"
+      disabled={savingOverlay}
+      onClick={handleDismiss}
+    >
+      <X size={22} strokeWidth={1.5} color={BRAND_NAVY} />
+    </button>
     <div className="flex items-center justify-center gap-2 pt-6 pb-4">
       {dots.map(i => <span key={i} className={`onboarding-review-dot${i === index ? " is-current" : ""}`} />)}
     </div>
@@ -413,8 +423,7 @@ const StoryReview = () => {
     </div>
     <div className="onboarding-review-actions">
       <Button className="onboarding-keep-this" disabled={savingOverlay} onClick={handleSave}>Keep this</Button>
-      <Button className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors h-auto" disabled={savingOverlay} onClick={handleEdit}>Edit</Button>
-      <Button variant="ghost" className="onboarding-dismiss" disabled={savingOverlay} onClick={handleDismiss}>Dismiss</Button>
+      <Button className="onboarding-edit-this" disabled={savingOverlay} onClick={handleEdit}>Edit</Button>
     </div>
     {sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
       const updated = artifacts.map((a, i) => i === index ? edited : a);
