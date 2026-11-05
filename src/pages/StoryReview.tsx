@@ -452,6 +452,12 @@ const StoryReview = () => {
       <div className={`flex-1 flex flex-col px-6 ${isOnboarding ? "onboarding-review-card" : ""}`}>
         {isOnboarding && <Button variant="ghost" className="onboarding-card-edit" onClick={handleEdit}>Edit</Button>}
         {isOnboarding && photoPreview && <img src={photoPreview} alt={current.title || "Touchstone photo"} className="onboarding-review-photo" />}
+        {!isOnboarding && !editingTitle && !editingNote ? (
+          <div role="button" tabIndex={0} aria-label="Edit this Touchstone" onClick={handleEdit} onKeyDown={(e) => { if (e.key === "Enter") handleEdit(); }}
+            className="mt-2 cursor-text" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
+            <MemoryArtifact photoUrl={livePhotoUrl} category={current.category} title={current.title} note={current.note} createdAt={new Date().toISOString()} />
+          </div>
+        ) : (<>
         <p
           className="uppercase"
           style={{
@@ -539,10 +545,9 @@ const StoryReview = () => {
           </p>
         )}
 
+        </>)}
+
         {/* Add a photo */}
-        {!isOnboarding && livePhotoUrl && (
-          <img src={livePhotoUrl} alt={current.title || "Touchstone photo"} className="mt-6 w-full rounded-lg object-cover" style={{ maxHeight: 260 }} />
-        )}
         {!isOnboarding && <input ref={photoInput} type="file" accept="image/*" className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
