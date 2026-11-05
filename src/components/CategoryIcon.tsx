@@ -193,13 +193,19 @@ interface CategoryIconCardProps {
   iconSize?: number;
   labelSize?: number;
   className?: string;
+  /**
+   * Draw the selected state as an inset ring instead of a border. The ring is
+   * painted inside the tile, so tile geometry is identical whether selected or
+   * not — nothing shifts when the user picks a category.
+   */
+  selectionRing?: boolean;
 }
 
 /**
  * CategoryIconCard — dark navy tile. Background never changes on selection.
- * Active state: category-coloured 2px border + matching outer glow,
- * icon and label at full opacity. Inactive: muted border, reduced opacity.
+ * Active state: category-coloured border (or an inset ring with `selectionRing`).
  */
+const SELECTION_RING_PX = 6;
 export const CategoryIconCard = ({
   category,
   label,
@@ -211,6 +217,7 @@ export const CategoryIconCard = ({
   iconSize,
   labelSize,
   className,
+  selectionRing,
 }: CategoryIconCardProps) => {
   const displayLabel = label ?? CATEGORY_LABELS[category];
   const isInteractive = !disabled && !comingSoon;
@@ -226,10 +233,20 @@ export const CategoryIconCard = ({
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
         backgroundColor: active ? "#F5F0E8" : "#2C3E50",
-        borderColor: active ? borderColor : "transparent",
-        borderWidth: active ? "3px" : "0px",
         borderStyle: "solid",
-        boxShadow: "none",
+        ...(selectionRing
+          ? {
+              borderWidth: "0px",
+              borderColor: "transparent",
+              boxShadow: active
+                ? `inset 0 0 0 ${SELECTION_RING_PX}px ${borderColor}`
+                : "none",
+            }
+          : {
+              borderColor: active ? borderColor : "transparent",
+              borderWidth: active ? "3px" : "0px",
+              boxShadow: "none",
+            }),
         outline: "none",
       }}
       className={cn(
