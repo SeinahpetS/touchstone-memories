@@ -449,12 +449,12 @@ const StoryReview = () => {
       </div>
 
       {/* Card body */}
-      <div className={`flex-1 flex flex-col px-6 ${isOnboarding ? "onboarding-review-card" : "overflow-y-auto pb-4"}`}>
+      <div className={`flex-1 flex flex-col px-6 ${isOnboarding ? "onboarding-review-card" : "overflow-y-auto pb-4 justify-center"}`}>
         {isOnboarding && <Button variant="ghost" className="onboarding-card-edit" onClick={handleEdit}>Edit</Button>}
         {isOnboarding && photoPreview && <img src={photoPreview} alt={current.title || "Touchstone photo"} className="onboarding-review-photo" />}
         {!isOnboarding && !editingTitle && !editingNote ? (
           <div role="button" tabIndex={0} aria-label="Edit this Touchstone" onClick={handleEdit} onKeyDown={(e) => { if (e.key === "Enter") handleEdit(); }}
-            className="mt-2 cursor-text" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
+            className="mt-2 mx-auto w-full max-w-sm cursor-text" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
             <MemoryArtifact photoUrl={livePhotoUrl} category={current.category} title={current.title} note={current.note} createdAt={new Date().toISOString()} />
           </div>
         ) : (<>
