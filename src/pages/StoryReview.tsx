@@ -277,40 +277,42 @@ const StoryReview = () => {
           Feel like something's missing?
         </p>
 
-        <button
-          type="button"
-          onClick={handleTellMeMore}
-          disabled={continuing}
-          className="mt-6"
-          style={{
-            background: "none",
-            border: "none",
-            color: AEGEAN,
-            fontFamily: "'Jost', sans-serif",
-            fontSize: 14,
-            cursor: continuing ? "not-allowed" : "pointer",
-            opacity: continuing ? 0.6 : 1,
-            padding: 6,
-          }}
-        >
-          {continuing ? "Looking again…" : "Tell Me More →"}
-        </button>
+        {!isOnboarding && (
+          <button
+            type="button"
+            onClick={handleTellMeMore}
+            disabled={continuing}
+            className="mt-6"
+            style={{
+              background: "none",
+              border: "none",
+              color: AEGEAN,
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              cursor: continuing ? "not-allowed" : "pointer",
+              opacity: continuing ? 0.6 : 1,
+              padding: 6,
+            }}
+          >
+            {continuing ? "Looking again…" : "Tell Me More →"}
+          </button>
+        )}
 
         <button
           type="button"
-          onClick={() => navigate("/archive")}
+          onClick={() => navigate(isOnboarding ? "/onboarding-name" : "/archive")}
           className="mt-3"
           style={{
             background: "none",
             border: "none",
-            color: MUTED,
+            color: isOnboarding ? BRAND_NAVY : MUTED,
             fontFamily: "'Jost', sans-serif",
-            fontSize: 13,
+            fontSize: isOnboarding ? 15 : 13,
             cursor: "pointer",
             padding: 6,
           }}
         >
-          Back to your archive →
+          {isOnboarding ? "Continue →" : "Back to your archive →"}
         </button>
       </div>
     );
