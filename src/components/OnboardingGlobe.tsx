@@ -206,4 +206,4 @@ export default forwardRef<GlobeHandle, {
     </g>
     <circle className="globe-edge" cx={150} cy={150} r={GLOBE_RADIUS} aria-hidden="true" />
   </svg>;
-}
+});

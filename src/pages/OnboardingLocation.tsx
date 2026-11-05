@@ -35,6 +35,33 @@ const OnboardingLocation = () => {
   useEffect(() => {
     let active = true;
     void searchOfflineCities(city, selection).then(rows => { if (active) setSuggestions(rows); });
+    return () => { active = false; };
+  }, [city, selection]);
+
+  const chooseCity = (row: CityRow) => {
+    setCity(row[0]);
+    setChosenCity(row);
+    setSelection({ country_code: row[1], region_code: row[3] });
+    setConfirmed(true);
+    setCompact(false);
+    setShowSuggestions(false);
+    setActiveSuggestion(-1);
+  };
+  const advance = () => navigate('/onboarding/ready');
+  const handleSkip = () => advance();
+  const handleContinue = async () => {
+    if (!city.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      const details = offlineCityDraft(chosenCity, city);
+      saveOnboardingDraft({ ...existing, ...details });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await supabase.from('profiles').update({ city: details.city, location_display: details.locationDisplay, region: details.region || null, country: details.country || null, place_id: null }).eq('id', session.user.id);
+      }
+    } finally { advance(); }
+  };
+
     return (
     <div className="location-screen">
       <OnboardingDotIndicator current={4} />
