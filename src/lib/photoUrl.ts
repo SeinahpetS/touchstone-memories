@@ -9,6 +9,8 @@ const SIGNED_TTL_SECONDS = 60 * 60; // 1 hour
 // Returns null for external URLs (Spotify/TMDB/Book covers) so they pass through unchanged.
 export function extractMemoryPhotoPath(value: string | null | undefined): string | null {
   if (!value) return null;
+  // Device-local onboarding previews are not storage object paths.
+  if (/^(blob:|data:)/i.test(value)) return null;
   // Already a public/sign URL?
   const marker = `/${BUCKET}/`;
   const idx = value.indexOf(marker);
