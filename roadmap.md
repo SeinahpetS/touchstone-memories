@@ -1,4 +1,5 @@
 # Onboarding card reliability
+- [ ] Add signed-in city matching and Settings autocomplete without coordinates; test save rules.
 - [x] Preserve extracted cards and review progress across reloads; show extraction failures without skipping review.
 - [x] Save kept cards after authentication, retain drafts through email confirmation and failed saves, and prevent duplicate saves.
 - [x] Run focused tests and verify the public flow on desktop and phone.

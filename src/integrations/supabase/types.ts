@@ -45,6 +45,7 @@ export type Database = {
           birth_year: number | null
           cancel_at_period_end: boolean
           city: string | null
+          city_lookup_done: boolean
           country: string | null
           created_at: string
           current_period_end: string | null
@@ -56,6 +57,7 @@ export type Database = {
           name: string | null
           notification_preferences: Json
           onboarding_complete: boolean
+          place_id: string | null
           region: string | null
           save_offer_redeemed: boolean
           state: string | null
@@ -76,6 +78,7 @@ export type Database = {
           birth_year?: number | null
           cancel_at_period_end?: boolean
           city?: string | null
+          city_lookup_done?: boolean
           country?: string | null
           created_at?: string
           current_period_end?: string | null
@@ -87,6 +90,7 @@ export type Database = {
           name?: string | null
           notification_preferences?: Json
           onboarding_complete?: boolean
+          place_id?: string | null
           region?: string | null
           save_offer_redeemed?: boolean
           state?: string | null
@@ -107,6 +111,7 @@ export type Database = {
           birth_year?: number | null
           cancel_at_period_end?: boolean
           city?: string | null
+          city_lookup_done?: boolean
           country?: string | null
           created_at?: string
           current_period_end?: string | null
@@ -118,6 +123,7 @@ export type Database = {
           name?: string | null
           notification_preferences?: Json
           onboarding_complete?: boolean
+          place_id?: string | null
           region?: string | null
           save_offer_redeemed?: boolean
           state?: string | null
