@@ -33,6 +33,8 @@ export interface OnboardingDraft {
   state?: string;
   region?: string;
   country?: string;
+  country_code?: string | null;
+  region_code?: string | null;
   locationDisplay?: string;
   lat?: number | null;
   lng?: number | null;

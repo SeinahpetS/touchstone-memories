@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countryGlobeFocus, GLOBE_FOCUS_WIDTH, GLOBE_RADIUS, GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
+import { countryGlobeFocus, GLOBE_EXPANDED_SIZE, GLOBE_FOCUS_WIDTH, GLOBE_RADIUS, GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
 import { geoCentroid, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology, GeometryCollection } from "topojson-specification";
@@ -42,6 +42,14 @@ describe("onboarding globe rules", () => {
     expect(needsSelectionRing([[150, 150], [174, 160]])).toBe(false);
     expect(needsSelectionRing([[150, 150], [160, 174]])).toBe(false);
   });
+  it("fits a regional country to 70% of the expanded 342px globe", () => {
+    expect(GLOBE_EXPANDED_SIZE).toBe(342);
+    const country = world.features.find(f => f.properties?.country_code === "US");
+    if (!country) throw new Error("US missing");
+    const focus = countryGlobeFocus(country, 342);
+    const bounds = geoPath(geoOrthographic().rotate(focus.rotation).scale(focus.scale)).bounds(country);
+    expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(239.4);
+  });
   it("loads regions for exactly the ten requested countries", () => {
     expect([...REGIONAL_COUNTRIES]).toEqual(["US", "CA", "MX", "BR", "AR", "RU", "CN", "IN", "AU", "ID"]);
     expect(REGIONAL_COUNTRIES.has("FR")).toBe(false);
@@ -64,9 +72,9 @@ describe("onboarding globe rules", () => {
   it("typing without selecting geography still returns cities", () => {
     expect(rankLocalCities(rows, "sp", { country_code: null, region_code: null })[0][1]).toBe("CA");
   });
-  it("shows suggestions from two characters with at most five results", () => {
+  it("shows suggestions from two characters with at most three results", () => {
     const selection = { country_code: null, region_code: null };
     expect(rankLocalCities(rows, "s", selection)).toEqual([]);
-    expect(rankLocalCities(Array.from({ length: 8 }, (_, i) => ["Seattle" + i, "US", "Washington", "US-WA", i] as CityRow), "se", selection)).toHaveLength(5);
+    expect(rankLocalCities(Array.from({ length: 8 }, (_, i) => ["Seattle" + i, "US", "Washington", "US-WA", i] as CityRow), "se", selection)).toHaveLength(3);
   });
 });
