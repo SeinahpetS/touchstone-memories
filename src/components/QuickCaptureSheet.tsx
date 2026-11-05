@@ -899,6 +899,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
                   iconSize={26}
                   labelSize={10}
                   active={category === c}
+                  selectionRing
                   onClick={() => setCategory(c)}
                 />
               ))}

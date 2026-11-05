@@ -233,10 +233,20 @@ export const CategoryIconCard = ({
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
         backgroundColor: active ? "#F5F0E8" : "#2C3E50",
-        borderColor: active ? borderColor : "transparent",
-        borderWidth: active ? "3px" : "0px",
         borderStyle: "solid",
-        boxShadow: "none",
+        ...(selectionRing
+          ? {
+              borderWidth: "0px",
+              borderColor: "transparent",
+              boxShadow: active
+                ? `inset 0 0 0 ${SELECTION_RING_PX}px ${borderColor}`
+                : "none",
+            }
+          : {
+              borderColor: active ? borderColor : "transparent",
+              borderWidth: active ? "3px" : "0px",
+              boxShadow: "none",
+            }),
         outline: "none",
       }}
       className={cn(
