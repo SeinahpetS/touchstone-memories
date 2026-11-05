@@ -449,7 +449,7 @@ const StoryReview = () => {
       </div>
 
       {/* Card body */}
-      <div className={`flex-1 flex flex-col px-6 ${isOnboarding ? "onboarding-review-card" : ""}`}>
+      <div className={`flex-1 flex flex-col px-6 ${isOnboarding ? "onboarding-review-card" : "overflow-y-auto pb-4"}`}>
         {isOnboarding && <Button variant="ghost" className="onboarding-card-edit" onClick={handleEdit}>Edit</Button>}
         {isOnboarding && photoPreview && <img src={photoPreview} alt={current.title || "Touchstone photo"} className="onboarding-review-photo" />}
         {!isOnboarding && !editingTitle && !editingNote ? (
