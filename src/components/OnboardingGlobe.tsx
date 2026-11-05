@@ -100,7 +100,7 @@ export default forwardRef<GlobeHandle, {
     animateView([-center[0], -center[1], 0], GLOBE_RADIUS);
   }
   useImperativeHandle(ref, () => ({ worldView }));
-  useEffect(() => { if (confirmation) worldView(); }, [confirmation]);
+  useEffect(() => { if (confirmation) worldView(); }, [confirmation, selectedArea]);
 
   async function selectAt(point: [number, number]) {
     const lonLat = projection.invert?.(point);
@@ -199,7 +199,7 @@ export default forwardRef<GlobeHandle, {
       d={path(country) ?? ""}><title>{country.properties.name}</title></path>)}
     {regions.map((region, index) => <path key={`${region.properties.region_code}-${index}`}
       data-region={region.properties.region_code}
-      className={`globe-region${region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
+      className={`globe-region${!selection.region_code || region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
       d={path(region) ?? ""}><title>{region.properties.name}</title></path>)}
     {!zoomed && selection.region_code && selectedCountry && <path className="globe-parent-outline" d={path(selectedCountry) ?? ""} />}
     {ring && <circle className="globe-selection-ring" cx={ring.cx} cy={ring.cy} r={SELECTION_RING_RADIUS} aria-hidden="true" />}

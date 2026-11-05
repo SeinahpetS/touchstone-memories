@@ -23,7 +23,7 @@ const OnboardingLocation = () => {
   const existing = loadOnboardingDraft() ?? emptyOnboardingDraft();
   const [city, setCity] = useState<string>(existing.city ?? "");
   const [submitting, setSubmitting] = useState(false);
-  const [selection, setSelection] = useState<GlobeSelection>({ country_code: null, region_code: null });
+  const [selection, setSelection] = useState<GlobeSelection>({ country_code: existing.country_code ?? null, region_code: existing.region_code ?? null });
   const [suggestions, setSuggestions] = useState<CityRow[]>([]);
   const [chosenCity, setChosenCity] = useState<CityRow | null>(null);
   const [confirmed, setConfirmed] = useState(false);
