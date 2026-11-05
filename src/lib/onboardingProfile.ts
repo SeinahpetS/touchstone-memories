@@ -9,7 +9,7 @@ import { clearOnboardingDraft, loadOnboardingDraft } from "@/lib/onboardingDraft
  */
 export async function saveOnboardingAnswersToProfile(userId: string): Promise<void> {
   const draft = loadOnboardingDraft();
-  const patch: Record<string, unknown> = { onboarding_complete: true };
+  const patch: Record<string, any> = { onboarding_complete: true };
   const firstName = draft?.firstName?.trim();
   if (firstName) {
     patch.first_name = firstName;
