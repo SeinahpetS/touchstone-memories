@@ -4,3 +4,4 @@
 - Keep Google city requests in the authenticated city-places function using the existing server key; resolve onboarding text once and reuse autocomplete tokens through Details, without requesting or persisting coordinates.
 - Keep pre-account story cards and review progress in the shared onboarding story draft module, and migrate them on authenticated archive entry with stable row IDs; this preserves cards through confirmation and makes retries safe.
 - Keep onboarding photo blobs in IndexedDB behind draft photo keys, and upload to deterministic user/memory paths during authenticated draft migration; retain blobs until all saves succeed to make retries safe.
+- Reuse MemoryArtifact for onboarding review rather than duplicating its card contents; its opt-in photo-first frame leaves archive and capture presentation unchanged.

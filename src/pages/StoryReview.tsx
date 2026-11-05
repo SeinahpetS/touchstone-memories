@@ -8,6 +8,7 @@ import OnboardingCardEditSheet from "@/components/OnboardingCardEditSheet";
 import { Button } from "@/components/ui/button";
 import { readOnboardingPhoto } from "@/lib/onboardingPhotos";
 import MemoryArtifact from "@/components/MemoryArtifact";
+import { dismissReviewCard } from "@/lib/onboardingReview";
 
 const AEGEAN = "#0E7C86";
 
@@ -262,11 +263,9 @@ const StoryReview = () => {
 
   const handleDismiss = () => {
     if (isOnboarding) {
-      const remaining = artifacts.filter((_, i) => i !== index);
+      const { remaining, nextIndex: next, finished } = dismissReviewCard(artifacts, index);
       const draft = loadOnboardingStoryDraft();
       if (!draft) return;
-      const finished = index >= remaining.length;
-      const next = finished ? remaining.length : index;
       try { saveOnboardingStoryDraft({ ...draft, artifacts: remaining as StoryArtifact[], reviewIndex: next }); }
       catch { toast.error("Couldn't keep your progress on this device."); return; }
       setArtifacts(remaining);

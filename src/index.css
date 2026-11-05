@@ -160,6 +160,7 @@
 .onboarding-keep-this { width: 100%; max-width: 480px; height: 56px; font-family: 'Jost', sans-serif; font-size: 17px; font-weight: 500; background: hsl(var(--globe-ocean)); color: hsl(var(--location-ivory)); }
 .onboarding-keep-this:hover { background: hsl(var(--globe-ocean)); }
 .onboarding-dismiss { min-height: 44px; font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 400; color: hsl(var(--location-ink)); }
+.onboarding-dismiss:hover { background: transparent; }
 .onboarding-saved-overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 32px; background: hsl(var(--location-ivory) / 0.92); }
 .onboarding-saved-overlay p { font-family: 'Playfair Display', serif; font-size: 22px; color: hsl(var(--globe-ocean)); text-align: center; }
 .onboarding-card-edit { position: sticky; top: 0; align-self: flex-end; min-width: 44px; height: 44px; flex-shrink: 0; z-index: 1; font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 400; color: hsl(var(--globe-ocean)); background: hsl(var(--location-ivory)); }
