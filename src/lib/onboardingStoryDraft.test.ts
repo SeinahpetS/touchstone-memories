@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ upsert: vi.fn(), update: vi.fn(), eq: vi.fn() }));
+const mocks = vi.hoisted(() => ({ upsert: vi.fn(), update: vi.fn(), eq: vi.fn(), invoke: vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { from: (table: string) => table === "touchstones"
+  supabase: { functions: { invoke: mocks.invoke }, from: (table: string) => table === "touchstones"
     ? { upsert: mocks.upsert }
     : { update: mocks.update } },
 }));
@@ -21,6 +21,7 @@ beforeEach(() => {
   mocks.upsert.mockResolvedValue({ error: null });
   mocks.eq.mockResolvedValue({ error: null });
   mocks.update.mockReturnValue({ eq: mocks.eq });
+  mocks.invoke.mockResolvedValue({ error: null });
 });
 
 describe("onboarding sample cards", () => {

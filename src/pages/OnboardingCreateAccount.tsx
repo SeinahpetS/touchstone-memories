@@ -74,8 +74,7 @@ const OnboardingCreateAccount = () => {
     if (d.region) patch.region = d.region;
     if (d.country) patch.country = d.country;
     if (d.locationDisplay) patch.location_display = d.locationDisplay;
-    if (typeof d.lat === "number") patch.lat = d.lat;
-    if (typeof d.lng === "number") patch.lng = d.lng;
+    if (d.city) patch.place_id = d.placeId ?? null;
     try {
       const { error } = await (supabase as any).from("profiles").update(patch).eq("id", userId);
       if (error) throw error;

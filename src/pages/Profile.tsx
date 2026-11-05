@@ -16,6 +16,8 @@ import { PricingSheet } from "@/components/PricingSheet";
 import { PaywallSheet } from "@/components/PaywallSheet";
 import { VividUpgradeCard } from "@/components/VividUpgradeCard";
 import { ManageSubscriptionModal } from "@/components/ManageSubscriptionModal";
+import ProfileCityInput from "@/components/ProfileCityInput";
+import { freeTextCity, type ProfileCity } from "@/lib/profileCity";
 
 interface ProfileRow {
   id: string;
@@ -43,6 +45,8 @@ const Profile = () => {
 
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [name, setName] = useState("");
+  const [city, setCity] = useState<ProfileCity>(freeTextCity(''));
+  const [cityChanged, setCityChanged] = useState(false);
   const [emailNotif, setEmailNotif] = useState(true);
   const [inAppNotif, setInAppNotif] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -82,6 +86,7 @@ const Profile = () => {
       if (cancelled || !data) return;
       setProfile(data as ProfileRow);
       setName(data.name ?? "");
+      setCity({ city: data.city ?? '', region: data.region ?? null, country: data.country ?? null, place_id: data.place_id ?? null, location_display: data.location_display ?? data.city ?? '' });
       const np = (data.notification_preferences as any) ?? {};
       setEmailNotif(np.email ?? true);
       setInAppNotif(np.inApp ?? true);
@@ -141,11 +146,13 @@ const Profile = () => {
         .from("profiles")
         .update({
           name: name.trim() || null,
+          ...(cityChanged ? { ...city, city: city.city.trim(), location_display: city.location_display.trim(), city_lookup_done: true } : {}),
           notification_preferences: { email: emailNotif, inApp: inAppNotif },
         })
         .eq("id", user.id);
       if (error) throw error;
       toast.success("​ saved.");
+      setCityChanged(false);
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message ?? "Couldn't save profile.");
@@ -269,6 +276,10 @@ const Profile = () => {
               disabled
               className="bg-muted/40"
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="profile-city">Where are you based?</Label>
+            <ProfileCityInput value={city} onChange={value => { setCity(value); setCityChanged(true); }} />
           </div>
         </section>
 
