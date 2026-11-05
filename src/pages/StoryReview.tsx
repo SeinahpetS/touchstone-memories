@@ -558,7 +558,7 @@ const StoryReview = () => {
         {!isOnboarding && <button
           type="button"
           onClick={() => photoInput.current?.click()}
-          className="mt-6 self-start"
+          className={isOnboarding ? "mt-6 self-start" : "mt-6 self-center"}
           style={{
             background: "none",
             border: "none",
