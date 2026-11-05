@@ -97,8 +97,8 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
           <p className="onboarding-crop-hint">Drag to move · pinch or slide to zoom</p>
           <input type="range" aria-label="Zoom" min={1} max={4} step={0.01} value={zoom} onChange={e => setZoom(Number(e.target.value))} className="onboarding-crop-zoom" />
           <div className="flex justify-center gap-3 mt-3">
-            <Button className="rounded-full px-8" disabled={busy} onClick={() => void applyCrop()}>Done</Button>
             <Button variant="outline" className="rounded-full px-8 bg-transparent" disabled={busy} onClick={() => { setAdjusting(false); setCrop({ x: 0, y: 0 }); setZoom(1); }}>Cancel</Button>
+            <Button className="rounded-full px-8" disabled={busy} onClick={() => void applyCrop()}>Done</Button>
           </div>
         </> : <>
         <img src={preview} alt="Touchstone photo preview" className="onboarding-edit-photo" />
