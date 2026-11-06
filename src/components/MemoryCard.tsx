@@ -170,13 +170,13 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         />
 
         {/* Body */}
-        <div style={{ padding: 10 }} className="space-y-1.5">
-          {/* Category icon tile (22px) + label in caps */}
+        <div style={{ padding: "7px 8px 8px" }} className="space-y-0.5">
+          {/* Category icon tile (20px) + label in caps */}
           <div className="flex items-center gap-1.5">
             <span
               style={{
-                width: 22,
-                height: 22,
+                width: 20,
+                height: 20,
                 borderRadius: 5,
                 backgroundColor: "#2C3E50",
                 display: "inline-flex",
@@ -184,7 +184,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 justifyContent: "center",
               }}
             >
-              <CategoryIcon category={cat} size={14} color="#B8860B" />
+              <CategoryIcon category={cat} size={13} color="#B8860B" />
             </span>
             <span
               style={{
