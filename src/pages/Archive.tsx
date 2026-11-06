@@ -609,6 +609,7 @@ const Archive = () => {
             />
             <span
               aria-hidden="true"
+              className="hidden md:inline-block"
               style={{
                 backgroundColor: "#F2EEE5",
                 color: "#B8860B",
