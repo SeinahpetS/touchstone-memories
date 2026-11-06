@@ -58,7 +58,8 @@
 - [x] "Record audio" copy only for the Sounds category; other categories show "Take photo".
 
 # People table and mentions
-- [ ] Add artifact Send a copy action and bottom sheet with optional person/note, native sharing, clipboard fallback, and focused tests; preserve other artifact content.
+- [x] Add artifact Send a copy action and bottom sheet with optional person/note, native sharing, clipboard fallback, and focused tests; preserve other artifact content; 21 focused tests pass.
+- [ ] Verify Send a copy in a signed-in preview; blocked because no signed-in session or account matches the requesting user.
 - [x] Add and test share-preview and authenticated share-keep functions, restricted output, recipient-owned photo copies, and rollback; no UI changes; 25 focused tests pass and live validation rejects invalid/missing tokens and invalid auth.
 - [ ] Verify a live authenticated share keep with recipient photo readback; blocked because no signed-in session or account matches the requesting user.
 - [x] Add share provenance fields and sender-only share records, createShare data helper, and focused tests; no UI changes.
