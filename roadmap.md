@@ -31,3 +31,9 @@
 - [ ] Phone archive: shrink the fixed parts (category tiles, ALL bar, buttons) so the card grid gets roughly twice the room.
 - [ ] Bottom nav pill: extend it so its edges line up with the page content column.
 - [ ] Remove Settings from bottom nav; open /settings from the profile circle top-right of /archive.
+# Story delete and hands-free telling
+- [x] Swipe a story left in Recent Stories to delete it, with a confirmation that says saved touchstones are not deleted.
+- [x] Tell Me A Story opens already listening: Web Speech API started in the tap handler, continuous + interimResults, all transcription behind one swappable transcribe service module.
+- [x] Listening screen: ivory background, 64px gold pulsing mic (0.5-1 opacity over 1.6s), "I'm listening." Playfair 28px navy, live transcript Jost 18px #2C3E50 that scrolls as it grows, pinned Done (56px navy fill, ivory text) and Pause text button.
+- [x] Never stop on silence; only Done ends it, and quietly restart if the browser ends recognition itself.
+- [x] Done hands the transcript to the existing story unfold flow; mic denied or unsupported browser falls back to the typed input with "You can type your story instead."

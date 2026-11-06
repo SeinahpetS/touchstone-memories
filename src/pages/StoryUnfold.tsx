@@ -1,9 +1,10 @@
-import { FilePen, ChevronRight, X, ArrowRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { FilePen, ChevronRight, X, ArrowRight, Trash2, Mic, Pause, Play } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
+import { transcribeEngine, type TranscribeSession } from "@/lib/transcribe";
 
 const BRAND_NAVY = "#1E2E3E";
 const SOFT_IVORY = "#F2EEE5";
@@ -12,6 +13,11 @@ const AEGEAN = "#0E7C86";
 const MUTED = "#8C8880";
 const CARD_SURFACE = "#E8E4D8";
 const DIVIDER = "#D4D0C4";
+const DELETE_RED = "#C0392B";
+/** How far a row must be dragged left before it asks to delete. */
+const SWIPE_TRIGGER = 72;
+/** How far the reveal layer is allowed to open. */
+const SWIPE_MAX = 112;
 
 interface StoryRow {
   id: string;
@@ -36,6 +42,16 @@ const StoryUnfold = () => {
   const [text, setText] = useState("");
   const [extracting, setExtracting] = useState(false);
   const [rows, setRows] = useState<StoryRow[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<StoryRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [swipe, setSwipe] = useState<{ id: string; x: number } | null>(null);
+  const pointer = useRef<{ id: string; x: number; y: number; drag: boolean } | null>(null);
+  const suppressClick = useRef(false);
+  const [mode, setMode] = useState<"listening" | "typing">("listening");
+  const [spoken, setSpoken] = useState("");
+  const [paused, setPaused] = useState(false);
+  const sessionRef = useRef<TranscribeSession | null>(null);
+  const spokenRef = useRef<HTMLDivElement | null>(null);
 
   const isOnboarding =
     typeof window !== "undefined" &&
@@ -91,9 +107,36 @@ const StoryUnfold = () => {
     }
   }, [sheetOpen]);
 
-  const handleExtract = async () => {
+  const handleDelete = async () => {
+    const target = pendingDelete;
+    if (!target || deleting) return;
+    const { data: userRes } = await supabase.auth.getUser();
+    const user = userRes?.user;
+    if (!user) {
+      toast("You need to be signed in to delete a story.");
+      setPendingDelete(null);
+      return;
+    }
+    setDeleting(true);
+    const { error } = await supabase
+      .from("story_sessions")
+      .delete()
+      .eq("id", target.id)
+      .eq("user_id", user.id);
+    setDeleting(false);
+    if (error) {
+      console.error("delete session failed", error);
+      toast("Couldn't delete that story. Try again.");
+      return;
+    }
+    setRows((prev) => prev.filter((r) => r.id !== target.id));
+    setPendingDelete(null);
+    toast("Story deleted.");
+  };
+
+  const handleExtract = async (input?: string) => {
     if (extracting) return;
-    const transcript = text.trim();
+    const transcript = (input ?? text).trim();
     if (!transcript) {
       toast("Tell a bit of a story first.");
       return;
@@ -110,6 +153,9 @@ const StoryUnfold = () => {
       if (extracted.length === 0) throw new Error("No artifacts extracted");
       setSheetOpen(false);
       setText("");
+      setSpoken("");
+      sessionRef.current?.stop();
+      sessionRef.current = null;
       navigate("/story-unfold/review", {
         state: {
           sessionId: data.session_id,
@@ -124,6 +170,67 @@ const StoryUnfold = () => {
       setExtracting(false);
     }
   };
+
+  const stopListening = () => {
+    sessionRef.current?.stop();
+    sessionRef.current = null;
+  };
+
+  // Started inside the tap handler so the browser may ask for mic permission here.
+  const handleTellStory = () => {
+    setExtracting(false);
+    setPaused(false);
+    setSpoken("");
+    setText("");
+    if (!transcribeEngine.isSupported()) {
+      setMode("typing");
+      setSheetOpen(true);
+      return;
+    }
+    setMode("listening");
+    setSheetOpen(true);
+    sessionRef.current = transcribeEngine.start({
+      onUpdate: ({ transcript }) => setSpoken(transcript),
+      onError: (error) => {
+        if (error === "denied") {
+          setMode("typing");
+          toast("Microphone access was declined. You can type your story instead.");
+        }
+      },
+    });
+  };
+
+  const handleDone = () => {
+    stopListening();
+    const story = spoken.trim();
+    if (!story) {
+      setMode("typing");
+      toast("Nothing came through yet. You can type your story instead.");
+      return;
+    }
+    void handleExtract(story);
+  };
+
+  const handlePauseToggle = () => {
+    const session = sessionRef.current;
+    if (!session) return;
+    if (session.isPaused()) {
+      session.resume();
+      setPaused(false);
+    } else {
+      session.pause();
+      setPaused(true);
+    }
+  };
+
+  useEffect(() => {
+    return () => stopListening();
+  }, []);
+
+  useEffect(() => {
+    const box = spokenRef.current;
+    if (box) box.scrollTop = box.scrollHeight;
+  }, [spoken]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
@@ -154,7 +261,7 @@ const StoryUnfold = () => {
         {/* CTA Button */}
         <button
           type="button"
-          onClick={() => setSheetOpen(true)}
+          onClick={handleTellStory}
           className="w-full flex items-center justify-center gap-3 mt-6"
           style={{
             backgroundColor: BRAND_NAVY,
@@ -194,6 +301,18 @@ const StoryUnfold = () => {
         >
           Recent stories
         </p>
+        {rows.length > 0 && (
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 11,
+              color: MUTED,
+              marginTop: 4,
+            }}
+          >
+            Swipe a story left to delete it.
+          </p>
+        )}
 
         {/* Story rows */}
         <div className="mt-3 space-y-3">
@@ -209,23 +328,88 @@ const StoryUnfold = () => {
             </p>
           )}
           {rows.map((row) => {
-            const tappable = true;
+            const offset = swipe?.id === row.id ? swipe.x : 0;
+            const dragging = swipe?.id === row.id;
             return (
               <div
                 key={row.id}
-                onClick={
-                  tappable
-                    ? () => navigate(row.complete ? `/story-unfold/session/${row.id}` : `/story-unfold/session/${row.id}/transcript`)
-                    : undefined
-                }
-                className="flex items-center gap-3 px-4 py-3"
-                style={{
-                  backgroundColor: CARD_SURFACE,
-                  borderRadius: 10,
-                  border: `0.5px solid ${DIVIDER}`,
-                  cursor: tappable ? "pointer" : "default",
-                }}
+                className="relative"
+                style={{ borderRadius: 10, overflow: "hidden" }}
               >
+                {/* Delete reveal behind the row */}
+                <div
+                  className="absolute inset-0 flex items-center justify-end"
+                  style={{ backgroundColor: DELETE_RED, borderRadius: 10 }}
+                >
+                  <div
+                    className="flex items-center gap-2 pr-4 uppercase"
+                    style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: 11,
+                      letterSpacing: "0.14em",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    <Trash2 size={15} strokeWidth={1.75} />
+                    Delete
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => {
+                    if (suppressClick.current) return;
+                    navigate(row.complete ? `/story-unfold/session/${row.id}` : `/story-unfold/session/${row.id}/transcript`);
+                  }}
+                  onPointerDown={(e) => {
+                    if (e.pointerType === "mouse" && e.button !== 0) return;
+                    pointer.current = { id: row.id, x: e.clientX, y: e.clientY, drag: false };
+                  }}
+                  onPointerMove={(e) => {
+                    const p = pointer.current;
+                    if (!p || p.id !== row.id) return;
+                    const dx = e.clientX - p.x;
+                    const dy = e.clientY - p.y;
+                    if (!p.drag) {
+                      if (Math.abs(dx) < 6) return;
+                      if (Math.abs(dx) <= Math.abs(dy)) {
+                        pointer.current = null;
+                        return;
+                      }
+                      p.drag = true;
+                      e.currentTarget.setPointerCapture?.(e.pointerId);
+                    }
+                    setSwipe({ id: row.id, x: Math.max(-SWIPE_MAX, Math.min(0, dx)) });
+                  }}
+                  onPointerUp={(e) => {
+                    const p = pointer.current;
+                    pointer.current = null;
+                    if (!p || p.id !== row.id) return;
+                    const dx = e.clientX - p.x;
+                    setSwipe(null);
+                    if (p.drag) {
+                      suppressClick.current = true;
+                      setTimeout(() => {
+                        suppressClick.current = false;
+                      }, 350);
+                      if (dx <= -SWIPE_TRIGGER) setPendingDelete(row);
+                    }
+                  }}
+                  onPointerCancel={() => {
+                    pointer.current = null;
+                    setSwipe(null);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3"
+                  style={{
+                    backgroundColor: CARD_SURFACE,
+                    borderRadius: 10,
+                    border: `0.5px solid ${DIVIDER}`,
+                    cursor: "pointer",
+                    transform: `translateX(${offset}px)`,
+                    transition: dragging ? "none" : "transform 220ms ease-out",
+                    touchAction: "pan-y",
+                    userSelect: "none",
+                  }}
+                >
                 {/* Status dot */}
                 <div
                   className="flex-shrink-0 rounded-full"
@@ -279,10 +463,9 @@ const StoryUnfold = () => {
                   )}
                 </div>
 
-                {/* Chevron (only when tappable / complete) */}
-                {tappable && (
-                  <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
-                )}
+                {/* Chevron */}
+                <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
+                </div>
               </div>
             );
           })}
@@ -321,8 +504,8 @@ const StoryUnfold = () => {
       {/* Tell Me A Story sheet */}
       {sheetOpen && (
         <div
-          className="fixed inset-0 z-50 flex flex-col"
-          style={{ backgroundColor: SOFT_IVORY }}
+          className="fixed inset-0 flex flex-col"
+          style={{ backgroundColor: SOFT_IVORY, zIndex: 60 }}
         >
           {/* Header */}
           <div className="relative flex items-center justify-center px-5 pt-6 pb-4">
@@ -337,7 +520,10 @@ const StoryUnfold = () => {
             </h2>
             <button
               type="button"
-              onClick={() => setSheetOpen(false)}
+              onClick={() => {
+                stopListening();
+                setSheetOpen(false);
+              }}
               aria-label="Close"
               className="absolute right-4 top-5 p-2"
               style={{ background: "none", border: "none", cursor: "pointer" }}
@@ -359,21 +545,75 @@ const StoryUnfold = () => {
                 Finding what's there…
               </p>
             </div>
+          ) : mode === "listening" && !extracting ? (
+            <div className="flex-1 w-full flex flex-col items-center px-6 pt-6 min-h-0">
+              <div
+                className="ts-mic-pulse flex items-center justify-center flex-shrink-0"
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: "50%",
+                  backgroundColor: OLD_GOLD,
+                }}
+              >
+                <Mic size={26} color={SOFT_IVORY} strokeWidth={1.75} />
+              </div>
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 28,
+                  color: BRAND_NAVY,
+                  marginTop: 22,
+                  textAlign: "center",
+                }}
+              >
+                I’m listening.
+              </p>
+              <div
+                ref={spokenRef}
+                className="w-full flex-1 min-h-0 overflow-y-auto"
+                style={{ marginTop: 18 }}
+              >
+                <p
+                  style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 18,
+                    color: "#2C3E50",
+                    lineHeight: 1.55,
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {spoken || "Start talking. Pauses are fine — I’ll keep going."}
+                </p>
+              </div>
+            </div>
           ) : (
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Start typing, or use your keyboard's dictation button to speak your story."
-              className="flex-1 w-full px-5 py-4 resize-none focus:outline-none"
-              style={{
-                backgroundColor: SOFT_IVORY,
-                border: "none",
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 14,
-                color: BRAND_NAVY,
-                lineHeight: 1.5,
-              }}
-            />
+            <>
+              <p
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 13,
+                  color: MUTED,
+                  padding: "0 20px",
+                }}
+              >
+                You can type your story instead.
+              </p>
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Start typing your story here."
+                className="flex-1 w-full px-5 py-4 resize-none focus:outline-none"
+                style={{
+                  backgroundColor: SOFT_IVORY,
+                  border: "none",
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 14,
+                  color: BRAND_NAVY,
+                  lineHeight: 1.5,
+                }}
+              />
+            </>
           )}
 
           {/* Bottom CTA */}
@@ -384,24 +624,162 @@ const StoryUnfold = () => {
               backgroundColor: SOFT_IVORY,
             }}
           >
-            <button
-              type="button"
-              onClick={handleExtract}
-              disabled={extracting}
-              className="w-full"
+            {mode === "listening" && !extracting ? (
+              <div className="flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={handleDone}
+                  className="w-full"
+                  style={{
+                    height: 56,
+                    backgroundColor: BRAND_NAVY,
+                    color: SOFT_IVORY,
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 16,
+                    borderRadius: 12,
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Done
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePauseToggle}
+                  className="flex items-center gap-2"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    marginTop: 10,
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    color: BRAND_NAVY,
+                  }}
+                >
+                  {paused ? (
+                    <Play size={14} color={BRAND_NAVY} strokeWidth={1.75} />
+                  ) : (
+                    <Pause size={14} color={BRAND_NAVY} strokeWidth={1.75} />
+                  )}
+                  {paused ? "Resume" : "Pause"}
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void handleExtract()}
+                disabled={extracting}
+                className="w-full"
+                style={{
+                  backgroundColor: AEGEAN,
+                  color: "#FFFFFF",
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 15,
+                  padding: "0.95rem",
+                  borderRadius: 12,
+                  border: "none",
+                  cursor: extracting ? "not-allowed" : "pointer",
+                  opacity: extracting ? 0.7 : 1,
+                }}
+              >
+                {extracting ? "Finding what’s there…" : "See What’s There"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation */}
+      {pendingDelete && (
+        <div
+          className="fixed inset-0 flex items-center justify-center px-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 60 }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="w-full max-w-md"
+            style={{
+              backgroundColor: CARD_SURFACE,
+              borderRadius: 12,
+              padding: 32,
+            }}
+          >
+            <h2
               style={{
-                backgroundColor: AEGEAN,
-                color: "#FFFFFF",
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 15,
-                padding: "0.95rem",
-                borderRadius: 12,
-                border: "none",
-                cursor: extracting ? "not-allowed" : "pointer",
-                opacity: extracting ? 0.7 : 1,
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 24,
+                color: BRAND_NAVY,
+                marginBottom: 12,
               }}
             >
-              {extracting ? "Finding what's there…" : "See What's There"}
+              Delete this story?
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                color: BRAND_NAVY,
+                lineHeight: 1.5,
+                marginBottom: 14,
+              }}
+            >
+              “{pendingDelete.title}” will be removed from your stories. This
+              can’t be undone.
+            </p>
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: AEGEAN,
+                lineHeight: 1.5,
+                marginBottom: 24,
+              }}
+            >
+              Any touchstones you saved from it stay in your Archive — deleting
+              this story doesn’t remove them.
+            </p>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex w-full items-center justify-center gap-2"
+              style={{
+                backgroundColor: DELETE_RED,
+                color: "#FFFFFF",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                letterSpacing: "0.08em",
+                fontWeight: 500,
+                padding: "12px 20px",
+                borderRadius: 8,
+                border: "none",
+                cursor: deleting ? "not-allowed" : "pointer",
+                opacity: deleting ? 0.7 : 1,
+                marginBottom: 10,
+              }}
+            >
+              <Trash2 size={15} strokeWidth={1.75} />
+              {deleting ? "DELETING…" : "DELETE STORY"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPendingDelete(null)}
+              disabled={deleting}
+              style={{
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                color: BRAND_NAVY,
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                padding: "8px",
+                cursor: deleting ? "not-allowed" : "pointer",
+                textAlign: "center",
+              }}
+            >
+              Whoops. Nevermind.
             </button>
           </div>
         </div>
