@@ -3,8 +3,12 @@ import { formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
 import { categoryHighlightColor } from "@/lib/categoryGlow";
 import MemoryPhoto from "@/components/MemoryPhoto";
+import ArtifactMentions from "@/components/ArtifactMentions";
+import type { Person } from "@/lib/people";
 
 interface Props {
+  touchstoneId?: string;
+  mentionedPeople?: Person[];
   photoUrl?: string | null;
   category: string;
   title?: string | null;
@@ -16,7 +20,7 @@ interface Props {
   photoFirst?: boolean;
 }
 
-const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
+const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, title, note, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
@@ -71,6 +75,7 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
         </p>
       )}
 
+      <ArtifactMentions touchstoneId={touchstoneId} people={mentionedPeople} />
       {note && <p className="text-base text-foreground leading-relaxed">{note}</p>}
     </div>
   );

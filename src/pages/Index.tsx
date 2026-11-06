@@ -432,6 +432,8 @@ const Index = () => {
               }}
             >
               <MemoryArtifact
+                touchstoneId={saved.id}
+                mentionedPeople={current.mentionedPeople}
                 photoUrl={saved.photo_url}
                 category={saved.category}
                 title={saved.title}

@@ -10,3 +10,4 @@
 - Keep Sounds microphone capture in the shared AudioUpload control, returning browser-recorded audio as a File through the existing attachment flow and releasing microphone tracks on stop or unmount; this keeps capture and edit behavior consistent without new storage paths.
 - Read and write people and touchstone_mentions only through the src/lib/people.ts data-access functions, never from components, so ownership checks (own person rows, mentions whose touchstone and person are both the user's) live in one place.
 - Keep capture mentions in a shared picker and detached post-save helper, separate from touchstone and AI payloads, so optional people links cannot delay capture or leak names to AI.
+- Render artifact mentions through one shared row and link to an owner-scoped person view using the people data layer, so detail views share chip behavior without component-level directory queries.
