@@ -50,3 +50,4 @@
 - [x] Selected category tile stays filled dark blue.
 - [x] QuickCaptureSheet close button -> X icon in the corner.
 - [x] Center the "Add a Touchstone" heading.
+- [x] Capture/edit screen: "Take photo" pill -> "Record audio" with a mic icon.

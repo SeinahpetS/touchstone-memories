@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, Upload, X } from "lucide-react";
+import { Mic, Upload, X } from "lucide-react";
 
 interface Props {
   file: File | null;
@@ -9,7 +9,7 @@ interface Props {
 
 const PhotoUpload = ({ file, preview, onSelect }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +20,7 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
   const clear = () => {
     onSelect(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    if (cameraInputRef.current) cameraInputRef.current.value = "";
+    if (audioInputRef.current) audioInputRef.current.value = "";
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -31,6 +31,24 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
   };
 
   if (preview) {
+    // A recorded clip has no picture to show, so it reads as an audio chip.
+    if (file && file.type.startsWith("audio/")) {
+      return (
+        <div className="relative flex w-full items-center justify-between gap-2 rounded-lg bg-card px-4 py-6">
+          <div className="flex items-center gap-2 text-foreground">
+            <Mic className="h-5 w-5" />
+            <span className="text-base truncate">{file.name}</span>
+          </div>
+          <button
+            type="button"
+            onClick={clear}
+            className="rounded-full bg-foreground/70 text-background p-1.5"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      );
+    }
     return (
       <div className="relative rounded-lg overflow-hidden">
         <img src={preview} alt="Selected" className="w-full max-h-64 object-cover" />
@@ -74,11 +92,11 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="button"
-          onClick={() => cameraInputRef.current?.click()}
+          onClick={() => audioInputRef.current?.click()}
           className="flex items-center gap-2 rounded-full bg-foreground/5 hover:bg-foreground/10 px-4 py-2 text-foreground transition-colors"
         >
-          <Camera className="h-5 w-5" />
-          <span className="text-base">Take photo</span>
+          <Mic className="h-5 w-5" />
+          <span className="text-base">Record audio</span>
         </button>
         <button
           type="button"
@@ -91,10 +109,9 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
       </div>
       <span className="text-xs opacity-70">or drag & drop an image</span>
       <input
-        ref={cameraInputRef}
+        ref={audioInputRef}
         type="file"
-        accept="image/*"
-        capture="environment"
+        accept="audio/*"
         onChange={handleChange}
         className="hidden"
       />
