@@ -489,7 +489,7 @@ const Archive = () => {
                     style={{
                       fontFamily: "'Playfair Display', serif",
                       fontSize: "26px",
-                      color: "#2C3E50",
+                      color: "#9E9585",
                       fontWeight: 400,
                       fontStyle: "italic",
                       whiteSpace: "nowrap",
