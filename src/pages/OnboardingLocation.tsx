@@ -66,11 +66,22 @@ const OnboardingLocation = () => {
   };
   const handleSkip = () => { void advance(); };
   const handleContinue = async () => {
-    if (!city.trim() || submitting) return;
+    if (submitting) return;
     setSubmitting(true);
     try {
-      const details = offlineCityDraft(chosenCity, city);
-      saveOnboardingDraft({ ...existing, ...details });
+      const text = city.trim();
+      if (text || chosenCity) {
+        saveOnboardingDraft({ ...existing, ...offlineCityDraft(chosenCity, text) });
+      } else if (selection.country_code) {
+        // No city typed: keep the country/region the globe picked so the
+        // flow still moves on with what the user actually chose.
+        saveOnboardingDraft({
+          ...existing,
+          country_code: selection.country_code,
+          region_code: selection.region_code,
+          country: countryNames[selection.country_code] ?? selection.country_code,
+        });
+      }
     } finally {
       await advance();
     }
@@ -127,7 +138,7 @@ const OnboardingLocation = () => {
           </div>
         </>}
       </div>
-      <footer className="location-footer"><Button className="location-continue" disabled={submitting || !city.trim()} onClick={handleContinue}>Continue</Button></footer>
+      <footer className="location-footer"><Button className="location-continue" disabled={submitting} onClick={handleContinue}>Continue</Button></footer>
     </div>
   );
 };
