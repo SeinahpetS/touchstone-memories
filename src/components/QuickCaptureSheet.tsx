@@ -605,7 +605,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
                         justifyContent: "center",
                       }}
                     >
-                      <CategoryIcon category={category} size={34} color="#B8860B" />
+                      <CategoryIcon category={category ?? "moment"} size={34} color="#B8860B" />
                     </span>
                   </div>
                 );
@@ -635,7 +635,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
                       justifyContent: "center",
                     }}
                   >
-                    <CategoryIcon category={category} size={16} color="#B8860B" />
+                    <CategoryIcon category={category ?? "moment"} size={16} color="#B8860B" />
                   </span>
                   <span
                     style={{
@@ -1015,7 +1015,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
 
             {/* Category-specific fields (location, relationship, restaurant, imprint search) */}
             <div className="mb-4">
-              <CategoryFields
+              {category && <CategoryFields
                 category={category}
                 values={fields}
                 onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
