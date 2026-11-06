@@ -570,41 +570,50 @@ const StoryReview = () => {
   return (
     <div className="fixed inset-0 z-40 flex flex-col" style={{ backgroundColor: SOFT_IVORY }}>
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
-        <div className="my-auto w-full py-6" style={{ paddingLeft: 24, paddingRight: 24 }}>
-          <div key={index} className={`review-carousel-card ${slideDir === "next" ? "from-right" : slideDir === "prev" ? "from-left" : ""}`}>
-            {cardBody}
-            <div className="flex justify-center mt-3">
-              <button type="button" onClick={handleLeaveOut} disabled={savingAll}
-                style={{ background: "none", border: "none", padding: 8, color: "#2C3E50", fontFamily: "'Jost', sans-serif", fontSize: 15, cursor: "pointer" }}>
-                Leave out
+        <div className="my-auto w-full px-6 py-6">
+          <div className="mx-auto w-full max-w-sm">
+            <div key={index} className={`review-carousel-card ${slideDir === "next" ? "from-right" : slideDir === "prev" ? "from-left" : ""}`}>
+              {cardBody}
+              {!isOnboarding && !editingTitle && !editingNote && (
+                <div className="flex justify-center mt-4">
+                  <Button className="onboarding-edit-this" onClick={handleEdit}>Edit</Button>
+                </div>
+              )}
+              <div className="flex justify-center mt-3">
+                <button type="button" onClick={handleLeaveOut} disabled={savingAll}
+                  style={{ background: "none", border: "none", padding: 8, color: "#2C3E50", fontFamily: "'Jost', sans-serif", fontSize: 15, cursor: "pointer" }}>
+                  Leave out
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center justify-between" style={{ marginTop: 20 }}>
+              <button type="button" aria-label="Previous card" onClick={() => goTo(index - 1)} style={{ ...navBtn, visibility: index > 0 ? "visible" : "hidden" }}>
+                <ChevronLeft size={24} color={BRAND_NAVY} strokeWidth={1.75} />
+              </button>
+              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 14, color: "#4A6B8A" }}>{index + 1} of {total}</span>
+              <button type="button" aria-label="Next card" onClick={() => goTo(index + 1)} style={{ ...navBtn, visibility: index < total - 1 ? "visible" : "hidden" }}>
+                <ChevronRight size={24} color={BRAND_NAVY} strokeWidth={1.75} />
               </button>
             </div>
-          </div>
-          <div className="flex items-center justify-between" style={{ marginTop: 20 }}>
-            <button type="button" aria-label="Previous card" onClick={() => goTo(index - 1)} style={{ ...navBtn, visibility: index > 0 ? "visible" : "hidden" }}>
-              <ChevronLeft size={24} color={BRAND_NAVY} strokeWidth={1.75} />
-            </button>
-            <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 14, color: "#4A6B8A" }}>{index + 1} of {total}</span>
-            <button type="button" aria-label="Next card" onClick={() => goTo(index + 1)} style={{ ...navBtn, visibility: index < total - 1 ? "visible" : "hidden" }}>
-              <ChevronRight size={24} color={BRAND_NAVY} strokeWidth={1.75} />
-            </button>
           </div>
         </div>
       </div>
 
       <div className="w-full px-6" style={{ paddingTop: 12, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
-        <button type="button" onClick={handleSaveAll} disabled={remainingCount === 0 || savingAll} aria-busy={savingAll}
-          className="w-full flex items-center justify-center gap-2"
-          style={{
-            height: 56, borderRadius: 14, border: "none",
-            backgroundColor: remainingCount === 0 ? "#E8E4D8" : BRAND_NAVY,
-            color: remainingCount === 0 ? "#2C3E50" : SOFT_IVORY,
-            fontFamily: "'Jost', sans-serif", fontSize: 17, fontWeight: 500,
-            cursor: remainingCount === 0 || savingAll ? "default" : "pointer",
-          }}>
-          {savingAll && <Loader2 size={18} className="animate-spin" />}
-          Save all {remainingCount}
-        </button>
+        <div className="mx-auto w-full max-w-sm">
+          <button type="button" onClick={handleSaveAll} disabled={remainingCount === 0 || savingAll} aria-busy={savingAll}
+            className="w-full flex items-center justify-center gap-2"
+            style={{
+              height: 56, borderRadius: 14, border: "none",
+              backgroundColor: remainingCount === 0 ? "#E8E4D8" : BRAND_NAVY,
+              color: remainingCount === 0 ? "#2C3E50" : SOFT_IVORY,
+              fontFamily: "'Jost', sans-serif", fontSize: 17, fontWeight: 500,
+              cursor: remainingCount === 0 || savingAll ? "default" : "pointer",
+            }}>
+            {savingAll && <Loader2 size={18} className="animate-spin" />}
+            Save all {remainingCount}
+          </button>
+        </div>
       </div>
 
       {isOnboarding && sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
