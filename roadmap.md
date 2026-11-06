@@ -40,4 +40,4 @@
 
 - [x] Story transcript card: bring to the 1/3 fold
 
-- [ ] Bottom nav: remove headroom above and room below at the bottom
+- [x] Bottom nav: remove headroom above and room below at the bottom
