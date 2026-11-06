@@ -816,7 +816,7 @@ const Archive = () => {
               />
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
+            <div className="grid grid-cols-2 gap-3 mt-2 pb-1">
               <AddTouchstoneCard
                 category={filter}
                 onAdd={() => setQuickCaptureOpen(true)}
