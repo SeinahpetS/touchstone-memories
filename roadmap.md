@@ -24,13 +24,10 @@
 - [ ] Do not highlight the country once a more specific region is selected; only the chosen region is gold.
 - [ ] Tapping a region country leaves it cream with 1px #1E2E3E admin-1 borders and zooms; only the tapped region is gold, and country_code is stored on country tap, region_code only on region tap. Non-region countries keep one-tap gold.
 - [ ] US zoom framed by contiguous 48 + DC only via per-country FOCUS_OVERRIDES (excluded region codes); rotate to ~[-98.5, 39], scale so those bounds fill the 342px globe minus 16px each side; AK/HI still drawn and tappable; 600ms animation.
-- [x] At /onboarding/create-account, check whether the email already has an account before continuing to the password step.
-- [x] Put "Continue with Google" in a proper button on /onboarding/create-account (both sub-steps).
-- [x] /archive page itself must not scroll; only the touchstone grid scrolls.
-- [x] Double the "touchstones" label font on /archive (10px -> 20px).
-- [x] Phone archive: shrink the fixed parts (category tiles, ALL bar, buttons) so the card grid gets roughly twice the room.
-- [x] Bottom nav pill: extend it so its edges line up with the page content column.
-- [x] Remove Settings from bottom nav; open /settings from the profile circle top-right of /archive.
-# Review carousel sizing and Edit button
-- [x] Revert the review card to the small centered size (max-w-sm) instead of full width.
-- [x] Bring back a visible Edit button under the signed-in review card.
+- [ ] At /onboarding/create-account, check whether the email already has an account before continuing to the password step.
+- [ ] Put "Continue with Google" in a proper button on /onboarding/create-account (both sub-steps).
+- [ ] /archive page itself must not scroll; only the touchstone grid scrolls.
+- [ ] Double the "touchstones" label font on /archive (10px -> 20px).
+- [ ] Phone archive: shrink the fixed parts (category tiles, ALL bar, buttons) so the card grid gets roughly twice the room.
+- [ ] Bottom nav pill: extend it so its edges line up with the page content column.
+- [ ] Remove Settings from bottom nav; open /settings from the profile circle top-right of /archive.

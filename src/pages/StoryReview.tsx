@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { loadOnboardingStoryDraft, saveOnboardingStoryDraft } from "@/lib/onboardingStoryDraft";
@@ -322,114 +322,6 @@ const StoryReview = () => {
     return Array.from({ length: total }, (_, i) => i);
   }, [total]);
 
-  const [slideDir, setSlideDir] = useState<"next" | "prev" | null>(null);
-  const [savingAll, setSavingAll] = useState(false);
-  const saveAllInFlight = useRef(false);
-
-  const goTo = (next: number) => {
-    if (next < 0 || next >= artifacts.length || next === index) return;
-    setSlideDir(next > index ? "next" : "prev");
-    setIndex(next);
-  };
-
-  useEffect(() => {
-    if (phase !== "cards") return;
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (sheetOpen || (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable))) return;
-      if (e.key === "ArrowRight") goTo(index + 1);
-      if (e.key === "ArrowLeft") goTo(index - 1);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
-
-  const persistOnboardingArtifacts = (list: Artifact[]) => {
-    const draft = loadOnboardingStoryDraft();
-    if (!draft) throw new Error("Missing story draft");
-    saveOnboardingStoryDraft({ ...draft, artifacts: list as StoryArtifact[], reviewIndex: 0 });
-  };
-
-  const handleLeaveOut = () => {
-    if (savingAll) return;
-    const removed = artifacts[index];
-    const removedAt = index;
-    const remaining = artifacts.filter((_, i) => i !== index);
-    if (isOnboarding) {
-      try { persistOnboardingArtifacts(remaining); }
-      catch { toast.error("Couldn't keep your progress on this device."); return; }
-    }
-    const wasLast = index >= remaining.length;
-    setSlideDir(wasLast ? "prev" : "next");
-    setArtifacts(remaining);
-    setIndex(Math.max(0, wasLast ? remaining.length - 1 : index));
-    toast("Card left out.", {
-      duration: 4000,
-      action: {
-        label: "Undo",
-        onClick: () => {
-          setArtifacts((arr) => {
-            const restored = [...arr.slice(0, removedAt), removed, ...arr.slice(removedAt)];
-            if (isOnboarding) { try { persistOnboardingArtifacts(restored); } catch { /* keep in memory */ } }
-            return restored;
-          });
-          setSlideDir(null);
-          setIndex(removedAt);
-        },
-      },
-    });
-  };
-
-  const handleSaveAll = async () => {
-    if (saveAllInFlight.current || artifacts.length === 0) return;
-    saveAllInFlight.current = true;
-    setSavingAll(true);
-    try {
-      if (isOnboarding) {
-        const draft = loadOnboardingStoryDraft();
-        if (!draft) throw new Error("Missing story draft");
-        const withIds = artifacts.map((a) => ({ ...a, id: a.id ?? crypto.randomUUID() }));
-        const keptIds = new Set(withIds.map((a) => a.id));
-        const kept = [...(draft.kept ?? []).filter((c) => !keptIds.has(c.id)), ...withIds];
-        saveOnboardingStoryDraft({ ...draft, artifacts: withIds as StoryArtifact[], kept: kept as typeof draft.kept, reviewIndex: withIds.length });
-        setArtifacts(withIds);
-        setSavedCount(kept.length);
-        setPhase("complete");
-        return;
-      }
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData?.user;
-      if (!user) { toast("Please sign in to save."); return; }
-      const rows = [];
-      for (const a of artifacts) {
-        let photo_url: string | null = null;
-        if (a.photoFile) {
-          const ext = a.photoFile.name.split(".").pop() || "jpg";
-          const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-          const { error: upErr } = await supabase.storage.from("memory-photos").upload(path, a.photoFile);
-          if (upErr) throw upErr;
-          photo_url = supabase.storage.from("memory-photos").getPublicUrl(path).data.publicUrl;
-        }
-        rows.push({ user_id: user.id, photo_url, category: a.category as any, title: a.title, note: a.note, source_session_id: sessionId ?? null });
-      }
-      const { data, error } = await supabase.from("touchstones").insert(rows).select("id");
-      if (error) throw error;
-      const newIds = [...confirmedIds, ...(data ?? []).map((r) => r.id as string)];
-      setConfirmedIds(newIds);
-      setSavedCount((c) => c + rows.length);
-      void updateSessionConfirmed(newIds);
-      void markSessionComplete();
-      setPhase("complete");
-    } catch (e) {
-      console.error("save all failed", e);
-      toast.error("Couldn't save your cards. Please try again.");
-    } finally {
-      saveAllInFlight.current = false;
-      setSavingAll(false);
-    }
-  };
-
-
   if (phase === "complete") {
     const reducedMotion = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     return (
@@ -509,113 +401,279 @@ const StoryReview = () => {
 
   if (done || !current) return null;
 
-  const cardBody = isOnboarding ? (
-    <div className="onboarding-shared-card">
-      <MemoryArtifact photoUrl={photoPreview} photoFirst category={current.category} title={current.title} note={current.note}
-        createdAt={new Date(storedDraft?.capturedAt || Date.now()).toISOString()} />
-      <div className="flex justify-center mt-4">
-        <Button className="onboarding-edit-this" onClick={handleEdit}>Edit</Button>
+  if (isOnboarding) return <div className="onboarding-review-screen">
+    <button
+      type="button"
+      aria-label="Dismiss this card"
+      className="onboarding-review-close"
+      disabled={savingOverlay}
+      onClick={handleDismiss}
+    >
+      <X size={22} strokeWidth={1.5} color={BRAND_NAVY} />
+    </button>
+    <div className="flex items-center justify-center gap-2 pt-6 pb-4">
+      {dots.map(i => <span key={i} className={`onboarding-review-dot${i === index ? " is-current" : ""}`} />)}
+    </div>
+    <div className="onboarding-review-body">
+      <div className="onboarding-review-carousel" aria-label="Extracted memories" aria-roledescription="carousel"
+        onPointerDown={e => { if (savingOverlay) return; swipeStart.current = { x: e.clientX, y: e.clientY }; }}
+        onPointerUp={e => {
+          const start = swipeStart.current; swipeStart.current = null;
+          if (!start || savingOverlay) return;
+          const dx = e.clientX - start.x, dy = e.clientY - start.y;
+          if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
+          setIndex(i => Math.max(0, Math.min(total - 1, i + (dx < 0 ? 1 : -1))));
+        }} onPointerCancel={() => { swipeStart.current = null; }}>
+        <div key={index} className="onboarding-shared-card">
+          <MemoryArtifact photoUrl={photoPreview} photoFirst category={current.category} title={current.title} note={current.note}
+            createdAt={new Date(storedDraft?.capturedAt || Date.now()).toISOString()} />
+        </div>
+      </div>
+      <div className="onboarding-review-actions">
+        <Button className="onboarding-edit-this" disabled={savingOverlay} onClick={handleEdit}>Edit</Button>
+        <Button className="onboarding-keep-this" disabled={savingOverlay} onClick={handleSave}>Save</Button>
       </div>
     </div>
-  ) : (
-    <div className="flex flex-col">
-      {!editingTitle && !editingNote ? (
-        <div role="button" tabIndex={0} aria-label="Edit this Touchstone" onClick={handleEdit} onKeyDown={(e) => { if (e.key === "Enter") handleEdit(); }}
-          className="w-full cursor-text overflow-hidden px-5 pb-6" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
-          <MemoryArtifact photoUrl={livePhotoUrl} category={current.category} title={current.title} note={current.note} createdAt={new Date().toISOString()} />
-        </div>
-      ) : (<>
-        <p className="uppercase" style={{ fontFamily: "'Jost', sans-serif", fontSize: 11, letterSpacing: "0.18em", color: MUTED, marginTop: 8 }}>
+    {sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
+      const updated = artifacts.map((a, i) => i === index ? edited : a);
+      const draft = loadOnboardingStoryDraft();
+      if (!draft) throw new Error("Missing story draft");
+      saveOnboardingStoryDraft({ ...draft, artifacts: updated as StoryArtifact[] });
+      setArtifacts(updated); setSheetOpen(false);
+    }} />}
+    {savingOverlay && <div className="onboarding-saved-overlay"><p>Saved. Part of your story now.</p></div>}
+  </div>;
+
+  return (
+    <div
+      className="fixed inset-0 z-40 flex flex-col"
+      style={{ backgroundColor: SOFT_IVORY }}
+    >
+      {/* Progress dots */}
+      <div className="flex items-center justify-center gap-2 pt-6 pb-4">
+        {dots.map((i) => (
+          <span
+            key={i}
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: 999,
+              backgroundColor: i === index ? BRAND_NAVY : DIVIDER,
+              opacity: i === index ? 1 : 0.7,
+              transition: "background-color 200ms",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Card body */}
+      <div className={`flex-1 flex flex-col px-6 ${isOnboarding ? "onboarding-review-card" : "overflow-y-auto pb-4 justify-center"}`}>
+        {isOnboarding && <Button variant="ghost" className="onboarding-card-edit" onClick={handleEdit}>Edit</Button>}
+        {isOnboarding && photoPreview && <img src={photoPreview} alt={current.title || "Touchstone photo"} className="onboarding-review-photo" />}
+        {!isOnboarding && !editingTitle && !editingNote ? (
+          <div role="button" tabIndex={0} aria-label="Edit this Touchstone" onClick={handleEdit} onKeyDown={(e) => { if (e.key === "Enter") handleEdit(); }}
+            className="mt-2 mx-auto w-full max-w-sm cursor-text overflow-hidden px-5 pb-6" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
+            <MemoryArtifact photoUrl={livePhotoUrl} category={current.category} title={current.title} note={current.note} createdAt={new Date().toISOString()} />
+          </div>
+        ) : (<>
+        <p
+          className="uppercase"
+          style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 11,
+            letterSpacing: "0.18em",
+            color: MUTED,
+            marginTop: 8,
+          }}
+        >
           {current.category}
         </p>
+
+        {/* Title */}
         {editingTitle ? (
-          <input autoFocus value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} onBlur={commitTitle}
-            onKeyDown={(e) => { if (e.key === "Enter") commitTitle(); }}
+          <input
+            autoFocus
+            value={draftTitle}
+            onChange={(e) => setDraftTitle(e.target.value)}
+            onBlur={commitTitle}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitTitle();
+            }}
             className="w-full mt-2 bg-transparent focus:outline-none"
-            style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: BRAND_NAVY, borderBottom: `1px solid ${DIVIDER}`, paddingBottom: 4 }} />
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 18,
+              color: BRAND_NAVY,
+              borderBottom: `1px solid ${DIVIDER}`,
+              paddingBottom: 4,
+            }}
+          />
         ) : (
-          <h2 onClick={() => { setDraftTitle(current.title); setEditingTitle(true); }}
-            style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: BRAND_NAVY, marginTop: 6, lineHeight: 1.3, cursor: "text" }}>
+          <h2
+            onClick={isOnboarding ? handleEdit : () => {
+              setDraftTitle(current.title);
+              setEditingTitle(true);
+            }}
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 18,
+              color: BRAND_NAVY,
+              marginTop: 6,
+              lineHeight: 1.3,
+              cursor: "text",
+            }}
+          >
             {current.title}
           </h2>
         )}
+
+        {/* Note */}
         {editingNote ? (
-          <textarea autoFocus={!editingTitle} value={draftNote} onChange={(e) => setDraftNote(e.target.value)} onBlur={commitNote}
-            className="w-full mt-4 bg-transparent focus:outline-none resize-none" rows={5}
-            style={{ fontFamily: "'Jost', sans-serif", fontSize: 14, color: MUTED, borderBottom: `1px solid ${DIVIDER}`, lineHeight: 1.5 }} />
+          <textarea
+            autoFocus={!editingTitle}
+            value={draftNote}
+            onChange={(e) => setDraftNote(e.target.value)}
+            onBlur={commitNote}
+            className="w-full mt-4 bg-transparent focus:outline-none resize-none"
+            rows={5}
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              color: MUTED,
+              borderBottom: `1px solid ${DIVIDER}`,
+              lineHeight: 1.5,
+            }}
+          />
         ) : (
-          <p onClick={() => { setDraftNote(current.note); setEditingNote(true); }}
-            style={{ fontFamily: "'Jost', sans-serif", fontSize: 14, color: MUTED, marginTop: 16, lineHeight: 1.55, cursor: "text" }}>
+          <p
+            onClick={isOnboarding ? handleEdit : () => {
+              setDraftNote(current.note);
+              setEditingNote(true);
+            }}
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              color: MUTED,
+              marginTop: 16,
+              lineHeight: 1.55,
+              cursor: "text",
+            }}
+          >
             {current.note}
           </p>
         )}
-      </>)}
-      <input ref={photoInput} type="file" accept="image/*" className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          e.target.value = "";
-          if (!file) return;
-          setArtifacts((arr) => arr.map((a, i) => (i === index ? { ...a, photoFile: file } : a)));
-        }} />
-      <button type="button" onClick={() => photoInput.current?.click()} className="mt-6 self-center"
-        style={{ background: "none", border: "none", padding: 0, color: MUTED, fontFamily: "'Jost', sans-serif", fontSize: 13, cursor: "pointer" }}>
-        {current.photoFile ? "Change photo →" : "Add a photo →"}
-      </button>
-    </div>
-  );
 
-  const remainingCount = artifacts.length;
-  const navBtn: React.CSSProperties = { width: 44, height: 44, display: "grid", placeItems: "center", background: "none", border: "none", cursor: "pointer" };
+        </>)}
 
-  return (
-    <div className="fixed inset-0 z-40 flex flex-col" style={{ backgroundColor: SOFT_IVORY }}>
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
-        <div className="my-auto w-full px-6 py-6">
-          <div className="mx-auto w-full max-w-sm">
-            <div key={index} className={`review-carousel-card ${slideDir === "next" ? "from-right" : slideDir === "prev" ? "from-left" : ""}`}>
-              {cardBody}
-              {!isOnboarding && !editingTitle && !editingNote && (
-                <div className="flex justify-center mt-4">
-                  <Button className="onboarding-edit-this" onClick={handleEdit}>Edit</Button>
-                </div>
-              )}
-              <div className="flex justify-center mt-3">
-                <button type="button" onClick={handleLeaveOut} disabled={savingAll}
-                  style={{ background: "none", border: "none", padding: 8, color: "#2C3E50", fontFamily: "'Jost', sans-serif", fontSize: 15, cursor: "pointer" }}>
-                  Leave out
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center justify-between" style={{ marginTop: 20 }}>
-              <button type="button" aria-label="Previous card" onClick={() => goTo(index - 1)} style={{ ...navBtn, visibility: index > 0 ? "visible" : "hidden" }}>
-                <ChevronLeft size={24} color={BRAND_NAVY} strokeWidth={1.75} />
-              </button>
-              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 14, color: "#4A6B8A" }}>{index + 1} of {total}</span>
-              <button type="button" aria-label="Next card" onClick={() => goTo(index + 1)} style={{ ...navBtn, visibility: index < total - 1 ? "visible" : "hidden" }}>
-                <ChevronRight size={24} color={BRAND_NAVY} strokeWidth={1.75} />
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Add a photo */}
+        {!isOnboarding && <input ref={photoInput} type="file" accept="image/*" className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            if (!file) return;
+            setArtifacts((arr) => arr.map((a, i) => (i === index ? { ...a, photoFile: file } : a)));
+          }} />}
+        {!isOnboarding && <button
+          type="button"
+          onClick={() => photoInput.current?.click()}
+          className={isOnboarding ? "mt-6 self-start" : "mt-6 self-center"}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            color: MUTED,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          {current.photoFile ? "Change photo →" : "Add a photo →"}
+        </button>}
       </div>
 
-      <div className="w-full px-6" style={{ paddingTop: 12, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
-        <div className="mx-auto w-full max-w-sm">
-          <button type="button" onClick={handleSaveAll} disabled={remainingCount === 0 || savingAll} aria-busy={savingAll}
-            className="w-full flex items-center justify-center gap-2"
+      {/* Bottom actions */}
+      <div
+        className="w-full max-w-sm mx-auto px-5"
+        style={{
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+          paddingTop: 12,
+        }}
+      >
+        <button
+          type="button"
+          onClick={handleSave}
+          className="w-full"
+          style={{
+            backgroundColor: BRAND_NAVY,
+            color: SOFT_IVORY,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 15,
+            padding: "0.95rem",
+            borderRadius: 12,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Save
+        </button>
+
+        {!isOnboarding && <button
+          type="button"
+          onClick={handleEdit}
+          className="w-full mt-3"
+          style={{
+            backgroundColor: "transparent",
+            color: BRAND_NAVY,
+            fontFamily: "'Jost', sans-serif",
+            fontSize: 15,
+            padding: "0.9rem",
+            borderRadius: 12,
+            border: `1px solid ${BRAND_NAVY}`,
+            cursor: "pointer",
+          }}
+        >
+          Edit
+        </button>}
+
+        <div className="flex justify-center mt-3">
+          <button
+            type="button"
+            onClick={handleDismiss}
             style={{
-              height: 56, borderRadius: 14, border: "none",
-              backgroundColor: remainingCount === 0 ? "#E8E4D8" : BRAND_NAVY,
-              color: remainingCount === 0 ? "#2C3E50" : SOFT_IVORY,
-              fontFamily: "'Jost', sans-serif", fontSize: 17, fontWeight: 500,
-              cursor: remainingCount === 0 || savingAll ? "default" : "pointer",
-            }}>
-            {savingAll && <Loader2 size={18} className="animate-spin" />}
-            Save all {remainingCount}
+              background: "none",
+              border: "none",
+              color: MUTED,
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 14,
+              cursor: "pointer",
+              padding: 6,
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
+
+        <div className="flex justify-center mt-2">
+          <button
+            type="button"
+            onClick={() => toast("Manual entry coming soon.")}
+            style={{
+              background: "none",
+              border: "none",
+              color: MUTED,
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 12,
+              cursor: "pointer",
+              padding: 4,
+              opacity: 0.85,
+            }}
+          >
+            Something's missing?
           </button>
         </div>
       </div>
 
+      {/* Saved overlay */}
       {isOnboarding && sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
         const updated = artifacts.map((a, i) => i === index ? edited : a);
         const draft = loadOnboardingStoryDraft();
@@ -624,6 +682,27 @@ const StoryReview = () => {
         setArtifacts(updated);
         setSheetOpen(false);
       }} />}
+      {savingOverlay && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-8"
+          style={{
+            backgroundColor: "rgba(242, 238, 229, 0.92)",
+            backdropFilter: "blur(2px)",
+          }}
+        >
+          <p
+            className="text-center"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 22,
+              color: BRAND_NAVY,
+              lineHeight: 1.3,
+            }}
+          >
+            Saved. Part of your story now.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
