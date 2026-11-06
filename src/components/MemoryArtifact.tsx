@@ -28,8 +28,8 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
           paddingTop: 20,
           paddingBottom: 12,
           gap: 6,
-          // 3pt rule closing off the category heading.
-          borderBottom: `3pt solid ${categoryHighlightColor(category)}`,
+          // 2pt rule closing off the category heading.
+          borderBottom: `2pt solid ${categoryHighlightColor(category)}`,
         }}
       >
         <CategoryIcon

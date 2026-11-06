@@ -45,3 +45,5 @@
 # Card glow and category heading rule
 - [x] Make each glow behind a touchstone card use that category's highlight color; verify desktop and phone.
 - [x] Add a 3pt line separating the category heading on the touchstone card; verify desktop and phone.
+
+- [x] Reduce the category heading rule from 3pt to 2pt.
