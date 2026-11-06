@@ -43,6 +43,13 @@
       "when": 1793945301729,
       "tag": "0005_add_touchstone_sharing",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793945355501,
+      "tag": "0006_restrict_touchstone_share_client_grants",
+      "breakpoints": true
     }
   ]
 }
