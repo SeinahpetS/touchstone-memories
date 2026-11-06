@@ -350,18 +350,6 @@ const Archive = () => {
               <ProfileAvatarButton />
             </div>
           </div>
-          <div className="flex justify-end -mt-2 mb-2">
-            <button
-              onClick={() => setShareOpen(true)}
-              className="flex flex-col items-center gap-1"
-              aria-label="Share"
-            >
-              <Share className="h-5 w-5" style={{ color: "#1E2E3E" }} />
-              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: 12, color: "#1E2E3E" }}>
-                Share
-              </span>
-            </button>
-          </div>
           <div
             style={{
               borderRadius: 18,
@@ -413,6 +401,13 @@ const Archive = () => {
                 }}
               />
             </label>
+            <button
+              onClick={() => setShareOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-muted-foreground px-4 py-2.5 transition-colors hover:bg-card"
+            >
+              <Share className="h-4 w-4" style={{ color: "#1E2E3E" }} />
+              <span className="font-source text-sm text-muted-foreground">Share</span>
+            </button>
             <button
               onClick={() => navigate(`/?edit=${selected.id}`)}
               className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors"
