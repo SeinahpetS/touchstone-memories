@@ -66,6 +66,7 @@ function hapticTap() {
     /* no-op */
   }
 }
+import GoldLeafBurst from "@/components/GoldLeafBurst";
 
 const StoryReview = () => {
   const navigate = useNavigate();
@@ -322,14 +323,18 @@ const StoryReview = () => {
   }, [total]);
 
   if (phase === "complete") {
+    const reducedMotion = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     return (
       <div
         className="fixed inset-0 z-40 flex flex-col items-center justify-center px-6"
         style={{ backgroundColor: SOFT_IVORY }}
       >
+        {!reducedMotion && <GoldLeafBurst onStart={() => { playChime(); hapticTap(); }} />}
         <h2
-          className="text-center"
+          className="text-center saved-fade-heading"
           style={{
+            position: "relative",
+            zIndex: 1,
             fontFamily: "'Playfair Display', serif",
             fontSize: 22,
             color: BRAND_NAVY,
@@ -375,8 +380,10 @@ const StoryReview = () => {
         <button
           type="button"
           onClick={() => navigate(isOnboarding ? "/onboarding-name" : "/archive")}
-          className="mt-3"
+          className={isOnboarding ? "mt-3 saved-fade-continue" : "mt-3"}
           style={{
+            position: "relative",
+            zIndex: 1,
             background: "none",
             border: "none",
             color: isOnboarding ? BRAND_NAVY : MUTED,
