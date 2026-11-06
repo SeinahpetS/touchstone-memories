@@ -100,6 +100,9 @@ const webSpeechEngine: TranscribeEngine = {
     let stopped = false;
     let paused = false;
     let restarting = false;
+    let restartTimer: ReturnType<typeof setTimeout> | null = null;
+    let startedAt = 0;
+    let quickFails = 0;
 
     const emit = () => {
       const spoken = finished.join(" ").replace(/\s+/g, " ").trim();
@@ -116,16 +119,21 @@ const webSpeechEngine: TranscribeEngine = {
     recognition.lang = navigator.language || "en-US";
     recognition.maxAlternatives = 1;
 
-    const begin = () => {
+    const begin = (delay = 0) => {
       if (stopped || paused || restarting) return;
       restarting = true;
-      try {
-        recognition.start();
-      } catch {
-        // Already running: the existing run keeps feeding results.
-      } finally {
+      if (restartTimer) clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => {
+        restartTimer = null;
         restarting = false;
-      }
+        if (stopped || paused) return;
+        startedAt = Date.now();
+        try {
+          recognition.start();
+        } catch {
+          // Already running: the existing run keeps feeding results.
+        }
+      }, delay);
     };
 
     recognition.onresult = (event) => {
@@ -157,7 +165,13 @@ const webSpeechEngine: TranscribeEngine = {
     recognition.onend = () => {
       if (stopped || paused) return;
       // The browser ended this run on its own. Carry on without telling anyone.
-      begin();
+      // A run that dies the moment it begins means something is wrong (no
+      // network, no service): back off instead of spinning, and stop trying
+      // once it's clear it will never come back. What was heard is kept.
+      if (Date.now() - startedAt < 700) quickFails += 1;
+      else quickFails = 0;
+      if (quickFails > 8) return;
+      begin(250);
     };
 
     begin();
@@ -165,6 +179,7 @@ const webSpeechEngine: TranscribeEngine = {
     return {
       stop: () => {
         stopped = true;
+        if (restartTimer) clearTimeout(restartTimer);
         try {
           recognition.stop();
         } catch {
