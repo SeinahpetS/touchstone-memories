@@ -4,6 +4,7 @@ import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/Ca
 import { categoryHighlightColor } from "@/lib/categoryGlow";
 import MemoryPhoto from "@/components/MemoryPhoto";
 import ArtifactMentions from "@/components/ArtifactMentions";
+import SendCopy from "@/components/SendCopy";
 import type { Person } from "@/lib/people";
 
 interface Props {
@@ -76,6 +77,7 @@ const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, tit
       )}
 
       <ArtifactMentions touchstoneId={touchstoneId} people={mentionedPeople} />
+      {touchstoneId && <SendCopy key={touchstoneId} touchstoneId={touchstoneId} mentionedPeople={mentionedPeople} />}
       {note && <p className="text-base text-foreground leading-relaxed">{note}</p>}
     </div>
   );

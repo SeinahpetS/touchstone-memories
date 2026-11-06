@@ -137,6 +137,16 @@
 }
 
 .capture-people { font-family: 'Jost', sans-serif; }
+.send-copy-row { margin-top: 6px !important; }
+.send-copy-text { font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 400; height: 36px; padding: 0; color: hsl(var(--mention-ink) / 0.6); }
+.send-copy-text:hover { background: transparent; color: hsl(var(--mention-ink) / 0.6); }
+.send-copy-sheet { background: hsl(var(--person-paper)); color: hsl(var(--mention-ink)); max-height: 85dvh; overflow-y: auto; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+.send-copy-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: hsl(var(--person-heading)); }
+.send-copy-note { font-family: 'Jost', sans-serif; font-size: 14px; }
+.send-copy-helper { font-family: 'Jost', sans-serif; font-size: 13px; color: hsl(var(--mention-ink) / 0.6); }
+.send-copy-chip[aria-pressed='true'] { outline: 1px solid hsl(var(--mention-plum)); outline-offset: 2px; }
+.send-copy-error { font-family: 'Jost', sans-serif; font-size: 14px; color: hsl(var(--destructive)); }
+.send-copy-feedback { position: fixed; z-index: 100; bottom: 100px; left: 50%; transform: translateX(-50%); padding: 8px 16px; border-radius: 6px; background: hsl(var(--person-paper)); color: hsl(var(--mention-ink)); font-family: 'Jost', sans-serif; font-size: 14px; }
 .person-page { background: hsl(var(--person-paper)); }
 .person-name { color: hsl(var(--person-heading)); }
 .capture-people-toggle { height: 36px; padding: 0; font-size: 14px; font-weight: 400; color: hsl(var(--mention-ink) / 0.6); background: transparent; }
