@@ -206,6 +206,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 fontFamily: "'Playfair Display', serif",
                 fontSize: 16,
                 fontWeight: 600,
+                lineHeight: 1.15,
                 color: "#2C3E50",
                 margin: 0,
               }}
@@ -219,6 +220,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 fontFamily: "Jost, sans-serif",
                 fontSize: 11,
                 fontWeight: 300,
+                lineHeight: 1.1,
                 color: "rgba(91,74,63,0.6)",
                 margin: 0,
               }}
