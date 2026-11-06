@@ -62,11 +62,11 @@ const BottomNav = () => {
   const { pathname } = useLocation();
 
   // Reserve space at the bottom of the page so content never slides under the
-  // floating tab bar. Nav height ≈ 70px + 12px bottom offset + safe area + breathing room.
+  // floating tab bar. Nav height ≈ 73px + 4px bottom offset + safe area + a little clearance.
   useEffect(() => {
     const prev = document.body.style.paddingBottom;
     document.body.style.paddingBottom =
-      "calc(env(safe-area-inset-bottom, 0px) + 110px)";
+      "calc(env(safe-area-inset-bottom, 0px) + 84px)";
     return () => {
       document.body.style.paddingBottom = prev;
     };
@@ -82,12 +82,12 @@ const BottomNav = () => {
         margin: "0 auto",
         width: "calc(100% - 40px)",
         maxWidth: 512,
-        bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
+        bottom: "calc(env(safe-area-inset-bottom, 0px) + 4px)",
         background: "rgba(30, 46, 62, 0.75)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         borderRadius: 40,
-        padding: "10px 18px",
+        padding: "6px 14px",
         display: "flex",
         justifyContent: "space-between",
         gap: 4,
@@ -109,7 +109,7 @@ const BottomNav = () => {
             style={{
               background: "transparent",
               border: "none",
-              padding: "4px 4px",
+              padding: "2px 4px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -124,9 +124,9 @@ const BottomNav = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 4,
-                minHeight: 63,
-                padding: "8px 14px",
+                gap: 2,
+                minHeight: 57,
+                padding: "5px 12px",
                 borderRadius: 999,
                 background: isActive ? HIGHLIGHT : "transparent",
                 transition: "background-color 220ms ease",
