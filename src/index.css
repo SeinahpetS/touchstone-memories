@@ -324,3 +324,6 @@
 .location-snippet-open { font-family: 'Jost', sans-serif; font-size: 13px; color: #4A6B8A; background: transparent; text-decoration: underline; text-underline-offset: 3px; }
 
 .artifact-location-line { display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; font-family: 'Jost', sans-serif; font-size: 13px; color: #5B4A3F; background: transparent; }
+.capture-where-value { display: inline-flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 14px; color: #5B4A3F; background: transparent; text-align: left; }
+.capture-where-value svg { color: #B8860B; flex-shrink: 0; }
+.capture-where-remove { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 14px; color: hsl(var(--mention-ink) / 0.6); }
