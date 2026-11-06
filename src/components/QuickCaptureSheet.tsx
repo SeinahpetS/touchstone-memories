@@ -13,6 +13,8 @@ import CategoryIcon, {
 import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
 import CapturePeople from "@/components/CapturePeople";
+import CaptureWhere from "@/components/CaptureWhere";
+import { allowsPhotoPrefill, loadCities, nearestCity, readPhotoGps, type CaptureCity } from "@/lib/captureLocation";
 import { linkPersonTouchstone, type Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
 import { capturePromptBody } from "@/lib/capturePrompt";
@@ -134,6 +136,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
   const [fields, setFields] = useState<CategoryFieldValues>({ ...initialFields });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [where, setWhere] = useState<CaptureCity | null>(null);
+  const [whereFromPhoto, setWhereFromPhoto] = useState(false);
   const [podcastPick, setPodcastPick] = useState<PodcastPick | null>(null);
   const [podcastManual, setPodcastManual] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -156,6 +160,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
       setNote(prefill?.kind === "link" && prefill.title ? prefill.title : "");
       if (prefill?.kind === "link") setDigitalType("link");
       setMentionedPeople([]);
+      setWhere(null);
+      setWhereFromPhoto(false);
       setEmotionalTone("");
       setWhoWasThere("");
       setConnectedTo("");
@@ -188,6 +194,24 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
     setPhotoPreview(url);
     return () => URL.revokeObjectURL(url);
   }, [photoFile]);
+
+  // Photo GPS → nearest city, read in the browser. Only fills an empty row; never for People.
+  useEffect(() => {
+    if (!photoFile || !allowsPhotoPrefill(category)) return;
+    let active = true;
+    readPhotoGps(photoFile).then(async (gps) => {
+      if (!gps || !active) return;
+      const city = nearestCity(await loadCities(), gps.lat, gps.lng);
+      if (!city || !active) return;
+      setWhere((cur) => { if (cur) return cur; setWhereFromPhoto(true); return city; });
+    });
+    return () => { active = false; };
+  }, [photoFile, category]);
+
+  // A photo-derived place doesn't carry over to People (manual only).
+  useEffect(() => {
+    if (whereFromPhoto && !allowsPhotoPrefill(category)) { setWhere(null); setWhereFromPhoto(false); }
+  }, [category, whereFromPhoto]);
 
   // ESC to close
   useEffect(() => {
@@ -288,9 +312,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         ai_prompt: PROMPT,
         ai_answer: whoWasThere.trim() || null,
         photo_url,
-        location_name: fields.locationName.trim() || null,
-        location_lat: fields.locationLat,
-        location_lng: fields.locationLng,
+        location_name: category === "digital_traces" ? null : where?.name ?? null,
+        location_lat: category === "digital_traces" ? null : where?.lat ?? null,
+        location_lng: category === "digital_traces" ? null : where?.lng ?? null,
         venue_name: fields.venueName.trim() || null,
         relationship_type:
           category === "person" && fields.relationshipType
@@ -1044,6 +1068,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
             />
 
             {user && <div className="mb-5"><CapturePeople key={String(open)} userId={user.id} selected={mentionedPeople} onChange={setMentionedPeople} /></div>}
+
+            <div className="mb-5"><CaptureWhere category={category} value={where} fromPhoto={whereFromPhoto} onChange={(v, fromPhoto) => { setWhere(v); setWhereFromPhoto(fromPhoto); }} /></div>
 
 
 
