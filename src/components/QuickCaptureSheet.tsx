@@ -1,3 +1,4 @@
+import { sanitizePhoto } from "@/lib/photoSanitize";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -248,11 +249,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
     try {
       let photo_url: string | null = null;
       if (photoFile) {
-        const ext = photoFile.name.split(".").pop();
-        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const clean = await sanitizePhoto(photoFile);
+        const path = `${user.id}/${crypto.randomUUID()}.jpg`;
         const { error: uploadErr } = await supabase.storage
           .from("memory-photos")
-          .upload(path, photoFile);
+          .upload(path, clean, { contentType: "image/jpeg" });
         if (uploadErr) throw uploadErr;
         const { data } = supabase.storage
           .from("memory-photos")

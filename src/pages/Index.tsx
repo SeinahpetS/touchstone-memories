@@ -1,3 +1,4 @@
+import { sanitizePhoto } from "@/lib/photoSanitize";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -268,11 +269,11 @@ const Index = () => {
       let photo_url: string | null = editId ? current.photoPreview ?? null : null;
 
       if (photoFile) {
-        const ext = photoFile.name.split(".").pop();
-        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const clean = await sanitizePhoto(photoFile);
+        const path = `${user.id}/${crypto.randomUUID()}.jpg`;
         const { error: uploadErr } = await supabase.storage
           .from("memory-photos")
-          .upload(path, photoFile);
+          .upload(path, clean, { contentType: "image/jpeg" });
         if (uploadErr) throw uploadErr;
         const { data } = supabase.storage.from("memory-photos").getPublicUrl(path);
         photo_url = data.publicUrl;

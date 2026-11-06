@@ -1,3 +1,4 @@
+import { sanitizePhoto } from "@/lib/photoSanitize";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -350,11 +351,10 @@ const Onboarding = () => {
       let photo_url: string | null = null;
       const file = getOnboardingPhoto();
       if (file) {
-        const ext = file.name.split(".").pop();
-        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const path = `${user.id}/${crypto.randomUUID()}.jpg`;
         const { error: upErr } = await supabase.storage
           .from("memory-photos")
-          .upload(path, file);
+          .upload(path, await sanitizePhoto(file), { contentType: "image/jpeg" });
         if (!upErr) {
           const { data } = supabase.storage.from("memory-photos").getPublicUrl(path);
           photo_url = data.publicUrl;
