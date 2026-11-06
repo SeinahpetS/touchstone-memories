@@ -61,13 +61,13 @@
 
     /* Category selection outline — brighter, higher-chroma variants for light mode */
     --cat-moment: 211 77% 45%;         /* #1B6FCB */
-    --cat-person: 152 83% 27%;         /* #0C7F49 */
-    --cat-object: 331 61% 43%;         /* #B02A6B */
-    --cat-place: 17 82% 42%;           /* #C24413 */
+    --cat-person: 331 61% 43%;         /* #B02A6B */
+    --cat-object: 192 86% 32%;         /* #0B7A96 */
+    --cat-place: 152 83% 27%;           /* #0C7F49 */
     --cat-food: 17 82% 42%;            /* #C24413 */
-    --cat-sound: 30 71% 37%;           /* #A2601C */
+    --cat-sound: 30 8% 40%;            /* #6E665E */
     --cat-imprint: 40 88% 31%;         /* #96680A */
-    --cat-digital-traces: 192 86% 32%; /* #0B7A96 */
+    --cat-digital-traces: 210 16% 42%; /* #5A6B7C */
     --cat-all: 40 88% 31%;             /* #96680A */
 
     /* Category-icon dark tile tokens */
@@ -116,13 +116,13 @@
 
     /* Category selection outline — original hues read well against navy in dark mode */
     --cat-moment: 209 30% 42%;         /* #4A6B8A */
-    --cat-person: 153 45% 34%;         /* #2E7D5E */
-    --cat-object: 325 41% 39%;         /* #8B3A62 */
-    --cat-place: 17 51% 54%;           /* #C2714F */
+    --cat-person: 325 41% 39%;         /* #8B3A62 */
+    --cat-object: 191 43% 37%;         /* #367588 */
+    --cat-place: 153 45% 34%;           /* #2E7D5E */
     --cat-food: 17 51% 54%;            /* #C2714F */
-    --cat-sound: 24 17% 30%;           /* #5B4A3F */
+    --cat-sound: 32 9% 66%;            /* #B3AAA0 */
     --cat-imprint: 43 88% 38%;         /* #B8860B */
-    --cat-digital-traces: 191 43% 37%; /* #367588 */
+    --cat-digital-traces: 210 18% 62%; /* #8B9DAF */
     --cat-all: 43 88% 38%;             /* #B8860B */
 
     --sidebar-background: 207 31% 12%;
