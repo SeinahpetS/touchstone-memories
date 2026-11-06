@@ -9,6 +9,9 @@ import Wordmark from "@/components/Wordmark";
 import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
+import CapturePeople from "@/components/CapturePeople";
+import { getMentionsForTouchstone, type Person } from "@/lib/people";
+import { saveCaptureMentions } from "@/lib/captureMentions";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
@@ -85,6 +88,7 @@ const initialFields: CategoryFieldValues = {
 };
 
 interface CategoryDraft {
+  mentionedPeople: Person[];
   title: string;
   emotionalTone: string;
   note: string;
@@ -97,6 +101,7 @@ interface CategoryDraft {
 }
 
 const emptyDraft = (): CategoryDraft => ({
+  mentionedPeople: [],
   title: "",
   emotionalTone: "",
   note: "",
@@ -170,7 +175,17 @@ const Index = () => {
         return;
       }
       const cat = data.category as CategoryKey;
+      let mentionedPeople: Person[];
+      try {
+        mentionedPeople = await getMentionsForTouchstone(editId);
+      } catch {
+        // Do not permit an unread directory to erase existing mentions on save.
+        toast.error("Couldn't load linked people. Please reopen Edit to try again.");
+        return;
+      }
+      if (cancelled) return;
       const draft: CategoryDraft = {
+        mentionedPeople,
         title: data.title ?? "",
         emotionalTone: data.emotional_tone ?? "",
         note: data.note ?? "",
@@ -333,6 +348,9 @@ const Index = () => {
       }
 
       if (error) throw error;
+      saveCaptureMentions(data.id, current.mentionedPeople.map((p) => p.id), () => {
+        toast.error("Touchstone saved, but its people couldn't be linked. You can add them in Edit.");
+      });
       setSaved(data);
       toast.success("Touchstone added to your Constellation!");
       logEvent(editId ? "memory_updated" : "capture_completed", {
@@ -558,6 +576,8 @@ const Index = () => {
               onChange={(e) => setNote(e.target.value)}
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
             />
+
+            {user && <CapturePeople key={`${category}-${editId ?? "new"}`} userId={user.id} selected={current.mentionedPeople} onChange={(mentionedPeople) => updateDraft({ mentionedPeople })} />}
 
             <div className="flex items-center justify-between gap-4 rounded-xl bg-card px-4 py-3">
               <div>

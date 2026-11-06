@@ -12,6 +12,10 @@ import CategoryIcon, {
 } from "@/components/CategoryIcon";
 import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
+import CapturePeople from "@/components/CapturePeople";
+import type { Person } from "@/lib/people";
+import { saveCaptureMentions } from "@/lib/captureMentions";
+import { toast } from "sonner";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import PodcastSearch, { type PodcastPick } from "@/components/PodcastSearch";
@@ -110,6 +114,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
+  const [mentionedPeople, setMentionedPeople] = useState<Person[]>([]);
   const [emotionalTone, setEmotionalTone] = useState("");
   const [whoWasThere, setWhoWasThere] = useState("");
   const [connectedTo, setConnectedTo] = useState("");
@@ -137,6 +142,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
       setCategory(initialCategory ?? "moment");
       setTitle("");
       setNote("");
+      setMentionedPeople([]);
       setEmotionalTone("");
       setWhoWasThere("");
       setConnectedTo("");
@@ -321,6 +327,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
       if (insertErr) throw insertErr;
 
       const newId = inserted?.id ?? null;
+      if (newId) saveCaptureMentions(newId, mentionedPeople.map((p) => p.id), () => {
+        toast.error("Touchstone saved, but its people couldn't be linked. You can add them in Edit.");
+      });
       setSavedId(newId);
       setConfirmed(true);
       playSaveFeedback();
@@ -994,6 +1003,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
               placeholder={notePlaceholder}
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic mb-5"
             />
+
+            {user && <div className="mb-5"><CapturePeople key={String(open)} userId={user.id} selected={mentionedPeople} onChange={setMentionedPeople} /></div>}
 
             <Input
               type="text"
