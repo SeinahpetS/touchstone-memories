@@ -86,12 +86,30 @@ async function tx<T>(mode: IDBTransactionMode, run: (s: IDBObjectStore) => IDBRe
   } finally { db.close(); }
 }
 
+/** A held share is dropped if it hasn't been saved or cancelled within 24 hours. */
+export const SHARE_TTL_MS = 24 * 60 * 60 * 1000;
+
+type StoredShare = SharedPayload & { savedAt?: number };
+
+export function isShareExpired(savedAt: number | undefined, now = Date.now()): boolean {
+  return typeof savedAt === "number" && now - savedAt >= SHARE_TTL_MS;
+}
+
 export async function saveSharedPayload(payload: SharedPayload): Promise<void> {
-  await tx("readwrite", (s) => s.put(payload, SHARE_RECORD_KEY));
+  await tx("readwrite", (s) => s.put({ ...payload, savedAt: Date.now() }, SHARE_RECORD_KEY));
 }
 
 export async function readSharedPayload(): Promise<SharedPayload | null> {
-  try { return ((await tx("readonly", (s) => s.get(SHARE_RECORD_KEY))) as SharedPayload) ?? null; } catch { return null; }
+  try {
+    const rec = ((await tx("readonly", (s) => s.get(SHARE_RECORD_KEY))) as StoredShare) ?? null;
+    if (!rec) return null;
+    if (isShareExpired(rec.savedAt)) { await clearSharedPayload(); return null; }
+    if (typeof rec.savedAt !== "number") { // written by the share worker: start its clock now
+      await tx("readwrite", (s) => s.put({ ...rec, savedAt: Date.now() }, SHARE_RECORD_KEY));
+    }
+    const { savedAt: _s, ...payload } = rec;
+    return payload;
+  } catch { return null; }
 }
 
 export async function clearSharedPayload(): Promise<void> {
