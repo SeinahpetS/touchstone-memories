@@ -58,6 +58,8 @@
 - [x] "Record audio" copy only for the Sounds category; other categories show "Take photo".
 
 # People table and mentions
+- [x] Add optional people selection below capture notes; save mentions without delaying capture and exclude them from AI requests; cover with focused tests.
+- [ ] Verify capture mentions read back in a signed-in preview; blocked until the user signs in (no matching account for requesting email).
 - [x] Create `people` and `touchstone_mentions` tables with RLS so a user only reaches their own rows and mentions where both sides are theirs.
 - [x] Read and write people and touchstone_mentions only through the src/lib/people.ts data-access functions, never from components, so ownership checks (own person rows, mentions whose touchstone and person are both the user's) live in one place.
 - [x] Link people.user_id to profiles(id) with on delete cascade, once profiles.id's own cascade to auth.users was confirmed.

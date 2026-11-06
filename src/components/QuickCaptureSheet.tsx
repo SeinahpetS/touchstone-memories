@@ -12,6 +12,11 @@ import CategoryIcon, {
 } from "@/components/CategoryIcon";
 import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
+import CapturePeople from "@/components/CapturePeople";
+import type { Person } from "@/lib/people";
+import { saveCaptureMentions } from "@/lib/captureMentions";
+import { capturePromptBody } from "@/lib/capturePrompt";
+import { toast } from "sonner";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import PodcastSearch, { type PodcastPick } from "@/components/PodcastSearch";
@@ -110,6 +115,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
   const [category, setCategory] = useState<CategoryKey>("moment");
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
+  const [mentionedPeople, setMentionedPeople] = useState<Person[]>([]);
   const [emotionalTone, setEmotionalTone] = useState("");
   const [whoWasThere, setWhoWasThere] = useState("");
   const [connectedTo, setConnectedTo] = useState("");
@@ -137,6 +143,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
       setCategory(initialCategory ?? "moment");
       setTitle("");
       setNote("");
+      setMentionedPeople([]);
       setEmotionalTone("");
       setWhoWasThere("");
       setConnectedTo("");
@@ -321,6 +328,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
       if (insertErr) throw insertErr;
 
       const newId = inserted?.id ?? null;
+      if (newId) saveCaptureMentions(newId, mentionedPeople.map((p) => p.id), () => {
+        toast.error("Touchstone saved, but its people couldn't be linked. You can add them in Edit.");
+      });
       setSavedId(newId);
       setConfirmed(true);
       playSaveFeedback();
@@ -351,26 +361,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
               }
             }
 
-            // Map internal category names to AI prompt schema
-            const categoryMap: Record<string, string> = {
-              person: "people",
-              digital_traces: "digital_trace",
-            };
-            const aiCategory = categoryMap[payload.category] ?? payload.category;
-
-            const aiBody: Record<string, any> = {
-              category: aiCategory,
-            };
-            if (payload.title) {
-              aiBody.title = payload.title;
-            }
-            if (payload.category === "person" && payload.still_in_touch !== null && payload.still_in_touch !== undefined) {
-              aiBody.still_in_touch = payload.still_in_touch;
-            }
-            if (photoBase64 && photoMediaType) {
-              aiBody.photo_base64 = photoBase64;
-              aiBody.photo_media_type = photoMediaType;
-            }
+            const aiBody = capturePromptBody({ category: payload.category, title: payload.title, still_in_touch: payload.still_in_touch }, photoBase64, photoMediaType);
 
             const { data: aiData, error: aiErr } = await supabase.functions.invoke(
               "generate-ai-prompt",
@@ -994,6 +985,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
               placeholder={notePlaceholder}
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic mb-5"
             />
+
+            {user && <div className="mb-5"><CapturePeople key={String(open)} userId={user.id} selected={mentionedPeople} onChange={setMentionedPeople} /></div>}
 
             <Input
               type="text"
