@@ -621,7 +621,7 @@ const Archive = () => {
           <div className="mt-3 mb-3 sm:mt-4 sm:mb-4">
             <div
               className="grid"
-              style={{ gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}
+              style={{ gridTemplateColumns: "repeat(4, 1fr)", gridAutoRows: "1fr", gap: "10px" }}
             >
               {FILTER_CATEGORIES.map((c) => {
                 const active = filter === c;
