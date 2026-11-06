@@ -11,14 +11,16 @@ type Flake = {
 const makeFlakes = (): Flake[] =>
   Array.from({ length: 14 }, () => {
     const size = rand(6, 14);
+    const top = rand(0, 25);
+    const vh = typeof window !== "undefined" ? window.innerHeight : 800;
     const j = () => rand(0, size * 0.3);
     const pts = [
       [j(), j()], [size - j(), j()], [size - j(), size - j()], [j(), size - j()],
     ].map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
     return {
       size, points: pts, opacity: rand(0.45, 0.9),
-      left: rand(20, 80), top: rand(0, 25), delay: rand(0, 600),
-      fall: rand(180, 280), dur: rand(2400, 3600),
+      left: rand(20, 80), top, delay: rand(0, 600),
+      fall: vh * (1 - top / 100) + size, dur: rand(2400, 3600),
       sway: rand(10, 16) * (Math.random() < 0.5 ? -1 : 1),
       cycles: rand(1, 2), rot: rand(-160, 160), flips: Math.round(rand(2, 3)),
       phase: Math.random() * Math.PI * 2,
@@ -46,7 +48,7 @@ const GoldLeafBurst = ({ onStart }: { onStart?: () => void }) => {
         const eased = 1 - Math.pow(1 - p, 3);
         const x = f.sway * Math.sin(f.phase + p * f.cycles * Math.PI * 2) - f.sway * Math.sin(f.phase);
         const sx = 1 - 0.85 * (0.5 - 0.5 * Math.cos(p * f.flips * Math.PI * 2));
-        const op = p < 0.6 ? f.opacity : f.opacity * (1 - (p - 0.6) / 0.4);
+        const op = p < 0.85 ? f.opacity : f.opacity * (1 - (p - 0.85) / 0.15);
         frames.push({
           transform: `translate(${x.toFixed(2)}px, ${(eased * f.fall).toFixed(2)}px) rotate(${(eased * f.rot).toFixed(1)}deg) scaleX(${sx.toFixed(3)})`,
           opacity: op,
