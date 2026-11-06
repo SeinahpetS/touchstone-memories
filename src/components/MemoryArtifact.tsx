@@ -8,6 +8,7 @@ import SendCopy from "@/components/SendCopy";
 import ReceivedRecollection from "@/components/ReceivedRecollection";
 import type { Person } from "@/lib/people";
 import { lazy, Suspense } from "react";
+import { MapPin } from "lucide-react";
 
 const LocationSnippet = lazy(() => import("@/components/LocationSnippet"));
 
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, title, note, receivedFromName, receivedNote, locationName, locationLat, locationLng, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
+  const hasLocation = locationLat != null && locationLng != null;
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
@@ -73,6 +75,10 @@ const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, tit
       {receivedFromName && <p className="received-from-label">From {receivedFromName}</p>}
       {title && <h2 className="font-playfair text-xl font-semibold text-foreground">{title}</h2>}
 
+      {hasLocation && (
+        <p className={`artifact-location-line ${title ? "!mt-1" : ""}`}><MapPin size={14} color="#B8860B" aria-hidden="true" /><span>{locationName?.trim() || "Pinned location"}</span></p>
+      )}
+
       {memoryDateLabel ? (
         <div className={`space-y-1 ${title ? "!mt-1.5" : ""}`}>
           <p className="font-playfair italic text-base text-foreground">{memoryDateLabel}</p>
@@ -89,8 +95,8 @@ const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, tit
       <ArtifactMentions touchstoneId={touchstoneId} people={mentionedPeople} />
       {touchstoneId && <SendCopy key={touchstoneId} touchstoneId={touchstoneId} mentionedPeople={mentionedPeople} />}
       {note && <p className="text-base text-foreground leading-relaxed">{note}</p>}
-      {locationLat != null && locationLng != null && (
-        <Suspense fallback={null}><LocationSnippet lat={locationLat} lng={locationLng} name={locationName} /></Suspense>
+      {hasLocation && (
+        <Suspense fallback={null}><LocationSnippet lat={locationLat!} lng={locationLng!} name={locationName} /></Suspense>
       )}
       <ReceivedRecollection name={receivedFromName} note={receivedNote} />
     </div>

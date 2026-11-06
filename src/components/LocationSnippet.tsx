@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { MapPin } from "lucide-react";
 import * as maplibregl from "maplibre-gl";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { Protocol } from "pmtiles";
@@ -23,9 +22,11 @@ const landGeoJson = () => {
 function buildStyle(): maplibregl.StyleSpecification {
   const css = getComputedStyle(document.documentElement);
   const hsl = (v: string, fb: string) => (css.getPropertyValue(v).trim() ? `hsl(${css.getPropertyValue(v).trim()})` : fb);
-  const water = hsl("--globe-ocean", "#2C3E50");
-  const land = hsl("--globe-land", "#E8E4D8");
-  const line = hsl("--globe-line", "#9E9585");
+  void hsl;
+  // Touchstone palette: parchment land, soft teal-grey water, warm stone lines.
+  const water = "#C9D3D4";
+  const land = "#E8E4D8";
+  const line = "#CFC8B8";
   if (PMTILES_URL) {
     if (!protocolAdded) { maplibregl.addProtocol("pmtiles", new Protocol().tile); protocolAdded = true; }
     return {
@@ -59,12 +60,12 @@ const LocationSnippet = ({ lat, lng, name }: Props) => {
   useEffect(() => {
     if (!mapEl.current) return;
     const map = new maplibregl.Map({
-      container: mapEl.current, style: buildStyle(), center: [lng, lat], zoom: PMTILES_URL ? 11 : 4,
+      container: mapEl.current, style: buildStyle(), center: [lng, lat], zoom: PMTILES_URL ? 11 : 5,
       interactive: false, attributionControl: false,
     });
     const pin = document.createElement("div");
     pin.className = "location-snippet-pin";
-    new maplibregl.Marker({ element: pin, anchor: "bottom" }).setLngLat([lng, lat]).addTo(map);
+    new maplibregl.Marker({ element: pin, anchor: "center" }).setLngLat([lng, lat]).addTo(map);
     return () => map.remove();
   }, [lat, lng]);
 
@@ -73,13 +74,10 @@ const LocationSnippet = ({ lat, lng, name }: Props) => {
 
   return (
     <div className="location-snippet">
-      <button type="button" className="location-snippet-label" onClick={open} aria-label={`Open ${label} in Maps`}>
-        <MapPin size={16} aria-hidden="true" /> <span>{label}</span>
-      </button>
       <button type="button" className="location-snippet-map" onClick={open} aria-label={`Open ${label} in Maps`}>
         <div ref={mapEl} className="location-snippet-canvas" aria-hidden="true" />
       </button>
-      <button type="button" className="location-snippet-open" onClick={open}>Open in Maps</button>
+      <button type="button" className="location-snippet-open" onClick={open}>Open in Maps ↗</button>
     </div>
   );
 };
