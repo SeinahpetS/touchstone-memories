@@ -1,3 +1,4 @@
+import { tellMeAStory } from "@/lib/ai";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,10 +21,7 @@ const TellStory = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke(
-        "extract-story-artifacts",
-        { body: { story } },
-      );
+      const { data, error: fnError } = await tellMeAStory({ story });
       if (fnError) throw fnError;
       const artifacts = (data as any)?.artifacts;
       if (!Array.isArray(artifacts) || artifacts.length === 0) {
