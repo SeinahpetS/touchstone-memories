@@ -70,7 +70,7 @@ export function needsSelectionRing(bounds: [[number, number], [number, number]])
   return Math.max(maxX - minX, maxY - minY) < SELECTION_RING_MIN_PX;
 }
 
-export type CityRow = [name: string, country: string, region: string, regionCode: string | null, population: number];
+export type CityRow = [name: string, country: string, region: string, regionCode: string | null, population: number, lat?: number, lng?: number];
 export const normalizeCity = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 export function rankLocalCities(rows: CityRow[], query: string, selection: GlobeSelection): CityRow[] {

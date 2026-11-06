@@ -10,6 +10,8 @@ import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
 import CapturePeople from "@/components/CapturePeople";
+import CaptureWhere from "@/components/CaptureWhere";
+import { allowsPhotoPrefill, loadCities, nearestCity, readPhotoGps } from "@/lib/captureLocation";
 import { getMentionsForTouchstone, type Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
 import CategorySelector from "@/components/CategorySelector";
@@ -133,6 +135,7 @@ const Index = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [mentionsReady, setMentionsReady] = useState(!editId);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [whereFromPhoto, setWhereFromPhoto] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
   const { title, emotionalTone, note, sentiment, whoWasThere, photoFile, photoPreview, fields, memoryDate } = current;
@@ -238,6 +241,15 @@ const Index = () => {
     if (file) {
       const url = URL.createObjectURL(file);
       updateDraft({ photoFile: file, photoPreview: url });
+      // Photo GPS → nearest city, in the browser; fills only an empty row, never for People or edits.
+      if (!editId && allowsPhotoPrefill(category) && !fields.locationName.trim()) {
+        readPhotoGps(file).then(async (gps) => {
+          const city = gps && nearestCity(await loadCities(), gps.lat, gps.lng);
+          if (!city) return;
+          setWhereFromPhoto(true);
+          setFields((prev) => prev.locationName.trim() ? prev : { ...prev, locationName: city.name, locationLat: city.lat, locationLng: city.lng });
+        });
+      }
     } else {
       updateDraft({ photoFile: null, photoPreview: null });
     }
@@ -305,9 +317,9 @@ const Index = () => {
         note: note.trim() || null,
         sentiment: sentiment || null,
         photo_url,
-        location_name: fields.locationName.trim() || null,
-        location_lat: fields.locationLat,
-        location_lng: fields.locationLng,
+        location_name: category === "digital_traces" ? null : fields.locationName.trim() || null,
+        location_lat: category === "digital_traces" ? null : fields.locationLat,
+        location_lng: category === "digital_traces" ? null : fields.locationLng,
         venue_name: fields.venueName.trim() || null,
         relationship_type:
           category === "person" && fields.relationshipType
@@ -611,6 +623,11 @@ const Index = () => {
             />
 
             {user && <CapturePeople key={`${category}-${editId ?? "new"}`} userId={user.id} selected={current.mentionedPeople} onChange={(mentionedPeople) => updateDraft({ mentionedPeople })} />}
+
+            {!editId && <CaptureWhere category={category}
+              value={fields.locationName.trim() ? { name: fields.locationName, lat: fields.locationLat, lng: fields.locationLng } : null}
+              fromPhoto={whereFromPhoto}
+              onChange={(v, fromPhoto) => { setWhereFromPhoto(fromPhoto); setFields((prev) => ({ ...prev, locationName: v?.name ?? "", locationLat: v?.lat ?? null, locationLng: v?.lng ?? null })); }} />}
 
             <div className="flex items-center justify-between gap-4 rounded-xl bg-card px-4 py-3">
               <div>
