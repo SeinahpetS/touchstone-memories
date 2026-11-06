@@ -437,7 +437,10 @@ const Archive = () => {
   ];
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div
+      className="bg-background flex flex-col overflow-hidden"
+      style={{ height: "calc(100dvh - env(safe-area-inset-bottom, 0px) - 110px)" }}
+    >
       <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col min-h-0">
         {/* Fixed header zone */}
         <div className="shrink-0">
