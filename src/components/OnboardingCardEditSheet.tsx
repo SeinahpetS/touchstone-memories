@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Cropper, { type Area } from "react-easy-crop";
 import { cropPhotoBlob } from "@/lib/cropPhoto";
 import { Button } from "@/components/ui/button";
-import { CATEGORY_LABELS, CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CATEGORY_LABELS, CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import type { StoryArtifact } from "@/lib/onboardingStoryDraft";
 import { readOnboardingPhoto, resizeOnboardingPhoto, storeOnboardingPhoto, removeOnboardingPhoto } from "@/lib/onboardingPhotos";
 
@@ -109,7 +109,7 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
       </div> : <Button variant="outline" className="onboarding-add-photo" disabled={busy} onClick={() => inputRef.current?.click()}><ImagePlus size={20} />Add a photo</Button>}
       <label className="onboarding-edit-field">Title<input aria-label="Title" className="onboarding-edit-title" value={title} onChange={e => setTitle(e.target.value)} /></label>
       <div className="onboarding-edit-field">Category
-        <Button variant="outline" className="onboarding-category-chip" aria-expanded={categoriesOpen} onClick={() => setCategoriesOpen(v => !v)}>{CATEGORY_LABELS[category]}</Button>
+        <Button variant="outline" className="onboarding-category-chip" aria-expanded={categoriesOpen} onClick={() => setCategoriesOpen(v => !v)}><CategoryIcon category={category as CategoryKey} size={18} color="#B8860B" />{CATEGORY_LABELS[category as CategoryKey]}</Button>
         {categoriesOpen && <div className="onboarding-category-options">{(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map(key =>
           <CategoryIconCard key={key} category={key} className="w-full h-full !min-w-0 !px-[6px] !py-[14px] !gap-1.5 text-center" iconSize={26} labelSize={10} active={category === key} selectionRing onClick={() => { setCategory(key); setCategoriesOpen(false); }} />)}</div>}
       </div>
