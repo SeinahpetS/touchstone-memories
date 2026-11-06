@@ -29,6 +29,13 @@
       "when": 1793944542882,
       "tag": "0003_create_people_and_touchstone_mentions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793944661020,
+      "tag": "0004_people_user_id_fkey_to_profiles",
+      "breakpoints": true
     }
   ]
 }
