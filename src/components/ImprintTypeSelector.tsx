@@ -185,7 +185,7 @@ const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange
           className={cn(
             "flex items-center gap-1.5 rounded-[18px] px-3 py-1.5 transition-all duration-200",
             active
-              ? "border border-[#2C3E50] bg-[#2C3E50] text-[#F2EEE5] dark:border-[#B8860B] dark:bg-[#B8860B] dark:text-[#F2EEE5]"
+              ? "border border-[#5D7692] bg-[#5D7692] text-[#F2EEE5]"
               : "border border-[rgba(44,62,80,0.28)] bg-transparent text-[#5B4A3F] dark:border-[rgba(242,238,229,0.25)] dark:text-[#E8E4D8]"
           )}
         >
