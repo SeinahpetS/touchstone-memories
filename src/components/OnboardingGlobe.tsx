@@ -201,7 +201,7 @@ export default forwardRef<GlobeHandle, {
     <path className="globe-graticule" d={path(graticule) ?? ""} />
     {countries.map((country, index) => <path key={country.id ?? index}
       data-country={country.properties.country_code}
-      className={`globe-country${country.properties.country_code === selection.country_code ? (selection.region_code ? " globe-parent-selected" : " globe-selected") : ""}`}
+      className={`globe-country${country.properties.country_code === selection.country_code && !REGIONAL_COUNTRIES.has(country.properties.country_code) ? " globe-selected" : ""}`}
       d={path(country) ?? ""}><title>{country.properties.name}</title></path>)}
     {regions.map((region, index) => <path key={`${region.properties.region_code}-${index}`}
       data-region={region.properties.region_code}
