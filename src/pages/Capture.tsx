@@ -37,7 +37,7 @@ export default function Capture() {
         return;
       }
       const next = buildSharedPrefill(payload);
-      await clearSharedPayload();
+      // Kept until save or cancel so a reload doesn't lose it.
       if (cancelled) return;
       if (params.toString()) navigate("/capture", { replace: true });
       setPrefill(next);
@@ -45,7 +45,10 @@ export default function Capture() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, user]);
 
-  const done = () => navigate("/archive", { replace: true });
+  const done = () => {
+    void clearSharedPayload();
+    navigate("/archive", { replace: true });
+  };
 
   return (
     <main className="min-h-screen bg-background">

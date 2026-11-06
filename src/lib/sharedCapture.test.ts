@@ -32,3 +32,9 @@ describe("shared capture", () => {
     expect(getPendingReturnRoute()).toBe(`/keep/${"a".repeat(48)}`);
   });
 });
+
+import { isShareExpired as _exp, SHARE_TTL_MS as _ttl } from "./sharedCapture";
+describe("held share expiry", () => {
+  it("keeps a share just under 24 hours old", () => { expect(_exp(0, 24 * 3600_000 - 1)).toBe(false); });
+  it("drops a share at 24 hours", () => { expect(_ttl).toBe(24 * 3600_000); expect(_exp(0, 24 * 3600_000)).toBe(true); });
+});
