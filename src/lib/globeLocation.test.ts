@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { countryGlobeFocus, GLOBE_EXPANDED_SIZE, GLOBE_FOCUS_WIDTH, GLOBE_RADIUS, GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
+import { countryGlobeFocus, mainlandGeometry, GLOBE_EXPANDED_SIZE, GLOBE_RADIUS, GLOBE_FOCUS_MS, GLOBE_FOCUS_WIDTH_RATIO, GLOBE_FOCUS_HEIGHT_RATIO, MAINLAND_AREA_SHARE, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
 import { geoCentroid, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology, GeometryCollection } from "topojson-specification";
-import type { FeatureCollection } from "geojson";
+import type { Feature, FeatureCollection, Geometry } from "geojson";
 import countries from "@/assets/geography/countries-110m.json";
+
+type Place = Feature<Geometry, { name: string; country_code: string }>;
 
 describe("onboarding globe rules", () => {
   it("only treats movement under 6px as a tap", () => {
@@ -13,42 +15,83 @@ describe("onboarding globe rules", () => {
     expect(isGlobeTap(12)).toBe(false);
   });
   it("focuses for 600ms", () => expect(GLOBE_FOCUS_MS).toBe(600));
-  const world = feature(countries as unknown as Topology, countries.objects.countries as unknown as GeometryCollection) as FeatureCollection;
-  it("centers the selected country's centroid on the orthographic sphere", () => {
-    const country = world.features.find(f => f.properties?.country_code === "FR");
-    if (!country) throw new Error("France missing");
+  const world = feature(countries as unknown as Topology, countries.objects.countries as unknown as GeometryCollection) as FeatureCollection<Geometry, Place["properties"]>;
+  const by = (code: string) => {
+    const found = world.features.find(f => f.properties?.country_code === code);
+    if (!found) throw new Error(`${code} missing`);
+    return found as Place;
+  };
+
+  it("centers the mainland centroid on the orthographic sphere", () => {
+    const country = by("FR");
     const focus = countryGlobeFocus(country);
     const projection = geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale);
-    const center = projection(geoCentroid(country));
+    const center = projection(geoCentroid(mainlandGeometry(country.geometry)));
     expect(center?.[0]).toBeCloseTo(150);
     expect(center?.[1]).toBeCloseTo(150);
   });
-  it("fits country width to 70% of the 300px globe area without shrinking the globe", () => {
-    expect(GLOBE_FOCUS_WIDTH).toBe(210);
+
+  it("keeps far-off territories out of the US focus", () => {
+    const us = by("US");
+    expect(mainlandGeometry(us.geometry).type).toBe("Polygon");
+    const focus = countryGlobeFocus(us);
+    expect(focus.rotation).toEqual([98.73, -39.87, 0].map((n, i) => i === 2 ? 0 : n).slice(0, 2).concat([0]).map(n => expect.any(Number)) as never);
+    expect(focus.rotation[0]).toBeCloseTo(98.73, 1);
+    expect(focus.rotation[1]).toBeCloseTo(-39.87, 1);
+    const projection = geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale);
+    const mainland = geoPath(projection).bounds(mainlandGeometry(us.geometry));
+    const whole = geoPath(projection).bounds(us.geometry);
+    expect(mainland[1][0] - mainland[0][0]).toBeCloseTo(300 * GLOBE_FOCUS_WIDTH_RATIO);
+    // Alaska sits outside the frame now, so the whole country cannot fit in it.
+    expect(whole[1][0] - whole[0][0]).toBeGreaterThan(300);
+  });
+
+  it("fits the mainland to 72% of the frame width without shrinking the globe", () => {
+    expect(GLOBE_FOCUS_WIDTH_RATIO).toBe(0.72);
     expect(GLOBE_RADIUS).toBe(146);
-    for (const code of ["US", "IN", "FR"]) {
-      const country = world.features.find(f => f.properties?.country_code === code);
-      if (!country) throw new Error(`${code} missing`);
+    for (const code of ["US", "IN", "FR", "AU"]) {
+      const country = by(code);
       const focus = countryGlobeFocus(country);
-      const bounds = geoPath(geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale)).bounds(country);
-      expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(210);
+      const bounds = geoPath(geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale)).bounds(mainlandGeometry(country.geometry));
+      expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(300 * GLOBE_FOCUS_WIDTH_RATIO);
       expect(focus.scale).toBeGreaterThanOrEqual(146);
     }
   });
+
+  it("caps a tall country at 85% of the frame height", () => {
+    expect(GLOBE_FOCUS_HEIGHT_RATIO).toBe(0.85);
+    const chile = by("CL");
+    const focus = countryGlobeFocus(chile);
+    const bounds = geoPath(geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale)).bounds(mainlandGeometry(chile.geometry));
+    expect(bounds[1][1] - bounds[0][1]).toBeCloseTo(300 * GLOBE_FOCUS_HEIGHT_RATIO);
+    expect(bounds[1][0] - bounds[0][0]).toBeLessThan(100);
+  });
+
+  it("keeps an island chain's full extent because no landmass dominates", () => {
+    expect(MAINLAND_AREA_SHARE).toBe(0.5);
+    const indonesia = by("ID");
+    expect(mainlandGeometry(indonesia.geometry).type).toBe("MultiPolygon");
+    const focus = countryGlobeFocus(indonesia);
+    const projection = geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale);
+    const mainland = geoPath(projection).bounds(mainlandGeometry(indonesia.geometry));
+    const whole = geoPath(projection).bounds(indonesia.geometry);
+    expect(whole[1][0] - whole[0][0]).toBeCloseTo(mainland[1][0] - mainland[0][0]);
+  });
+
+  it("fits the mainland to 72% of the expanded 420px globe", () => {
+    expect(GLOBE_EXPANDED_SIZE).toBe(420);
+    const us = by("US");
+    const focus = countryGlobeFocus(us, GLOBE_EXPANDED_SIZE);
+    const bounds = geoPath(geoOrthographic().rotate(focus.rotation).scale(focus.scale)).bounds(mainlandGeometry(us.geometry));
+    expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(420 * GLOBE_FOCUS_WIDTH_RATIO);
+  });
+
   it("rings selections smaller than 24px across on screen", () => {
     expect(SELECTION_RING_MIN_PX).toBe(24);
     expect(SELECTION_RING_RADIUS).toBe(11);
     expect(needsSelectionRing([[150, 150], [155, 156]])).toBe(true);
     expect(needsSelectionRing([[150, 150], [174, 160]])).toBe(false);
     expect(needsSelectionRing([[150, 150], [160, 174]])).toBe(false);
-  });
-  it("fits a regional country to 70% of the expanded 342px globe", () => {
-    expect(GLOBE_EXPANDED_SIZE).toBe(342);
-    const country = world.features.find(f => f.properties?.country_code === "US");
-    if (!country) throw new Error("US missing");
-    const focus = countryGlobeFocus(country, 342);
-    const bounds = geoPath(geoOrthographic().rotate(focus.rotation).scale(focus.scale)).bounds(country);
-    expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(239.4);
   });
   it("loads regions for exactly the ten requested countries", () => {
     expect([...REGIONAL_COUNTRIES]).toEqual(["US", "CA", "MX", "BR", "AR", "RU", "CN", "IN", "AU", "ID"]);
