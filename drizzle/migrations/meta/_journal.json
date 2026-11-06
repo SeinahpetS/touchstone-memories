@@ -36,6 +36,20 @@
       "when": 1793944661020,
       "tag": "0004_people_user_id_fkey_to_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793945301729,
+      "tag": "0005_add_touchstone_sharing",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793945355501,
+      "tag": "0006_restrict_touchstone_share_client_grants",
+      "breakpoints": true
     }
   ]
 }
