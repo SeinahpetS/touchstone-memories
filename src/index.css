@@ -55,6 +55,17 @@
     --ink: 207 31% 24%;             /* #2C3E50 */
     --ivory: 39 33% 92%;            /* #F2EEE5 */
 
+    /* Category selection outline — brighter, higher-chroma variants for light mode */
+    --cat-moment: 211 77% 45%;         /* #1B6FCB */
+    --cat-person: 152 83% 27%;         /* #0C7F49 */
+    --cat-object: 331 61% 43%;         /* #B02A6B */
+    --cat-place: 17 82% 42%;           /* #C24413 */
+    --cat-food: 17 82% 42%;            /* #C24413 */
+    --cat-sound: 30 71% 37%;           /* #A2601C */
+    --cat-imprint: 40 88% 31%;         /* #96680A */
+    --cat-digital-traces: 192 86% 32%; /* #0B7A96 */
+    --cat-all: 40 88% 31%;             /* #96680A */
+
     /* Category-icon dark tile tokens */
     --dark-bg: 210 29% 24%;         /* #2C3E50 — Touchstone navy */
     --dark-card: 210 29% 24%;       /* #2C3E50 — Touchstone navy */
@@ -98,6 +109,17 @@
     --border: 207 31% 20%;
     --input: 207 31% 20%;
     --ring: 43 88% 38%;
+
+    /* Category selection outline — original hues read well against navy in dark mode */
+    --cat-moment: 209 30% 42%;         /* #4A6B8A */
+    --cat-person: 153 45% 34%;         /* #2E7D5E */
+    --cat-object: 325 41% 39%;         /* #8B3A62 */
+    --cat-place: 17 51% 54%;           /* #C2714F */
+    --cat-food: 17 51% 54%;            /* #C2714F */
+    --cat-sound: 24 17% 30%;           /* #5B4A3F */
+    --cat-imprint: 43 88% 38%;         /* #B8860B */
+    --cat-digital-traces: 191 43% 37%; /* #367588 */
+    --cat-all: 43 88% 38%;             /* #B8860B */
 
     --sidebar-background: 207 31% 12%;
     --sidebar-foreground: 39 33% 92%;

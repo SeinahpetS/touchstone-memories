@@ -12,7 +12,7 @@ import { PaywallSheet } from "@/components/PaywallSheet";
 import { VividUpgradeCard } from "@/components/VividUpgradeCard";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import TimelineView from "@/components/TimelineView";
-import CategoryIcon, { CategoryIconCard, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
+import CategoryIcon, { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import AddTouchstoneCard from "@/components/AddTouchstoneCard";
 import {
@@ -35,6 +35,18 @@ const FILTER_CATEGORIES: CategoryKey[] = [
   "imprint",
   "digital_traces",
 ];
+
+/* Selected-tile outline: light mode uses brighter tokens, dark mode keeps the original hues. */
+const CATEGORY_BORDER_VAR: Record<CategoryKey, string> = {
+  moment: "--cat-moment",
+  person: "--cat-person",
+  object: "--cat-object",
+  place: "--cat-place",
+  food: "--cat-food",
+  sound: "--cat-sound",
+  imprint: "--cat-imprint",
+  digital_traces: "--cat-digital-traces",
+};
 
 const PLURAL_LABELS: Record<CategoryKey, string> = {
   moment: "Moments",
@@ -622,7 +634,7 @@ const Archive = () => {
                     style={{
                       background: "#1E2E3E",
                       borderRadius: 12,
-                      border: active ? `4px solid ${CATEGORY_BORDER_COLORS[c]}` : "2px solid transparent",
+                      border: active ? `4px solid hsl(var(${CATEGORY_BORDER_VAR[c]}))` : "2px solid transparent",
                       padding: "10px 6px 8px",
                     }}
                   >
@@ -658,7 +670,7 @@ const Archive = () => {
                 width: "100%",
                 borderRadius: 12,
                 background: "#1E2E3E",
-                border: `2px solid ${filter === "all" ? "#B8860B" : "transparent"}`,
+                border: `2px solid ${filter === "all" ? "hsl(var(--cat-all))" : "transparent"}`,
               }}
             >
               <span className="flex items-center" style={{ gap: 8 }}>
