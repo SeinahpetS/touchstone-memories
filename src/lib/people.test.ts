@@ -23,6 +23,8 @@ const h = vi.hoisted(() => {
         return self;
       },
       delete: () => self,
+      update: (payload: unknown) => { call.payload = payload; return self; },
+      maybeSingle: () => self,
       eq: (key: string, value: unknown) => {
         call.filters[key] = value;
         return self;
@@ -53,6 +55,7 @@ vi.mock("@/integrations/supabase/client", () => ({
       select: () => h.builder(table, "select"),
       insert: (payload: unknown) => h.builder(table, "insert").insert(payload),
       delete: () => h.builder(table, "delete"),
+      update: (payload: unknown) => h.builder(table, "update").update(payload),
     }),
   },
 }));
@@ -62,6 +65,7 @@ import {
   getMentionsForTouchstone,
   getPeople,
   setMentionsForTouchstone,
+  linkPersonTouchstone,
 } from "./people";
 
 const person = (id: string, name: string) => ({
@@ -78,6 +82,22 @@ beforeEach(() => {
 });
 
 describe("the people directory", () => {
+  it("links a saved People touchstone to the owned person record", async () => {
+    h.state.responder = (call: Call) => call.table === "touchstones"
+      ? { data: { id: "t-person", photo_url: "portrait.jpg" }, error: null }
+      : { data: { ...person("p1", "Mom"), people_touchstone_id: "t-person" }, error: null };
+    const linked = await linkPersonTouchstone("u1", "p1", "t-person");
+    expect(linked.people_touchstone_id).toBe("t-person");
+    expect(h.journal[0].filters).toEqual({ id: "t-person", user_id: "u1", category: "person" });
+    const update = h.journal.find((call: Call) => call.op === "update");
+    expect(update?.filters).toEqual({ id: "p1", user_id: "u1" });
+    expect(update?.payload).toEqual({ people_touchstone_id: "t-person" });
+  });
+  it("does not link a missing, foreign, or non-People touchstone", async () => {
+    h.state.responder = () => ({ data: null, error: null });
+    await expect(linkPersonTouchstone("u1", "p1", "wrong-touchstone")).rejects.toThrow("An owned People touchstone is required.");
+    expect(h.journal.some((call: Call) => call.op === "update")).toBe(false);
+  });
   it("only reads the signed-in user's own people", async () => {
     h.state.responder = () => ({ data: [person("p1", "Mom")], error: null });
 
