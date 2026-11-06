@@ -35,7 +35,6 @@ describe("onboarding globe rules", () => {
     const us = by("US");
     expect(mainlandGeometry(us.geometry).type).toBe("Polygon");
     const focus = countryGlobeFocus(us);
-    expect(focus.rotation).toEqual([98.73, -39.87, 0].map((n, i) => i === 2 ? 0 : n).slice(0, 2).concat([0]).map(n => expect.any(Number)) as never);
     expect(focus.rotation[0]).toBeCloseTo(98.73, 1);
     expect(focus.rotation[1]).toBeCloseTo(-39.87, 1);
     const projection = geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale);
