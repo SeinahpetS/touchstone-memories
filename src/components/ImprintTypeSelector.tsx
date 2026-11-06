@@ -174,7 +174,7 @@ const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange
   <div className="flex flex-wrap justify-center gap-2">
     {(options ?? (OPTIONS as unknown as { value: T; label: string }[])).map(({ value: v, label }) => {
       const active = value === v;
-      const IconComp = Icon[v];
+      const IconComp = Icon[v as PillType] as (p: IconProps) => JSX.Element;
       const fg = active ? "#F2EEE5" : "#5B4A3F";
       return (
         <button
