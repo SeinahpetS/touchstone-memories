@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { readOnboardingPhoto } from "@/lib/onboardingPhotos";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import { dismissReviewCard } from "@/lib/onboardingReview";
+import { categoryGlowShadow, categoryGlowVars } from "@/lib/categoryGlow";
 
 const AEGEAN = "#0E7C86";
 
@@ -424,7 +425,7 @@ const StoryReview = () => {
           if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
           setIndex(i => Math.max(0, Math.min(total - 1, i + (dx < 0 ? 1 : -1))));
         }} onPointerCancel={() => { swipeStart.current = null; }}>
-        <div key={index} className="onboarding-shared-card">
+        <div key={index} className="onboarding-shared-card" style={categoryGlowVars(current.category)}>
           <MemoryArtifact photoUrl={photoPreview} photoFirst category={current.category} title={current.title} note={current.note}
             createdAt={new Date(storedDraft?.capturedAt || Date.now()).toISOString()} />
         </div>
@@ -472,7 +473,7 @@ const StoryReview = () => {
         {isOnboarding && photoPreview && <img src={photoPreview} alt={current.title || "Touchstone photo"} className="onboarding-review-photo" />}
         {!isOnboarding && !editingTitle && !editingNote ? (
           <div role="button" tabIndex={0} aria-label="Edit this Touchstone" onClick={handleEdit} onKeyDown={(e) => { if (e.key === "Enter") handleEdit(); }}
-            className="mt-2 mx-auto w-full max-w-sm cursor-text overflow-hidden px-5 pb-6" style={{ borderRadius: 18, boxShadow: "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)" }}>
+            className="mt-2 mx-auto w-full max-w-sm cursor-text overflow-hidden px-5 pb-6" style={{ borderRadius: 18, boxShadow: categoryGlowShadow(current.category) }}>
             <MemoryArtifact photoUrl={livePhotoUrl} category={current.category} title={current.title} note={current.note} createdAt={new Date().toISOString()} />
           </div>
         ) : (<>

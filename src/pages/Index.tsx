@@ -13,6 +13,7 @@ import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryF
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
+import { categoryGlowShadow } from "@/lib/categoryGlow";
 import MemoryArtifact from "@/components/MemoryArtifact";
 import ShareMemorySheet from "@/components/ShareMemorySheet";
 import { Share } from "lucide-react";
@@ -403,8 +404,7 @@ const Index = () => {
             <div
               style={{
                 borderRadius: 18,
-                boxShadow:
-                  "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)",
+                boxShadow: categoryGlowShadow(saved.category),
                 transition: "box-shadow 0.6s ease",
               }}
             >
