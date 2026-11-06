@@ -175,7 +175,6 @@ const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange
     {(options ?? (OPTIONS as unknown as { value: T; label: string }[])).map(({ value: v, label }) => {
       const active = value === v;
       const IconComp = Icon[v as PillType] as (p: IconProps) => JSX.Element;
-      const fg = active ? "#F2EEE5" : "#5B4A3F";
       return (
         <button
           key={v}
@@ -186,12 +185,12 @@ const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange
           className={cn(
             "flex items-center gap-1.5 rounded-[18px] px-3 py-1.5 transition-all duration-200",
             active
-              ? "bg-[#4A6B8A] text-[#F2EEE5]"
-              : "bg-[#E8E4D8] text-[#5B4A3F]"
+              ? "border border-[#2C3E50] bg-[#2C3E50] text-[#F2EEE5] dark:border-[#B8860B] dark:bg-[#B8860B] dark:text-[#F2EEE5]"
+              : "border border-[rgba(44,62,80,0.28)] bg-transparent text-[#5B4A3F] dark:border-[rgba(242,238,229,0.25)] dark:text-[#E8E4D8]"
           )}
         >
-          <IconComp size={16} color={fg} />
-          <span className="font-jost text-[10px] uppercase tracking-[0.06em]" style={{ color: fg }}>
+          <IconComp size={16} color="currentColor" />
+          <span className="font-jost text-[10px] uppercase tracking-[0.06em]">
             {label}
           </span>
         </button>
