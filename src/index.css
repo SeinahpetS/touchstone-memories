@@ -314,3 +314,12 @@
 }
 @keyframes ts-final-phrase { from { color: rgba(74,107,138,0.7); } to { color: #1E2E3E; } }
 .ts-final-phrase { animation: ts-final-phrase 200ms ease-out; }
+
+/* Artifact location snippet */
+.location-snippet { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.location-snippet-label { display: inline-flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 15px; color: hsl(var(--foreground)); background: transparent; }
+.location-snippet-map { display: block; width: 100%; height: 140px; padding: 0; border-radius: 12px; overflow: hidden; border: 1px solid hsl(var(--border)); background: hsl(var(--card)); cursor: pointer; }
+.location-snippet-canvas { width: 100%; height: 100%; pointer-events: none; }
+.location-snippet-pin { width: 18px; height: 18px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #B8860B; border: 2px solid #F2EEE5; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
+.location-snippet-open { font-family: 'Jost', sans-serif; font-size: 13px; color: #5B4A3F; background: transparent; text-decoration: underline; text-underline-offset: 3px; }
+.dark .location-snippet-open { color: hsl(var(--muted-foreground)); }
