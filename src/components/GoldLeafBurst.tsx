@@ -45,7 +45,7 @@ const GoldLeafBurst = ({ onStart }: { onStart?: () => void }) => {
       const frames: Keyframe[] = [];
       for (let s = 0; s <= steps; s++) {
         const p = s / steps;
-        const eased = 1 - Math.pow(1 - p, 3);
+        const eased = p * (1.5 - 0.5 * p); // gentle ease-out so flakes drift past the text
         const x = f.sway * Math.sin(f.phase + p * f.cycles * Math.PI * 2) - f.sway * Math.sin(f.phase);
         const sx = 1 - 0.85 * (0.5 - 0.5 * Math.cos(p * f.flips * Math.PI * 2));
         const op = p < 0.85 ? f.opacity : f.opacity * (1 - (p - 0.85) / 0.15);
