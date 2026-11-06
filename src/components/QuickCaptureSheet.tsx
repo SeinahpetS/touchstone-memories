@@ -890,8 +890,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
               )}
             </div>
 
-            {/* 2. Category grid — 4 columns × 2 rows */}
-            <div className="mb-5 grid grid-cols-4 gap-2">
+            {/* 2. Category grid — 4 columns × 2 rows, every tile the same size */}
+            <div className="mb-5 grid grid-cols-4 gap-2 auto-rows-fr">
               {CATEGORIES.map((c) => (
                 <CategoryIconCard
                   key={c}
