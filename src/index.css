@@ -7,6 +7,8 @@
 @layer base {
   :root {
     --mention-ink: 210 29.032258% 24.313725%;
+    --person-heading: 210 34.782609% 18.039216%;
+    --person-paper: 41.538462 33.333333% 92.352941%;
     --mention-plum: 330.37037 41.044776% 38.627451%;
     --globe-ocean: 210 34.782609% 18.039216%;
     --globe-land: 45 25.806452% 87.843137%;
@@ -135,6 +137,8 @@
 }
 
 .capture-people { font-family: 'Jost', sans-serif; }
+.person-page { background: hsl(var(--person-paper)); }
+.person-name { color: hsl(var(--person-heading)); }
 .capture-people-toggle { height: 36px; padding: 0; font-size: 14px; font-weight: 400; color: hsl(var(--mention-ink) / 0.6); background: transparent; }
 .capture-people-toggle:hover { background: transparent; color: hsl(var(--mention-ink) / 0.6); }
 .capture-person-chip { height: 28px; max-width: 100%; padding: 0 10px; border-radius: 14px; font-size: 13px; font-weight: 400; color: hsl(var(--mention-plum)); background: hsl(var(--mention-plum) / 0.12); white-space: normal; overflow-wrap: anywhere; }

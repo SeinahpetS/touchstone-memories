@@ -11,3 +11,4 @@
 - Read and write people and touchstone_mentions only through the src/lib/people.ts data-access functions, never from components, so ownership checks (own person rows, mentions whose touchstone and person are both the user's) live in one place.
 - Keep capture mentions in a shared picker and detached post-save helper, separate from touchstone and AI payloads, so optional people links cannot delay capture or leak names to AI.
 - Render artifact mentions through one shared row and link to an owner-scoped person view using the people data layer, so detail views share chip behavior without component-level directory queries.
+- Link person-page captures through an opt-in shared capture callback and people-layer ownership/category validation, so portrait creation reuses capture without changing ordinary saves or sending directory names to AI.

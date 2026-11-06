@@ -145,6 +145,24 @@ export async function getTouchstonesForPerson(personId: string): Promise<any[]> 
 }
 
 /** Case-insensitive lookup inside the user's own directory. */
+export async function getPersonTouchstone(userId: string, touchstoneId: string) {
+  const { data, error } = await supabase.from("touchstones").select("id, photo_url")
+    .eq("id", touchstoneId).eq("user_id", userId).eq("category", "person").maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+/** Only an owned People touchstone may become an owned directory portrait. */
+export async function linkPersonTouchstone(userId: string, personId: string, touchstoneId: string): Promise<Person> {
+  const touchstone = await getPersonTouchstone(userId, touchstoneId);
+  if (!touchstone) throw new Error("An owned People touchstone is required.");
+  const { data, error } = await supabase.from("people")
+    .update({ people_touchstone_id: touchstoneId }).eq("id", personId).eq("user_id", userId)
+    .select(PERSON_COLUMNS).single();
+  if (error) throw error;
+  return data as Person;
+}
+
 async function findPersonByName(userId: string, name: string): Promise<Person | null> {
   const needle = name.trim().toLowerCase();
   const people = await getPeople(userId);

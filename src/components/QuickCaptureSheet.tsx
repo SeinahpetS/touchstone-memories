@@ -13,7 +13,7 @@ import CategoryIcon, {
 import PhotoUpload from "@/components/PhotoUpload";
 import AudioUpload from "@/components/AudioUpload";
 import CapturePeople from "@/components/CapturePeople";
-import type { Person } from "@/lib/people";
+import { linkPersonTouchstone, type Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
 import { capturePromptBody } from "@/lib/capturePrompt";
 import { toast } from "sonner";
@@ -105,9 +105,11 @@ interface Props {
   onSaved?: () => void;
   /** Category the sheet opens on (archive grid's "Add a …" card). */
   initialCategory?: CategoryKey;
+  capturePersonId?: string;
+  onPersonLinked?: () => void;
 }
 
-const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) => {
+const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePersonId, onPersonLinked }: Props) => {
   const { user } = useAuth();
   const entitlement = useEntitlement();
   const [paywallOpen, setPaywallOpen] = useState(false);
@@ -328,6 +330,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
       if (insertErr) throw insertErr;
 
       const newId = inserted?.id ?? null;
+      if (newId && capturePersonId && category === "person") {
+        void linkPersonTouchstone(user.id, capturePersonId, newId).then(() => onPersonLinked?.()).catch(() => {
+          toast.error("Touchstone saved, but couldn't link it to this person.");
+        });
+      }
       if (newId) saveCaptureMentions(newId, mentionedPeople.map((p) => p.id), () => {
         toast.error("Touchstone saved, but its people couldn't be linked. You can add them in Edit.");
       });
