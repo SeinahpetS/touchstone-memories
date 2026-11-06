@@ -387,6 +387,9 @@ const Archive = () => {
           <div
             style={{
               borderRadius: 18,
+              // Category row inside the card reserves 20px above its label;
+              // mirror it with double that below so the card breathes.
+              paddingBottom: 40,
               boxShadow:
                 "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)",
               transition: "box-shadow 0.6s ease",
