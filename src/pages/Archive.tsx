@@ -362,6 +362,7 @@ const Archive = () => {
             }}
           >
             <MemoryArtifact
+              touchstoneId={selected.id}
               photoUrl={selected.photo_url}
               category={selected.category}
               title={selected.title}
