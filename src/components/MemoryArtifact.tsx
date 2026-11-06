@@ -75,8 +75,8 @@ const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, tit
       {receivedFromName && <p className="received-from-label">From {receivedFromName}</p>}
       {title && <h2 className="font-playfair text-xl font-semibold text-foreground">{title}</h2>}
 
-      {hasLocation && (
-        <p className={`artifact-location-line ${title ? "!mt-1" : ""}`}><MapPin size={14} color="#B8860B" aria-hidden="true" /><span>{locationName?.trim() || "Pinned location"}</span></p>
+      {(hasLocation || !!locationName?.trim()) && (
+        <p className={`artifact-location-line ${title ? "!mt-1" : ""}`}><MapPin size={14} color="#B8860B" aria-hidden="true" /><span>{category === "person" && locationName?.trim() ? `Met at ${locationName.trim()}` : locationName?.trim() || "Pinned location"}</span></p>
       )}
 
       {memoryDateLabel ? (
