@@ -1,0 +1,1 @@
+ALTER TABLE public.touchstone_shares ADD COLUMN IF NOT EXISTS include_location boolean NOT NULL DEFAULT false;

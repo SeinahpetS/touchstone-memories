@@ -11,11 +11,12 @@ import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/
 
 export default function SendCopy({ touchstoneId, mentionedPeople }: { touchstoneId: string; mentionedPeople?: Person[] }) {
   const { user } = useAuth();
-  const [details, setDetails] = useState<{ id: string; userId: string; ownerId: string; received: string | null; note: string | null } | null>(null);
+  const [details, setDetails] = useState<{ id: string; userId: string; ownerId: string; received: string | null; note: string | null; hasLocation: boolean } | null>(null);
   const [open, setOpen] = useState(false);
   const [people, setPeople] = useState<Person[]>([]);
   const [personId, setPersonId] = useState<string | null>(null);
   const [includeNote, setIncludeNote] = useState(false);
+  const [includeLocation, setIncludeLocation] = useState(false);
   const [firstName, setFirstName] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -27,9 +28,9 @@ export default function SendCopy({ touchstoneId, mentionedPeople }: { touchstone
   useEffect(() => {
     if (!user) return;
     let active = true;
-    supabase.from('touchstones').select('user_id,received_from_user_id,note')
+    supabase.from('touchstones').select('user_id,received_from_user_id,note,location_lat,location_lng')
       .eq('id', touchstoneId).eq('user_id', user.id).maybeSingle().then(({ data, error }) => {
-        if (active && !error && data) setDetails({ id: touchstoneId, userId: user.id, ownerId: data.user_id, received: data.received_from_user_id, note: data.note });
+        if (active && !error && data) setDetails({ id: touchstoneId, userId: user.id, ownerId: data.user_id, received: data.received_from_user_id, note: data.note, hasLocation: data.location_lat != null && data.location_lng != null });
       });
     return () => { active = false; };
   }, [touchstoneId, user?.id]);
@@ -53,13 +54,13 @@ export default function SendCopy({ touchstoneId, mentionedPeople }: { touchstone
   const changeOpen = (next: boolean) => {
     if (busy) return;
     setOpen(next);
-    if (next) { setPersonId(null); setIncludeNote(false); setError(''); setPeople(mentionedPeople ?? []); }
+    if (next) { setPersonId(null); setIncludeNote(false); setIncludeLocation(false); setError(''); setPeople(mentionedPeople ?? []); }
   };
   const create = async () => {
     if (creating.current || firstName === null) return;
     creating.current = true; setBusy(true); setError('');
     try {
-      const token = await createShare(touchstoneId, personId, Boolean(details.note?.trim()) && includeNote);
+      const token = await createShare(touchstoneId, personId, Boolean(details.note?.trim()) && includeNote, details.hasLocation && includeLocation);
       const result = await deliverCopyLink(firstName, token);
       if (result === 'cancelled') return;
       setOpen(false);
@@ -85,6 +86,10 @@ export default function SendCopy({ touchstoneId, mentionedPeople }: { touchstone
           {details.note?.trim() && <div className="send-copy-note flex items-center justify-between gap-4">
             <label htmlFor={`send-note-${touchstoneId}`}>Include my note</label>
             <Switch id={`send-note-${touchstoneId}`} checked={includeNote} onCheckedChange={setIncludeNote} disabled={busy} />
+          </div>}
+          {details.hasLocation && <div className="send-copy-note flex items-center justify-between gap-4">
+            <label htmlFor={`send-location-${touchstoneId}`}>Include location</label>
+            <Switch id={`send-location-${touchstoneId}`} checked={includeLocation} onCheckedChange={setIncludeLocation} disabled={busy} />
           </div>}
           <SheetDescription className="send-copy-helper">They'll get their own copy to keep. Link works for 14 days.</SheetDescription>
           {error && <p role="alert" className="send-copy-error">{error}</p>}

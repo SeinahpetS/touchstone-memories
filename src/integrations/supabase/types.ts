@@ -263,6 +263,7 @@ export type Database = {
           expires_at: string
           from_user_id: string
           id: string
+          include_location: boolean
           include_note: boolean
           kept_by_user_id: string | null
           kept_touchstone_id: string | null
@@ -276,6 +277,7 @@ export type Database = {
           expires_at?: string
           from_user_id: string
           id?: string
+          include_location?: boolean
           include_note?: boolean
           kept_by_user_id?: string | null
           kept_touchstone_id?: string | null
@@ -289,6 +291,7 @@ export type Database = {
           expires_at?: string
           from_user_id?: string
           id?: string
+          include_location?: boolean
           include_note?: boolean
           kept_by_user_id?: string | null
           kept_touchstone_id?: string | null

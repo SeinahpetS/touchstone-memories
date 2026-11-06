@@ -13,6 +13,7 @@ import CapturePeople from "@/components/CapturePeople";
 import { getMentionsForTouchstone, type Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
 import CategorySelector from "@/components/CategorySelector";
+import EditLocationLine from "@/components/EditLocationLine";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector, { SOUND_OPTIONS, DIGITAL_OPTIONS, type DigitalType } from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
@@ -573,6 +574,9 @@ const Index = () => {
 
             {/* Field 2 — Date */}
             <MemoryDateInput value={memoryDate} onChange={setMemoryDate} />
+
+            {editId && <EditLocationLine name={fields.locationName} lat={fields.locationLat} lng={fields.locationLng}
+              onChange={(v) => setFields((prev) => ({ ...prev, locationName: v.name, locationLat: v.lat, locationLng: v.lng }))} />}
 
             {/* Field 3 — Location & other category-specific fields */}
             <CategoryFields
