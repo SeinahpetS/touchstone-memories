@@ -493,7 +493,7 @@ const Archive = () => {
                       display: "flex",
                       alignItems: "baseline",
                       gap: "7px",
-                      marginTop: "6px",
+                      marginTop: "4px",
                     }}
                   >
                     <span
@@ -513,6 +513,7 @@ const Archive = () => {
                         color: "#9E9585",
                         letterSpacing: "0.12em",
                         textTransform: "lowercase",
+                        lineHeight: 1,
                       }}
                     >
                       touchstones
@@ -526,7 +527,7 @@ const Archive = () => {
 
           {/* Diamond divider */}
           <div
-            className="flex items-center mt-4"
+            className="flex items-center mt-2"
             aria-hidden="true"
             style={{ width: "100%" }}
           >
@@ -559,8 +560,8 @@ const Archive = () => {
           {/* Search bar */}
           <div
             style={{
-              marginTop: "14px",
-              marginBottom: "10px",
+              marginTop: "10px",
+              marginBottom: "8px",
               backgroundColor: "#E8E4D8",
               borderRadius: "10px",
               padding: "9px 12px",
