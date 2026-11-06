@@ -209,13 +209,13 @@ const StoryUnfold = () => {
             </p>
           )}
           {rows.map((row) => {
-            const tappable = row.complete;
+            const tappable = true;
             return (
               <div
                 key={row.id}
                 onClick={
                   tappable
-                    ? () => navigate(`/story-unfold/session/${row.id}`)
+                    ? () => navigate(row.complete ? `/story-unfold/session/${row.id}` : `/story-unfold/session/${row.id}/transcript`)
                     : undefined
                 }
                 className="flex items-center gap-3 px-4 py-3"

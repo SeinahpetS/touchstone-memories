@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { MoreHorizontal, Pencil, Search, Share } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -259,6 +259,22 @@ const Archive = () => {
     setFetching(false);
     fetchHeaderStats();
   };
+
+  // Open a single touchstone when linked from a story (?memory=<id>)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const linkedMemoryId = searchParams.get("memory");
+  useEffect(() => {
+    if (!user || !linkedMemoryId) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("touchstones").select("*").eq("id", linkedMemoryId).eq("user_id", user.id).maybeSingle();
+      if (data) setSelected(data);
+      const next = new URLSearchParams(searchParams);
+      next.delete("memory");
+      setSearchParams(next, { replace: true });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, linkedMemoryId]);
 
   useEffect(() => {
     fetchTouchstones();
