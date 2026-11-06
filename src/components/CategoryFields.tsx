@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import LocationAutocomplete from "@/components/LocationAutocomplete";
 import SpotifySearch, { type SpotifyPick } from "@/components/SpotifySearch";
 import BookSearch, { type BookPick } from "@/components/BookSearch";
 import TmdbSearch, { type TmdbPick } from "@/components/TmdbSearch";
@@ -39,17 +38,6 @@ const inputClass = "h-11 text-base bg-card border-0 placeholder:italic";
  * Sound → audio upload placeholder (disabled).
  */
 const CategoryFields = ({ category, values, onChange }: Props) => {
-  const showLocation = ["moment", "person", "object", "place", "food"].includes(
-    category
-  );
-  const locationPlaceholder =
-    category === "person"
-      ? "Where did you meet?"
-      : category === "object"
-      ? "Where is this from?"
-      : category === "place"
-      ? "Venue or address"
-      : "Add a location";
 
   return (
     <div className="space-y-4">
@@ -97,20 +85,6 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
           value={values.venueName}
           onChange={(e) => onChange({ venueName: e.target.value })}
           className={inputClass}
-        />
-      )}
-
-      {showLocation && (
-        <LocationAutocomplete
-          value={values.locationName}
-          placeholder="Where was this?"
-          onChange={(loc) =>
-            onChange({
-              locationName: loc.name,
-              locationLat: loc.lat,
-              locationLng: loc.lng,
-            })
-          }
         />
       )}
 

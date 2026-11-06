@@ -18,7 +18,7 @@ import { saveCaptureMentions } from "@/lib/captureMentions";
 import { capturePromptBody } from "@/lib/capturePrompt";
 import { toast } from "sonner";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
-import ImprintTypeSelector, { SOUND_OPTIONS } from "@/components/ImprintTypeSelector";
+import ImprintTypeSelector, { SOUND_OPTIONS, DIGITAL_OPTIONS, type DigitalType } from "@/components/ImprintTypeSelector";
 import PodcastSearch, { type PodcastPick } from "@/components/PodcastSearch";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
@@ -75,6 +75,9 @@ const IMPRINT_NOTE_PLACEHOLDERS: Record<string, string> = {
 };
 
 const PROMPT = "Who else would remember this?";
+
+const digitalPlaceholder = (t: DigitalType | null) =>
+  t === "message" ? "Name this message" : t === "screenshot" ? "Name this screenshot" : "Touchstone link (https://...)";
 const CONFIRMATION = "Saved. Part of your story now.";
 
 const WHO_WAS_THERE_CATEGORIES: CategoryKey[] = [
@@ -121,6 +124,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
   const [mentionedPeople, setMentionedPeople] = useState<Person[]>([]);
   const [emotionalTone, setEmotionalTone] = useState("");
   const [whoWasThere, setWhoWasThere] = useState("");
+  const [digitalType, setDigitalType] = useState<DigitalType | null>(null);
   const [connectedTo, setConnectedTo] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [memoryDate, setMemoryDate] = useState<MemoryDate>(emptyMemoryDate());
@@ -918,6 +922,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
               <div className="mb-4">
                 <ImprintTypeSelector
                   options={SOUND_OPTIONS}
+                  category="sound"
                   value={fields.soundType ?? null}
                   onChange={(t) =>
                     setFields((prev) => ({
@@ -934,6 +939,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
             {category === "imprint" && (
               <div className="mb-4">
                 <ImprintTypeSelector
+                  category="imprint"
                   value={fields.imprintType}
                   onChange={(t) => {
                     const source: CategoryFieldValues["imprintSource"] =
@@ -958,6 +964,17 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
               </div>
             )}
 
+            {category === "digital_traces" && (
+              <div className="mb-4">
+                <ImprintTypeSelector
+                  options={DIGITAL_OPTIONS}
+                  category="digital_traces"
+                  value={digitalType}
+                  onChange={(t) => setDigitalType((prev) => (prev === t ? null : t))}
+                />
+              </div>
+            )}
+
             {/* 3. Title — podcast subtype swaps in a Listen Notes search experience */}
             <div className="mb-4">
               {category === "imprint" && fields.imprintType === "podcast" ? (
@@ -974,8 +991,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  maxLength={120}
-                  placeholder="Name this Touchstone"
+                  maxLength={category === "digital_traces" ? 500 : 120}
+                  placeholder={category === "digital_traces" ? digitalPlaceholder(digitalType) : "Name this Touchstone"}
                   className="h-12 text-base bg-card border-0 placeholder:italic"
                 />
               )}
@@ -1019,14 +1036,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
 
             {user && <div className="mb-5"><CapturePeople key={String(open)} userId={user.id} selected={mentionedPeople} onChange={setMentionedPeople} /></div>}
 
-            <Input
-              type="text"
-              autoComplete="off"
-              value={whoWasThere}
-              onChange={(e) => setWhoWasThere(e.target.value)}
-              placeholder={PROMPT}
-              className="h-12 text-base bg-card border-0 placeholder:italic"
-            />
+
 
             {/* Keep this private — toggle, off by default */}
             <div
