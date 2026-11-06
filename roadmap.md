@@ -24,3 +24,4 @@
 - [ ] Do not highlight the country once a more specific region is selected; only the chosen region is gold.
 - [ ] Tapping a region country leaves it cream with 1px #1E2E3E admin-1 borders and zooms; only the tapped region is gold, and country_code is stored on country tap, region_code only on region tap. Non-region countries keep one-tap gold.
 - [ ] US zoom framed by contiguous 48 + DC only via per-country FOCUS_OVERRIDES (excluded region codes); rotate to ~[-98.5, 39], scale so those bounds fill the 342px globe minus 16px each side; AK/HI still drawn and tappable; 600ms animation.
+- [ ] At /onboarding/create-account, check whether the email already has an account before continuing to the password step.
