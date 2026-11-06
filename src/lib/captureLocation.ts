@@ -2,7 +2,7 @@ import type { CityRow } from "./globeLocation";
 import { normalizeCity } from "./globeLocation";
 
 /** A city-level capture location. Coordinates only when it matches a bundled GeoNames city. */
-export interface CaptureCity { name: string; lat: number | null; lng: number | null }
+export interface CaptureCity { name: string; lat: number | null; lng: number | null; placeId?: string | null }
 
 const files = import.meta.glob("../assets/geography/cities/*.json");
 let all: Promise<CityRow[]> | null = null;
