@@ -15,6 +15,7 @@ import AudioUpload from "@/components/AudioUpload";
 import CapturePeople from "@/components/CapturePeople";
 import type { Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
+import { capturePromptBody } from "@/lib/capturePrompt";
 import { toast } from "sonner";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
@@ -360,26 +361,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
               }
             }
 
-            // Map internal category names to AI prompt schema
-            const categoryMap: Record<string, string> = {
-              person: "people",
-              digital_traces: "digital_trace",
-            };
-            const aiCategory = categoryMap[payload.category] ?? payload.category;
-
-            const aiBody: Record<string, any> = {
-              category: aiCategory,
-            };
-            if (payload.title) {
-              aiBody.title = payload.title;
-            }
-            if (payload.category === "person" && payload.still_in_touch !== null && payload.still_in_touch !== undefined) {
-              aiBody.still_in_touch = payload.still_in_touch;
-            }
-            if (photoBase64 && photoMediaType) {
-              aiBody.photo_base64 = photoBase64;
-              aiBody.photo_media_type = photoMediaType;
-            }
+            const aiBody = capturePromptBody({ category: payload.category, title: payload.title, still_in_touch: payload.still_in_touch }, photoBase64, photoMediaType);
 
             const { data: aiData, error: aiErr } = await supabase.functions.invoke(
               "generate-ai-prompt",

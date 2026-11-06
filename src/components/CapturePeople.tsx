@@ -62,7 +62,7 @@ export default function CapturePeople({ userId, selected, onChange }: Props) {
         {error && <p role="status" className="text-sm text-destructive">{error}</p>}
       </div>}
       {selected.length > 0 && <div className="mt-2 flex flex-wrap gap-2">
-        {selected.map((person) => <Button key={person.id} type="button" variant="ghost" className="capture-person-chip" aria-label={`Remove ${person.name}`} onClick={() => onChange(selected.filter((p) => p.id !== person.id))}>{person.name}<X aria-hidden="true" className="!size-3" /></Button>)}
+        {selected.map((person) => <Button key={person.id} type="button" variant="ghost" className="capture-person-chip" aria-label={`Remove ${person.name}`} onClick={() => onChange(selected.filter((p) => p.id !== person.id))}><span className="truncate">{person.name}</span><X aria-hidden="true" className="!size-3" /></Button>)}
       </div>}
     </div>
   );
