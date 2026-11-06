@@ -135,6 +135,7 @@ const Index = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [mentionsReady, setMentionsReady] = useState(!editId);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [whereFromPhoto, setWhereFromPhoto] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
   const { title, emotionalTone, note, sentiment, whoWasThere, photoFile, photoPreview, fields, memoryDate } = current;
@@ -240,6 +241,15 @@ const Index = () => {
     if (file) {
       const url = URL.createObjectURL(file);
       updateDraft({ photoFile: file, photoPreview: url });
+      // Photo GPS → nearest city, in the browser; fills only an empty row, never for People or edits.
+      if (!editId && allowsPhotoPrefill(category) && !fields.locationName.trim()) {
+        readPhotoGps(file).then(async (gps) => {
+          const city = gps && nearestCity(await loadCities(), gps.lat, gps.lng);
+          if (!city) return;
+          setWhereFromPhoto(true);
+          setFields((prev) => prev.locationName.trim() ? prev : { ...prev, locationName: city.name, locationLat: city.lat, locationLng: city.lng });
+        });
+      }
     } else {
       updateDraft({ photoFile: null, photoPreview: null });
     }
