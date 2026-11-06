@@ -9,7 +9,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   },
 }));
 
-import { ARCHIVE_PATH, ONBOARDING_NAME_PATH, resolvePostSignInPath } from "./postSignInRoute";
+import { ARCHIVE_PATH, ONBOARDING_NAME_PATH, resolvePostSignInPath, getPendingKeepRoute } from "./postSignInRoute";
 
 beforeEach(() => {
   localStorage.clear();
@@ -18,6 +18,31 @@ beforeEach(() => {
 });
 
 describe("where a signed-in user belongs", () => {
+  it('returns only a valid pending keep route', () => {
+    expect(getPendingKeepRoute()).toBeNull();
+    localStorage.setItem('ts_pending_keep', 'ab'.repeat(24));
+    expect(getPendingKeepRoute()).toBe(`/keep/${'ab'.repeat(24)}`);
+    localStorage.setItem('ts_pending_keep', '../auth');
+    expect(getPendingKeepRoute()).toBeNull();
+  });
+  it('returns to a pending keep instead of every archive destination', async () => {
+    const token = 'ab'.repeat(24);
+    localStorage.setItem('ts_pending_keep', token);
+    for (const flag of ['ts_onboarding_complete', 'ts_onboarding_draft_v1', 'ts_onboarding_draft']) {
+      localStorage.setItem(flag, '1');
+      expect(await resolvePostSignInPath('u1')).toBe(`/keep/${token}`);
+      localStorage.removeItem(flag);
+    }
+    mocks.maybeSingle.mockResolvedValue({ data: { city: 'Seattle' }, error: null });
+    expect(await resolvePostSignInPath('u1')).toBe(`/keep/${token}`);
+    mocks.maybeSingle.mockResolvedValue({ data: null, error: {} });
+    expect(await resolvePostSignInPath('u1')).toBe(`/keep/${token}`);
+  });
+  it('does not bypass the name screen with a pending keep', async () => {
+    localStorage.setItem('ts_pending_keep', 'ab'.repeat(24));
+    mocks.maybeSingle.mockResolvedValue({ data: { city: null, location_display: null }, error: null });
+    expect(await resolvePostSignInPath('u1')).toBe(ONBOARDING_NAME_PATH);
+  });
   it("sends an account with no city back to the name screen", async () => {
     mocks.maybeSingle.mockResolvedValue({ data: { city: null, location_display: null }, error: null });
     expect(await resolvePostSignInPath("account-1")).toBe(ONBOARDING_NAME_PATH);
