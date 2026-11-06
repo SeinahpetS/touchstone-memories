@@ -47,6 +47,6 @@
 - [x] Add a 3pt line separating the category heading on the touchstone card; verify desktop and phone.
 
 - [x] Reduce the category heading rule from 3pt to 2pt.
-- [ ] Selected category tile stays filled dark blue (QuickCaptureSheet / CategoryIconCard).
-- [ ] QuickCaptureSheet close button -> X icon in the corner.
-- [ ] Center the "Add a Touchstone" heading.
+- [x] Selected category tile stays filled dark blue.
+- [x] QuickCaptureSheet close button -> X icon in the corner.
+- [x] Center the "Add a Touchstone" heading.
