@@ -14,6 +14,7 @@ import { useEntitlement } from "@/hooks/useEntitlement";
 import TimelineView from "@/components/TimelineView";
 import CategoryIcon, { CategoryIconCard, CATEGORY_BORDER_COLORS, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
+import AddTouchstoneCard from "@/components/AddTouchstoneCard";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -702,6 +703,26 @@ const Archive = () => {
         >
           {fetching ? (
             <p className="text-center text-muted-foreground py-12">Loading…</p>
+          ) : touchstones.length === 0 && totalCount === 0 ? (
+            <div className="pt-2 pb-4">
+              <div className="grid grid-cols-2 gap-3">
+                <AddTouchstoneCard
+                  category={filter}
+                  onAdd={() => setQuickCaptureOpen(true)}
+                />
+              </div>
+              <p
+                className="text-center"
+                style={{
+                  fontFamily: "Jost, sans-serif",
+                  fontSize: 13,
+                  color: "#5B4A3F",
+                  margin: "16px 0 0",
+                }}
+              >
+                A person, a place, a thing you don’t want to forget.
+              </p>
+            </div>
           ) : touchstones.length === 0 ? (
             <div className="h-full flex flex-col">
               {/* Zone 2 — divider with center diamond */}
@@ -796,6 +817,10 @@ const Archive = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-2 pb-4">
+              <AddTouchstoneCard
+                category={filter}
+                onAdd={() => setQuickCaptureOpen(true)}
+              />
               {visibleTouchstones.map((m) => (
                 <MemoryCard
                   key={m.id}
