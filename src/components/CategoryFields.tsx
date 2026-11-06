@@ -114,6 +114,12 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
         />
       )}
 
+      {category === "sound" && (
+        <div className="rounded-md bg-card px-4 py-3 text-sm text-muted-foreground">
+          Audio capture coming soon
+        </div>
+      )}
+
       {category === "sound" && values.soundType === "music" && (
         <SpotifySearch
           value={values.spotifyPick}
