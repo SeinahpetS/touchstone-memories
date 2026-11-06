@@ -52,14 +52,14 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
       {title && <h2 className="font-playfair text-xl font-semibold text-foreground">{title}</h2>}
 
       {memoryDateLabel ? (
-        <div className="space-y-1">
+        <div className={`space-y-1 ${title ? "!mt-3" : ""}`}>
           <p className="font-playfair italic text-base text-foreground">{memoryDateLabel}</p>
           <p className="text-xs text-muted-foreground">
             Saved {format(new Date(createdAt), "MMMM d, yyyy")}
           </p>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">
+        <p className={`text-sm text-muted-foreground ${title ? "!mt-3" : ""}`}>
           {format(new Date(createdAt), "MMMM d, yyyy")}
         </p>
       )}
