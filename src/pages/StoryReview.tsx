@@ -431,7 +431,7 @@ const StoryReview = () => {
       </div>
       <div className="onboarding-review-actions">
         <Button className="onboarding-edit-this" disabled={savingOverlay} onClick={handleEdit}>Edit</Button>
-        <Button className="onboarding-keep-this" disabled={savingOverlay} onClick={handleSave}>Keep this</Button>
+        <Button className="onboarding-keep-this" disabled={savingOverlay} onClick={handleSave}>Save</Button>
       </div>
     </div>
     {sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
