@@ -172,8 +172,11 @@
 .onboarding-review-photo { width: calc(100% + 48px); max-width: none; margin-left: -24px; aspect-ratio: 4 / 3; object-fit: cover; flex-shrink: 0; }
 .onboarding-edit-backdrop { position: fixed; inset: 0; z-index: 70; background: hsl(var(--globe-ocean) / 0.35); display: flex; align-items: center; justify-content: center; padding: 12px; }
 .onboarding-edit-sheet { width: 100%; max-width: 440px; max-height: calc(100dvh - 24px); overflow-y: auto; background: hsl(var(--location-ivory)); color: hsl(var(--globe-ocean)); padding: 20px; border-radius: 20px; animation: onboarding-edit-rise 300ms ease both; outline: none; }
-.onboarding-edit-photo { width: 100%; max-height: 26dvh; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; }
-.onboarding-crop-frame { position: relative; width: 100%; max-height: 30dvh; aspect-ratio: 4 / 3; margin: 0 auto; border-radius: 12px; overflow: hidden; background: hsl(var(--foreground)); touch-action: none; }
+.onboarding-edit-photo { display: block; max-width: 100%; max-height: 26dvh; width: auto; height: auto; margin: 0 auto; border-radius: 12px; }
+.onboarding-crop-ratios { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+.onboarding-crop-ratios button { padding: 6px 14px; border-radius: 9999px; border: 1px solid hsl(var(--globe-ocean)); background: transparent; color: hsl(var(--globe-ocean)); font-family: 'Jost', sans-serif; font-size: 13px; }
+.onboarding-crop-ratios button[aria-pressed='true'] { background: hsl(var(--globe-ocean)); color: hsl(var(--location-ivory)); }
+.onboarding-crop-frame { position: relative; margin: 0 auto; border-radius: 12px; overflow: hidden; background: hsl(var(--foreground)); touch-action: none; }
 .onboarding-crop-hint { margin-top: 8px; text-align: center; font-size: 13px; color: hsl(var(--muted-foreground)); }
 .onboarding-crop-zoom { width: 100%; margin-top: 6px; accent-color: #B8860B; }
 .onboarding-add-photo { width: 100%; height: 52px; border: 1.5px dashed hsl(var(--globe-line)); border-radius: 12px; background: transparent; color: hsl(var(--location-ink)); font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 400; }
