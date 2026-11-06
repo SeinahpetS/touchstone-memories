@@ -1,5 +1,5 @@
-import { FilePen, ChevronRight, X, ArrowRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { FilePen, ChevronRight, X, ArrowRight, Trash2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -12,6 +12,11 @@ const AEGEAN = "#0E7C86";
 const MUTED = "#8C8880";
 const CARD_SURFACE = "#E8E4D8";
 const DIVIDER = "#D4D0C4";
+const DELETE_RED = "#C0392B";
+/** How far a row must be dragged left before it asks to delete. */
+const SWIPE_TRIGGER = 72;
+/** How far the reveal layer is allowed to open. */
+const SWIPE_MAX = 112;
 
 interface StoryRow {
   id: string;
@@ -36,6 +41,11 @@ const StoryUnfold = () => {
   const [text, setText] = useState("");
   const [extracting, setExtracting] = useState(false);
   const [rows, setRows] = useState<StoryRow[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<StoryRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [swipe, setSwipe] = useState<{ id: string; x: number } | null>(null);
+  const pointer = useRef<{ id: string; x: number; y: number; drag: boolean } | null>(null);
+  const suppressClick = useRef(false);
 
   const isOnboarding =
     typeof window !== "undefined" &&
@@ -90,6 +100,33 @@ const StoryUnfold = () => {
       };
     }
   }, [sheetOpen]);
+
+  const handleDelete = async () => {
+    const target = pendingDelete;
+    if (!target || deleting) return;
+    const { data: userRes } = await supabase.auth.getUser();
+    const user = userRes?.user;
+    if (!user) {
+      toast("You need to be signed in to delete a story.");
+      setPendingDelete(null);
+      return;
+    }
+    setDeleting(true);
+    const { error } = await supabase
+      .from("story_sessions")
+      .delete()
+      .eq("id", target.id)
+      .eq("user_id", user.id);
+    setDeleting(false);
+    if (error) {
+      console.error("delete session failed", error);
+      toast("Couldn't delete that story. Try again.");
+      return;
+    }
+    setRows((prev) => prev.filter((r) => r.id !== target.id));
+    setPendingDelete(null);
+    toast("Story deleted.");
+  };
 
   const handleExtract = async () => {
     if (extracting) return;
