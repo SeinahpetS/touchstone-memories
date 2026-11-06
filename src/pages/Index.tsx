@@ -177,15 +177,17 @@ const Index = () => {
       }
       const cat = data.category as CategoryKey;
       let mentionedPeople: Person[];
+      let mentionsLoaded = false;
       try {
         mentionedPeople = await getMentionsForTouchstone(editId);
+        mentionsLoaded = true;
       } catch {
         // Do not permit an unread directory to erase existing mentions on save.
         toast.error("Couldn't load linked people. Please reopen Edit to try again.");
         mentionedPeople = [];
       }
       if (cancelled) return;
-      setMentionsReady(true);
+      setMentionsReady(mentionsLoaded);
       const draft: CategoryDraft = {
         mentionedPeople,
         title: data.title ?? "",
