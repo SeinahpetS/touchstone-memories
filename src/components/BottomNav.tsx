@@ -24,7 +24,7 @@ const TABS: Tab[] = [
     path: "/archive",
     icon: BookOpen,
     label: "Archive",
-    activeColor: ACTIVE,
+    activeColor: OLD_GOLD,
     activeLabelColor: ACTIVE,
   },
   {
@@ -52,7 +52,7 @@ const TABS: Tab[] = [
         Canvas
       </>
     ),
-    activeColor: ACTIVE,
+    activeColor: OLD_GOLD,
     activeLabelColor: ACTIVE,
   },
 ];
