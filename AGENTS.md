@@ -8,3 +8,4 @@
 - Persist onboarding location as city, country_code and region_code only; never write latitude or longitude into the onboarding draft or the profile.
 - Decide a signed-in user's destination from profile state in one shared helper: no stored city, no completion flag and no waiting draft sends them to the name screen, while a signed-in finish of the location screen writes the answers straight to the profile and opens the archive.
 - Keep Sounds microphone capture in the shared AudioUpload control, returning browser-recorded audio as a File through the existing attachment flow and releasing microphone tracks on stop or unmount; this keeps capture and edit behavior consistent without new storage paths.
+- Read and write people and touchstone_mentions only through the src/lib/people.ts data-access functions, never from components, so ownership checks (own person rows, mentions whose touchstone and person are both the user's) live in one place.
