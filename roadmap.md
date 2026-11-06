@@ -19,3 +19,6 @@
 # Review card vertical placement
 - [x] Keep the touchstone card and its Keep this/Edit row centered slightly above mid-screen at any card height; verify desktop and phone.
 - [x] Swap the review card's Keep this and Edit button positions.
+# Zoomed country view and selection highlighting
+- [ ] Make the zoomed-in US view match the reference: full-bleed rectangular map, contiguous US spanning ~75% of the frame, graticule and state borders visible, no circular edge while zoomed.
+- [ ] Do not highlight the country once a more specific region is selected; only the chosen region is gold.
