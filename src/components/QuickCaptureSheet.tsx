@@ -427,6 +427,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         fields.bookPick?.title ||
         fields.tmdbPick?.title ||
         ""
+      : category === "sound" && fields.soundType === "music"
+      ? fields.spotifyPick?.title || ""
       : "");
   const cardAnswer = whoWasThere.trim();
 
