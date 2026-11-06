@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import {
   SEASON_MONTHS,
   SEASON_OPTIONS,
@@ -64,13 +65,14 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
       )}
 
       <div className="grid grid-cols-2 gap-3">
+        <div className="relative min-w-0">
         <select
           aria-label="Season"
           value={value.season ?? ""}
           onChange={(e) =>
             setSeason((e.target.value || null) as MemorySeason | null)
           }
-          className={fieldClass}
+          className={`${fieldClass} appearance-none pr-10`}
         >
           <option value="">Season</option>
           {SEASON_OPTIONS.map((s) => (
@@ -79,6 +81,8 @@ const MemoryDateInput = ({ value, onChange }: Props) => {
             </option>
           ))}
         </select>
+        <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground" />
+        </div>
 
         <input
           type="text"
