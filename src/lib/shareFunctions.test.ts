@@ -68,11 +68,12 @@ function admin() {
 }
 
 beforeEach(() => {
-  share = { id: 's1', from_user_id: 'sender', touchstone_id: 't1', include_note: false,
+  share = { id: 's1', from_user_id: 'sender', touchstone_id: 't1', include_note: false, include_location: false,
     status: 'sent', expires_at: new Date(now + 86400000).toISOString() };
   original = { id: 't1', category: 'moment', title: 'Sunday', photo_url: 'sender/photo.JPG',
     note: 'Private recollection', memory_year: 1999, memory_month: 5, memory_day: 12,
-    memory_season: 'spring', when_text: 'May 1999', people: 'Do not copy' };
+    memory_season: 'spring', when_text: 'May 1999', people: 'Do not copy',
+    location_name: 'Carmel, CA', location_lat: 36.55, location_lng: -121.92 };
   rows = []; files = []; calls = []; fail = ''; race = false; serial = 0;
 });
 
@@ -114,6 +115,7 @@ describe('keeping a share', () => {
       id: 'new-1', user_id: 'recipient', category: 'moment', title: 'Sunday', photo_url: 'recipient/new-2.JPG',
       memory_year: 1999, memory_month: 5, memory_day: 12, memory_season: 'spring', when_text: 'May 1999',
       note: '', source_touchstone_id: 't1', received_from_user_id: 'sender', received_from_name: 'Steph', received_note: null,
+      location_name: null, location_lat: null, location_lng: null,
     }]);
     expect(share).toMatchObject({ status: 'kept', kept_by_user_id: 'recipient', kept_touchstone_id: 'new-1' });
     expect(calls.some(c => c.table === 'touchstone_mentions')).toBe(false);
@@ -122,6 +124,11 @@ describe('keeping a share', () => {
     share.include_note = true;
     await keep();
     expect(rows[0].received_note).toBe('Private recollection'); expect(rows[0].note).toBe('');
+  });
+  it('copies location only when the sender included it', async () => {
+    share.include_location = true;
+    await keep();
+    expect(rows[0]).toMatchObject({ location_name: 'Carmel, CA', location_lat: 36.55, location_lng: -121.92 });
   });
   it.each(['https://images.example/cover.jpg', '', null])('preserves external or empty photo %s without copying', async photo => {
     original.photo_url = photo;
