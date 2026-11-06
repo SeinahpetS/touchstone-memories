@@ -47,5 +47,3 @@
 - [x] Add a 3pt line separating the category heading on the touchstone card; verify desktop and phone.
 
 - [x] Reduce the category heading rule from 3pt to 2pt.
-
-- [x] Double the category label size on the touchstone card (11px -> 22px).
