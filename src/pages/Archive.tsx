@@ -36,8 +36,7 @@ const FILTER_CATEGORIES: CategoryKey[] = [
   "digital_traces",
 ];
 
-const PLURAL_LABELS: Record<CategoryKey, string> = {
-  moment: "Moments",
+const PLURAL_LABELS: Record<CategoryKey, string> = {  moment: "Moments",
   person: "People",
   object: "Objects",
   place: "Places",
