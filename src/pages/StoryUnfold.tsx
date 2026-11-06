@@ -1,9 +1,10 @@
-import { FilePen, ChevronRight, X, ArrowRight, Trash2 } from "lucide-react";
+import { FilePen, ChevronRight, X, ArrowRight, Trash2, Mic, Pause, Play } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
+import { transcribeEngine, type TranscribeSession } from "@/lib/transcribe";
 
 const BRAND_NAVY = "#1E2E3E";
 const SOFT_IVORY = "#F2EEE5";
@@ -46,6 +47,11 @@ const StoryUnfold = () => {
   const [swipe, setSwipe] = useState<{ id: string; x: number } | null>(null);
   const pointer = useRef<{ id: string; x: number; y: number; drag: boolean } | null>(null);
   const suppressClick = useRef(false);
+  const [mode, setMode] = useState<"listening" | "typing">("listening");
+  const [spoken, setSpoken] = useState("");
+  const [paused, setPaused] = useState(false);
+  const sessionRef = useRef<TranscribeSession | null>(null);
+  const spokenRef = useRef<HTMLDivElement | null>(null);
 
   const isOnboarding =
     typeof window !== "undefined" &&
@@ -128,9 +134,9 @@ const StoryUnfold = () => {
     toast("Story deleted.");
   };
 
-  const handleExtract = async () => {
+  const handleExtract = async (input?: string) => {
     if (extracting) return;
-    const transcript = text.trim();
+    const transcript = (input ?? text).trim();
     if (!transcript) {
       toast("Tell a bit of a story first.");
       return;
@@ -147,6 +153,9 @@ const StoryUnfold = () => {
       if (extracted.length === 0) throw new Error("No artifacts extracted");
       setSheetOpen(false);
       setText("");
+      setSpoken("");
+      sessionRef.current?.stop();
+      sessionRef.current = null;
       navigate("/story-unfold/review", {
         state: {
           sessionId: data.session_id,
@@ -161,6 +170,67 @@ const StoryUnfold = () => {
       setExtracting(false);
     }
   };
+
+  const stopListening = () => {
+    sessionRef.current?.stop();
+    sessionRef.current = null;
+  };
+
+  // Started inside the tap handler so the browser may ask for mic permission here.
+  const handleTellStory = () => {
+    setExtracting(false);
+    setPaused(false);
+    setSpoken("");
+    setText("");
+    if (!transcribeEngine.isSupported()) {
+      setMode("typing");
+      setSheetOpen(true);
+      return;
+    }
+    setMode("listening");
+    setSheetOpen(true);
+    sessionRef.current = transcribeEngine.start({
+      onUpdate: ({ transcript }) => setSpoken(transcript),
+      onError: (error) => {
+        if (error === "denied") {
+          setMode("typing");
+          toast("Microphone access was declined. You can type your story instead.");
+        }
+      },
+    });
+  };
+
+  const handleDone = () => {
+    stopListening();
+    const story = spoken.trim();
+    if (!story) {
+      setMode("typing");
+      toast("Nothing came through yet. You can type your story instead.");
+      return;
+    }
+    void handleExtract(story);
+  };
+
+  const handlePauseToggle = () => {
+    const session = sessionRef.current;
+    if (!session) return;
+    if (session.isPaused()) {
+      session.resume();
+      setPaused(false);
+    } else {
+      session.pause();
+      setPaused(true);
+    }
+  };
+
+  useEffect(() => {
+    return () => stopListening();
+  }, []);
+
+  useEffect(() => {
+    const box = spokenRef.current;
+    if (box) box.scrollTop = box.scrollHeight;
+  }, [spoken]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
@@ -191,7 +261,7 @@ const StoryUnfold = () => {
         {/* CTA Button */}
         <button
           type="button"
-          onClick={() => setSheetOpen(true)}
+          onClick={handleTellStory}
           className="w-full flex items-center justify-center gap-3 mt-6"
           style={{
             backgroundColor: BRAND_NAVY,
@@ -450,7 +520,10 @@ const StoryUnfold = () => {
             </h2>
             <button
               type="button"
-              onClick={() => setSheetOpen(false)}
+              onClick={() => {
+                stopListening();
+                setSheetOpen(false);
+              }}
               aria-label="Close"
               className="absolute right-4 top-5 p-2"
               style={{ background: "none", border: "none", cursor: "pointer" }}
@@ -472,21 +545,75 @@ const StoryUnfold = () => {
                 Finding what's there…
               </p>
             </div>
+          ) : mode === "listening" && !extracting ? (
+            <div className="flex-1 w-full flex flex-col items-center px-6 pt-6 min-h-0">
+              <div
+                className="ts-mic-pulse flex items-center justify-center flex-shrink-0"
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: "50%",
+                  backgroundColor: OLD_GOLD,
+                }}
+              >
+                <Mic size={26} color={SOFT_IVORY} strokeWidth={1.75} />
+              </div>
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: 28,
+                  color: BRAND_NAVY,
+                  marginTop: 22,
+                  textAlign: "center",
+                }}
+              >
+                I’m listening.
+              </p>
+              <div
+                ref={spokenRef}
+                className="w-full flex-1 min-h-0 overflow-y-auto"
+                style={{ marginTop: 18 }}
+              >
+                <p
+                  style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 18,
+                    color: "#2C3E50",
+                    lineHeight: 1.55,
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {spoken || "Start talking. Pauses are fine — I’ll keep going."}
+                </p>
+              </div>
+            </div>
           ) : (
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Start typing, or use your keyboard's dictation button to speak your story."
-              className="flex-1 w-full px-5 py-4 resize-none focus:outline-none"
-              style={{
-                backgroundColor: SOFT_IVORY,
-                border: "none",
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 14,
-                color: BRAND_NAVY,
-                lineHeight: 1.5,
-              }}
-            />
+            <>
+              <p
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 13,
+                  color: MUTED,
+                  padding: "0 20px",
+                }}
+              >
+                You can type your story instead.
+              </p>
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Start typing your story here."
+                className="flex-1 w-full px-5 py-4 resize-none focus:outline-none"
+                style={{
+                  backgroundColor: SOFT_IVORY,
+                  border: "none",
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 14,
+                  color: BRAND_NAVY,
+                  lineHeight: 1.5,
+                }}
+              />
+            </>
           )}
 
           {/* Bottom CTA */}
@@ -497,25 +624,68 @@ const StoryUnfold = () => {
               backgroundColor: SOFT_IVORY,
             }}
           >
-            <button
-              type="button"
-              onClick={handleExtract}
-              disabled={extracting}
-              className="w-full"
-              style={{
-                backgroundColor: AEGEAN,
-                color: "#FFFFFF",
-                fontFamily: "'Jost', sans-serif",
-                fontSize: 15,
-                padding: "0.95rem",
-                borderRadius: 12,
-                border: "none",
-                cursor: extracting ? "not-allowed" : "pointer",
-                opacity: extracting ? 0.7 : 1,
-              }}
-            >
-              {extracting ? "Finding what's there…" : "See What's There"}
-            </button>
+            {mode === "listening" && !extracting ? (
+              <div className="flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={handleDone}
+                  className="w-full"
+                  style={{
+                    height: 56,
+                    backgroundColor: BRAND_NAVY,
+                    color: SOFT_IVORY,
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 16,
+                    borderRadius: 12,
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Done
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePauseToggle}
+                  className="flex items-center gap-2"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    marginTop: 10,
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: 14,
+                    color: BRAND_NAVY,
+                  }}
+                >
+                  {paused ? (
+                    <Play size={14} color={BRAND_NAVY} strokeWidth={1.75} />
+                  ) : (
+                    <Pause size={14} color={BRAND_NAVY} strokeWidth={1.75} />
+                  )}
+                  {paused ? "Resume" : "Pause"}
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void handleExtract()}
+                disabled={extracting}
+                className="w-full"
+                style={{
+                  backgroundColor: AEGEAN,
+                  color: "#FFFFFF",
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: 15,
+                  padding: "0.95rem",
+                  borderRadius: 12,
+                  border: "none",
+                  cursor: extracting ? "not-allowed" : "pointer",
+                  opacity: extracting ? 0.7 : 1,
+                }}
+              >
+                {extracting ? "Finding what’s there…" : "See What’s There"}
+              </button>
+            )}
           </div>
         </div>
       )}

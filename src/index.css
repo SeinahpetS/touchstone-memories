@@ -255,3 +255,9 @@
 @media (prefers-reduced-motion: reduce) {
   .saved-fade-heading, .saved-fade-continue { animation: none; }
 }
+
+@keyframes ts-mic-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.ts-mic-pulse { animation: ts-mic-pulse 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .ts-mic-pulse { animation: none; opacity: 1; }
+}
