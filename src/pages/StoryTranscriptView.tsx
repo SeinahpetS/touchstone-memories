@@ -176,6 +176,7 @@ const StoryTranscriptView = () => {
         ) : (
           <div
             style={{
+              marginTop: "calc(33vh - 60px)",
               backgroundColor: CARD_SURFACE,
               border: `1px solid ${DIVIDER}`,
               borderRadius: 18,

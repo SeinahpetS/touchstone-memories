@@ -14,6 +14,9 @@ type Tab = {
 const ACTIVE = "#F2EEE5";
 const INACTIVE = "#8C8880";
 const OLD_GOLD = "#B8860B";
+// Soft ivory wash over the navy bar — reads as the lighter "highlighted" capsule
+// behind the active tab, like the reference nav.
+const HIGHLIGHT = "rgba(242, 238, 229, 0.16)";
 
 const TABS: Tab[] = [
   {
@@ -102,32 +105,46 @@ const BottomNav = () => {
             key={tab.key}
             type="button"
             onClick={() => navigate(tab.path)}
+            aria-current={isActive ? "page" : undefined}
             style={{
               background: "transparent",
               border: "none",
-              padding: "6px 12px",
+              padding: "4px 4px",
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: 4,
               cursor: "pointer",
               flex: 1,
               minWidth: 0,
             }}
           >
-            <Icon size={22} color={iconColor} strokeWidth={1.75} style={{ opacity: 1 }} />
             <span
               style={{
-                fontFamily: '"Jost", system-ui, sans-serif',
-                fontSize: 10,
-                lineHeight: 1.15,
-                color: labelColor,
-                textAlign: "center",
-                opacity: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 4,
+                minHeight: 63,
+                padding: "8px 14px",
+                borderRadius: 999,
+                background: isActive ? HIGHLIGHT : "transparent",
+                transition: "background-color 220ms ease",
               }}
             >
-              {tab.label}
+              <Icon size={22} color={iconColor} strokeWidth={1.75} style={{ opacity: 1 }} />
+              <span
+                style={{
+                  fontFamily: '"Jost", system-ui, sans-serif',
+                  fontSize: 10,
+                  lineHeight: 1.15,
+                  color: labelColor,
+                  textAlign: "center",
+                  opacity: 1,
+                }}
+              >
+                {tab.label}
+              </span>
             </span>
           </button>
         );
