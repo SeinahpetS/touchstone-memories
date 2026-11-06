@@ -12,7 +12,7 @@ type Tab = {
 };
 
 const ACTIVE = "#F2EEE5";
-const INACTIVE = "#8C8880";
+const INACTIVE = "#F2EEE5";
 const OLD_GOLD = "#B8860B";
 // Soft ivory wash over the navy bar — reads as the lighter "highlighted" capsule
 // behind the active tab, like the reference nav.
