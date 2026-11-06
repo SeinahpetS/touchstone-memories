@@ -111,7 +111,7 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
       <div className="onboarding-edit-field">Category
         <Button variant="outline" className="onboarding-category-chip" aria-expanded={categoriesOpen} onClick={() => setCategoriesOpen(v => !v)}>{CATEGORY_LABELS[category]}</Button>
         {categoriesOpen && <div className="onboarding-category-options">{(Object.keys(CATEGORY_LABELS) as CategoryKey[]).map(key =>
-          <CategoryIconCard key={key} category={key} className="w-full !min-w-0 !px-[8px] !py-[14px] !gap-1.5" iconSize={26} labelSize={10} active={category === key} selectionRing onClick={() => { setCategory(key); setCategoriesOpen(false); }} />)}</div>}
+          <CategoryIconCard key={key} category={key} className="w-full h-full !min-w-0 !px-[6px] !py-[14px] !gap-1.5 text-center" iconSize={26} labelSize={10} active={category === key} selectionRing onClick={() => { setCategory(key); setCategoriesOpen(false); }} />)}</div>}
       </div>
       <label className="onboarding-edit-field">Note<textarea aria-label="Note" rows={3} className="onboarding-edit-note" value={note} onChange={e => setNote(e.target.value)} /></label>
       <Button className="onboarding-edit-save" disabled={busy || adjusting} onClick={() => void save()}>Save</Button>
