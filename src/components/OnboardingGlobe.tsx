@@ -4,7 +4,7 @@ import { feature } from "topojson-client";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import world from "@/assets/geography/countries-110m.json";
-import { countryGlobeFocus, GLOBE_RADIUS, GLOBE_EXPANDED_SIZE, GLOBE_FOCUS_MS, SELECTION_RING_RADIUS, isGlobeTap, needsSelectionRing, REGIONAL_COUNTRIES, type GlobeSelection } from "@/lib/globeLocation";
+import { countryGlobeFocus, FOCUS_OVERRIDES, focusGeometryFor, GLOBE_FRAME, GLOBE_RADIUS, GLOBE_EXPANDED_SIZE, GLOBE_FOCUS_MS, SELECTION_RING_RADIUS, isGlobeTap, needsSelectionRing, REGIONAL_COUNTRIES, type GlobeSelection } from "@/lib/globeLocation";
 
 type Place = Feature<Geometry, { name: string; country_code: string; region_code?: string }>;
 function decode(data: unknown): Place[] {
@@ -87,10 +87,11 @@ export default forwardRef<GlobeHandle, {
     frame.current = requestAnimationFrame(animate);
   }
 
-  function focusCountry(country: Place) {
+  function focusCountry(country: Place, regionList: Place[] = regions) {
     if (!REGIONAL_COUNTRIES.has(country.properties.country_code)) return;
     setZoomed(true);
-    const focus = countryGlobeFocus(country);
+    const focus = countryGlobeFocus(country, GLOBE_FRAME,
+      focusGeometryFor(country, regionList, country.properties.country_code));
     animateView(focus.rotation, focus.scale);
   }
 
@@ -121,9 +122,20 @@ export default forwardRef<GlobeHandle, {
     onSelect({ country_code: code, region_code: null });
     setRegions([]);
     const version = ++loadVersion.current;
+    const loader = REGIONAL_COUNTRIES.has(code) ? regionFiles[`../assets/geography/regions/${code}.json`] : undefined;
+    // A country with a focus override is framed by its own regions, so they are
+    // in hand before the zoom starts.
+    if (loader && FOCUS_OVERRIDES[code]) {
+      try {
+        const module = await loader() as { default: unknown };
+        if (loadVersion.current !== version) return;
+        const regs = decode(module.default);
+        setRegions(regs);
+        focusCountry(country, regs);
+        return;
+      } catch { /* Falls back to framing the country's whole shape. */ }
+    }
     focusCountry(country);
-    if (!REGIONAL_COUNTRIES.has(code)) return;
-    const loader = regionFiles[`../assets/geography/regions/${code}.json`];
     if (!loader) return;
     try {
       const module = await loader() as { default: unknown };

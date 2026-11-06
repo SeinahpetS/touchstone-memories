@@ -136,7 +136,7 @@
 .globe-edge { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 1.5px; }
 .globe-region { stroke: hsl(var(--globe-ocean)); stroke-width: 1px; }
 .globe-country, .globe-region, .globe-graticule, .globe-edge, .globe-selection-ring { vector-effect: non-scaling-stroke; }
-.globe-expanded { width: min(420px, 100%); height: auto; }
+.globe-expanded { width: min(342px, 100%); height: auto; }
 .globe-compact { width: 150px; height: 150px; opacity: 0.35; transition-duration: 300ms; }
 .globe-confirmation { width: 220px; height: 220px; opacity: 1; }
 .globe-selected { fill: hsl(var(--globe-selection)); }

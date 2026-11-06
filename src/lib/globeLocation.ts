@@ -1,5 +1,5 @@
-import { geoArea, geoCentroid, geoOrthographic, geoPath } from "d3-geo";
-import type { Geometry } from "geojson";
+import { geoCentroid, geoOrthographic, geoPath } from "d3-geo";
+import type { Geometry, MultiPolygon } from "geojson";
 
 export interface GlobeSelection {
   country_code: string | null;
@@ -9,32 +9,45 @@ export interface GlobeSelection {
 export const REGIONAL_COUNTRIES = new Set(["US", "CA", "MX", "BR", "AR", "RU", "CN", "IN", "AU", "ID"]);
 export const GLOBE_FOCUS_MS = 600;
 export const GLOBE_RADIUS = 146;
-export const GLOBE_EXPANDED_SIZE = 420;
-/** The mainland is scaled until it spans this much of the frame's width. */
-export const GLOBE_FOCUS_WIDTH_RATIO = 0.72;
-/** ...but never taller than this much of the frame. */
+/** The globe's own drawing surface, in viewBox units. */
+export const GLOBE_FRAME = 300;
+export const GLOBE_EXPANDED_SIZE = 342;
+/** Air kept on each side of the expanded globe when a country is framed. */
+export const GLOBE_FOCUS_PADDING = 16;
+/** The share of the frame a country's focus shape is scaled to fill. */
+export const GLOBE_FOCUS_WIDTH_RATIO = (GLOBE_EXPANDED_SIZE - GLOBE_FOCUS_PADDING * 2) / GLOBE_EXPANDED_SIZE;
+/** A country taller than this share of the frame is held back so it stays readable. */
 export const GLOBE_FOCUS_HEIGHT_RATIO = 0.85;
-/** A landmass holding this share of the country's area becomes the focus. */
-export const MAINLAND_AREA_SHARE = 0.5;
+
+/** Region codes left out of a country's zoom framing, keyed by country code. */
+export const FOCUS_OVERRIDES: Record<string, string[]> = {
+  US: ["US-AK", "US-HI", "US-PR", "US-VI", "US-GU", "US-AS", "US-MP"],
+};
+
+type RegionLike = { geometry: Geometry; properties: { region_code?: string | null } };
 
 /**
- * Keep only the landmass that holds most of the country, so far-off territories
- * and island chains don't drag the focus out to sea and shrink the mainland.
+ * The shape a country's zoom is framed on: the region subset its override
+ * allows, otherwise the country's full shape.
  */
-export function mainlandGeometry(geometry: Geometry): Geometry {
-  if (geometry.type !== "MultiPolygon") return geometry;
-  const polys = geometry.coordinates.map((coordinates) => ({ type: "Polygon", coordinates }) as Geometry);
-  const areas = polys.map((polygon) => geoArea(polygon));
-  const total = areas.reduce((sum, area) => sum + area, 0);
-  const biggest = Math.max(...areas);
-  return total > 0 && biggest / total >= MAINLAND_AREA_SHARE
-    ? polys[areas.indexOf(biggest)]
-    : geometry;
+export function focusGeometryFor(
+  country: { geometry: Geometry },
+  regions: readonly RegionLike[],
+  code: string,
+): Geometry {
+  const excluded = FOCUS_OVERRIDES[code];
+  if (!excluded) return country.geometry;
+  const kept = regions.filter(region => !excluded.includes(region.properties.region_code ?? ""));
+  if (!kept.length) return country.geometry;
+  const coordinates = kept.flatMap(region => region.geometry.type === "MultiPolygon"
+    ? (region.geometry as MultiPolygon).coordinates
+    : [(region.geometry as unknown as { coordinates: MultiPolygon["coordinates"][0] }).coordinates]);
+  return { type: "MultiPolygon", coordinates } as Geometry;
 }
 
-/** Rotation and scale that centre a country's mainland and fill the frame with it. */
-export function countryGlobeFocus(country: { geometry: Geometry }, size = 300) {
-  const shape = mainlandGeometry(country.geometry);
+/** Rotation and scale that centre a shape and fill the expanded globe with it. */
+export function countryGlobeFocus(country: { geometry: Geometry }, size = GLOBE_FRAME, focus?: Geometry) {
+  const shape = focus ?? country.geometry;
   const center = geoCentroid(shape);
   const rotation: [number, number, number] = [-center[0], -center[1], 0];
   const radius = size / 2 - 4;
