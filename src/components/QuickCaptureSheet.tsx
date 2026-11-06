@@ -898,7 +898,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
                   category={c}
                   label={PLURAL_LABELS[c]}
                   className="w-full !min-w-0 !px-[8px] !py-[14px] !gap-1.5"
-                  iconSize={26}
+                  // Moment keeps its size; every other category's glyph is 10% larger.
+                  iconSize={c === "moment" ? 26 : 29}
                   labelSize={10}
                   active={category === c}
                   selectionRing
