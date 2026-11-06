@@ -138,7 +138,7 @@
 .globe-country, .globe-region, .globe-graticule, .globe-edge, .globe-parent-outline, .globe-selection-ring { vector-effect: non-scaling-stroke; }
 .globe-parent-selected { fill: hsl(var(--globe-land)); }
 .globe-parent-outline { fill: none; stroke: hsl(var(--globe-selection)); stroke-width: 1.5px; pointer-events: none; }
-.globe-expanded { width: min(342px, 100vw); height: min(342px, 100vw); }
+.globe-expanded { width: min(420px, 100%); height: auto; }
 .globe-compact { width: 150px; height: 150px; opacity: 0.35; transition-duration: 300ms; }
 .globe-confirmation { width: 220px; height: 220px; opacity: 1; }
 .globe-selected { fill: hsl(var(--globe-selection)); }
