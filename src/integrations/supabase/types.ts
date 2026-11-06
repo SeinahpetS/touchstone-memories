@@ -309,6 +309,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      email_exists: { Args: { p_email: string }; Returns: boolean }
       has_active_vivid: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
