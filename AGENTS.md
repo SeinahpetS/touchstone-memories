@@ -1,4 +1,5 @@
 # Project rules
+- Keep share creation in src/lib/shares.ts using the verified current user and database-generated token defaults; sender-only database policies prevent recipient or foreign-touchstone access without UI assumptions.
 - Keep onboarding geography and city ranking isolated in frontend modules with lazy local per-country assets; offline selections persist structured city details only on Continue and never add Google requests or coordinates.
 - Use one orthographic projection for countries, regions, and graticule, clipped to a fixed circular globe viewport with an independent edge; scale zoom must not hide the circular frame.
 - Keep Google city requests in the authenticated city-places function using the existing server key; resolve onboarding text once and reuse autocomplete tokens through Details, without requesting or persisting coordinates.
