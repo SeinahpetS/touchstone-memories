@@ -46,9 +46,10 @@ const OnboardingCreateAccount = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
 
-  const handleEmailContinue = () => {
+  const handleEmailContinue = async () => {
     const parsed = emailSchema.safeParse(email);
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Invalid email.");
@@ -56,6 +57,22 @@ const OnboardingCreateAccount = () => {
     }
     setError(null);
     setEmail(parsed.data);
+    setChecking(true);
+    let taken = false;
+    try {
+      const { data, error: checkError } = await supabase.functions.invoke("check-email", {
+        body: { email: parsed.data },
+      });
+      taken = !checkError && data?.exists === true;
+    } catch {
+      // A failed check must not block someone who has never been here before.
+      taken = false;
+    }
+    setChecking(false);
+    if (taken) {
+      setError("This email already has an archive. Sign in to keep going.");
+      return;
+    }
     saveOnboardingDraft({ ...existing });
     setStep("password");
   };
@@ -185,15 +202,20 @@ const OnboardingCreateAccount = () => {
       type="button"
       onClick={handleGoogle}
       disabled={submitting}
-      className="w-full flex items-center justify-center gap-2"
+      className="ts-google-btn w-full flex items-center justify-center"
       style={{
-        fontFamily: "'Jost', sans-serif",
-        fontSize: 12,
-        color: "#9E9585",
         marginTop: 20,
-        textAlign: "center",
-        background: "transparent",
-        border: "none",
+        height: 52,
+        padding: "0 12px",
+        gap: 10,
+        backgroundColor: "#FFFFFF",
+        border: "1px solid #747775",
+        borderRadius: 12,
+        fontFamily: "'Jost', sans-serif",
+        fontWeight: 500,
+        fontSize: 14,
+        lineHeight: "20px",
+        color: "#1F1F1F",
         cursor: submitting ? "not-allowed" : "pointer",
         opacity: submitting ? 0.6 : 1,
       }}
@@ -298,6 +320,7 @@ const OnboardingCreateAccount = () => {
           <button
             type="button"
             onClick={handleEmailContinue}
+            disabled={checking}
             className="w-full"
             style={{
               marginTop: 40,
@@ -308,10 +331,12 @@ const OnboardingCreateAccount = () => {
               borderRadius: 12,
               fontFamily: "'Playfair Display', Georgia, serif",
               fontSize: 16,
-              cursor: "pointer",
+              cursor: checking ? "not-allowed" : "pointer",
+              opacity: checking ? 0.7 : 1,
+              transition: "opacity 200ms ease",
             }}
           >
-            Continue
+            {checking ? "Checking…" : "Continue"}
           </button>
 
           {googleButton}
@@ -414,6 +439,7 @@ const OnboardingCreateAccount = () => {
 
       <style>{`
         @keyframes ts-screen8-fade-in { from { opacity: 0 } to { opacity: 1 } }
+        .ts-google-btn:hover { background-color: #F2F2F2 !important; }
         input::placeholder {
           color: rgba(30, 46, 62, 0.35);
           font-style: italic;

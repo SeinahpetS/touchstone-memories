@@ -135,10 +135,8 @@
 .globe-graticule, .globe-edge { pointer-events: none; }
 .globe-edge { fill: none; stroke: hsl(var(--globe-line)); stroke-width: 1.5px; }
 .globe-region { stroke: hsl(var(--globe-ocean)); stroke-width: 1px; }
-.globe-country, .globe-region, .globe-graticule, .globe-edge, .globe-parent-outline, .globe-selection-ring { vector-effect: non-scaling-stroke; }
-.globe-parent-selected { fill: hsl(var(--globe-land)); }
-.globe-parent-outline { fill: none; stroke: hsl(var(--globe-selection)); stroke-width: 1.5px; pointer-events: none; }
-.globe-expanded { width: min(342px, 100vw); height: min(342px, 100vw); }
+.globe-country, .globe-region, .globe-graticule, .globe-edge, .globe-selection-ring { vector-effect: non-scaling-stroke; }
+.globe-expanded { width: min(342px, 100%); height: auto; }
 .globe-compact { width: 150px; height: 150px; opacity: 0.35; transition-duration: 300ms; }
 .globe-confirmation { width: 220px; height: 220px; opacity: 1; }
 .globe-selected { fill: hsl(var(--globe-selection)); }
@@ -221,8 +219,8 @@
 .location-confirm h2 { margin: 8px 0 12px; font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 500; color: hsl(var(--globe-ocean)); overflow-wrap: anywhere; }
 .location-change { font-family: 'Jost', sans-serif; font-size: 15px; color: hsl(var(--globe-ocean)); }
 .location-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px 24px max(20px, env(safe-area-inset-bottom)); display: flex; justify-content: center; background: hsl(var(--location-ivory)); z-index: 20; }
-.location-continue { height: 56px; width: 100%; max-width: 420px; border-radius: 14px; font-family: 'Jost', sans-serif; font-size: 17px; font-weight: 500; background: hsl(var(--globe-ocean)); color: hsl(var(--location-ivory)); }
-.location-continue:hover { background: hsl(var(--globe-ocean)); }
+.location-continue { height: 56px; width: 100%; max-width: 420px; border-radius: 14px; font-family: 'Jost', sans-serif; font-size: 17px; font-weight: 500; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: 1.5px solid hsl(var(--primary)); }
+.location-continue:hover { background: transparent !important; color: hsl(var(--primary)) !important; }
 .location-continue:disabled { background: hsl(var(--globe-land)); color: hsl(var(--location-ink)); opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .onboarding-globe { transition: none; } }
 

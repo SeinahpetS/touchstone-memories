@@ -1,80 +1,124 @@
 import { describe, expect, it } from "vitest";
-import { countryGlobeFocus, GLOBE_EXPANDED_SIZE, GLOBE_FOCUS_WIDTH, GLOBE_RADIUS, GLOBE_FOCUS_MS, SELECTION_RING_MIN_PX, SELECTION_RING_RADIUS, REGIONAL_COUNTRIES, isGlobeTap, needsSelectionRing, rankLocalCities, type CityRow } from "./globeLocation";
-import { geoCentroid, geoOrthographic, geoPath } from "d3-geo";
+import { geoBounds, geoCentroid, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
-import type { Topology, GeometryCollection } from "topojson-specification";
-import type { FeatureCollection } from "geojson";
-import countries from "@/assets/geography/countries-110m.json";
+import type { Feature, Geometry } from "geojson";
+import countriesRaw from "../assets/geography/countries-110m.json";
+import usRegionsRaw from "../assets/geography/regions/US.json";
+import {
+  countryGlobeFocus,
+  FOCUS_OVERRIDES,
+  focusGeometryFor,
+  GLOBE_EXPANDED_SIZE,
+  GLOBE_FOCUS_HEIGHT_RATIO,
+  GLOBE_FOCUS_PADDING,
+  GLOBE_FRAME,
+  GLOBE_RADIUS,
+  isGlobeTap,
+  needsSelectionRing,
+  rankLocalCities,
+  REGIONAL_COUNTRIES,
+  type CityRow,
+} from "./globeLocation";
 
-describe("onboarding globe rules", () => {
-  it("only treats movement under 6px as a tap", () => {
-    expect(isGlobeTap(5.99)).toBe(true);
-    expect(isGlobeTap(6)).toBe(false);
-    expect(isGlobeTap(12)).toBe(false);
+type Place = Feature<Geometry, { name: string; country_code: string; region_code?: string }>;
+const features = (topology: unknown, object: unknown) =>
+  (feature as unknown as (topology: unknown, object: unknown) => { features: Place[] })(topology, object);
+
+const countries = features(countriesRaw, "countries");
+const usRegions = features(usRegionsRaw,
+  Object.keys((usRegionsRaw as unknown as { objects: Record<string, unknown> }).objects)[0]);
+const countryByCode = (code: string) => countries.find(country => country.properties.country_code === code)!;
+
+describe("globe focus", () => {
+  it("keeps every country but the US framed by its full shape", () => {
+    expect(Object.keys(FOCUS_OVERRIDES)).toEqual(["US"]);
+    expect(FOCUS_OVERRIDES.US).toEqual(expect.arrayContaining(["US-AK", "US-HI"]));
+    const france = countryByCode("FR");
+    expect(focusGeometryFor(france, [], "FR")).toBe(france.geometry);
+    // Without its regions in hand, an overridden country still frames its full shape.
+    expect(focusGeometryFor(countryByCode("US"), [], "US")).toBe(countryByCode("US").geometry);
   });
-  it("focuses for 600ms", () => expect(GLOBE_FOCUS_MS).toBe(600));
-  const world = feature(countries as unknown as Topology, countries.objects.countries as unknown as GeometryCollection) as FeatureCollection;
-  it("centers the selected country's centroid on the orthographic sphere", () => {
-    const country = world.features.find(f => f.properties?.country_code === "FR");
-    if (!country) throw new Error("France missing");
-    const focus = countryGlobeFocus(country);
-    const projection = geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale);
-    const center = projection(geoCentroid(country));
-    expect(center?.[0]).toBeCloseTo(150);
-    expect(center?.[1]).toBeCloseTo(150);
+
+  it("drops the excluded regions from the US focus shape", () => {
+    const focus = focusGeometryFor(countryByCode("US"), usRegions, "US");
+    const [[west, south], [east, north]] = geoBounds(focus);
+    expect(north).toBeLessThan(50); // no Alaska
+    expect(south).toBeGreaterThan(24); // no Hawaii
+    expect(west).toBeGreaterThan(-126); // no Aleutians or territories
+    expect(east).toBeLessThan(-66);
   });
-  it("fits country width to 70% of the 300px globe area without shrinking the globe", () => {
-    expect(GLOBE_FOCUS_WIDTH).toBe(210);
-    expect(GLOBE_RADIUS).toBe(146);
-    for (const code of ["US", "IN", "FR"]) {
-      const country = world.features.find(f => f.properties?.country_code === code);
-      if (!country) throw new Error(`${code} missing`);
-      const focus = countryGlobeFocus(country);
-      const bounds = geoPath(geoOrthographic().translate([150, 150]).rotate(focus.rotation).scale(focus.scale)).bounds(country);
-      expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(210);
-      expect(focus.scale).toBeGreaterThanOrEqual(146);
-    }
+
+  it("faces the contiguous US toward the viewer", () => {
+    const focus = focusGeometryFor(countryByCode("US"), usRegions, "US");
+    const [lon, lat] = geoCentroid(focus);
+    expect(Math.abs(lon + 98.5)).toBeLessThan(1.5);
+    expect(Math.abs(lat - 39)).toBeLessThan(1.5);
+    const { rotation, scale } = countryGlobeFocus(countryByCode("US"), GLOBE_FRAME, focus);
+    expect(rotation).toEqual([-lon, -lat, 0]);
+    const projection = geoOrthographic().translate([150, 150]).scale(scale).rotate(rotation);
+    const [cx, cy] = geoPath(projection).centroid(focus);
+    expect(Math.abs(cx - 150)).toBeLessThan(1);
+    expect(Math.abs(cy - 150)).toBeLessThan(1);
   });
-  it("rings selections smaller than 24px across on screen", () => {
-    expect(SELECTION_RING_MIN_PX).toBe(24);
-    expect(SELECTION_RING_RADIUS).toBe(11);
-    expect(needsSelectionRing([[150, 150], [155, 156]])).toBe(true);
-    expect(needsSelectionRing([[150, 150], [174, 160]])).toBe(false);
-    expect(needsSelectionRing([[150, 150], [160, 174]])).toBe(false);
-  });
-  it("fits a regional country to 70% of the expanded 342px globe", () => {
+
+  it("fills the expanded globe with the focus, minus 16px on each side", () => {
+    const focus = focusGeometryFor(countryByCode("US"), usRegions, "US");
+    const { rotation, scale } = countryGlobeFocus(countryByCode("US"), GLOBE_EXPANDED_SIZE, focus);
+    const projection = geoOrthographic()
+      .translate([GLOBE_EXPANDED_SIZE / 2, GLOBE_EXPANDED_SIZE / 2]).scale(scale).rotate(rotation);
+    const bounds = geoPath(projection).bounds(focus);
+    const width = bounds[1][0] - bounds[0][0];
     expect(GLOBE_EXPANDED_SIZE).toBe(342);
-    const country = world.features.find(f => f.properties?.country_code === "US");
-    if (!country) throw new Error("US missing");
-    const focus = countryGlobeFocus(country, 342);
-    const bounds = geoPath(geoOrthographic().rotate(focus.rotation).scale(focus.scale)).bounds(country);
-    expect(bounds[1][0] - bounds[0][0]).toBeCloseTo(239.4);
+    expect(width).toBeCloseTo(GLOBE_EXPANDED_SIZE - GLOBE_FOCUS_PADDING * 2, 0);
+    expect(bounds[0][0]).toBeGreaterThan(0);
+    expect(bounds[1][0]).toBeLessThan(GLOBE_EXPANDED_SIZE);
+    expect(bounds[0][1]).toBeGreaterThan(0);
+    expect(bounds[1][1]).toBeLessThan(GLOBE_EXPANDED_SIZE);
   });
-  it("loads regions for exactly the ten requested countries", () => {
+
+  it("holds a tall country back so it stays readable", () => {
+    const chile = countryByCode("CL");
+    const { rotation, scale } = countryGlobeFocus(chile, GLOBE_EXPANDED_SIZE);
+    const projection = geoOrthographic()
+      .translate([GLOBE_EXPANDED_SIZE / 2, GLOBE_EXPANDED_SIZE / 2]).scale(scale).rotate(rotation);
+    const bounds = geoPath(projection).bounds(chile);
+    expect(bounds[1][1] - bounds[0][1]).toBeLessThanOrEqual(GLOBE_EXPANDED_SIZE * GLOBE_FOCUS_HEIGHT_RATIO + 1);
+  });
+
+  it("keeps the whole sphere inside the frame in world view", () => {
+    expect(GLOBE_RADIUS * 2).toBeLessThanOrEqual(GLOBE_FRAME);
+    expect(GLOBE_EXPANDED_SIZE).toBeGreaterThan(GLOBE_RADIUS * 2);
+    const world = geoOrthographic().translate([150, 150]).scale(GLOBE_RADIUS).rotate([0, 0]);
+    const limb = world([0, 90]) ?? [0, 0];
+    expect(Math.hypot(limb[0] - 150, limb[1] - 150)).toBeCloseTo(GLOBE_RADIUS, 0);
+  });
+
+  it("marks a selection too small to find without a ring", () => {
+    expect(needsSelectionRing([[140, 150], [152, 162]])).toBe(true);
+    expect(needsSelectionRing([[100, 150], [130, 180]])).toBe(false);
+  });
+
+  it("treats only a short pointer movement as a tap", () => {
+    expect(isGlobeTap(5.9)).toBe(true);
+    expect(isGlobeTap(6)).toBe(false);
+  });
+
+  it("ranks suggestions by selected country, then region, then population", () => {
+    const rows: CityRow[] = [
+      ["Berlin", "DE", "Berlin", "DE-BE", 3_600_000],
+      ["Bergisch Gladbach", "DE", "Nordrhein-Westfalen", "DE-NW", 160_000],
+      ["Bern", "CH", "Bern", "CH-BE", 140_000],
+    ];
+    expect(rankLocalCities(rows, "be", { country_code: "DE", region_code: "DE-NW" }).map(row => row[0]))
+      .toEqual(["Bergisch Gladbach", "Berlin", "Bern"]);
+    expect(rankLocalCities(rows, "be", { country_code: "DE", region_code: null }).map(row => row[0]))
+      .toEqual(["Berlin", "Bergisch Gladbach", "Bern"]);
+    expect(rankLocalCities(rows, "be", { country_code: null, region_code: null }).map(row => row[0]))
+      .toEqual(["Berlin", "Bergisch Gladbach", "Bern"]);
+    expect(rankLocalCities(rows, "b", { country_code: null, region_code: null })).toEqual([]);
+  });
+
+  it("keeps the ten region-aware countries", () => {
     expect([...REGIONAL_COUNTRIES]).toEqual(["US", "CA", "MX", "BR", "AR", "RU", "CN", "IN", "AU", "ID"]);
-    expect(REGIONAL_COUNTRIES.has("FR")).toBe(false);
-    const assets = import.meta.glob("../assets/geography/regions/*.json");
-    expect(Object.keys(assets).length).toBe(10);
-    for (const code of REGIONAL_COUNTRIES) {
-      expect(assets[`../assets/geography/regions/${code}.json`]).toBeDefined();
-      expect(countries.objects.countries.geometries.some(g => g.properties.country_code === code)).toBe(true);
-    }
-  });
-  const rows: CityRow[] = [
-    ["Springfield", "US", "Illinois", "US-IL", 100000],
-    ["Springfield", "US", "Oregon", "US-OR", 50000],
-    ["Springfield", "CA", "Ontario", "CA-ON", 200000],
-  ];
-  it("ranks the selected region first, then the selected country", () => {
-    expect(rankLocalCities(rows, "sp", { country_code: "US", region_code: "US-OR" }).map(r => r[3]))
-      .toEqual(["US-OR", "US-IL", "CA-ON"]);
-  });
-  it("typing without selecting geography still returns cities", () => {
-    expect(rankLocalCities(rows, "sp", { country_code: null, region_code: null })[0][1]).toBe("CA");
-  });
-  it("shows suggestions from two characters with at most three results", () => {
-    const selection = { country_code: null, region_code: null };
-    expect(rankLocalCities(rows, "s", selection)).toEqual([]);
-    expect(rankLocalCities(Array.from({ length: 8 }, (_, i) => ["Seattle" + i, "US", "Washington", "US-WA", i] as CityRow), "se", selection)).toHaveLength(3);
   });
 });

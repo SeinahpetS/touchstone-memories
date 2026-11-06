@@ -4,7 +4,7 @@ import { feature } from "topojson-client";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import world from "@/assets/geography/countries-110m.json";
-import { countryGlobeFocus, GLOBE_RADIUS, GLOBE_EXPANDED_SIZE, GLOBE_FOCUS_MS, SELECTION_RING_RADIUS, isGlobeTap, needsSelectionRing, REGIONAL_COUNTRIES, type GlobeSelection } from "@/lib/globeLocation";
+import { countryGlobeFocus, FOCUS_OVERRIDES, focusGeometryFor, GLOBE_FRAME, GLOBE_RADIUS, GLOBE_EXPANDED_SIZE, GLOBE_FOCUS_MS, SELECTION_RING_RADIUS, isGlobeTap, needsSelectionRing, REGIONAL_COUNTRIES, type GlobeSelection } from "@/lib/globeLocation";
 
 type Place = Feature<Geometry, { name: string; country_code: string; region_code?: string }>;
 function decode(data: unknown): Place[] {
@@ -87,10 +87,11 @@ export default forwardRef<GlobeHandle, {
     frame.current = requestAnimationFrame(animate);
   }
 
-  function focusCountry(country: Place) {
+  function focusCountry(country: Place, regionList: Place[] = regions) {
     if (!REGIONAL_COUNTRIES.has(country.properties.country_code)) return;
     setZoomed(true);
-    const focus = countryGlobeFocus(country);
+    const focus = countryGlobeFocus(country, GLOBE_FRAME,
+      focusGeometryFor(country, regionList, country.properties.country_code));
     animateView(focus.rotation, focus.scale);
   }
 
@@ -104,8 +105,10 @@ export default forwardRef<GlobeHandle, {
 
   async function selectAt(point: [number, number]) {
     const lonLat = projection.invert?.(point);
-    // Orthographic inversion outside the ocean disk is not a valid tap.
-    if (!lonLat || !lonLat.every(Number.isFinite) || Math.hypot(point[0] - 150, point[1] - 150) > GLOBE_RADIUS) return;
+    // Taps must land on the sphere: inside the visible disc in world view, or
+    // inside the full frame once a country is zoomed in.
+    const reach = zoomed ? view.scale : GLOBE_RADIUS;
+    if (!lonLat || !lonLat.every(Number.isFinite) || Math.hypot(point[0] - 150, point[1] - 150) > reach) return;
     if (!zoomed && selectedCountry && ((ring && Math.hypot(point[0] - ring.cx, point[1] - ring.cy) <= SELECTION_RING_RADIUS) || (selectedArea && geoContains(selectedArea, lonLat)))) { focusCountry(selectedCountry); return; }
     const region = regions.find(item => geoContains(item, lonLat));
     if (region) {
@@ -119,9 +122,20 @@ export default forwardRef<GlobeHandle, {
     onSelect({ country_code: code, region_code: null });
     setRegions([]);
     const version = ++loadVersion.current;
+    const loader = REGIONAL_COUNTRIES.has(code) ? regionFiles[`../assets/geography/regions/${code}.json`] : undefined;
+    // A country with a focus override is framed by its own regions, so they are
+    // in hand before the zoom starts.
+    if (loader && FOCUS_OVERRIDES[code]) {
+      try {
+        const module = await loader() as { default: unknown };
+        if (loadVersion.current !== version) return;
+        const regs = decode(module.default);
+        setRegions(regs);
+        focusCountry(country, regs);
+        return;
+      } catch { /* Falls back to framing the country's whole shape. */ }
+    }
     focusCountry(country);
-    if (!REGIONAL_COUNTRIES.has(code)) return;
-    const loader = regionFiles[`../assets/geography/regions/${code}.json`];
     if (!loader) return;
     try {
       const module = await loader() as { default: unknown };
@@ -189,21 +203,24 @@ export default forwardRef<GlobeHandle, {
       event.preventDefault(); cancelAnimationFrame(frame.current);
       setView(v => ({ ...v, rotation: [v.rotation[0] + move[0], Math.max(-89, Math.min(89, v.rotation[1] + move[1])), 0] }));
     }}>
-    <defs><clipPath id={clipId}><circle cx={150} cy={150} r={GLOBE_RADIUS} /></clipPath></defs>
-    <circle className="globe-ocean" cx={150} cy={150} r={GLOBE_RADIUS} />
+    <defs><clipPath id={clipId}>{zoomed
+      ? <rect x={0} y={0} width={300} height={300} />
+      : <circle cx={150} cy={150} r={GLOBE_RADIUS} />}</clipPath></defs>
+    {zoomed
+      ? <rect className="globe-ocean" x={0} y={0} width={300} height={300} />
+      : <circle className="globe-ocean" cx={150} cy={150} r={GLOBE_RADIUS} />}
     <g clipPath={`url(#${clipId})`}>
     <path className="globe-graticule" d={path(graticule) ?? ""} />
     {countries.map((country, index) => <path key={country.id ?? index}
       data-country={country.properties.country_code}
-      className={`globe-country${country.properties.country_code === selection.country_code ? (selection.region_code ? " globe-parent-selected" : " globe-selected") : ""}`}
+      className={`globe-country${country.properties.country_code === selection.country_code && !REGIONAL_COUNTRIES.has(country.properties.country_code) ? " globe-selected" : ""}`}
       d={path(country) ?? ""}><title>{country.properties.name}</title></path>)}
     {regions.map((region, index) => <path key={`${region.properties.region_code}-${index}`}
       data-region={region.properties.region_code}
-      className={`globe-region${!selection.region_code || region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
+      className={`globe-region${region.properties.region_code === selection.region_code ? " globe-selected" : ""}`}
       d={path(region) ?? ""}><title>{region.properties.name}</title></path>)}
-    {!zoomed && selection.region_code && selectedCountry && <path className="globe-parent-outline" d={path(selectedCountry) ?? ""} />}
     {ring && <circle className="globe-selection-ring" cx={ring.cx} cy={ring.cy} r={SELECTION_RING_RADIUS} aria-hidden="true" />}
     </g>
-    <circle className="globe-edge" cx={150} cy={150} r={GLOBE_RADIUS} aria-hidden="true" />
+    {!zoomed && <circle className="globe-edge" cx={150} cy={150} r={GLOBE_RADIUS} aria-hidden="true" />}
   </svg>;
 });
