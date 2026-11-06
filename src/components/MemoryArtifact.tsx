@@ -19,7 +19,7 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
-      {photoFirst && photoUrl && <MemoryPhoto src={photoUrl} alt={title || "Memory"} className="w-full aspect-[4/3] object-cover" />}
+      {photoFirst && photoUrl && <MemoryPhoto src={photoUrl} alt={title || "Memory"} className="w-full h-auto max-h-[60dvh] object-contain" />}
       {/* Inline category label */}
       <div
         className="flex items-center justify-center"

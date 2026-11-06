@@ -11,6 +11,7 @@ export type StoryArtifact = {
   note: string;
   source_phrase?: string;
   photoKey?: string;
+  originalPhotoKey?: string;
 };
 
 export type OnboardingStoryDraft = {
@@ -87,7 +88,7 @@ async function persistStory(userId: string) {
   await resolveProfileCity();
 
   // Only discard device photos once every memory and the profile have saved.
-  const photoKeys = new Set(draft?.artifacts.concat(kept).flatMap(a => a.photoKey ? [a.photoKey] : []) ?? []);
+  const photoKeys = new Set(draft?.artifacts.concat(kept).flatMap(a => [a.photoKey, a.originalPhotoKey].filter((k): k is string => !!k)) ?? []);
   await Promise.all([...photoKeys].map(key => removeOnboardingPhoto(key)));
   localStorage.removeItem(KEY);
   clearOnboardingDraft();

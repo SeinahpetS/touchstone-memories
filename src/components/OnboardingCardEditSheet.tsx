@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Crop, ArrowLeftRight, Trash2 } from "lucide-react";
+import { ImagePlus, Crop, ArrowLeftRight, Trash2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import Cropper, { type Area } from "react-easy-crop";
 import { cropPhotoBlob } from "@/lib/cropPhoto";
@@ -18,6 +18,8 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
   const [category, setCategory] = useState(artifact.category);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [photo, setPhoto] = useState<Blob | null>(null);
+  const [original, setOriginal] = useState<Blob | null>(null);
+  const [aspect, setAspect] = useState(4 / 3);
   const [removed, setRemoved] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,9 +39,14 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
 
   useEffect(() => {
     let active = true;
-    if (artifact.photoKey) void readOnboardingPhoto(artifact.photoKey).then(blob => { if (active && blob) setPhoto(blob); }).catch(() => toast.error("Couldn't load your photo."));
+    if (artifact.photoKey) void readOnboardingPhoto(artifact.photoKey).then(async blob => {
+      if (!active || !blob) return;
+      setPhoto(blob);
+      const orig = artifact.originalPhotoKey ? await readOnboardingPhoto(artifact.originalPhotoKey).catch(() => null) : null;
+      if (active) setOriginal(orig ?? blob);
+    }).catch(() => toast.error("Couldn't load your photo."));
     return () => { active = false; };
-  }, [artifact.photoKey]);
+  }, [artifact.photoKey, artifact.originalPhotoKey]);
   useEffect(() => {
     if (!photo) { setPreview(null); return; }
     const url = URL.createObjectURL(photo);
@@ -56,14 +63,20 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
   const save = async () => {
     setBusy(true);
     let newKey: string | undefined;
+    let origKey: string | undefined;
     try {
       if (photo && !removed) {
         newKey = crypto.randomUUID();
         await storeOnboardingPhoto(newKey, photo);
+        if (original && original !== photo) {
+          origKey = crypto.randomUUID();
+          await storeOnboardingPhoto(origKey, original);
+        }
       }
-      onSave({ ...artifact, title, category, note, photoKey: newKey });
+      onSave({ ...artifact, title, category, note, photoKey: newKey, originalPhotoKey: origKey });
     } catch {
       if (newKey) void removeOnboardingPhoto(newKey);
+      if (origKey) void removeOnboardingPhoto(origKey);
       toast.error("Couldn't save your changes on this device. Please try again.");
     } finally { setBusy(false); }
   };
@@ -84,14 +97,18 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
         e.target.value = "";
         if (!file) return;
         setBusy(true);
-        try { setPhoto(await resizeOnboardingPhoto(file)); setRemoved(false); }
+        try { const b = await resizeOnboardingPhoto(file); setPhoto(b); setOriginal(b); setRemoved(false); }
         catch { toast.error("Couldn't open this photo. Please choose a supported still image."); }
         finally { setBusy(false); }
       }} />
       {preview && !removed ? <div>
         {adjusting ? <>
-          <div className="onboarding-crop-frame">
-            <Cropper image={preview} crop={crop} zoom={zoom} aspect={4 / 3} minZoom={1} maxZoom={4}
+          <div className="onboarding-crop-ratios" role="group" aria-label="Photo shape">
+            {([["Landscape", 4 / 3], ["Portrait", 3 / 4], ["Square", 1]] as const).map(([label, r]) =>
+              <button key={label} type="button" aria-pressed={aspect === r} onClick={() => setAspect(r)}>{label}</button>)}
+          </div>
+          <div className="onboarding-crop-frame" style={{ aspectRatio: String(aspect), width: `min(100%, calc(30dvh * ${aspect}))` }}>
+            <Cropper image={preview} crop={crop} zoom={zoom} aspect={aspect} minZoom={1} maxZoom={4}
               onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(_, px) => setArea(px)} />
           </div>
           <p className="onboarding-crop-hint">Drag to move · pinch or slide to zoom</p>
@@ -104,7 +121,8 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
         <img src={preview} alt="Touchstone photo preview" className="onboarding-edit-photo" />
         <div className="flex justify-center gap-3 mt-3"><Button variant="outline" size="icon" aria-label="Crop and move photo" title="Crop & move" className="rounded-full bg-transparent" disabled={busy} onClick={() => setAdjusting(true)}><Crop size={18} /></Button>
           <Button variant="outline" size="icon" aria-label="Replace photo" title="Replace" className="rounded-full bg-transparent" disabled={busy} onClick={() => inputRef.current?.click()}><ArrowLeftRight size={18} /></Button>
-          <Button variant="outline" size="icon" aria-label="Remove photo" title="Remove" className="rounded-full bg-transparent" disabled={busy} onClick={() => { setPhoto(null); setRemoved(true); }}><Trash2 size={18} /></Button></div>
+          <Button variant="outline" size="icon" aria-label="Remove photo" title="Remove" className="rounded-full bg-transparent" disabled={busy} onClick={() => { setPhoto(null); setRemoved(true); }}><Trash2 size={18} /></Button>
+          {original && original !== photo && <Button variant="outline" size="icon" aria-label="Revert to original photo" title="Revert to original" className="rounded-full bg-transparent" disabled={busy} onClick={() => setPhoto(original)}><Undo2 size={18} /></Button>}</div>
         </>}
       </div> : <Button variant="outline" className="onboarding-add-photo" disabled={busy} onClick={() => inputRef.current?.click()}><ImagePlus size={20} />Add a photo</Button>}
       <label className="onboarding-edit-field">Title<input aria-label="Title" className="onboarding-edit-title" value={title} onChange={e => setTitle(e.target.value)} /></label>
