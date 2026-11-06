@@ -327,3 +327,11 @@
 .capture-where-value { display: inline-flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 14px; color: #5B4A3F; background: transparent; text-align: left; }
 .capture-where-value svg { color: #B8860B; flex-shrink: 0; }
 .capture-where-remove { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 14px; color: hsl(var(--mention-ink) / 0.6); }
+
+/* "Where?" Google fallback */
+.where-google { display: flex; flex-direction: column; gap: 6px; }
+.where-google-logo { margin: 0; font-family: Roboto, Arial, sans-serif; font-size: 11px; font-weight: 500; color: hsl(var(--muted-foreground)); }
+.where-google-note { margin: 0; font-size: 13px; color: hsl(var(--muted-foreground)); }
+.where-google-more { align-self: flex-start; background: none; border: 0; padding: 0; font-family: 'Jost', sans-serif; font-size: 13px; color: #4A6B8A; text-decoration: underline; text-underline-offset: 3px; }
+.where-google-consent { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: hsl(var(--card)); font-size: 14px; color: hsl(var(--foreground)); }
+.where-google-consent p { margin: 0; }
