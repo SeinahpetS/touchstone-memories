@@ -59,4 +59,4 @@
 
 # People table and mentions
 - [x] Create `people` and `touchstone_mentions` tables with RLS so a user only reaches their own rows and mentions where both sides are theirs.
-- [ ] Add data-access functions getPeople, createPerson, getMentionsForTouchstone, setMentionsForTouchstone, getTouchstonesForPerson in the data layer, not called directly from components.
+- [x] Add data-access functions getPeople, createPerson, getMentionsForTouchstone, setMentionsForTouchstone, getTouchstonesForPerson in the data layer, not called directly from components.
