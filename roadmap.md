@@ -54,4 +54,4 @@
 
 # Add a Touchstone tiles
 - [x] Highlighted category copy must not wrap; Archive filter tiles keep one line when selected.
-- [ ] Reduce the height of the "Add a Touchstone" category rectangles; verify no clipping.
+- [x] Reduce the height of the "Add a Touchstone" category rectangles; verify no clipping.
