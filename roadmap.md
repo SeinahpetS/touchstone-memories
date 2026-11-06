@@ -59,4 +59,5 @@
 
 # People table and mentions
 - [x] Create `people` and `touchstone_mentions` tables with RLS so a user only reaches their own rows and mentions where both sides are theirs.
-- [x] Add data-access functions getPeople, createPerson, getMentionsForTouchstone, setMentionsForTouchstone, getTouchstonesForPerson in the data layer, not called directly from components.
+- [x] Read and write people and touchstone_mentions only through the src/lib/people.ts data-access functions, never from components, so ownership checks (own person rows, mentions whose touchstone and person are both the user's) live in one place.
+- [x] Link people.user_id to profiles(id) with on delete cascade, once profiles.id's own cascade to auth.users was confirmed.

@@ -68,6 +68,13 @@ export type Database = {
             referencedRelation: "touchstones"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "people_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
