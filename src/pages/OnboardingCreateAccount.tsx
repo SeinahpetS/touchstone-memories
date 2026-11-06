@@ -185,15 +185,20 @@ const OnboardingCreateAccount = () => {
       type="button"
       onClick={handleGoogle}
       disabled={submitting}
-      className="w-full flex items-center justify-center gap-2"
+      className="ts-google-btn w-full flex items-center justify-center"
       style={{
-        fontFamily: "'Jost', sans-serif",
-        fontSize: 12,
-        color: "#9E9585",
         marginTop: 20,
-        textAlign: "center",
-        background: "transparent",
-        border: "none",
+        height: 52,
+        padding: "0 12px",
+        gap: 10,
+        backgroundColor: "#FFFFFF",
+        border: "1px solid #747775",
+        borderRadius: 12,
+        fontFamily: "'Jost', sans-serif",
+        fontWeight: 500,
+        fontSize: 14,
+        lineHeight: "20px",
+        color: "#1F1F1F",
         cursor: submitting ? "not-allowed" : "pointer",
         opacity: submitting ? 0.6 : 1,
       }}
@@ -414,6 +419,7 @@ const OnboardingCreateAccount = () => {
 
       <style>{`
         @keyframes ts-screen8-fade-in { from { opacity: 0 } to { opacity: 1 } }
+        .ts-google-btn:hover { background-color: #F2F2F2 !important; }
         input::placeholder {
           color: rgba(30, 46, 62, 0.35);
           font-style: italic;
