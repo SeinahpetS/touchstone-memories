@@ -95,13 +95,15 @@ Deno.serve(async (req) => {
   const userClient = createClient(url, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: auth } } });
   const { data: u } = await userClient.auth.getUser();
   if (!u?.user) return json({ error: 'unauthorized' }, 401);
-  const dryRun = (await req.json().catch(() => ({})))?.dryRun !== false;
+  const body = await req.json().catch(() => ({}));
+  const dryRun = body?.dryRun !== false; const only: string | undefined = body?.only; const rotatedMode: boolean = body?.rotated === true;
   const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
   const report = { dryRun, rotated: [] as string[], scanned: 0, withMetadata: 0, cleaned: 0, alreadyClean: 0, skipped: [] as string[], failed: [] as string[], removedKinds: {} as Record<string, number> };
   for (const bucket of ['memory-photos', 'avatars']) {
     for (const f of await listAll(admin, bucket)) {
       report.scanned++;
       const key = `${bucket}/${f.path}`;
+      if (only && key !== only) continue;
       try {
         const { data, error } = await admin.storage.from(bucket).download(f.path); if (error || !data) throw error ?? new Error('download');
         const bytes = new Uint8Array(await data.arrayBuffer());
@@ -113,6 +115,7 @@ Deno.serve(async (req) => {
         const orient = (r as { orient?: number }).orient ?? 1;
         if (orient > 1 && orient <= 8) report.rotated.push(`${key} (orientation ${orient})`);
         if (dryRun) continue;
+        if (!only && (orient > 1 && orient <= 8) !== rotatedMode) continue;
         const outBytes = orient > 1 && orient <= 8 ? await bakeOrientation(r.out, orient) : r.out;
         const { error: upErr } = await admin.storage.from(bucket).upload(f.path, new Blob([outBytes], { type }), { upsert: true, contentType: type });
         if (upErr) throw upErr; report.cleaned++;
