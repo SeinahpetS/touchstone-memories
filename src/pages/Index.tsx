@@ -1,3 +1,4 @@
+import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,6 +122,7 @@ const Index = () => {
   const [saved, setSaved] = useState<any>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
   const { title, emotionalTone, note, sentiment, whoWasThere, photoFile, photoPreview, fields, memoryDate } = current;
@@ -193,6 +195,7 @@ const Index = () => {
       };
       setCategory(cat);
       setDrafts({ [cat]: draft });
+      setIsPrivate(!!data.is_private);
     };
     load();
     return () => {
@@ -306,6 +309,7 @@ const Index = () => {
           WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
             ? whoWasThere.trim()
             : null,
+        is_private: isPrivate,
       };
 
       let data: any;
@@ -549,6 +553,23 @@ const Index = () => {
               onChange={(e) => setNote(e.target.value)}
               className="min-h-[120px] text-base bg-card border-0 resize-none placeholder:italic"
             />
+
+            <div className="flex items-center justify-between gap-4 rounded-xl bg-card px-4 py-3">
+              <div>
+                <p className="text-base" style={{ color: "#2C3E50", fontFamily: "'Source Sans 3', sans-serif", fontWeight: 600, margin: 0 }}>
+                  Keep this private
+                </p>
+                <p style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, color: "rgba(91,74,63,0.75)", margin: "2px 0 0" }}>
+                  Only visible to you — not shared or included in your book
+                </p>
+              </div>
+              <Switch
+                checked={isPrivate}
+                onCheckedChange={setIsPrivate}
+                aria-label="Keep this private"
+                className="data-[state=checked]:bg-[#B8860B]"
+              />
+            </div>
 
             <Button
               onClick={handleSave}

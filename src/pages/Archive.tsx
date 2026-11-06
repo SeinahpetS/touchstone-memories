@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MoreHorizontal, Pencil, Search, Share } from "lucide-react";
+import { Lock, MoreHorizontal, Pencil, Search, Share, Unlock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -406,7 +406,33 @@ const Archive = () => {
               }}
             />
           </div>
-          <div className="flex justify-center pt-4">
+          <div className="flex justify-center gap-3 pt-4">
+            <button
+              onClick={async () => {
+                const next = !selected.is_private;
+                const { error } = await (supabase as any)
+                  .from("touchstones")
+                  .update({ is_private: next })
+                  .eq("id", selected.id);
+                if (error) {
+                  toast.error("Couldn't update privacy.");
+                  return;
+                }
+                setSelected({ ...selected, is_private: next });
+                toast.success(next ? "Marked private." : "No longer private.");
+                fetchTouchstones();
+              }}
+              aria-pressed={!!selected.is_private}
+              className="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-base transition-colors"
+              style={{
+                borderColor: "#B8860B",
+                backgroundColor: selected.is_private ? "#B8860B" : "transparent",
+                color: selected.is_private ? "#F2EEE5" : "#B8860B",
+              }}
+            >
+              {selected.is_private ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+              {selected.is_private ? "Private" : "Make private"}
+            </button>
             <button
               onClick={() => navigate(`/?edit=${selected.id}`)}
               className="rounded-full bg-primary px-6 py-3 text-base text-primary-foreground hover:bg-primary/90 transition-colors"
