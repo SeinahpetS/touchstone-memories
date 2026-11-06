@@ -1,4 +1,5 @@
 # Project rules
+- Preserve pending keep tokens through one validated post-sign-in helper that overrides only archive destinations; the public keep page requests photos only after authenticated keeping and uses the shared artifact and capture controls for recipient notes.
 - Keep artifact copy sending in an opt-in shared SendCopy control that reads owner-scoped original metadata and uses createShare; this keeps unsaved/review cards unchanged and browser sharing separate from persistence.
 - Keep public share previews and authenticated keeps in server-only edge handlers with allowlisted fields and isolated service-role clients; conditional share updates and recipient-scoped cleanup prevent duplicate keeps and sender-file references.
 - Keep share creation in src/lib/shares.ts using the verified current user and database-generated token defaults; sender-only database policies prevent recipient or foreign-touchstone access without UI assumptions.

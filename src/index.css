@@ -138,6 +138,11 @@
 
 .capture-people { font-family: 'Jost', sans-serif; }
 .send-copy-row { margin-top: 6px !important; }
+.keep-page { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 32px 24px; background: hsl(var(--person-paper)); color: hsl(var(--mention-ink)); }
+.keep-heading { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: hsl(var(--person-heading)); overflow-wrap: anywhere; }
+.keep-body, .keep-note { font-family: 'Jost', sans-serif; font-size: 16px; color: hsl(var(--mention-ink)); overflow-wrap: anywhere; }
+.keep-confirmation { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; background: hsl(var(--person-heading) / 0.95); pointer-events: auto; }
+.keep-confirmation p { font-family: 'Playfair Display', serif; font-size: 28px; text-align: center; color: hsl(var(--person-paper)); }
 .send-copy-text { font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 400; height: 36px; padding: 0; color: hsl(var(--mention-ink) / 0.6); }
 .send-copy-text:hover { background: transparent; color: hsl(var(--mention-ink) / 0.6); }
 .send-copy-sheet { background: hsl(var(--person-paper)); color: hsl(var(--mention-ink)); max-height: 85dvh; overflow-y: auto; padding-bottom: max(24px, env(safe-area-inset-bottom)); }

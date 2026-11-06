@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { saveOnboardingAnswersToProfile } from "@/lib/onboardingProfile";
+import { getPendingKeepRoute } from "@/lib/postSignInRoute";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
 import { ChevronLeft, Globe2 } from "lucide-react";
 import world from "@/assets/geography/countries-110m.json";
@@ -59,7 +60,7 @@ const OnboardingLocation = () => {
       } catch {
         toast.error("Couldn't save your details. We'll try again in your archive.");
       }
-      navigate('/archive');
+      navigate(getPendingKeepRoute() ?? '/archive');
       return;
     }
     navigate('/onboarding/ready');
