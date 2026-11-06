@@ -170,7 +170,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
         />
 
         {/* Body */}
-        <div style={{ padding: "7px 8px 14px" }} className="space-y-0.5">
+        <div style={{ padding: "7px 8px 22px" }} className="space-y-0.5">
           {/* Category icon tile (20px) + label in caps */}
           <div className="flex items-center gap-1.5">
             <span
