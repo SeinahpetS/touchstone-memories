@@ -2,7 +2,8 @@ import { cn } from "@/lib/utils";
 
 export type ImprintType = "music" | "book" | "film" | "tv" | "art" | "quote" | "poem" | "podcast";
 export type SoundType = "music" | "podcast" | "voice" | "everyday";
-type PillType = ImprintType | SoundType;
+export type DigitalType = "link" | "message" | "screenshot";
+type PillType = ImprintType | SoundType | DigitalType;
 
 interface IconProps {
   size?: number;
@@ -10,6 +11,23 @@ interface IconProps {
 }
 
 const Icon: Record<PillType, (p: IconProps) => JSX.Element> = {
+  link: ({ size = 32, color = "currentColor" }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
+      <path d="M16 20a5 5 0 0 0 7 0l4-4a5 5 0 0 0-7-7l-1.5 1.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M20 16a5 5 0 0 0-7 0l-4 4a5 5 0 0 0 7 7l1.5-1.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
+  message: ({ size = 32, color = "currentColor" }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
+      <path d="M7 9h22v15H15l-6 5v-5H7z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+    </svg>
+  ),
+  screenshot: ({ size = 32, color = "currentColor" }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
+      <rect x="11" y="5" width="14" height="26" rx="2.5" stroke={color} strokeWidth="1.5" />
+      <path d="M8 12V8h4M28 12V8h-4M8 24v4h4M28 24v4h-4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
   voice: ({ size = 32, color = "currentColor" }: IconProps) => (
     <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
       <path d="M8 26c0-3 2-5 5-5h2v-4a5 5 0 0 1 10 0c0 3-2 4-4 5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -164,13 +182,27 @@ export const SOUND_OPTIONS: { value: SoundType; label: string }[] = [
   { value: "everyday", label: "Everyday" },
 ];
 
+export const DIGITAL_OPTIONS: { value: DigitalType; label: string }[] = [
+  { value: "link", label: "Link" },
+  { value: "message", label: "Message" },
+  { value: "screenshot", label: "Screenshot" },
+];
+
+/** Category colour variable used for the selected pill fill (a lighter tint of it). */
+const CATEGORY_VAR: Record<string, string> = {
+  imprint: "--cat-imprint",
+  sound: "--cat-sound",
+  digital_traces: "--cat-digital-traces",
+};
+
 interface Props<T extends PillType> {
   value: T | null;
   onChange: (next: T) => void;
   options?: { value: T; label: string }[];
+  category?: "imprint" | "sound" | "digital_traces";
 }
 
-const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange, options }: Props<T>) => (
+const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange, options, category = "imprint" }: Props<T>) => (
   <div className="flex flex-wrap justify-center gap-2">
     {(options ?? (OPTIONS as unknown as { value: T; label: string }[])).map(({ value: v, label }) => {
       const active = value === v;
@@ -182,10 +214,18 @@ const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange
           onClick={() => onChange(v)}
           aria-pressed={active}
           aria-label={label}
+          style={
+            active
+              ? {
+                  backgroundColor: `color-mix(in srgb, hsl(var(${CATEGORY_VAR[category]})) 45%, #F2EEE5)`,
+                  borderColor: `hsl(var(${CATEGORY_VAR[category]}))`,
+                }
+              : undefined
+          }
           className={cn(
             "flex items-center gap-1.5 rounded-[18px] px-3 py-1.5 transition-all duration-200",
             active
-              ? "border border-[#5D7692] bg-[#5D7692] text-[#F2EEE5]"
+              ? "border text-[#1E2E3E]"
               : "border border-[rgba(44,62,80,0.28)] bg-transparent text-[#5B4A3F] dark:border-[rgba(242,238,229,0.25)] dark:text-[#E8E4D8]"
           )}
         >

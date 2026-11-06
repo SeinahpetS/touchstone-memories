@@ -14,7 +14,7 @@ import { getMentionsForTouchstone, type Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
-import ImprintTypeSelector, { SOUND_OPTIONS } from "@/components/ImprintTypeSelector";
+import ImprintTypeSelector, { SOUND_OPTIONS, DIGITAL_OPTIONS, type DigitalType } from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { categoryGlowShadow } from "@/lib/categoryGlow";
@@ -148,6 +148,7 @@ const Index = () => {
   const setNote = (v: string) => updateDraft({ note: v });
   const setSentiment = (v: string) => updateDraft({ sentiment: v });
   const setWhoWasThere = (v: string) => updateDraft({ whoWasThere: v });
+  const [digitalType, setDigitalType] = useState<DigitalType | null>(null);
   const setFields = (
     updater: (prev: CategoryFieldValues) => CategoryFieldValues
   ) => updateDraft({ fields: updater(current.fields) });
@@ -514,7 +515,7 @@ const Index = () => {
             {/* Field 1 — Name */}
             <Input
               type="text"
-              placeholder="Name this Touchstone"
+              placeholder={category === "digital_traces" ? (digitalType === "message" ? "Name this message" : digitalType === "screenshot" ? "Name this screenshot" : "Touchstone link (https://...)") : "Name this Touchstone"}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="h-12 text-base bg-card border-0 placeholder:italic"
@@ -523,6 +524,7 @@ const Index = () => {
 {category === "sound" && (
               <ImprintTypeSelector
                   options={SOUND_OPTIONS}
+                  category="sound"
                   value={fields.soundType ?? null}
                   onChange={(t) =>
                     setFields((prev) => ({
@@ -534,9 +536,19 @@ const Index = () => {
                 />
             )}
 
+            {category === "digital_traces" && (
+              <ImprintTypeSelector
+                options={DIGITAL_OPTIONS}
+                category="digital_traces"
+                value={digitalType}
+                onChange={(t) => setDigitalType((prev) => (prev === t ? null : t))}
+              />
+            )}
+
             {/* Imprint sub-type — appears right after Name */}
             {category === "imprint" && (
               <ImprintTypeSelector
+                category="imprint"
                 value={fields.imprintType}
                 onChange={(t) => {
                   const source: CategoryFieldValues["imprintSource"] =
@@ -565,18 +577,6 @@ const Index = () => {
               values={fields}
               onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
             />
-
-            {/* Who else was there? — for selected categories only */}
-            {WHO_WAS_THERE_CATEGORIES.includes(category) && (
-              <Input
-                type="text"
-                autoComplete="off"
-                placeholder="Who else was there?"
-                value={whoWasThere}
-                onChange={(e) => setWhoWasThere(e.target.value)}
-                className="h-12 text-base bg-card border-0 placeholder:italic"
-              />
-            )}
 
             {/* Emotional tone — one-word feeling */}
             <Input
