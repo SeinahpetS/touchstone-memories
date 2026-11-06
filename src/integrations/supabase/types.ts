@@ -257,6 +257,70 @@ export type Database = {
           },
         ]
       }
+      touchstone_shares: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          from_user_id: string
+          id: string
+          include_note: boolean
+          kept_by_user_id: string | null
+          kept_touchstone_id: string | null
+          person_id: string | null
+          status: string
+          token: string
+          touchstone_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string
+          from_user_id: string
+          id?: string
+          include_note?: boolean
+          kept_by_user_id?: string | null
+          kept_touchstone_id?: string | null
+          person_id?: string | null
+          status?: string
+          token?: string
+          touchstone_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          from_user_id?: string
+          id?: string
+          include_note?: boolean
+          kept_by_user_id?: string | null
+          kept_touchstone_id?: string | null
+          person_id?: string | null
+          status?: string
+          token?: string
+          touchstone_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "touchstone_shares_from_user_id_fkey"
+            columns: ["from_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "touchstone_shares_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "touchstone_shares_touchstone_id_fkey"
+            columns: ["touchstone_id"]
+            isOneToOne: false
+            referencedRelation: "touchstones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       touchstones: {
         Row: {
           ai_answer: string | null
@@ -281,9 +345,13 @@ export type Database = {
           openlibrary_id: string | null
           people: string | null
           photo_url: string | null
+          received_from_name: string | null
+          received_from_user_id: string | null
+          received_note: string | null
           relationship_type: string | null
           sentiment: string | null
           source_session_id: string | null
+          source_touchstone_id: string | null
           source_url: string | null
           spotify_id: string | null
           still_in_touch: boolean | null
@@ -317,9 +385,13 @@ export type Database = {
           openlibrary_id?: string | null
           people?: string | null
           photo_url?: string | null
+          received_from_name?: string | null
+          received_from_user_id?: string | null
+          received_note?: string | null
           relationship_type?: string | null
           sentiment?: string | null
           source_session_id?: string | null
+          source_touchstone_id?: string | null
           source_url?: string | null
           spotify_id?: string | null
           still_in_touch?: boolean | null
@@ -353,9 +425,13 @@ export type Database = {
           openlibrary_id?: string | null
           people?: string | null
           photo_url?: string | null
+          received_from_name?: string | null
+          received_from_user_id?: string | null
+          received_note?: string | null
           relationship_type?: string | null
           sentiment?: string | null
           source_session_id?: string | null
+          source_touchstone_id?: string | null
           source_url?: string | null
           spotify_id?: string | null
           still_in_touch?: boolean | null
