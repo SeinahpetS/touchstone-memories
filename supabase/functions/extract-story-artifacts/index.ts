@@ -306,7 +306,7 @@ Deno.serve(async (req) => {
         .select("id, title, expires_at, status")
         .single();
       if (updateErr) {
-        console.error("story_sessions update error", updateErr);
+        console.error("story_sessions update error", updateErr?.code);
         return new Response(
           JSON.stringify({ error: "Could not update session", detail: updateErr.message }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -326,7 +326,7 @@ Deno.serve(async (req) => {
         .select("id, title, expires_at, status")
         .single();
       if (insertErr) {
-        console.error("story_sessions insert error", insertErr);
+        console.error("story_sessions insert error", insertErr?.code);
         return new Response(
           JSON.stringify({ error: "Could not save session", detail: insertErr.message }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

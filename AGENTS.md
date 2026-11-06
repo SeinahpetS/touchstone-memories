@@ -20,3 +20,4 @@
 - Keep the artifact location map self-hosted (MapLibre with bundled geography or a self-hosted Protomaps archive) and route taps through src/lib/openInMaps.ts; no map-provider request happens until the person taps.
 - Keep capture "Where?" location in src/lib/captureLocation.ts and the shared CaptureWhere row, matching against bundled GeoNames cities (city-level, rounded coordinates) and reading photo GPS only in the browser; this keeps place labels city-level with no external geocoding.
 - Pass every photo upload through sanitizePhoto in src/lib/photoSanitize.ts (HEIC→JPEG, canvas re-encode) after reading GPS from the original file; uploaded files must never carry EXIF/GPS.
+- Route every AI request through src/lib/ai (one function per task, per-task provider claude/on-device/skip, tones only from src/lib/ai/tones.ts); skipped tasks never fall back to Claude, so on-device processing can plug in without touching screens.
