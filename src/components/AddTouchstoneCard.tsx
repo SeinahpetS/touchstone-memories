@@ -59,7 +59,7 @@ const AddTouchstoneCard = ({ category, onAdd }: Props) => {
           justifyContent: "center",
         }}
       >
-        <Plus size={28} color="#B8860B" strokeWidth={1.5} />
+        <Plus size={34} color="#B8860B" strokeWidth={1.5} />
       </span>
       <span
         className="line-clamp-1"

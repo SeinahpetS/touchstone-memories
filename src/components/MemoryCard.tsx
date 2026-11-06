@@ -155,7 +155,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 justifyContent: "center",
               }}
             >
-              <CategoryIcon category={cat} size={28} color="#B8860B" />
+              <CategoryIcon category={cat} size={34} color="#B8860B" />
             </span>
           </div>
         )}
@@ -185,7 +185,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
                 justifyContent: "center",
               }}
             >
-              <CategoryIcon category={cat} size={13} color="#B8860B" />
+              <CategoryIcon category={cat} size={16} color="#B8860B" />
             </span>
             <span
               style={{
@@ -248,7 +248,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
             onClick={(e) => e.stopPropagation()}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-background/85 backdrop-blur-sm text-foreground shadow-sm hover:bg-background transition-colors"
           >
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="h-[19px] w-[19px]" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
