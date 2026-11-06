@@ -133,6 +133,7 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
           {original && original !== photo && <Button variant="outline" size="icon" aria-label="Revert to original photo" title="Revert to original" className="rounded-full bg-transparent" disabled={busy} onClick={() => setPhoto(original)}><Undo2 size={18} /></Button>}</div>
         </>}
       </div> : <Button variant="outline" className="onboarding-add-photo" disabled={busy} onClick={() => inputRef.current?.click()}><ImagePlus size={20} />Add a photo</Button>}
+      {!adjusting && <>
       <label className="onboarding-edit-field">Title<input aria-label="Title" className="onboarding-edit-title" value={title} onChange={e => setTitle(e.target.value)} /></label>
       <div className="onboarding-edit-field">Category
         <Button variant="outline" className="onboarding-category-chip" aria-expanded={categoriesOpen} onClick={() => setCategoriesOpen(v => !v)}><CategoryIcon category={category as CategoryKey} size={23} color="#B8860B" className="!size-[23px]" />{CATEGORY_LABELS[category as CategoryKey]}</Button>
@@ -142,6 +143,7 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
       <label className="onboarding-edit-field">Note<textarea aria-label="Note" rows={3} className="onboarding-edit-note" value={note} onChange={e => setNote(e.target.value)} /></label>
       <Button className="onboarding-edit-save" disabled={busy || adjusting} onClick={() => void save()}>Save</Button>
       <Button variant="ghost" className="onboarding-edit-cancel" disabled={busy} onClick={onCancel}>Cancel</Button>
+      </>}
     </div>
   </div>;
 }
