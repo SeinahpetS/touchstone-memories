@@ -58,6 +58,7 @@
 - [x] "Record audio" copy only for the Sounds category; other categories show "Take photo".
 
 # People table and mentions
+- [ ] Add and test share-preview and authenticated share-keep functions, restricted output, recipient-owned photo copies, and rollback; no UI changes.
 - [x] Add share provenance fields and sender-only share records, createShare data helper, and focused tests; no UI changes.
 - [x] Refine person page name and portrait; link People capture to the directory record; ownership/link tests pass (19 focused tests total).
 - [x] Add linked people between artifact date and note, person destinations, and preserve shared mention editing; 17 focused tests pass.
