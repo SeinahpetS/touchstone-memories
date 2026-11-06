@@ -38,4 +38,4 @@
 - [x] Never stop on silence; only Done ends it, and quietly restart if the browser ends recognition itself.
 - [x] Done hands the transcript to the existing story unfold flow; mic denied or unsupported browser falls back to the typed input with "You can type your story instead."
 
-- [ ] Story transcript card: bring to the 1/3 fold
+- [x] Story transcript card: bring to the 1/3 fold
