@@ -58,7 +58,7 @@
 - [x] "Record audio" copy only for the Sounds category; other categories show "Take photo".
 
 # People table and mentions
-- [ ] Add linked people between artifact date and note, person destinations, and preserve shared mention editing; verify with focused tests.
+- [x] Add linked people between artifact date and note, person destinations, and preserve shared mention editing; 17 focused tests pass.
 - [x] Add optional people selection below capture notes; save mentions without delaying capture and exclude them from AI requests; cover with focused tests.
 - [ ] Verify capture mentions read back in a signed-in preview; blocked until the user signs in (no matching account for requesting email).
 - [x] Create `people` and `touchstone_mentions` tables with RLS so a user only reaches their own rows and mentions where both sides are theirs.
