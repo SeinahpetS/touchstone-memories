@@ -86,7 +86,7 @@ const BottomNav = () => {
         background: "rgba(30, 46, 62, 0.75)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
-        borderRadius: 40,
+        borderRadius: 16,
         padding: "4px 14px",
         display: "flex",
         justifyContent: "space-between",
@@ -127,7 +127,7 @@ const BottomNav = () => {
                 gap: 1,
                 minHeight: 44,
                 padding: "4px 10px",
-                borderRadius: 999,
+                borderRadius: 10,
                 background: isActive ? HIGHLIGHT : "transparent",
                 transition: "background-color 220ms ease",
               }}
