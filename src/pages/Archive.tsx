@@ -412,8 +412,8 @@ const Archive = () => {
           </div>
           <div className="flex justify-center gap-3 pt-4">
             <label
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-base"
-              style={{ borderColor: "#B8860B", color: "#B8860B" }}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-muted-foreground px-4 py-2.5 text-base"
+              style={{ color: "#B8860B" }}
             >
               <Lock className="h-4 w-4" />
               <span className="font-source text-sm text-muted-foreground">Private</span>
