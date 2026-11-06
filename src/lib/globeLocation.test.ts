@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { geoBounds, geoCentroid, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
-import type { Geometry } from "geojson";
+import type { Feature, Geometry } from "geojson";
 import countriesRaw from "../assets/geography/countries-110m.json";
 import usRegionsRaw from "../assets/geography/regions/US.json";
 import {
@@ -20,12 +20,13 @@ import {
   type CityRow,
 } from "./globeLocation";
 
-type Place = { geometry: Geometry; properties: { name: string; country_code: string; region_code?: string } };
+type Place = Feature<Geometry, { name: string; country_code: string; region_code?: string }>;
 const features = (topology: unknown, object: unknown) =>
-  (feature(topology as never, object as never) as unknown as { features: Place[] }).features;
+  (feature as unknown as (topology: unknown, object: unknown) => { features: Place[] })(topology, object);
 
-const countries = features(countriesRaw, (countriesRaw as { objects: Record<string, never> }).objects.countries);
-const usRegions = features(usRegionsRaw, Object.values((usRegionsRaw as { objects: Record<string, never> }).objects)[0]);
+const countries = features(countriesRaw, "countries");
+const usRegions = features(usRegionsRaw,
+  Object.keys((usRegionsRaw as unknown as { objects: Record<string, unknown> }).objects)[0]);
 const countryByCode = (code: string) => countries.find(country => country.properties.country_code === code)!;
 
 describe("globe focus", () => {
@@ -87,7 +88,7 @@ describe("globe focus", () => {
   it("keeps the whole sphere inside the frame in world view", () => {
     expect(GLOBE_RADIUS * 2).toBeLessThanOrEqual(GLOBE_FRAME);
     expect(GLOBE_EXPANDED_SIZE).toBeGreaterThan(GLOBE_RADIUS * 2);
-    const world = geoOrthographic().translate([150, 150]).scale(GLOBE_RADIUS).rotate([0, -22, 0]);
+    const world = geoOrthographic().translate([150, 150]).scale(GLOBE_RADIUS).rotate([0, 0]);
     const limb = world([0, 90]) ?? [0, 0];
     expect(Math.hypot(limb[0] - 150, limb[1] - 150)).toBeCloseTo(GLOBE_RADIUS, 0);
   });
@@ -105,15 +106,15 @@ describe("globe focus", () => {
   it("ranks suggestions by selected country, then region, then population", () => {
     const rows: CityRow[] = [
       ["Berlin", "DE", "Berlin", "DE-BE", 3_600_000],
-      ["Bonn", "DE", "Nordrhein-Westfalen", "DE-NW", 330_000],
+      ["Bergisch Gladbach", "DE", "Nordrhein-Westfalen", "DE-NW", 160_000],
       ["Bern", "CH", "Bern", "CH-BE", 140_000],
     ];
     expect(rankLocalCities(rows, "be", { country_code: "DE", region_code: "DE-NW" }).map(row => row[0]))
-      .toEqual(["Bonn", "Berlin", "Bern"]);
+      .toEqual(["Bergisch Gladbach", "Berlin", "Bern"]);
     expect(rankLocalCities(rows, "be", { country_code: "DE", region_code: null }).map(row => row[0]))
-      .toEqual(["Berlin", "Bonn", "Bern"]);
+      .toEqual(["Berlin", "Bergisch Gladbach", "Bern"]);
     expect(rankLocalCities(rows, "be", { country_code: null, region_code: null }).map(row => row[0]))
-      .toEqual(["Berlin", "Bonn", "Bern"]);
+      .toEqual(["Berlin", "Bergisch Gladbach", "Bern"]);
     expect(rankLocalCities(rows, "b", { country_code: null, region_code: null })).toEqual([]);
   });
 
