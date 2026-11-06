@@ -19,7 +19,8 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [photo, setPhoto] = useState<Blob | null>(null);
   const [original, setOriginal] = useState<Blob | null>(null);
-  const [aspect, setAspect] = useState(4 / 3);
+  const [aspect, setAspect] = useState(1);
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [removed, setRemoved] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,9 +29,10 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
   const [zoom, setZoom] = useState(1);
   const [area, setArea] = useState<Area | null>(null);
   const applyCrop = async () => {
-    if (!preview || !area) { setAdjusting(false); return; }
+    const src = originalUrl ?? preview;
+    if (!src || !area) { setAdjusting(false); return; }
     setBusy(true);
-    try { setPhoto(await cropPhotoBlob(preview, area)); setAdjusting(false); setCrop({ x: 0, y: 0 }); setZoom(1); }
+    try { setPhoto(await cropPhotoBlob(src, area)); setAdjusting(false); setCrop({ x: 0, y: 0 }); setZoom(1); }
     catch { toast.error("Couldn't adjust this photo. Please try again."); }
     finally { setBusy(false); }
   };
@@ -47,6 +49,12 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
     }).catch(() => toast.error("Couldn't load your photo."));
     return () => { active = false; };
   }, [artifact.photoKey, artifact.originalPhotoKey]);
+  useEffect(() => {
+    if (!original) { setOriginalUrl(null); return; }
+    const url = URL.createObjectURL(original);
+    setOriginalUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [original]);
   useEffect(() => {
     if (!photo) { setPreview(null); return; }
     const url = URL.createObjectURL(photo);
@@ -107,8 +115,8 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
             {([["Landscape", 4 / 3], ["Portrait", 3 / 4], ["Square", 1]] as const).map(([label, r]) =>
               <button key={label} type="button" aria-pressed={aspect === r} onClick={() => setAspect(r)}>{label}</button>)}
           </div>
-          <div className="onboarding-crop-frame" style={{ aspectRatio: String(aspect), width: `min(100%, calc(30dvh * ${aspect}))` }}>
-            <Cropper image={preview} crop={crop} zoom={zoom} aspect={aspect} minZoom={1} maxZoom={4}
+          <div className="onboarding-crop-frame">
+            <Cropper image={originalUrl ?? preview} objectFit="contain" crop={crop} zoom={zoom} aspect={aspect} minZoom={1} maxZoom={4}
               onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(_, px) => setArea(px)} />
           </div>
           <p className="onboarding-crop-hint">Drag to move · pinch or slide to zoom</p>
