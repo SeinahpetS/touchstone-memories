@@ -230,9 +230,9 @@ const TimelineView = ({ memories, onSelect, onChanged }: TimelineViewProps) => {
                                 </span>
                               </span>
                               {yOpen ? (
-                                <ChevronDown size={16} color="#8A8070" />
+                                <ChevronDown size={19} color="#8A8070" />
                               ) : (
-                                <ChevronRight size={16} color="#8A8070" />
+                                <ChevronRight size={19} color="#8A8070" />
                               )}
                             </span>
                           </button>
