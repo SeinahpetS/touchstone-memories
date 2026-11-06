@@ -367,6 +367,8 @@ const Archive = () => {
               category={selected.category}
               title={selected.title}
               note={selected.note}
+              receivedFromName={selected.received_from_name}
+              receivedNote={selected.received_note}
               createdAt={selected.created_at}
               memoryDate={{
                 season: selected.memory_season ?? null,

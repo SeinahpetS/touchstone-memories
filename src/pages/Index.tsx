@@ -438,6 +438,8 @@ const Index = () => {
                 category={saved.category}
                 title={saved.title}
                 note={saved.note}
+                receivedFromName={saved.received_from_name}
+                receivedNote={saved.received_note}
                 createdAt={saved.created_at}
                 memoryDate={{
                   season: saved.memory_season ?? null,
