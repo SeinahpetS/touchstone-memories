@@ -40,7 +40,7 @@ describe("creating a touchstone share", () => {
     expect(await createShare("t1", "p1", false)).toBe("ab".repeat(24));
     expect(h.journal).toEqual([{
       table: "touchstone_shares",
-      payload: { from_user_id: "u1", touchstone_id: "t1", person_id: "p1", include_note: false },
+      payload: { from_user_id: "u1", touchstone_id: "t1", person_id: "p1", include_note: false, include_location: false },
       columns: "token",
     }]);
   });
