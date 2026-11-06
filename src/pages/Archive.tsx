@@ -1,7 +1,7 @@
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Lock, MoreHorizontal, Pencil, Search, Share } from "lucide-react";
+import { Lock, Search, Share } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -16,12 +16,6 @@ import TimelineView from "@/components/TimelineView";
 import CategoryIcon, { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import AddTouchstoneCard from "@/components/AddTouchstoneCard";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { migrateOnboardingStory } from "@/lib/onboardingStoryDraft";
 import { toast } from "sonner";
