@@ -93,6 +93,7 @@ interface RequestBody {
   still_in_touch?: boolean | null;
   photo_base64?: string | null;
   photo_media_type?: string | null;
+  photo_description?: string | null;
 }
 
 function buildUserMessage(body: RequestBody): { content: any[]; hasPhoto: boolean } {
@@ -105,9 +106,13 @@ function buildUserMessage(body: RequestBody): { content: any[]; hasPhoto: boolea
     lines.push(`still_in_touch: ${body.still_in_touch}`);
   }
 
+  // A photo description replaces the photo: send text only, never the image.
+  const description = typeof body.photo_description === "string" ? body.photo_description.trim().slice(0, 1000) : "";
+  if (description) lines.push(`photo_description: ${description}`);
+
   const textPrompt = lines.join("\n");
 
-  const hasPhoto = !!(body.photo_base64 && body.photo_media_type);
+  const hasPhoto = !description && !!(body.photo_base64 && body.photo_media_type);
   if (hasPhoto) {
     return {
       hasPhoto: true,
@@ -145,7 +150,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get("Touchtone_Anthopic_API_Key");
+    const apiKey = Deno.env.get("ANTHROPIC_KEY_MEMORIES");
     if (!apiKey) {
       return new Response(
         JSON.stringify({ error: "Anthropic API key not configured" }),
@@ -211,8 +216,8 @@ Deno.serve(async (req) => {
     }, MOCK_TEXT);
 
     if (!resp.ok) {
-      const errText = await resp.text();
-      console.error("Anthropic error", resp.status, errText);
+      await resp.body?.cancel();
+      console.error("Anthropic error", resp.status); // status only: never log prompts or replies
       return new Response(
         JSON.stringify({ error: "AI prompt unavailable" }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -237,7 +242,7 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("generate-ai-prompt error", e);
+    console.error("generate-ai-prompt error", e instanceof Error ? e.name : "unknown");
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

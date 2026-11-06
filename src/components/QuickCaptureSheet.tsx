@@ -399,9 +399,6 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         setAiPromptLoading(true);
         (async () => {
           try {
-            // Convert photo to base64 for vision input if present
-            let photoBase64: string | null = null;
-            let photoMediaType: string | null = null;
             const { data: aiData, error: aiErr } = await generateQuestion({
               category: payload.category, title: payload.title, still_in_touch: payload.still_in_touch, photo: photoFile,
             });
