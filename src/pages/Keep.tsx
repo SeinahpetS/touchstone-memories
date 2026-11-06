@@ -76,6 +76,7 @@ export default function Keep() {
       artifact ? <div className="keep-artifact mx-auto w-full max-w-md">
         <MemoryArtifact touchstoneId={artifact.id} category={artifact.category} photoUrl={artifact.photo_url} title={artifact.title} createdAt={artifact.created_at}
           receivedFromName={artifact.received_from_name}
+          locationName={artifact.location_name} locationLat={artifact.location_lat} locationLng={artifact.location_lng}
           memoryDate={{ year: artifact.memory_year, month: artifact.memory_month, day: artifact.memory_day, season: artifact.memory_season as MemorySeason | null }} />
         <div className="mt-6 space-y-3">
           <Textarea aria-label="Your memory note" placeholder="What do you remember?" value={note} onChange={e => setNote(e.target.value)} autoFocus className="keep-note min-h-28" />

@@ -11,7 +11,7 @@ const firstName = (profile: { first_name?: string | null; name?: string | null }
 
 async function readShare(admin: AdminClient, token: string) {
   const { data, error } = await admin.from('touchstone_shares')
-    .select('id,from_user_id,touchstone_id,include_note,status,expires_at')
+    .select('id,from_user_id,touchstone_id,include_note,include_location,status,expires_at')
     .eq('token', token).maybeSingle();
   if (error) throw new ShareError('share_failed');
   if (!data) throw new ShareError('not_found', 404);
@@ -79,7 +79,7 @@ export async function keepShare(
   if (await expireShare(admin, share, now()) === 'expired') throw new ShareError('expired', 410);
   if (share.from_user_id === recipientId) throw new ShareError('self', 403);
   const { data: original, error: originalError } = await admin.from('touchstones')
-    .select('id,category,title,photo_url,note,memory_year,memory_month,memory_day,memory_season,when_text')
+    .select('id,category,title,photo_url,note,memory_year,memory_month,memory_day,memory_season,when_text,location_name,location_lat,location_lng')
     .eq('id', share.touchstone_id).eq('user_id', share.from_user_id).maybeSingle();
   if (originalError) throw new ShareError('share_failed');
   if (!original) throw new ShareError('not_found', 404);
@@ -107,6 +107,10 @@ export async function keepShare(
       memory_day: original.memory_day, memory_season: original.memory_season, when_text: original.when_text,
       note: '', source_touchstone_id: original.id, received_from_user_id: share.from_user_id,
       received_from_name: name, received_note: share.include_note ? original.note : null,
+      // Location travels only when the sender opted in.
+      location_name: share.include_location ? original.location_name ?? null : null,
+      location_lat: share.include_location ? original.location_lat ?? null : null,
+      location_lng: share.include_location ? original.location_lng ?? null : null,
     });
     if (insertError) throw new ShareError('share_failed');
     // Only one concurrent recipient can win; losers remove their own copy and row.

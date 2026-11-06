@@ -5,6 +5,7 @@ export async function createShare(
   touchstoneId: string,
   personId: string | null,
   includeNote: boolean,
+  includeLocation = false,
 ): Promise<string> {
   const { data: auth, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
@@ -17,6 +18,7 @@ export async function createShare(
       touchstone_id: touchstoneId,
       person_id: personId,
       include_note: includeNote,
+      include_location: includeLocation,
     })
     .select("token")
     .single();
