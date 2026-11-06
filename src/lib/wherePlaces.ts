@@ -18,10 +18,15 @@ export async function searchGooglePlaces(input: string, sessionToken: string): P
 
 /** Keep the confirmed label and Google place_id; coordinates come only from a GeoNames match. */
 export function cityFromGoogle(rows: CityRow[] | null, place: GooglePlace): CaptureCity {
-  const region = place.secondary.split(",")[0]?.trim();
-  const label = region ? `${place.main}, ${region}` : place.main;
-  const local = rows ? matchCity(rows, label) : null;
-  const fallback = rows && local?.lat == null ? matchCity(rows, place.main) : null;
-  const geo = local?.lat != null ? local : fallback?.lat != null ? fallback : null;
-  return geo ? { ...geo, placeId: place.placeId } : { name: label, lat: null, lng: null, placeId: place.placeId };
+  const parts = place.secondary.split(",").map(s => s.trim()).filter(Boolean);
+  for (const part of parts) {
+    const geo = rows ? matchCity(rows, `${place.main}, ${part}`) : null;
+    if (geo?.lat != null) return { ...geo, placeId: place.placeId };
+  }
+  return { name: googleLabel(place), lat: null, lng: null, placeId: place.placeId };
 }
+
+export const googleLabel = (place: GooglePlace) => {
+  const parts = place.secondary.split(",").map(s => s.trim()).filter(Boolean);
+  return parts.length ? `${place.main}, ${parts[0]}` : place.main;
+};
