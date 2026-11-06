@@ -1,13 +1,26 @@
 import { cn } from "@/lib/utils";
 
 export type ImprintType = "music" | "book" | "film" | "tv" | "art" | "quote" | "poem" | "podcast";
+export type SoundType = "music" | "podcast" | "voice" | "everyday";
+type PillType = ImprintType | SoundType;
 
 interface IconProps {
   size?: number;
   color?: string;
 }
 
-const Icon = {
+const Icon: Record<PillType, (p: IconProps) => JSX.Element> = {
+  voice: ({ size = 32, color = "currentColor" }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
+      <path d="M8 26c0-3 2-5 5-5h2v-4a5 5 0 0 1 10 0c0 3-2 4-4 5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M27 9c2 2 3 4 3 7s-1 5-3 7" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
+  everyday: ({ size = 32, color = "currentColor" }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
+      <path d="M6 18h3l3-8 4 16 4-12 3 6 2-2h5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
   music: ({ size = 32, color = "currentColor" }: IconProps) => (
     <svg width={size} height={size} viewBox="0 0 36 36" fill="none">
       <path
@@ -136,24 +149,30 @@ const Icon = {
 };
 
 const OPTIONS: { value: ImprintType; label: string }[] = [
-  { value: "music", label: "Music" },
   { value: "book", label: "Book" },
   { value: "film", label: "Film" },
   { value: "tv", label: "TV Show" },
   { value: "art", label: "Art" },
   { value: "quote", label: "Quote" },
   { value: "poem", label: "Poem" },
-  { value: "podcast", label: "Podcast" },
 ];
 
-interface Props {
-  value: ImprintType | null;
-  onChange: (next: ImprintType) => void;
+export const SOUND_OPTIONS: { value: SoundType; label: string }[] = [
+  { value: "music", label: "Music" },
+  { value: "podcast", label: "Podcast" },
+  { value: "voice", label: "Voice" },
+  { value: "everyday", label: "Everyday" },
+];
+
+interface Props<T extends PillType> {
+  value: T | null;
+  onChange: (next: T) => void;
+  options?: { value: T; label: string }[];
 }
 
-const ImprintTypeSelector = ({ value, onChange }: Props) => (
+const ImprintTypeSelector = <T extends PillType = ImprintType>({ value, onChange, options }: Props<T>) => (
   <div className="flex flex-wrap justify-center gap-2">
-    {OPTIONS.map(({ value: v, label }) => {
+    {(options ?? (OPTIONS as unknown as { value: T; label: string }[])).map(({ value: v, label }) => {
       const active = value === v;
       const IconComp = Icon[v];
       const fg = active ? "#F2EEE5" : "#5B4A3F";

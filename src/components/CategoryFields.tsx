@@ -4,7 +4,7 @@ import LocationAutocomplete from "@/components/LocationAutocomplete";
 import SpotifySearch, { type SpotifyPick } from "@/components/SpotifySearch";
 import BookSearch, { type BookPick } from "@/components/BookSearch";
 import TmdbSearch, { type TmdbPick } from "@/components/TmdbSearch";
-import ImprintTypeSelector, { type ImprintType } from "@/components/ImprintTypeSelector";
+import ImprintTypeSelector, { type ImprintType, type SoundType } from "@/components/ImprintTypeSelector";
 import type { CategoryKey } from "@/components/CategoryIcon";
 
 export interface CategoryFieldValues {
@@ -19,6 +19,7 @@ export interface CategoryFieldValues {
   tmdbPick: TmdbPick | null;
   imprintSource: "photo" | "spotify" | "book" | "tmdb";
   imprintType: ImprintType | null;
+  soundType?: SoundType | null;
 }
 
 interface Props {
@@ -113,20 +114,15 @@ const CategoryFields = ({ category, values, onChange }: Props) => {
         />
       )}
 
-      {category === "sound" && (
-        <div className="rounded-md bg-card px-4 py-3 text-sm text-muted-foreground">
-          Audio capture coming soon
-        </div>
+      {category === "sound" && values.soundType === "music" && (
+        <SpotifySearch
+          value={values.spotifyPick}
+          onChange={(pick) => onChange({ spotifyPick: pick })}
+        />
       )}
 
       {category === "imprint" && (
         <div className="space-y-4">
-          {values.imprintType === "music" && (
-            <SpotifySearch
-              value={values.spotifyPick}
-              onChange={(pick) => onChange({ spotifyPick: pick })}
-            />
-          )}
           {values.imprintType === "book" && (
             <BookSearch
               value={values.bookPick}
