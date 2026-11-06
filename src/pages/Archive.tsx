@@ -641,7 +641,7 @@ const Archive = () => {
                     <span style={{ marginBottom: 6 }} className="flex items-center justify-center">
                       <CategoryIcon
                         category={c}
-                        size={c === "imprint" ? 18 : 22}
+                        size={c === "moment" || c === "object" ? 22 : (c === "imprint" ? 18 : 22) * 1.1}
                         color="#B8860B"
                       />
                     </span>
