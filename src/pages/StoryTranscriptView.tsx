@@ -14,6 +14,7 @@ type Span = {
   end: number;
   phrase?: string;
   artifact_index?: number;
+  touchstoneId?: string;
 };
 
 const StoryTranscriptView = () => {
@@ -35,21 +36,42 @@ const StoryTranscriptView = () => {
       const [{ data: sess }, vividRes] = await Promise.all([
         supabase
           .from("story_sessions")
-          .select("transcript, highlight_spans")
+          .select("transcript, highlight_spans, extracted_artifacts")
           .eq("id", id)
           .maybeSingle(),
         userId
           ? supabase.rpc("has_active_vivid", { _user_id: userId })
           : Promise.resolve({ data: false }),
       ]);
+      const { data: saved } = await supabase
+        .from("touchstones")
+        .select("id, title")
+        .eq("source_session_id", id);
 
       if (cancelled) return;
       setTranscript((sess?.transcript as string) ?? "");
       const rawSpans = Array.isArray(sess?.highlight_spans)
         ? (sess!.highlight_spans as any[])
         : [];
+      // Link the phrases behind saved touchstones so they can be tapped
+      const text = ((sess?.transcript as string) ?? "");
+      const lower = text.toLowerCase();
+      const artifacts = Array.isArray((sess as any)?.extracted_artifacts)
+        ? ((sess as any).extracted_artifacts as any[]) : [];
+      const linked: Span[] = [];
+      for (const t of (saved ?? []) as { id: string; title: string | null }[]) {
+        const title = (t.title ?? "").trim().toLowerCase();
+        const art = artifacts.find((a) => (a?.title ?? "").trim().toLowerCase() === title);
+        const candidates = [art?.source_phrase, t.title].filter(
+          (c): c is string => typeof c === "string" && c.trim().length > 1,
+        );
+        for (const c of candidates) {
+          const at = lower.indexOf(c.trim().toLowerCase());
+          if (at >= 0) { linked.push({ start: at, end: at + c.trim().length, touchstoneId: t.id }); break; }
+        }
+      }
       setSpans(
-        rawSpans
+        [...linked, ...rawSpans]
           .filter(
             (s) =>
               s &&
@@ -78,6 +100,7 @@ const StoryTranscriptView = () => {
       const last = merged[merged.length - 1];
       if (last && s.start <= last.end) {
         last.end = Math.max(last.end, s.end);
+        last.touchstoneId = last.touchstoneId ?? s.touchstoneId;
       } else {
         merged.push({ ...s });
       }
@@ -92,7 +115,13 @@ const StoryTranscriptView = () => {
       out.push(
         <mark
           key={`h-${i}`}
+          role={s.touchstoneId ? "link" : undefined}
+          tabIndex={s.touchstoneId ? 0 : undefined}
+          onClick={s.touchstoneId ? () => navigate(`/archive?memory=${s.touchstoneId}`) : undefined}
+          onKeyDown={s.touchstoneId ? (e) => { if (e.key === "Enter") navigate(`/archive?memory=${s.touchstoneId}`); } : undefined}
           style={{
+            cursor: s.touchstoneId ? "pointer" : "default",
+            fontWeight: s.touchstoneId ? 600 : undefined,
             backgroundColor: `${highlightColor}26`, // ~15% alpha
             color: BRAND_NAVY,
             padding: "0 2px",
@@ -107,7 +136,7 @@ const StoryTranscriptView = () => {
     });
     if (cursor < transcript.length) out.push(transcript.slice(cursor));
     return out;
-  }, [transcript, spans, highlightColor]);
+  }, [transcript, spans, highlightColor, navigate]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
