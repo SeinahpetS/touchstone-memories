@@ -833,8 +833,13 @@ const Archive = () => {
           )}
         </div>
 
-        {/* Pinned action button + view-indicator dots */}
-        <div className="shrink-0 bg-background pt-3 pb-5 sm:pt-4 sm:pb-8">
+        {/* Pinned view-indicator dots + capture sheet */}
+        <div
+          className={cn(
+            "shrink-0 bg-background",
+            timelineUnlocked && "pt-3 pb-5 sm:pt-4 sm:pb-8",
+          )}
+        >
           {timelineUnlocked && (
             <div
               className="flex items-center justify-center gap-2 mb-2"
@@ -863,43 +868,10 @@ const Archive = () => {
               })}
             </div>
           )}
-          <button
-            onClick={() => setQuickCaptureOpen(true)}
-            className="w-full h-[46px] sm:h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            + Add a Touchstone
-          </button>
-
-          <button
-            onClick={() => {
-              if (!entitlement.hasAccess) {
-                setStoryVividOpen(true);
-                return;
-              }
-              const seenKey = user ? `touchstone:story-tooltip-seen:${user.id}` : null;
-              if (seenKey && !localStorage.getItem(seenKey)) {
-                setStoryTooltipOpen(true);
-              } else {
-                navigate("/tell-a-story");
-              }
-            }}
-            className="w-full h-[46px] sm:h-14 mt-3 rounded-full transition-colors flex items-center justify-center gap-2"
-            style={{
-              backgroundColor: "#0E7C86",
-              color: "#FFFFFF",
-              fontFamily: "'Playfair Display', serif",
-              fontStyle: "italic",
-              fontSize: 18,
-            }}
-          >
-            <span aria-hidden="true" style={{ color: "#F5D67A", fontSize: 12, letterSpacing: 1 }}>
-              ​
-            </span>
-            <span>Tell Me A Story</span>
-          </button>
 
           <QuickCaptureSheet
             open={quickCaptureOpen}
+            initialCategory={filter === "all" ? undefined : filter}
             onClose={() => setQuickCaptureOpen(false)}
             onSaved={() => {
               fetchTouchstones();
