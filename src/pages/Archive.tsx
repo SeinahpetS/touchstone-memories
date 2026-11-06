@@ -441,7 +441,7 @@ const Archive = () => {
       className="bg-background flex flex-col overflow-hidden"
       style={{ height: "calc(100dvh - env(safe-area-inset-bottom, 0px) - 110px - var(--ts-top-bar, 0px))" }}
     >
-      <div className="mx-auto w-full max-w-lg px-5 pt-8 flex-1 flex flex-col min-h-0">
+      <div className="mx-auto w-full max-w-lg px-5 pt-5 sm:pt-8 flex-1 flex flex-col min-h-0">
         {/* Fixed header zone */}
         <div className="shrink-0">
           {/* Header block: greeting + count (left) | avatar (right) */}
@@ -492,7 +492,7 @@ const Archive = () => {
                     <span
                       style={{
                         fontFamily: "Jost, sans-serif",
-                        fontSize: "10px",
+                        fontSize: "20px",
                         color: "#9E9585",
                         letterSpacing: "0.12em",
                         textTransform: "lowercase",
@@ -588,7 +588,7 @@ const Archive = () => {
           </div>
 
           {/* Zone 1 — filter grid: 4x2 categories + ALL bar */}
-          <div className="mt-4 mb-4">
+          <div className="mt-3 mb-3 sm:mt-4 sm:mb-4">
             <div
               className="grid"
               style={{ gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}
@@ -600,14 +600,13 @@ const Archive = () => {
                     key={c}
                     onClick={() => setFilter(c)}
                     aria-pressed={active}
+                    className="filter-tile flex flex-col items-center justify-center"
                     style={{
                       background: "#1E2E3E",
                       borderRadius: 12,
                       border: active ? `4px solid ${CATEGORY_BORDER_COLORS[c]}` : "2px solid transparent",
                       padding: "10px 6px 8px",
-                      height: 78,
                     }}
-                    className="flex flex-col items-center justify-center"
                   >
                     <span style={{ marginBottom: 6 }} className="flex items-center justify-center">
                       <CategoryIcon
@@ -635,15 +634,14 @@ const Archive = () => {
             <button
               onClick={() => setFilter("all")}
               aria-pressed={filter === "all"}
+              className="filter-all flex items-center justify-center"
               style={{
                 marginTop: 10,
                 width: "100%",
-                height: 44,
                 borderRadius: 12,
                 background: "#1E2E3E",
                 border: `2px solid ${filter === "all" ? "#B8860B" : "transparent"}`,
               }}
-              className="flex items-center justify-center"
             >
               <span className="flex items-center" style={{ gap: 8 }}>
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
@@ -795,7 +793,7 @@ const Archive = () => {
         </div>
 
         {/* Pinned action button + view-indicator dots */}
-        <div className="shrink-0 bg-background pt-4 pb-8">
+        <div className="shrink-0 bg-background pt-3 pb-5 sm:pt-4 sm:pb-8">
           {timelineUnlocked && (
             <div
               className="flex items-center justify-center gap-2 mb-2"
@@ -826,7 +824,7 @@ const Archive = () => {
           )}
           <button
             onClick={() => setQuickCaptureOpen(true)}
-            className="w-full h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="w-full h-[46px] sm:h-14 text-lg rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             + Add a Touchstone
           </button>
@@ -844,7 +842,7 @@ const Archive = () => {
                 navigate("/tell-a-story");
               }
             }}
-            className="w-full h-14 mt-3 rounded-full transition-colors flex items-center justify-center gap-2"
+            className="w-full h-[46px] sm:h-14 mt-3 rounded-full transition-colors flex items-center justify-center gap-2"
             style={{
               backgroundColor: "#0E7C86",
               color: "#FFFFFF",

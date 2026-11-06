@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, FilePen, Palette, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
+import { BookOpen, FilePen, Palette, type LucideIcon } from "lucide-react";
 
 type Tab = {
   key: string;
@@ -52,14 +52,6 @@ const TABS: Tab[] = [
     activeColor: ACTIVE,
     activeLabelColor: ACTIVE,
   },
-  {
-    key: "settings",
-    path: "/settings",
-    icon: SettingsIcon,
-    label: "Settings",
-    activeColor: ACTIVE,
-    activeLabelColor: ACTIVE,
-  },
 ];
 
 const BottomNav = () => {
@@ -82,8 +74,11 @@ const BottomNav = () => {
       aria-label="Primary"
       style={{
         position: "fixed",
-        left: "50%",
-        transform: "translateX(-50%)",
+        left: 0,
+        right: 0,
+        margin: "0 auto",
+        width: "calc(100% - 40px)",
+        maxWidth: 512,
         bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
         background: "rgba(30, 46, 62, 0.75)",
         backdropFilter: "blur(12px)",
@@ -91,6 +86,7 @@ const BottomNav = () => {
         borderRadius: 40,
         padding: "10px 18px",
         display: "flex",
+        justifyContent: "space-between",
         gap: 4,
         zIndex: 50,
         boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
@@ -116,7 +112,8 @@ const BottomNav = () => {
               justifyContent: "center",
               gap: 4,
               cursor: "pointer",
-              minWidth: 56,
+              flex: 1,
+              minWidth: 0,
             }}
           >
             <Icon size={22} color={iconColor} strokeWidth={1.75} style={{ opacity: 1 }} />

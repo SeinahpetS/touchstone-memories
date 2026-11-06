@@ -24,9 +24,9 @@ type Place = Feature<Geometry, { name: string; country_code: string; region_code
 const features = (topology: unknown, object: unknown) =>
   (feature as unknown as (topology: unknown, object: unknown) => { features: Place[] })(topology, object);
 
-const countries = features(countriesRaw, "countries");
+const countries = features(countriesRaw, "countries").features;
 const usRegions = features(usRegionsRaw,
-  Object.keys((usRegionsRaw as unknown as { objects: Record<string, unknown> }).objects)[0]);
+  Object.keys((usRegionsRaw as unknown as { objects: Record<string, unknown> }).objects)[0]).features;
 const countryByCode = (code: string) => countries.find(country => country.properties.country_code === code)!;
 
 describe("globe focus", () => {
