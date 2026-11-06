@@ -629,7 +629,7 @@ const Index = () => {
             {!editId && <CaptureWhere category={category}
               value={fields.locationName.trim() ? { name: fields.locationName, lat: fields.locationLat, lng: fields.locationLng, placeId: wherePlaceId } : null}
               fromPhoto={whereFromPhoto}
-              onChange={(v, fromPhoto) => { setWhereFromPhoto(fromPhoto); setWherePlaceId(v?.placeId ?? null); setFields((prev) => ({ ...prev, locationName: v?.name ?? "", locationLat: v?.lat ?? null, locationLng: v?.lng ?? null })); }} />}
+              onChange={(v, fromPhoto) => { setWhereFromPhoto(fromPhoto); setWherePlaceId(v?.placeId ?? null); setWherePlaceId(v?.placeId ?? null); setFields((prev) => ({ ...prev, locationName: v?.name ?? "", locationLat: v?.lat ?? null, locationLng: v?.lng ?? null })); }} />}
 
             <div className="flex items-center justify-between gap-4 rounded-xl bg-card px-4 py-3">
               <div>
