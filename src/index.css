@@ -255,3 +255,10 @@
 @media (prefers-reduced-motion: reduce) {
   .saved-fade-heading, .saved-fade-continue { animation: none; }
 }
+
+/* Story review carousel: incoming card fades in and slides 24px toward the middle. */
+.review-carousel-card { animation: review-card-in 250ms ease-out both; }
+.review-carousel-card.from-right { --review-from: 24px; }
+.review-carousel-card.from-left { --review-from: -24px; }
+@keyframes review-card-in { from { opacity: 0; transform: translateX(var(--review-from, 0)); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .review-carousel-card { animation: none; } }
