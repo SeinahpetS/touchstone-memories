@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import OnboardingDotIndicator from "@/components/OnboardingDotIndicator";
-import { transcribeEngine, type TranscribeSession } from "@/lib/transcribe";
+import { transcribeEngine, startVoiceLevel, type TranscribeSession } from "@/lib/transcribe";
 
 const BRAND_NAVY = "#1E2E3E";
 const SOFT_IVORY = "#F2EEE5";
@@ -52,6 +52,12 @@ const StoryUnfold = () => {
   const [paused, setPaused] = useState(false);
   const sessionRef = useRef<TranscribeSession | null>(null);
   const spokenRef = useRef<HTMLDivElement | null>(null);
+  const [finals, setFinals] = useState<string[]>([]);
+  const [interim, setInterim] = useState("");
+  const [voiceReactive, setVoiceReactive] = useState(false);
+  const micRef = useRef<HTMLDivElement | null>(null);
+  const voiceRef = useRef<{ stop: () => void } | null>(null);
+  const smoothRef = useRef(0);
 
   const isOnboarding =
     typeof window !== "undefined" &&
@@ -172,6 +178,9 @@ const StoryUnfold = () => {
   };
 
   const stopListening = () => {
+    voiceRef.current?.stop();
+    voiceRef.current = null;
+    setVoiceReactive(false);
     sessionRef.current?.stop();
     sessionRef.current = null;
   };
@@ -181,6 +190,8 @@ const StoryUnfold = () => {
     setExtracting(false);
     setPaused(false);
     setSpoken("");
+    setFinals([]);
+    setInterim("");
     setText("");
     if (!transcribeEngine.isSupported()) {
       setMode("typing");
@@ -190,13 +201,35 @@ const StoryUnfold = () => {
     setMode("listening");
     setSheetOpen(true);
     sessionRef.current = transcribeEngine.start({
-      onUpdate: ({ transcript }) => setSpoken(transcript),
+      onUpdate: ({ transcript, finals: done, interim: live }) => {
+        setSpoken(transcript);
+        setFinals(done);
+        setInterim(live.trim());
+      },
       onError: (error) => {
         if (error === "denied") {
           setMode("typing");
           toast("Microphone access was declined. You can type your story instead.");
         }
       },
+    });
+    smoothRef.current = 0;
+    void startVoiceLevel((level) => {
+      const el = micRef.current;
+      smoothRef.current += (level - smoothRef.current) * 0.15;
+      const s = smoothRef.current;
+      if (el) {
+        el.style.transform = `scale(${1 + 0.35 * s})`;
+        el.style.opacity = String(0.6 + 0.4 * s);
+      }
+    }).then((handle) => {
+      if (!handle) return; // fall back to the timed pulse
+      if (!sessionRef.current) {
+        handle.stop();
+        return;
+      }
+      voiceRef.current = handle;
+      setVoiceReactive(true);
     });
   };
 
@@ -230,7 +263,7 @@ const StoryUnfold = () => {
   useEffect(() => {
     const box = spokenRef.current;
     if (box) box.scrollTop = box.scrollHeight;
-  }, [spoken]);
+  }, [spoken, finals, interim]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: SOFT_IVORY }}>
@@ -548,8 +581,10 @@ const StoryUnfold = () => {
           ) : mode === "listening" && !extracting ? (
             <div className="flex-1 w-full flex flex-col items-center px-6 pt-6 min-h-0">
               <div
-                className="ts-mic-pulse flex items-center justify-center flex-shrink-0"
+                ref={micRef}
+                className={`${voiceReactive ? "" : "ts-mic-pulse "}flex items-center justify-center flex-shrink-0`}
                 style={{
+                  ...(voiceReactive ? { transform: "scale(1)", opacity: 0.6 } : {}),
                   width: 64,
                   height: 64,
                   borderRadius: "50%",
@@ -578,12 +613,27 @@ const StoryUnfold = () => {
                   style={{
                     fontFamily: "'Jost', sans-serif",
                     fontSize: 18,
-                    color: "#2C3E50",
-                    lineHeight: 1.55,
+                    lineHeight: 1.5,
                     whiteSpace: "pre-wrap",
+                    paddingBottom: 120,
                   }}
                 >
-                  {spoken || "Start talking. Pauses are fine — I’ll keep going."}
+                  {finals.length === 0 && !interim ? (
+                    <span style={{ color: "#4A6B8A", opacity: 0.7 }}>
+                      Start talking. Pauses are fine — I’ll keep going.
+                    </span>
+                  ) : (
+                    <>
+                      {finals.map((phrase, i) => (
+                        <span key={i} className="ts-final-phrase" style={{ color: BRAND_NAVY }}>
+                          {phrase.trim()}{" "}
+                        </span>
+                      ))}
+                      {interim && (
+                        <span style={{ color: "#4A6B8A", opacity: 0.7 }}>{interim}</span>
+                      )}
+                    </>
+                  )}
                 </p>
               </div>
             </div>
