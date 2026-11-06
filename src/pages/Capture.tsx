@@ -14,6 +14,7 @@ export default function Capture() {
   const [params] = useSearchParams();
   const [prefill, setPrefill] = useState<SharedPrefill | null>(null);
   const stored = useRef<Promise<void> | null>(null);
+  const resolved = useRef(false);
 
   // Hold any query-string share (url/title/text) before anything else.
   if (!stored.current) {
@@ -24,11 +25,11 @@ export default function Capture() {
   }
 
   useEffect(() => {
-    if (loading) return;
-    let cancelled = false;
+    if (loading || resolved.current) return;
+    resolved.current = true;
+    const cancelled = false;
     void (async () => {
       await stored.current;
-      if (cancelled) return;
       const payload = await readSharedPayload();
       if (!user) {
         if (payload) markPendingShare();
@@ -37,12 +38,10 @@ export default function Capture() {
       }
       const next = buildSharedPrefill(payload);
       await clearSharedPayload();
-      if (!cancelled) {
-        if (params.toString()) navigate("/capture", { replace: true });
-        setPrefill(next);
-      }
+      if (cancelled) return;
+      if (params.toString()) navigate("/capture", { replace: true });
+      setPrefill(next);
     })();
-    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, user]);
 
