@@ -111,13 +111,13 @@ export default function OnboardingCardEditSheet({ artifact, onSave, onCancel }: 
       }} />
       {preview && !removed ? <div>
         {adjusting ? <>
-          <div className="onboarding-crop-ratios" role="group" aria-label="Photo shape">
-            {([["Landscape", 4 / 3], ["Portrait", 3 / 4], ["Square", 1]] as const).map(([label, r]) =>
-              <button key={label} type="button" aria-pressed={aspect === r} onClick={() => setAspect(r)}>{label}</button>)}
-          </div>
           <div className="onboarding-crop-frame">
             <Cropper image={originalUrl ?? preview} objectFit="contain" crop={crop} zoom={zoom} aspect={aspect} minZoom={1} maxZoom={4}
               onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={(_, px) => setArea(px)} />
+          </div>
+          <div className="onboarding-crop-ratios" role="group" aria-label="Photo shape">
+            {([["Landscape", 4 / 3], ["Portrait", 3 / 4], ["Square", 1]] as const).map(([label, r]) =>
+              <button key={label} type="button" aria-pressed={aspect === r} onClick={() => setAspect(r)}>{label}</button>)}
           </div>
           <p className="onboarding-crop-hint">Drag to move · pinch or slide to zoom</p>
           <input type="range" aria-label="Zoom" min={1} max={4} step={0.01} value={zoom} onChange={e => setZoom(Number(e.target.value))} className="onboarding-crop-zoom" />
