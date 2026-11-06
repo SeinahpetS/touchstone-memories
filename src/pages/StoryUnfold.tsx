@@ -504,8 +504,8 @@ const StoryUnfold = () => {
       {/* Tell Me A Story sheet */}
       {sheetOpen && (
         <div
-          className="fixed inset-0 z-50 flex flex-col"
-          style={{ backgroundColor: SOFT_IVORY }}
+          className="fixed inset-0 flex flex-col"
+          style={{ backgroundColor: SOFT_IVORY, zIndex: 60 }}
         >
           {/* Header */}
           <div className="relative flex items-center justify-center px-5 pt-6 pb-4">
