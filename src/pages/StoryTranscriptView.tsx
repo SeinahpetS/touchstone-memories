@@ -21,6 +21,7 @@ const StoryTranscriptView = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [transcript, setTranscript] = useState("");
+  const [title, setTitle] = useState<string | null>(null);
   const [spans, setSpans] = useState<Span[]>([]);
   const [isVivid, setIsVivid] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -36,7 +37,7 @@ const StoryTranscriptView = () => {
       const [{ data: sess }, vividRes] = await Promise.all([
         supabase
           .from("story_sessions")
-          .select("transcript, highlight_spans, extracted_artifacts")
+          .select("transcript, highlight_spans, extracted_artifacts, title")
           .eq("id", id)
           .maybeSingle(),
         userId
@@ -50,6 +51,7 @@ const StoryTranscriptView = () => {
 
       if (cancelled) return;
       setTranscript((sess?.transcript as string) ?? "");
+      setTitle(typeof sess?.title === "string" ? sess.title : null);
       const rawSpans = Array.isArray(sess?.highlight_spans)
         ? (sess!.highlight_spans as any[])
         : [];
