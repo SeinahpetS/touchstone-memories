@@ -235,19 +235,13 @@ export const CategoryIconCard = ({
         // Navy fill is the tile's constant state — selection is shown by the ring.
         backgroundColor: "#2C3E50",
         borderStyle: "solid",
-        ...(selectionRing
-          ? {
-              borderWidth: "0px",
-              borderColor: "transparent",
-              boxShadow: active
-                ? `inset 0 0 0 ${SELECTION_RING_PX}px ${borderColor}`
-                : "none",
-            }
-          : {
-              borderColor: active ? borderColor : "transparent",
-              borderWidth: active ? "3px" : "0px",
-              boxShadow: "none",
-            }),
+        borderWidth: "0px",
+        borderColor: "transparent",
+        // The ring is painted inside the tile, so the label's text area is
+        // identical whether selected or not — copy never re-wraps on highlight.
+        boxShadow: active
+          ? `inset 0 0 0 ${selectionRing ? SELECTION_RING_PX : 3}px ${borderColor}`
+          : "none",
         outline: "none",
       }}
       className={cn(

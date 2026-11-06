@@ -51,3 +51,7 @@
 - [x] QuickCaptureSheet close button -> X icon in the corner.
 - [x] Center the "Add a Touchstone" heading.
 - [x] Capture/edit screen: "Take photo" pill -> "Record audio" with a mic icon.
+
+# Add a Touchstone tiles
+- [x] Highlighted category copy must not wrap; Archive filter tiles keep one line when selected.
+- [x] Reduce the height of the "Add a Touchstone" category rectangles; verify no clipping.
