@@ -98,6 +98,17 @@ Deno.serve(async (req) => {
   const body = await req.json().catch(() => ({}));
   const dryRun = body?.dryRun !== false; const only: string | undefined = body?.only; const rotatedMode: boolean = body?.rotated === true;
   const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
+  // Fallback for photos too large to rotate here: hand out a short signed URL,
+  // then accept the upright, metadata-free JPEG back for the same path.
+  if (only && (body?.signedUrl || body?.replaceB64)) {
+    const [bucket, ...rest] = only.split('/'); const path = rest.join('/');
+    if (!['memory-photos', 'avatars'].includes(bucket)) return json({ error: 'bad_bucket' }, 400);
+    if (body.signedUrl) { const { data, error } = await admin.storage.from(bucket).createSignedUrl(path, 300); return error ? json({ error: error.message }, 500) : json({ url: data.signedUrl }); }
+    const bytes = Uint8Array.from(atob(body.replaceB64), (c) => c.charCodeAt(0));
+    if (bytes[0] !== 0xff || bytes[1] !== 0xd8 || cleanJpeg(bytes).removed.length) return json({ error: 'not_clean_jpeg' }, 400);
+    const { error } = await admin.storage.from(bucket).upload(path, new Blob([bytes], { type: 'image/jpeg' }), { upsert: true, contentType: 'image/jpeg' });
+    return error ? json({ error: error.message }, 500) : json({ replaced: only });
+  }
   const report = { dryRun, rotated: [] as string[], scanned: 0, withMetadata: 0, cleaned: 0, alreadyClean: 0, skipped: [] as string[], failed: [] as string[], removedKinds: {} as Record<string, number> };
   for (const bucket of ['memory-photos', 'avatars']) {
     for (const f of await listAll(admin, bucket)) {
