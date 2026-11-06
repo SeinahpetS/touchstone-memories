@@ -1019,7 +1019,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
                 category={category}
                 values={fields}
                 onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
-              />
+              />}
             </div>
 
             {/* Emotional tone */}
