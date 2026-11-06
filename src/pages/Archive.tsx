@@ -621,7 +621,7 @@ const Archive = () => {
           <div className="mt-3 mb-3 sm:mt-4 sm:mb-4">
             <div
               className="grid"
-              style={{ gridTemplateColumns: "repeat(4, 1fr)", gridAutoRows: "1fr", gap: "10px" }}
+              style={{ gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}
             >
               {FILTER_CATEGORIES.map((c) => {
                 const active = filter === c;
@@ -641,7 +641,7 @@ const Archive = () => {
                     <span style={{ marginBottom: 6 }} className="flex items-center justify-center">
                       <CategoryIcon
                         category={c}
-                        size={c === "moment" || c === "object" ? 22 : (c === "imprint" ? 18 : 22) * 1.1}
+                        size={c === "imprint" ? 18 : 22}
                         color="#B8860B"
                       />
                     </span>
