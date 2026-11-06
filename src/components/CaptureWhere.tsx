@@ -88,7 +88,7 @@ export default function CaptureWhere({ category, value, fromPhoto, onChange }: P
         </div>}
         {runGoogle && google && google.length > 0 && <div className="where-google" role="group" aria-label="Results from Google Maps">
           <div className="flex flex-wrap gap-2">
-            {google.map(p => <Button key={p.placeId} type="button" variant="ghost" className="capture-person-chip" onClick={() => pick({ ...cityFromGoogle(rows, p), name: cityFromGoogle(rows, p).lat != null ? cityFromGoogle(rows, p).name : googleLabel(p) })}>{googleLabel(p)}</Button>)}
+            {google.map(p => <Button key={p.placeId} type="button" variant="ghost" className="capture-person-chip" onClick={() => pick(cityFromGoogle(rows, p))}>{googleLabel(p)}</Button>)}
           </div>
           <p className="where-google-logo" aria-label="Results from Google Maps">Google Maps</p>
         </div>}

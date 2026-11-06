@@ -315,6 +315,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         location_name: category === "digital_traces" ? null : where?.name ?? null,
         location_lat: category === "digital_traces" ? null : where?.lat ?? null,
         location_lng: category === "digital_traces" ? null : where?.lng ?? null,
+        location_place_id: category === "digital_traces" ? null : where?.placeId ?? null,
         venue_name: fields.venueName.trim() || null,
         relationship_type:
           category === "person" && fields.relationshipType

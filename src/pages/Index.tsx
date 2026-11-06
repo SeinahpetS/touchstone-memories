@@ -136,6 +136,7 @@ const Index = () => {
   const [mentionsReady, setMentionsReady] = useState(!editId);
   const [isPrivate, setIsPrivate] = useState(false);
   const [whereFromPhoto, setWhereFromPhoto] = useState(false);
+  const [wherePlaceId, setWherePlaceId] = useState<string | null>(null);
 
   const current = drafts[category] ?? emptyDraft();
   const { title, emotionalTone, note, sentiment, whoWasThere, photoFile, photoPreview, fields, memoryDate } = current;
@@ -320,6 +321,7 @@ const Index = () => {
         location_name: category === "digital_traces" ? null : fields.locationName.trim() || null,
         location_lat: category === "digital_traces" ? null : fields.locationLat,
         location_lng: category === "digital_traces" ? null : fields.locationLng,
+        ...(!editId ? { location_place_id: category === "digital_traces" || !fields.locationName.trim() ? null : wherePlaceId } : {}),
         venue_name: fields.venueName.trim() || null,
         relationship_type:
           category === "person" && fields.relationshipType
@@ -625,9 +627,9 @@ const Index = () => {
             {user && <CapturePeople key={`${category}-${editId ?? "new"}`} userId={user.id} selected={current.mentionedPeople} onChange={(mentionedPeople) => updateDraft({ mentionedPeople })} />}
 
             {!editId && <CaptureWhere category={category}
-              value={fields.locationName.trim() ? { name: fields.locationName, lat: fields.locationLat, lng: fields.locationLng } : null}
+              value={fields.locationName.trim() ? { name: fields.locationName, lat: fields.locationLat, lng: fields.locationLng, placeId: wherePlaceId } : null}
               fromPhoto={whereFromPhoto}
-              onChange={(v, fromPhoto) => { setWhereFromPhoto(fromPhoto); setFields((prev) => ({ ...prev, locationName: v?.name ?? "", locationLat: v?.lat ?? null, locationLng: v?.lng ?? null })); }} />}
+              onChange={(v, fromPhoto) => { setWhereFromPhoto(fromPhoto); setWherePlaceId(v?.placeId ?? null); setFields((prev) => ({ ...prev, locationName: v?.name ?? "", locationLat: v?.lat ?? null, locationLng: v?.lng ?? null })); }} />}
 
             <div className="flex items-center justify-between gap-4 rounded-xl bg-card px-4 py-3">
               <div>
