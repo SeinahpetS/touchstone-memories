@@ -40,7 +40,7 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
         <span
           style={{
             fontFamily: "Jost, sans-serif",
-            fontSize: 11,
+            fontSize: 22,
             fontWeight: 500,
             letterSpacing: "0.15em",
             textTransform: "uppercase",
