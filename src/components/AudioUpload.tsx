@@ -151,7 +151,7 @@ const AudioUpload = ({ file, onSelect }: Props) => {
       recorderRef.current = null;
       if (!mountedRef.current) return;
       setRecordingState("idle");
-      const name = cause instanceof Error ? cause.name : "";
+      const name = cause && typeof cause === "object" && "name" in cause ? cause.name : "";
       setError(name === "NotAllowedError" || name === "SecurityError"
         ? "Microphone access was denied. Allow microphone access in your browser to record, or upload an audio file."
         : name === "NotFoundError"
