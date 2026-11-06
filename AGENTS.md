@@ -1,4 +1,5 @@
 # Project rules
+- Keep artifact copy sending in an opt-in shared SendCopy control that reads owner-scoped original metadata and uses createShare; this keeps unsaved/review cards unchanged and browser sharing separate from persistence.
 - Keep public share previews and authenticated keeps in server-only edge handlers with allowlisted fields and isolated service-role clients; conditional share updates and recipient-scoped cleanup prevent duplicate keeps and sender-file references.
 - Keep share creation in src/lib/shares.ts using the verified current user and database-generated token defaults; sender-only database policies prevent recipient or foreign-touchstone access without UI assumptions.
 - Keep onboarding geography and city ranking isolated in frontend modules with lazy local per-country assets; offline selections persist structured city details only on Continue and never add Google requests or coordinates.
