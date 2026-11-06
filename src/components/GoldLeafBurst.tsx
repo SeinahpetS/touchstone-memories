@@ -5,8 +5,11 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 type Flake = {
   size: number; points: string; opacity: number; left: number; top: number;
   delay: number; fall: number; dur: number; sway: number; cycles: number;
-  rot: number; flips: number; phase: number;
+  rot: number; flips: number; phase: number; fill: string;
 };
+
+const GOLD_DARK = "#B8860B";
+const GOLD_BRIGHT = "#FFD700";
 
 const makeFlakes = (): Flake[] =>
   Array.from({ length: 14 }, () => {
@@ -20,10 +23,11 @@ const makeFlakes = (): Flake[] =>
     return {
       size, points: pts, opacity: rand(0.45, 0.9),
       left: rand(20, 80), top, delay: rand(0, 600),
-      fall: vh * (1 - top / 100) + size, dur: rand(2400, 3600),
+      fall: vh * (1 - top / 100) + size, dur: rand(3600, 5400),
       sway: rand(10, 16) * (Math.random() < 0.5 ? -1 : 1),
       cycles: rand(1, 2), rot: rand(-160, 160), flips: Math.round(rand(2, 3)),
       phase: Math.random() * Math.PI * 2,
+      fill: Math.random() < 0.5 ? GOLD_BRIGHT : GOLD_DARK,
     };
   });
 
@@ -71,7 +75,7 @@ const GoldLeafBurst = ({ onStart }: { onStart?: () => void }) => {
           height={f.size}
           style={{ position: "absolute", left: `${f.left}%`, top: `${f.top}%`, opacity: 0 }}
         >
-          <polygon points={f.points} fill="#B8860B" />
+          <polygon points={f.points} fill={f.fill} />
         </svg>
       ))}
     </div>
