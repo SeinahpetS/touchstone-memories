@@ -28,6 +28,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { playSaveFeedback } from "@/lib/saveFeedback";
 import { X } from "lucide-react";
+import type { SharedPrefill } from "@/lib/sharedCapture";
 
 const CATEGORIES: CategoryKey[] = [
   "moment",
@@ -111,14 +112,16 @@ interface Props {
   initialCategory?: CategoryKey;
   capturePersonId?: string;
   onPersonLinked?: () => void;
+  /** Content shared into Touchstone; only /capture passes this. */
+  prefill?: SharedPrefill;
 }
 
-const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePersonId, onPersonLinked }: Props) => {
+const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePersonId, onPersonLinked, prefill }: Props) => {
   const { user } = useAuth();
   const entitlement = useEntitlement();
   const [paywallOpen, setPaywallOpen] = useState(false);
   const navigate = useNavigate();
-  const [category, setCategory] = useState<CategoryKey>("moment");
+  const [category, setCategory] = useState<CategoryKey | null>("moment");
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
   const [mentionedPeople, setMentionedPeople] = useState<Person[]>([]);
@@ -147,9 +150,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
 
   useEffect(() => {
     if (open) {
-      setCategory(initialCategory ?? "moment");
-      setTitle("");
-      setNote("");
+      // A shared image opens with no category chosen; a shared link opens Digital Traces.
+      setCategory(prefill?.kind === "image" ? null : prefill?.kind === "link" ? "digital_traces" : initialCategory ?? "moment");
+      setTitle(prefill?.kind === "link" ? prefill.url : "");
+      setNote(prefill?.kind === "link" && prefill.title ? prefill.title : "");
+      if (prefill?.kind === "link") setDigitalType("link");
       setMentionedPeople([]);
       setEmotionalTone("");
       setWhoWasThere("");
@@ -157,8 +162,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
       setIsPrivate(false);
       setMemoryDate(emptyMemoryDate());
       setFields({ ...initialFields });
-      setPhotoFile(null);
-      setPhotoPreview(null);
+      setPhotoFile(prefill?.kind === "image" ? prefill.file : null);
+      if (prefill?.kind !== "image") setPhotoPreview(null);
       setPodcastPick(null);
       setPodcastManual(false);
       setSaving(false);
@@ -205,6 +210,10 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
 
   const handleSave = async () => {
     if (!user) return;
+    if (!category) {
+      setError("Choose a category before saving.");
+      return;
+    }
     if (!canSave) {
       setError("Add a photo, title, or answer before saving.");
       return;
@@ -325,7 +334,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
             ? memoryDate.yearText.trim()
             : null,
         who_was_there:
-          WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
+          !!category && WHO_WAS_THERE_CATEGORIES.includes(category) && whoWasThere.trim()
             ? whoWasThere.trim()
             : null,
         connected_to: connectedTo.trim() || null,
@@ -415,11 +424,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
   const notePlaceholder =
     category === "imprint" && fields.imprintType
       ? IMPRINT_NOTE_PLACEHOLDERS[fields.imprintType]
-      : NOTE_PLACEHOLDERS[category];
+      : category ? NOTE_PLACEHOLDERS[category] : "What do you want to remember about this?";
 
   // Build values for confirmation card
-  const cardCategoryColor = CATEGORY_BORDER_COLORS[category] ?? "#B8860B";
-  const cardCategoryLabel = CATEGORY_LABELS[category] ?? category;
+  const cardCategoryColor = (category && CATEGORY_BORDER_COLORS[category]) || "#B8860B";
+  const cardCategoryLabel = (category && CATEGORY_LABELS[category]) || "";
   const cardDateLabel =
     (memoryDate.yearText && memoryDate.yearText.trim()) ||
     formatMemoryDate(memoryDate) ||
@@ -596,7 +605,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
                         justifyContent: "center",
                       }}
                     >
-                      <CategoryIcon category={category} size={34} color="#B8860B" />
+                      <CategoryIcon category={category ?? "moment"} size={34} color="#B8860B" />
                     </span>
                   </div>
                 );
@@ -626,7 +635,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
                       justifyContent: "center",
                     }}
                   >
-                    <CategoryIcon category={category} size={16} color="#B8860B" />
+                    <CategoryIcon category={category ?? "moment"} size={16} color="#B8860B" />
                   </span>
                   <span
                     style={{
@@ -1006,11 +1015,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
 
             {/* Category-specific fields (location, relationship, restaurant, imprint search) */}
             <div className="mb-4">
-              <CategoryFields
+              {category && <CategoryFields
                 category={category}
                 values={fields}
                 onChange={(next) => setFields((prev) => ({ ...prev, ...next }))}
-              />
+              />}
             </div>
 
             {/* Emotional tone */}

@@ -12,6 +12,7 @@ import ConstellationIntro from "./pages/ConstellationIntro.tsx";
 import Auth from "./pages/Auth.tsx";
 import Archive from "./pages/Archive.tsx";
 import Person from "./pages/Person.tsx";
+import Capture from "./pages/Capture";
 import Keep from "./pages/Keep.tsx";
 import Profile from "./pages/Profile.tsx";
 import FAQ from "./pages/FAQ.tsx";
@@ -213,6 +214,7 @@ const App = () => (
           <Route path="/archive" element={<Archive />} />
           <Route path="/person/:id" element={<Person />} />
           <Route path="/keep/:token" element={<Keep />} />
+          <Route path="/capture" element={<Capture />} />
           <Route path="/settings" element={<Profile />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/story-unfold" element={<StoryUnfold />} />
