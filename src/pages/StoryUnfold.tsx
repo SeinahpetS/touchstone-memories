@@ -231,6 +231,18 @@ const StoryUnfold = () => {
         >
           Recent stories
         </p>
+        {rows.length > 0 && (
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: 11,
+              color: MUTED,
+              marginTop: 4,
+            }}
+          >
+            Swipe a story left to delete it.
+          </p>
+        )}
 
         {/* Story rows */}
         <div className="mt-3 space-y-3">
@@ -246,23 +258,88 @@ const StoryUnfold = () => {
             </p>
           )}
           {rows.map((row) => {
-            const tappable = true;
+            const offset = swipe?.id === row.id ? swipe.x : 0;
+            const dragging = swipe?.id === row.id;
             return (
               <div
                 key={row.id}
-                onClick={
-                  tappable
-                    ? () => navigate(row.complete ? `/story-unfold/session/${row.id}` : `/story-unfold/session/${row.id}/transcript`)
-                    : undefined
-                }
-                className="flex items-center gap-3 px-4 py-3"
-                style={{
-                  backgroundColor: CARD_SURFACE,
-                  borderRadius: 10,
-                  border: `0.5px solid ${DIVIDER}`,
-                  cursor: tappable ? "pointer" : "default",
-                }}
+                className="relative"
+                style={{ borderRadius: 10, overflow: "hidden" }}
               >
+                {/* Delete reveal behind the row */}
+                <div
+                  className="absolute inset-0 flex items-center justify-end"
+                  style={{ backgroundColor: DELETE_RED, borderRadius: 10 }}
+                >
+                  <div
+                    className="flex items-center gap-2 pr-4 uppercase"
+                    style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: 11,
+                      letterSpacing: "0.14em",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    <Trash2 size={15} strokeWidth={1.75} />
+                    Delete
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => {
+                    if (suppressClick.current) return;
+                    navigate(row.complete ? `/story-unfold/session/${row.id}` : `/story-unfold/session/${row.id}/transcript`);
+                  }}
+                  onPointerDown={(e) => {
+                    if (e.pointerType === "mouse" && e.button !== 0) return;
+                    pointer.current = { id: row.id, x: e.clientX, y: e.clientY, drag: false };
+                  }}
+                  onPointerMove={(e) => {
+                    const p = pointer.current;
+                    if (!p || p.id !== row.id) return;
+                    const dx = e.clientX - p.x;
+                    const dy = e.clientY - p.y;
+                    if (!p.drag) {
+                      if (Math.abs(dx) < 6) return;
+                      if (Math.abs(dx) <= Math.abs(dy)) {
+                        pointer.current = null;
+                        return;
+                      }
+                      p.drag = true;
+                      e.currentTarget.setPointerCapture?.(e.pointerId);
+                    }
+                    setSwipe({ id: row.id, x: Math.max(-SWIPE_MAX, Math.min(0, dx)) });
+                  }}
+                  onPointerUp={(e) => {
+                    const p = pointer.current;
+                    pointer.current = null;
+                    if (!p || p.id !== row.id) return;
+                    const dx = e.clientX - p.x;
+                    setSwipe(null);
+                    if (p.drag) {
+                      suppressClick.current = true;
+                      setTimeout(() => {
+                        suppressClick.current = false;
+                      }, 350);
+                      if (dx <= -SWIPE_TRIGGER) setPendingDelete(row);
+                    }
+                  }}
+                  onPointerCancel={() => {
+                    pointer.current = null;
+                    setSwipe(null);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3"
+                  style={{
+                    backgroundColor: CARD_SURFACE,
+                    borderRadius: 10,
+                    border: `0.5px solid ${DIVIDER}`,
+                    cursor: "pointer",
+                    transform: `translateX(${offset}px)`,
+                    transition: dragging ? "none" : "transform 220ms ease-out",
+                    touchAction: "pan-y",
+                    userSelect: "none",
+                  }}
+                >
                 {/* Status dot */}
                 <div
                   className="flex-shrink-0 rounded-full"
@@ -316,10 +393,9 @@ const StoryUnfold = () => {
                   )}
                 </div>
 
-                {/* Chevron (only when tappable / complete) */}
-                {tappable && (
-                  <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
-                )}
+                {/* Chevron */}
+                <ChevronRight size={18} color={MUTED} strokeWidth={1.75} />
+                </div>
               </div>
             );
           })}
@@ -439,6 +515,101 @@ const StoryUnfold = () => {
               }}
             >
               {extracting ? "Finding what's there…" : "See What's There"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation */}
+      {pendingDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="w-full max-w-md"
+            style={{
+              backgroundColor: CARD_SURFACE,
+              borderRadius: 12,
+              padding: 32,
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 24,
+                color: BRAND_NAVY,
+                marginBottom: 12,
+              }}
+            >
+              Delete this story?
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                color: BRAND_NAVY,
+                lineHeight: 1.5,
+                marginBottom: 14,
+              }}
+            >
+              “{pendingDelete.title}” will be removed from your stories. This
+              can’t be undone.
+            </p>
+            <p
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 13,
+                color: AEGEAN,
+                lineHeight: 1.5,
+                marginBottom: 24,
+              }}
+            >
+              Any touchstones you saved from it stay in your Archive — deleting
+              this story doesn’t remove them.
+            </p>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex w-full items-center justify-center gap-2"
+              style={{
+                backgroundColor: DELETE_RED,
+                color: "#FFFFFF",
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                letterSpacing: "0.08em",
+                fontWeight: 500,
+                padding: "12px 20px",
+                borderRadius: 8,
+                border: "none",
+                cursor: deleting ? "not-allowed" : "pointer",
+                opacity: deleting ? 0.7 : 1,
+                marginBottom: 10,
+              }}
+            >
+              <Trash2 size={15} strokeWidth={1.75} />
+              {deleting ? "DELETING…" : "DELETE STORY"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPendingDelete(null)}
+              disabled={deleting}
+              style={{
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                color: BRAND_NAVY,
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                padding: "8px",
+                cursor: deleting ? "not-allowed" : "pointer",
+                textAlign: "center",
+              }}
+            >
+              Whoops. Nevermind.
             </button>
           </div>
         </div>
