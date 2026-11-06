@@ -407,23 +407,25 @@ const StoryReview = () => {
     <div className="flex items-center justify-center gap-2 pt-6 pb-4">
       {dots.map(i => <span key={i} className={`onboarding-review-dot${i === index ? " is-current" : ""}`} />)}
     </div>
-    <div className="onboarding-review-carousel" aria-label="Extracted memories" aria-roledescription="carousel"
-      onPointerDown={e => { if (savingOverlay) return; swipeStart.current = { x: e.clientX, y: e.clientY }; }}
-      onPointerUp={e => {
-        const start = swipeStart.current; swipeStart.current = null;
-        if (!start || savingOverlay) return;
-        const dx = e.clientX - start.x, dy = e.clientY - start.y;
-        if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
-        setIndex(i => Math.max(0, Math.min(total - 1, i + (dx < 0 ? 1 : -1))));
-      }} onPointerCancel={() => { swipeStart.current = null; }}>
-      <div key={index} className="onboarding-shared-card">
-        <MemoryArtifact photoUrl={photoPreview} photoFirst category={current.category} title={current.title} note={current.note}
-          createdAt={new Date(storedDraft?.capturedAt || Date.now()).toISOString()} />
+    <div className="onboarding-review-body">
+      <div className="onboarding-review-carousel" aria-label="Extracted memories" aria-roledescription="carousel"
+        onPointerDown={e => { if (savingOverlay) return; swipeStart.current = { x: e.clientX, y: e.clientY }; }}
+        onPointerUp={e => {
+          const start = swipeStart.current; swipeStart.current = null;
+          if (!start || savingOverlay) return;
+          const dx = e.clientX - start.x, dy = e.clientY - start.y;
+          if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
+          setIndex(i => Math.max(0, Math.min(total - 1, i + (dx < 0 ? 1 : -1))));
+        }} onPointerCancel={() => { swipeStart.current = null; }}>
+        <div key={index} className="onboarding-shared-card">
+          <MemoryArtifact photoUrl={photoPreview} photoFirst category={current.category} title={current.title} note={current.note}
+            createdAt={new Date(storedDraft?.capturedAt || Date.now()).toISOString()} />
+        </div>
       </div>
-    </div>
-    <div className="onboarding-review-actions">
-      <Button className="onboarding-keep-this" disabled={savingOverlay} onClick={handleSave}>Keep this</Button>
-      <Button className="onboarding-edit-this" disabled={savingOverlay} onClick={handleEdit}>Edit</Button>
+      <div className="onboarding-review-actions">
+        <Button className="onboarding-edit-this" disabled={savingOverlay} onClick={handleEdit}>Edit</Button>
+        <Button className="onboarding-keep-this" disabled={savingOverlay} onClick={handleSave}>Keep this</Button>
+      </div>
     </div>
     {sheetOpen && <OnboardingCardEditSheet artifact={current as StoryArtifact} onCancel={() => setSheetOpen(false)} onSave={edited => {
       const updated = artifacts.map((a, i) => i === index ? edited : a);
