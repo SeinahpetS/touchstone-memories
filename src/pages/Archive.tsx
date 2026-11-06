@@ -521,11 +521,10 @@ const Archive = () => {
                     </span>
                     <span
                       style={{
-                        fontFamily: "Jost, sans-serif",
+                        fontFamily: "'Playfair Display', serif",
                         fontSize: "20px",
+                        fontWeight: 600,
                         color: "#9E9585",
-                        letterSpacing: "0.12em",
-                        textTransform: "lowercase",
                         lineHeight: 1,
                       }}
                     >
