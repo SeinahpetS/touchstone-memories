@@ -97,9 +97,11 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSaved?: () => void;
+  /** Category the sheet opens on (archive grid's "Add a …" card). */
+  initialCategory?: CategoryKey;
 }
 
-const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
+const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) => {
   const { user } = useAuth();
   const entitlement = useEntitlement();
   const [paywallOpen, setPaywallOpen] = useState(false);
@@ -131,7 +133,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved }: Props) => {
 
   useEffect(() => {
     if (open) {
-      setCategory("moment");
+      setCategory(initialCategory ?? "moment");
       setTitle("");
       setNote("");
       setEmotionalTone("");

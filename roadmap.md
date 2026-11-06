@@ -39,3 +39,5 @@
 - [x] Done hands the transcript to the existing story unfold flow; mic denied or unsupported browser falls back to the typed input with "You can type your story instead."
 
 - [x] Story transcript card: bring to the 1/3 fold
+
+- [x] Bottom nav: remove headroom above and room below at the bottom
