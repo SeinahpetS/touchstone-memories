@@ -1,7 +1,7 @@
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Lock, MoreHorizontal, Pencil, Search, Share, Unlock } from "lucide-react";
+import { Lock, MoreHorizontal, Pencil, Search, Share } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
