@@ -13,6 +13,8 @@ export interface TranscribeUpdate {
   transcript: string;
   /** The words currently being recognised, not yet finalised. */
   interim: string;
+  /** Each finalised phrase, in order. */
+  finals: string[];
 }
 
 export interface TranscribeHandlers {
@@ -110,6 +112,7 @@ const webSpeechEngine: TranscribeEngine = {
       handlers.onUpdate({
         transcript: trailing ? `${spoken} ${trailing}`.trim() : spoken,
         interim,
+        finals: [...finished],
       });
     };
 
@@ -207,3 +210,52 @@ const webSpeechEngine: TranscribeEngine = {
 
 /** The engine every screen uses. Swap this line to change transcription. */
 export const transcribeEngine: TranscribeEngine = webSpeechEngine;
+
+/**
+ * Live microphone volume (0..1) for voice-reactive visuals.
+ * Returns null when the browser can't open a second mic stream.
+ */
+export async function startVoiceLevel(
+  onLevel: (level: number) => void,
+): Promise<{ stop: () => void } | null> {
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) return null;
+    const Ctx =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return null;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ctx = new Ctx();
+    if (ctx.state === "suspended") await ctx.resume().catch(() => {});
+    const source = ctx.createMediaStreamSource(stream);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    source.connect(analyser);
+    const data = new Uint8Array(analyser.fftSize);
+    let raf = 0;
+    let stopped = false;
+    const tick = () => {
+      if (stopped) return;
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i += 1) {
+        const v = (data[i] - 128) / 128;
+        sum += v * v;
+      }
+      const rms = Math.sqrt(sum / data.length);
+      onLevel(Math.min(1, rms * 6));
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    return {
+      stop: () => {
+        stopped = true;
+        cancelAnimationFrame(raf);
+        stream.getTracks().forEach((t) => t.stop());
+        void ctx.close().catch(() => {});
+      },
+    };
+  } catch {
+    return null;
+  }
+}

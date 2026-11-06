@@ -261,3 +261,5 @@
 @media (prefers-reduced-motion: reduce) {
   .ts-mic-pulse { animation: none; opacity: 1; }
 }
+@keyframes ts-final-phrase { from { color: rgba(74,107,138,0.7); } to { color: #1E2E3E; } }
+.ts-final-phrase { animation: ts-final-phrase 200ms ease-out; }
