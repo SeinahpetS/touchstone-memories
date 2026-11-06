@@ -43,7 +43,7 @@ export async function sanitizePhoto(file: Blob & { name?: string }, maxEdge = 40
   ctx.fillRect(0, 0, w, h);
   ctx.drawImage(img.draw, 0, 0, w, h);
   img.close?.();
-  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", 0.9));
+  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", 0.92));
   if (!blob) throw new Error("Couldn't prepare that photo.");
   const base = (file.name ?? "photo").replace(/\.[^.]+$/, "") || "photo";
   return new File([blob], `${base}.jpg`, { type: "image/jpeg" });

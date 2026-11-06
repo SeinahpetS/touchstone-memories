@@ -3,6 +3,7 @@
 // re-encoded (lossless byte surgery). Never touches database rows.
 // POST { "dryRun": true } reports only. Delete this function after the run.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts';
 
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' };
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -21,8 +22,8 @@ function orientationApp1(o: number): Uint8Array {
 }
 const has = (s: Uint8Array, str: string) => new TextDecoder('latin1').decode(s.subarray(0, 64)).includes(str);
 
-function cleanJpeg(b: Uint8Array): { out: Uint8Array; removed: string[] } {
-  if (b[0] !== 0xff || b[1] !== 0xd8) return { out: b, removed: [] };
+function cleanJpeg(b: Uint8Array): { out: Uint8Array; removed: string[]; orient: number } {
+  if (b[0] !== 0xff || b[1] !== 0xd8) return { out: b, removed: [], orient: 1 };
   const parts: Uint8Array[] = [b.subarray(0, 2)]; const removed: string[] = []; let orient = 1; let i = 2;
   while (i + 4 <= b.length && b[i] === 0xff) {
     const m = b[i + 1];
@@ -35,11 +36,10 @@ function cleanJpeg(b: Uint8Array): { out: Uint8Array; removed: string[] } {
     } else parts.push(seg);
     i += 2 + len;
   }
-  if (!removed.length) return { out: b, removed };
-  if (orient > 1 && orient <= 8) parts.splice(1, 0, orientationApp1(orient));
+  if (!removed.length) return { out: b, removed, orient };
   parts.push(b.subarray(i));
   const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; }
-  return { out, removed };
+  return { out, removed, orient };
 }
 function cleanPng(b: Uint8Array): { out: Uint8Array; removed: string[] } {
   const drop = new Set(['eXIf', 'tEXt', 'iTXt', 'zTXt', 'tIME']); const parts = [b.subarray(0, 8)]; const removed: string[] = []; let i = 8;
@@ -74,6 +74,18 @@ async function listAll(admin: any, bucket: string, prefix = ''): Promise<{ path:
   return res;
 }
 
+// Apply the EXIF rotation to the pixels themselves, then re-encode at quality 92
+// (output carries no EXIF at all, so it displays upright everywhere).
+async function bakeOrientation(clean: Uint8Array, orient: number): Promise<Uint8Array> {
+  const img = await Image.decode(clean) as Image;
+  const flipX = () => { const c = img.clone(); for (let y = 1; y <= img.height; y++) for (let x = 1; x <= img.width; x++) img.setPixelAt(x, y, c.getPixelAt(img.width - x + 1, y)); };
+  if (orient === 2 || orient === 4 || orient === 5 || orient === 7) flipX();
+  const ccw: Record<number, number> = { 2: 0, 3: 180, 4: 180, 5: 90, 6: 270, 7: 270, 8: 90 };
+  const a = ccw[orient] ?? 0; let out: Image = img;
+  if (a) out = img.rotate(a);
+  return await out.encodeJPEG(92);
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
@@ -85,7 +97,7 @@ Deno.serve(async (req) => {
   if (!u?.user) return json({ error: 'unauthorized' }, 401);
   const dryRun = (await req.json().catch(() => ({})))?.dryRun !== false;
   const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
-  const report = { dryRun, scanned: 0, withMetadata: 0, cleaned: 0, alreadyClean: 0, skipped: [] as string[], failed: [] as string[], removedKinds: {} as Record<string, number> };
+  const report = { dryRun, rotated: [] as string[], scanned: 0, withMetadata: 0, cleaned: 0, alreadyClean: 0, skipped: [] as string[], failed: [] as string[], removedKinds: {} as Record<string, number> };
   for (const bucket of ['memory-photos', 'avatars']) {
     for (const f of await listAll(admin, bucket)) {
       report.scanned++;
@@ -98,10 +110,13 @@ Deno.serve(async (req) => {
         if (!r) { report.skipped.push(`${key} (${type})`); continue; }
         if (!r.removed.length) { report.alreadyClean++; continue; }
         report.withMetadata++; for (const k of r.removed) report.removedKinds[k] = (report.removedKinds[k] ?? 0) + 1;
+        const orient = (r as { orient?: number }).orient ?? 1;
+        if (orient > 1 && orient <= 8) report.rotated.push(`${key} (orientation ${orient})`);
         if (dryRun) continue;
-        const { error: upErr } = await admin.storage.from(bucket).upload(f.path, new Blob([r.out], { type }), { upsert: true, contentType: type });
+        const outBytes = orient > 1 && orient <= 8 ? await bakeOrientation(r.out, orient) : r.out;
+        const { error: upErr } = await admin.storage.from(bucket).upload(f.path, new Blob([outBytes], { type }), { upsert: true, contentType: type });
         if (upErr) throw upErr; report.cleaned++;
-      } catch { report.failed.push(key); }
+      } catch (e) { report.failed.push(`${key}: ${(e as Error)?.message ?? e}`); }
     }
   }
   return json(report);
