@@ -383,7 +383,7 @@ const Archive = () => {
               className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-muted-foreground px-4 py-2.5 text-base"
               style={{ color: "#B8860B" }}
             >
-              <Lock className="h-4 w-4" />
+              <Lock className="h-[19px] w-[19px]" />
               <span className="font-source text-sm text-muted-foreground">Private</span>
               <Switch
                 checked={!!selected.is_private}
@@ -408,7 +408,7 @@ const Archive = () => {
               onClick={() => setShareOpen(true)}
               className="inline-flex items-center gap-2 rounded-full border border-muted-foreground px-4 py-2.5 transition-colors hover:bg-card"
             >
-              <Share className="h-4 w-4" style={{ color: "#1E2E3E" }} />
+              <Share className="h-[19px] w-[19px]" style={{ color: "#1E2E3E" }} />
               <span className="font-source text-sm text-muted-foreground">Share</span>
             </button>
             <button
@@ -585,7 +585,7 @@ const Archive = () => {
               gap: "10px",
             }}
           >
-            <Search size={16} strokeWidth={1.75} color="#B8860B" aria-hidden="true" />
+            <Search size={19} strokeWidth={1.75} color="#B8860B" aria-hidden="true" />
             <input
               ref={searchInputRef}
               type="text"
@@ -649,7 +649,7 @@ const Archive = () => {
                     <span style={{ marginBottom: 6 }} className="flex items-center justify-center">
                       <CategoryIcon
                         category={c}
-                        size={c === "imprint" ? 18 : 22}
+                        size={c === "imprint" ? 22 : 26}
                         color="#B8860B"
                       />
                     </span>
@@ -682,7 +682,7 @@ const Archive = () => {
               }}
             >
               <span className="flex items-center" style={{ gap: 8 }}>
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <svg width="18" height="18" viewBox="0 0 15 15" fill="none">
                   <polygon
                     points="7.5,1 14,7.5 7.5,14 1,7.5"
                     stroke="#B8860B"
