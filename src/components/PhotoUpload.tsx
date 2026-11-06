@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Mic, Upload, X } from "lucide-react";
+import { Camera, Mic, Upload, X } from "lucide-react";
 
 interface Props {
   file: File | null;
@@ -9,7 +9,6 @@ interface Props {
 
 const PhotoUpload = ({ file, preview, onSelect }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const audioInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +19,6 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
   const clear = () => {
     onSelect(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    if (audioInputRef.current) audioInputRef.current.value = "";
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -92,11 +90,11 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="button"
-          onClick={() => audioInputRef.current?.click()}
+          onClick={() => fileInputRef.current?.click()}
           className="flex items-center gap-2 rounded-full bg-foreground/5 hover:bg-foreground/10 px-4 py-2 text-foreground transition-colors"
         >
-          <Mic className="h-5 w-5" />
-          <span className="text-base">Record audio</span>
+          <Camera className="h-5 w-5" />
+          <span className="text-base">Take photo</span>
         </button>
         <button
           type="button"
@@ -109,16 +107,10 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
       </div>
       <span className="text-xs opacity-70">or drag & drop an image</span>
       <input
-        ref={audioInputRef}
-        type="file"
-        accept="audio/*"
-        onChange={handleChange}
-        className="hidden"
-      />
-      <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleChange}
         className="hidden"
       />
