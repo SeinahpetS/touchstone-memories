@@ -634,7 +634,12 @@ const Archive = () => {
                     style={{
                       background: "#1E2E3E",
                       borderRadius: 12,
-                      border: active ? `4px solid hsl(var(${CATEGORY_BORDER_VAR[c]}))` : "2px solid transparent",
+                      // Selection is painted as an inset ring so the tile's text
+                      // area never shrinks — labels stay on one line when picked.
+                      border: "none",
+                      boxShadow: active
+                        ? `inset 0 0 0 4px hsl(var(${CATEGORY_BORDER_VAR[c]}))`
+                        : "none",
                       padding: "10px 6px 8px",
                     }}
                   >
