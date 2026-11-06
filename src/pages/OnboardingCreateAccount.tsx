@@ -14,6 +14,7 @@ import {
   saveOnboardingDraft,
 } from "@/lib/onboardingDraft";
 import { migrateOnboardingStory } from "@/lib/onboardingStoryDraft";
+import { getPendingKeepRoute } from "@/lib/postSignInRoute";
 
 type SubStep = "email" | "password";
 
@@ -118,7 +119,7 @@ const OnboardingCreateAccount = () => {
       markOnboardingComplete();
       clearOnboardingDraft();
       setFadingOut(true);
-      window.setTimeout(() => navigate("/archive"), 400);
+      window.setTimeout(() => navigate(getPendingKeepRoute() ?? "/archive"), 400);
     };
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!cancelled && session?.user) void finish(session.user.id);
@@ -185,7 +186,7 @@ const OnboardingCreateAccount = () => {
 
       // 400ms crossfade to /archive.
       setFadingOut(true);
-      window.setTimeout(() => navigate("/archive"), 400);
+      window.setTimeout(() => navigate(getPendingKeepRoute() ?? "/archive"), 400);
     } catch (err: any) {
       setSubmitting(false);
       const msg = err?.message || "Couldn't create your account. Try again.";

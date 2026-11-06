@@ -2,6 +2,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const ARCHIVE_PATH = "/archive";
 export const ONBOARDING_NAME_PATH = "/onboarding-name";
+export const PENDING_KEEP_KEY = "ts_pending_keep";
+
+export function getPendingKeepRoute(): string | null {
+  try {
+    const token = localStorage.getItem(PENDING_KEEP_KEY);
+    return token && /^[a-fA-F0-9]{48}$/.test(token) ? `/keep/${token}` : null;
+  } catch { return null; }
+}
 
 const DRAFT_KEY = "ts_onboarding_draft_v1";
 const STORY_DRAFT_KEY = "ts_onboarding_draft";
@@ -36,21 +44,21 @@ export const isOnboardingCompleteFlagged = (): boolean => {
  * archive.
  */
 export async function resolvePostSignInPath(userId: string): Promise<string> {
-  if (isOnboardingCompleteFlagged()) return ARCHIVE_PATH;
-  if (hasOnboardingDraftWaiting()) return ARCHIVE_PATH;
+  if (isOnboardingCompleteFlagged()) return getPendingKeepRoute() ?? ARCHIVE_PATH;
+  if (hasOnboardingDraftWaiting()) return getPendingKeepRoute() ?? ARCHIVE_PATH;
   try {
     const { data, error } = await supabase
       .from("profiles")
       .select("city, location_display")
       .eq("id", userId)
       .maybeSingle();
-    if (error) return ARCHIVE_PATH;
+    if (error) return getPendingKeepRoute() ?? ARCHIVE_PATH;
     const city = (data?.city ?? "").trim();
     const locationDisplay = (data?.location_display ?? "").trim();
-    if (city || locationDisplay) return ARCHIVE_PATH;
+    if (city || locationDisplay) return getPendingKeepRoute() ?? ARCHIVE_PATH;
   } catch {
     // A failed read must never trap a signed-in user on a blank screen.
-    return ARCHIVE_PATH;
+    return getPendingKeepRoute() ?? ARCHIVE_PATH;
   }
   return ONBOARDING_NAME_PATH;
 }
