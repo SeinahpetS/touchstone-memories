@@ -36,7 +36,20 @@ const FILTER_CATEGORIES: CategoryKey[] = [
   "digital_traces",
 ];
 
-const PLURAL_LABELS: Record<CategoryKey, string> = {  moment: "Moments",
+/* Selected-tile outline: light mode uses brighter tokens, dark mode keeps the original hues. */
+const CATEGORY_BORDER_VAR: Record<CategoryKey, string> = {
+  moment: "--cat-moment",
+  person: "--cat-person",
+  object: "--cat-object",
+  place: "--cat-place",
+  food: "--cat-food",
+  sound: "--cat-sound",
+  imprint: "--cat-imprint",
+  digital_traces: "--cat-digital-traces",
+};
+
+const PLURAL_LABELS: Record<CategoryKey, string> = {
+  moment: "Moments",
   person: "People",
   object: "Objects",
   place: "Places",
