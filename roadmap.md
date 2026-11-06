@@ -26,3 +26,4 @@
 - [ ] US zoom framed by contiguous 48 + DC only via per-country FOCUS_OVERRIDES (excluded region codes); rotate to ~[-98.5, 39], scale so those bounds fill the 342px globe minus 16px each side; AK/HI still drawn and tappable; 600ms animation.
 - [ ] At /onboarding/create-account, check whether the email already has an account before continuing to the password step.
 - [ ] Put "Continue with Google" in a proper button on /onboarding/create-account (both sub-steps).
+- [ ] /archive page itself must not scroll; only the touchstone grid scrolls.
