@@ -232,7 +232,8 @@ export const CategoryIconCard = ({
       aria-pressed={active}
       aria-label={`${displayLabel}${comingSoon ? " (coming soon)" : ""}`}
       style={{
-        backgroundColor: active ? "#F5F0E8" : "#2C3E50",
+        // Navy fill is the tile's constant state — selection is shown by the ring.
+        backgroundColor: "#2C3E50",
         borderStyle: "solid",
         ...(selectionRing
           ? {
@@ -282,7 +283,7 @@ export const CategoryIconCard = ({
           fontSize: `${labelSize ?? 10}px`,
           textTransform: "uppercase",
           letterSpacing: "0.12em",
-          color: active ? "#2C3E50" : "rgba(255,255,255,0.70)",
+          color: active ? "#E8E4D8" : "rgba(255,255,255,0.70)",
           opacity: 1,
         }}
       >
