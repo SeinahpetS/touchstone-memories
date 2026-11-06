@@ -2393,14 +2393,14 @@ const PhotoStep = ({
       <input
         ref={libraryRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         className="hidden"
         onChange={onFileChange}
       />
       <input
         ref={cameraRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         capture="environment"
         className="hidden"
         onChange={onFileChange}

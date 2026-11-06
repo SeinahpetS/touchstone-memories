@@ -157,8 +157,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
     if (open) {
       // A shared image opens with no category chosen; a shared link opens Digital Traces.
       setCategory(prefill?.kind === "image" ? null : prefill?.kind === "link" ? "digital_traces" : initialCategory ?? "moment");
-      setTitle(prefill?.kind === "link" ? prefill.url : "");
-      setNote(prefill?.kind === "link" && prefill.title ? prefill.title : "");
+      // Shared link: page title goes in Title (URL if there's no title); note stays empty.
+      setTitle(prefill?.kind === "link" ? prefill.title ?? prefill.url : "");
+      setNote("");
       if (prefill?.kind === "link") setDigitalType("link");
       setMentionedPeople([]);
       setWhere(null);
@@ -345,7 +346,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
               : fields.imprintType
             : null,
         source_url:
-          category === "imprint" &&
+          category === "digital_traces" && prefill?.kind === "link"
+            ? prefill.url
+            : category === "imprint" &&
           fields.imprintType === "podcast" &&
           !podcastManual &&
           podcastPick

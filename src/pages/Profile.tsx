@@ -1,3 +1,4 @@
+import { clearSharedPayload } from "@/lib/sharedCapture";
 import { sanitizePhoto } from "@/lib/photoSanitize";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -247,7 +248,7 @@ const Profile = () => {
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept="image/*,.heic,.heif"
               className="hidden"
               onChange={handleAvatarChange}
             />
@@ -674,6 +675,7 @@ const Profile = () => {
                     "delete-account",
                   );
                   if (error) throw error;
+                  await clearSharedPayload();
                   await supabase.auth.signOut();
                   navigate("/", { replace: true });
                 } catch (err: any) {

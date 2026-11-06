@@ -109,7 +109,7 @@ const PhotoUpload = ({ file, preview, onSelect }: Props) => {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         capture="environment"
         onChange={handleChange}
         className="hidden"

@@ -568,7 +568,7 @@ const StoryReview = () => {
         </>)}
 
         {/* Add a photo */}
-        {!isOnboarding && <input ref={photoInput} type="file" accept="image/*" className="hidden"
+        {!isOnboarding && <input ref={photoInput} type="file" accept="image/*,.heic,.heif" className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
             e.target.value = "";
