@@ -340,6 +340,7 @@ export type Database = {
           location_lat: number | null
           location_lng: number | null
           location_name: string | null
+          location_place_id: string | null
           memory_day: number | null
           memory_month: number | null
           memory_season: string | null
@@ -380,6 +381,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_name?: string | null
+          location_place_id?: string | null
           memory_day?: number | null
           memory_month?: number | null
           memory_season?: string | null
@@ -420,6 +422,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_name?: string | null
+          location_place_id?: string | null
           memory_day?: number | null
           memory_month?: number | null
           memory_season?: string | null
