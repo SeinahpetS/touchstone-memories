@@ -38,6 +38,38 @@ export type Database = {
         }
         Relationships: []
       }
+      people: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          people_touchstone_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          people_touchstone_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          people_touchstone_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "people_people_touchstone_id_fkey"
+            columns: ["people_touchstone_id"]
+            isOneToOne: false
+            referencedRelation: "touchstones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -184,6 +216,39 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      touchstone_mentions: {
+        Row: {
+          created_at: string
+          person_id: string
+          touchstone_id: string
+        }
+        Insert: {
+          created_at?: string
+          person_id: string
+          touchstone_id: string
+        }
+        Update: {
+          created_at?: string
+          person_id?: string
+          touchstone_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "touchstone_mentions_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "touchstone_mentions_touchstone_id_fkey"
+            columns: ["touchstone_id"]
+            isOneToOne: false
+            referencedRelation: "touchstones"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       touchstones: {
         Row: {
