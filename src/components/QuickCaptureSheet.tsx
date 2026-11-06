@@ -18,7 +18,7 @@ import { saveCaptureMentions } from "@/lib/captureMentions";
 import { capturePromptBody } from "@/lib/capturePrompt";
 import { toast } from "sonner";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
-import ImprintTypeSelector from "@/components/ImprintTypeSelector";
+import ImprintTypeSelector, { SOUND_OPTIONS } from "@/components/ImprintTypeSelector";
 import PodcastSearch, { type PodcastPick } from "@/components/PodcastSearch";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
@@ -97,6 +97,7 @@ const initialFields: CategoryFieldValues = {
   tmdbPick: null,
   imprintSource: "photo",
   imprintType: null,
+  soundType: null,
 };
 
 interface Props {
@@ -221,9 +222,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
           .getPublicUrl(path);
         photo_url = data.publicUrl;
       } else if (category === "imprint") {
-        if (fields.imprintSource === "spotify" && fields.spotifyPick?.image) {
-          photo_url = fields.spotifyPick.image;
-        } else if (fields.imprintSource === "book" && fields.bookPick?.coverUrl) {
+        if (fields.imprintSource === "book" && fields.bookPick?.coverUrl) {
           photo_url = fields.bookPick.coverUrl;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick?.image) {
           photo_url = fields.tmdbPick.image;
@@ -236,12 +235,13 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         }
       }
 
+      if (!photoFile && category === "sound" && fields.soundType === "music" && fields.spotifyPick?.image) {
+        photo_url = fields.spotifyPick.image;
+      }
       // Auto-derive title for imprints if blank
       let resolvedTitle = title.trim();
       if (!resolvedTitle && category === "imprint") {
-        if (fields.imprintSource === "spotify" && fields.spotifyPick) {
-          resolvedTitle = fields.spotifyPick.title;
-        } else if (fields.imprintSource === "book" && fields.bookPick) {
+        if (fields.imprintSource === "book" && fields.bookPick) {
           resolvedTitle = fields.bookPick.title;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick) {
           resolvedTitle = fields.tmdbPick.title;
@@ -252,6 +252,10 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         ) {
           resolvedTitle = podcastPick.composedTitle;
         }
+      }
+
+      if (!resolvedTitle && category === "sound" && fields.soundType === "music" && fields.spotifyPick) {
+        resolvedTitle = fields.spotifyPick.title;
       }
 
       const resolvedMemoryYear =
@@ -282,7 +286,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         still_in_touch:
           category === "person" ? fields.stillInTouch : null,
         spotify_id:
-          category === "imprint" && fields.imprintSource === "spotify"
+          category === "sound" && fields.soundType === "music"
             ? fields.spotifyPick?.id ?? null
             : null,
         openlibrary_id:
@@ -294,7 +298,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
             ? fields.tmdbPick?.id ?? null
             : null,
         imprint_subtype:
-          category === "imprint" && fields.imprintType
+          category === "sound"
+            ? fields.soundType ?? null
+            : category === "imprint" && fields.imprintType
             ? fields.imprintType === "tv"
               ? "tv_show"
               : fields.imprintType
@@ -421,6 +427,8 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         fields.bookPick?.title ||
         fields.tmdbPick?.title ||
         ""
+      : category === "sound" && fields.soundType === "music"
+      ? fields.spotifyPick?.title || ""
       : "");
   const cardAnswer = whoWasThere.trim();
 
@@ -905,6 +913,22 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
                 />
               ))}
             </div>
+
+{category === "sound" && (
+              <div className="mb-4">
+                <ImprintTypeSelector
+                  options={SOUND_OPTIONS}
+                  value={fields.soundType ?? null}
+                  onChange={(t) =>
+                    setFields((prev) => ({
+                      ...prev,
+                      soundType: prev.soundType === t ? null : t,
+                      spotifyPick: t === "music" ? prev.spotifyPick : null,
+                    }))
+                  }
+                />
+              </div>
+            )}
 
             {/* Imprint sub-type — shown above the title so the title field can adapt to the choice */}
             {category === "imprint" && (

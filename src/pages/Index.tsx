@@ -14,7 +14,7 @@ import { getMentionsForTouchstone, type Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
-import ImprintTypeSelector from "@/components/ImprintTypeSelector";
+import ImprintTypeSelector, { SOUND_OPTIONS } from "@/components/ImprintTypeSelector";
 import MemoryDateInput from "@/components/MemoryDateInput";
 import { emptyMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import { categoryGlowShadow } from "@/lib/categoryGlow";
@@ -85,6 +85,7 @@ const initialFields: CategoryFieldValues = {
   tmdbPick: null,
   imprintSource: "photo",
   imprintType: null,
+  soundType: null,
 };
 
 interface CategoryDraft {
@@ -262,21 +263,20 @@ const Index = () => {
         photo_url = data.publicUrl;
       } else if (!editId && category === "imprint") {
         // Fall back to Spotify/Book/TMDB cover art when no photo is uploaded.
-        if (fields.imprintSource === "spotify" && fields.spotifyPick?.image) {
-          photo_url = fields.spotifyPick.image;
-        } else if (fields.imprintSource === "book" && fields.bookPick?.coverUrl) {
+        if (fields.imprintSource === "book" && fields.bookPick?.coverUrl) {
           photo_url = fields.bookPick.coverUrl;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick?.image) {
           photo_url = fields.tmdbPick.image;
         }
       }
 
+      if (!photoFile && !editId && category === "sound" && fields.soundType === "music" && fields.spotifyPick?.image) {
+        photo_url = fields.spotifyPick.image;
+      }
       // Auto-derive a title for imprints if user left it blank.
       let resolvedTitle = title.trim();
       if (!resolvedTitle && category === "imprint") {
-        if (fields.imprintSource === "spotify" && fields.spotifyPick) {
-          resolvedTitle = fields.spotifyPick.title;
-        } else if (fields.imprintSource === "book" && fields.bookPick) {
+        if (fields.imprintSource === "book" && fields.bookPick) {
           resolvedTitle = fields.bookPick.title;
         } else if (fields.imprintSource === "tmdb" && fields.tmdbPick) {
           resolvedTitle = fields.tmdbPick.title;
@@ -284,6 +284,10 @@ const Index = () => {
       }
 
       // Auto-fill the memory year for TMDB picks if the user hasn't set one.
+      if (!resolvedTitle && category === "sound" && fields.soundType === "music" && fields.spotifyPick) {
+        resolvedTitle = fields.spotifyPick.title;
+      }
+
       const resolvedMemoryYear =
         memoryDate.year ??
         (category === "imprint" &&
@@ -308,7 +312,7 @@ const Index = () => {
             ? fields.relationshipType
             : null,
         spotify_id:
-          category === "imprint" && fields.imprintSource === "spotify"
+          category === "sound" && fields.soundType === "music"
             ? fields.spotifyPick?.id ?? null
             : null,
         openlibrary_id:
@@ -515,6 +519,20 @@ const Index = () => {
               onChange={(e) => setTitle(e.target.value)}
               className="h-12 text-base bg-card border-0 placeholder:italic"
             />
+
+{category === "sound" && (
+              <ImprintTypeSelector
+                  options={SOUND_OPTIONS}
+                  value={fields.soundType ?? null}
+                  onChange={(t) =>
+                    setFields((prev) => ({
+                      ...prev,
+                      soundType: prev.soundType === t ? null : t,
+                      spotifyPick: t === "music" ? prev.spotifyPick : null,
+                    }))
+                  }
+                />
+            )}
 
             {/* Imprint sub-type — appears right after Name */}
             {category === "imprint" && (
