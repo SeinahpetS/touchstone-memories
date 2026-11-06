@@ -560,7 +560,7 @@ const Index = () => {
                   Keep this private
                 </p>
                 <p style={{ fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, color: "rgba(91,74,63,0.75)", margin: "2px 0 0" }}>
-                  Only visible to you — not shared or included in your book
+                  Only visible to you
                 </p>
               </div>
               <Switch
