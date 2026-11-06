@@ -8,6 +8,7 @@ import { logEvent } from "@/lib/analytics";
 import Wordmark from "@/components/Wordmark";
 import ProfileAvatarButton from "@/components/ProfileAvatarButton";
 import PhotoUpload from "@/components/PhotoUpload";
+import AudioUpload from "@/components/AudioUpload";
 import CategorySelector from "@/components/CategorySelector";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector from "@/components/ImprintTypeSelector";
@@ -468,11 +469,15 @@ const Index = () => {
           </>
         ) : (
           <>
-            <PhotoUpload
-              file={photoFile}
-              preview={photoPreview}
-              onSelect={handlePhotoSelect}
-            />
+            {category === "sound" ? (
+              <AudioUpload file={photoFile} onSelect={handlePhotoSelect} />
+            ) : (
+              <PhotoUpload
+                file={photoFile}
+                preview={photoPreview}
+                onSelect={handlePhotoSelect}
+              />
+            )}
 
             <CategorySelector value={category} onChange={handleCategoryChange} />
 

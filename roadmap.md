@@ -55,3 +55,4 @@
 # Add a Touchstone tiles
 - [x] Highlighted category copy must not wrap; Archive filter tiles keep one line when selected.
 - [x] Reduce the height of the "Add a Touchstone" category rectangles; verify no clipping.
+- [x] "Record audio" copy only for the Sounds category; other categories show "Take photo".
