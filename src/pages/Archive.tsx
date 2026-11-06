@@ -545,7 +545,7 @@ const Archive = () => {
 
           {/* Diamond divider */}
           <div
-            className="flex items-center mt-2"
+            className="flex items-center mt-4"
             aria-hidden="true"
             style={{ width: "100%" }}
           >
@@ -578,7 +578,7 @@ const Archive = () => {
           {/* Search bar */}
           <div
             style={{
-              marginTop: "10px",
+              marginTop: "18px",
               marginBottom: "8px",
               backgroundColor: "#E8E4D8",
               borderRadius: "10px",
