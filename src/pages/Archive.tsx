@@ -420,7 +420,7 @@ const Archive = () => {
               <Switch
                 checked={!!selected.is_private}
                 aria-label="Keep this private"
-                className="data-[state=checked]:bg-[#B8860B]"
+                className="data-[state=checked]:bg-[#B8860B] data-[state=unchecked]:bg-[#1E2E3E]"
                 onCheckedChange={async (next) => {
                   const { error } = await (supabase as any)
                     .from("touchstones")
