@@ -416,7 +416,7 @@ const Archive = () => {
               style={{ borderColor: "#B8860B", color: "#B8860B" }}
             >
               <Lock className="h-4 w-4" />
-              <span className="font-source text-sm">Private</span>
+              <span className="font-source text-sm text-muted-foreground">Private</span>
               <Switch
                 checked={!!selected.is_private}
                 aria-label="Keep this private"
