@@ -16,3 +16,6 @@
 - [x] After any sign-in: no profile city, ts_onboarding_complete unset, no onboarding draft waiting -> /onboarding-name instead of /archive.
 - [x] Signed-in user finishing /onboarding/location: skip /onboarding/ready and /onboarding/create-account, save name/birth/location straight to profile, set ts_onboarding_complete, go to /archive.
 - [x] Onboarding location saves only city, country_code, region_code; never lat/lng. Report existing lat/lng columns and whether rows hold values.
+# Review card vertical placement
+- [ ] Keep the touchstone card and its Keep this/Edit row centered slightly above mid-screen at any card height; verify desktop and phone.
+- [ ] Swap the review card's Keep this and Edit button positions.
