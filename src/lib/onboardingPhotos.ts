@@ -1,3 +1,4 @@
+import { sanitizePhoto } from "@/lib/photoSanitize";
 import { supabase } from "@/integrations/supabase/client";
 
 export const PHOTO_MAX_SIDE = 2048;
@@ -50,7 +51,7 @@ export async function uploadOnboardingPhoto(userId: string, memoryId: string, ke
   const photo = await readOnboardingPhoto(key);
   if (!photo) throw new Error("Your saved photo could not be found on this device.");
   const path = `${userId}/${memoryId}.jpg`;
-  const { error } = await supabase.storage.from("memory-photos").upload(path, photo, { contentType: "image/jpeg", upsert: true });
+  const { error } = await supabase.storage.from("memory-photos").upload(path, await sanitizePhoto(photo), { contentType: "image/jpeg", upsert: true });
   if (error) throw error;
   return path;
 }

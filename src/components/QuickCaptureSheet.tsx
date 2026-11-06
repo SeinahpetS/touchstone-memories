@@ -1,3 +1,4 @@
+import { sanitizePhoto } from "@/lib/photoSanitize";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -156,8 +157,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
     if (open) {
       // A shared image opens with no category chosen; a shared link opens Digital Traces.
       setCategory(prefill?.kind === "image" ? null : prefill?.kind === "link" ? "digital_traces" : initialCategory ?? "moment");
-      setTitle(prefill?.kind === "link" ? prefill.url : "");
-      setNote(prefill?.kind === "link" && prefill.title ? prefill.title : "");
+      // Shared link: page title goes in Title (URL if there's no title); note stays empty.
+      setTitle(prefill?.kind === "link" ? prefill.title ?? prefill.url : "");
+      setNote("");
       if (prefill?.kind === "link") setDigitalType("link");
       setMentionedPeople([]);
       setWhere(null);
@@ -248,11 +250,11 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
     try {
       let photo_url: string | null = null;
       if (photoFile) {
-        const ext = photoFile.name.split(".").pop();
-        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const clean = await sanitizePhoto(photoFile);
+        const path = `${user.id}/${crypto.randomUUID()}.jpg`;
         const { error: uploadErr } = await supabase.storage
           .from("memory-photos")
-          .upload(path, photoFile);
+          .upload(path, clean, { contentType: "image/jpeg" });
         if (uploadErr) throw uploadErr;
         const { data } = supabase.storage
           .from("memory-photos")
@@ -344,7 +346,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
               : fields.imprintType
             : null,
         source_url:
-          category === "imprint" &&
+          category === "digital_traces" && prefill?.kind === "link"
+            ? prefill.url
+            : category === "imprint" &&
           fields.imprintType === "podcast" &&
           !podcastManual &&
           podcastPick

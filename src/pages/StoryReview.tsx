@@ -1,3 +1,4 @@
+import { sanitizePhoto } from "@/lib/photoSanitize";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
@@ -194,9 +195,9 @@ const StoryReview = () => {
     }
     let photo_url: string | null = null;
     if (a.photoFile) {
-      const ext = a.photoFile.name.split(".").pop() || "jpg";
-      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("memory-photos").upload(path, a.photoFile);
+      const path = `${user.id}/${crypto.randomUUID()}.jpg`;
+      const clean = await sanitizePhoto(a.photoFile);
+      const { error: upErr } = await supabase.storage.from("memory-photos").upload(path, clean, { contentType: "image/jpeg" });
       if (upErr) { console.error("photo upload failed", upErr); toast("Couldn't upload that photo."); return null; }
       photo_url = supabase.storage.from("memory-photos").getPublicUrl(path).data.publicUrl;
     }
@@ -567,7 +568,7 @@ const StoryReview = () => {
         </>)}
 
         {/* Add a photo */}
-        {!isOnboarding && <input ref={photoInput} type="file" accept="image/*" className="hidden"
+        {!isOnboarding && <input ref={photoInput} type="file" accept="image/*,.heic,.heif" className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
             e.target.value = "";
