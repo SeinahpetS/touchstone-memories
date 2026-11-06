@@ -369,6 +369,9 @@ const Archive = () => {
               note={selected.note}
               receivedFromName={selected.received_from_name}
               receivedNote={selected.received_note}
+              locationName={selected.location_name}
+              locationLat={selected.location_lat}
+              locationLng={selected.location_lng}
               createdAt={selected.created_at}
               memoryDate={{
                 season: selected.memory_season ?? null,

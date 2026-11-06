@@ -445,6 +445,9 @@ const Index = () => {
                 note={saved.note}
                 receivedFromName={saved.received_from_name}
                 receivedNote={saved.received_note}
+              locationName={saved.location_name}
+              locationLat={saved.location_lat}
+              locationLng={saved.location_lng}
                 createdAt={saved.created_at}
                 memoryDate={{
                   season: saved.memory_season ?? null,

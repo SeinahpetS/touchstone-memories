@@ -7,6 +7,9 @@ import ArtifactMentions from "@/components/ArtifactMentions";
 import SendCopy from "@/components/SendCopy";
 import ReceivedRecollection from "@/components/ReceivedRecollection";
 import type { Person } from "@/lib/people";
+import { lazy, Suspense } from "react";
+
+const LocationSnippet = lazy(() => import("@/components/LocationSnippet"));
 
 interface Props {
   touchstoneId?: string;
@@ -17,6 +20,9 @@ interface Props {
   note?: string | null;
   receivedFromName?: string | null;
   receivedNote?: string | null;
+  locationName?: string | null;
+  locationLat?: number | null;
+  locationLng?: number | null;
   createdAt: string;
   memoryDate?: MemoryDate;
   onClose?: () => void;
@@ -24,7 +30,7 @@ interface Props {
   photoFirst?: boolean;
 }
 
-const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, title, note, receivedFromName, receivedNote, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
+const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, title, note, receivedFromName, receivedNote, locationName, locationLat, locationLng, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
@@ -83,6 +89,9 @@ const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, tit
       <ArtifactMentions touchstoneId={touchstoneId} people={mentionedPeople} />
       {touchstoneId && <SendCopy key={touchstoneId} touchstoneId={touchstoneId} mentionedPeople={mentionedPeople} />}
       {note && <p className="text-base text-foreground leading-relaxed">{note}</p>}
+      {locationLat != null && locationLng != null && (
+        <Suspense fallback={null}><LocationSnippet lat={locationLat} lng={locationLng} name={locationName} /></Suspense>
+      )}
       <ReceivedRecollection name={receivedFromName} note={receivedNote} />
     </div>
   );
