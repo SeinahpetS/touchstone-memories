@@ -56,3 +56,7 @@
 - [x] Highlighted category copy must not wrap; Archive filter tiles keep one line when selected.
 - [x] Reduce the height of the "Add a Touchstone" category rectangles; verify no clipping.
 - [x] "Record audio" copy only for the Sounds category; other categories show "Take photo".
+
+# People table and mentions
+- [x] Create `people` and `touchstone_mentions` tables with RLS so a user only reaches their own rows and mentions where both sides are theirs.
+- [ ] Add data-access functions getPeople, createPerson, getMentionsForTouchstone, setMentionsForTouchstone, getTouchstonesForPerson in the data layer, not called directly from components.
