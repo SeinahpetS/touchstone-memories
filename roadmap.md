@@ -41,3 +41,7 @@
 - [x] Story transcript card: bring to the 1/3 fold
 
 - [x] Bottom nav: remove headroom above and room below at the bottom
+
+# Card glow and category heading rule
+- [x] Make each glow behind a touchstone card use that category's highlight color; verify desktop and phone.
+- [x] Add a 3pt line separating the category heading on the touchstone card; verify desktop and phone.

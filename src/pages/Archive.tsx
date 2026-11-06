@@ -18,6 +18,7 @@ import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import AddTouchstoneCard from "@/components/AddTouchstoneCard";
 import { cn } from "@/lib/utils";
 import { migrateOnboardingStory } from "@/lib/onboardingStoryDraft";
+import { categoryGlowShadow } from "@/lib/categoryGlow";
 import { toast } from "sonner";
 
 const FILTER_CATEGORIES: CategoryKey[] = [
@@ -356,8 +357,7 @@ const Archive = () => {
               // Category row inside the card reserves 20px above its label;
               // mirror it with double that below so the card breathes.
               paddingBottom: 40,
-              boxShadow:
-                "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)",
+              boxShadow: categoryGlowShadow(selected.category),
               transition: "box-shadow 0.6s ease",
             }}
           >

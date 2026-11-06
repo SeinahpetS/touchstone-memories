@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { formatMemoryDate, type MemoryDate } from "@/lib/memoryDate";
 import CategoryIcon, { CATEGORY_LABELS, type CategoryKey } from "@/components/CategoryIcon";
+import { categoryHighlightColor } from "@/lib/categoryGlow";
 import MemoryPhoto from "@/components/MemoryPhoto";
 
 interface Props {
@@ -23,7 +24,13 @@ const MemoryArtifact = ({ photoUrl, category, title, note, createdAt, memoryDate
       {/* Inline category label */}
       <div
         className="flex items-center justify-center"
-        style={{ paddingTop: 20, paddingBottom: 12, gap: 6 }}
+        style={{
+          paddingTop: 20,
+          paddingBottom: 12,
+          gap: 6,
+          // 3pt rule closing off the category heading.
+          borderBottom: `3pt solid ${categoryHighlightColor(category)}`,
+        }}
       >
         <CategoryIcon
           category={category as CategoryKey}
