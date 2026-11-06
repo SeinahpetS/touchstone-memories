@@ -741,7 +741,7 @@ const Archive = () => {
                   margin: "16px 0 0",
                 }}
               >
-                A person, a place, a thing you don’t want to forget.
+                Add something that you never want to forget
               </p>
             </div>
           ) : touchstones.length === 0 ? (
