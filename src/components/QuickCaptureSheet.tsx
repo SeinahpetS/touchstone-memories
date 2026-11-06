@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { playSaveFeedback } from "@/lib/saveFeedback";
+import { X } from "lucide-react";
 
 const CATEGORIES: CategoryKey[] = [
   "moment",
@@ -848,7 +849,7 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
       ) : (
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[92vh] overflow-y-auto"
+        className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[92vh] overflow-y-auto"
         style={{
           backgroundColor: "#F2EEE5",
           padding: "24px 22px 28px",
@@ -857,25 +858,24 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory }: Props) =
         }}
       >
         <>
-            <div className="flex items-center justify-between mb-4">
-              <h2
-                style={{
-                  fontFamily: "'Playfair Display', serif",
-                  color: "#2C3E50",
-                  fontSize: 20,
-                }}
-              >
-                Add a Touchstone
-              </h2>
-              <button
-                onClick={onClose}
-                aria-label="Close"
-                className="text-sm uppercase tracking-[0.12em]"
-                style={{ color: "#5B4A3F", fontFamily: "Jost, sans-serif" }}
-              >
-                Close
-              </button>
-            </div>
+            <h2
+              className="mb-4 text-center"
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                color: "#2C3E50",
+                fontSize: 20,
+              }}
+            >
+              Add a Touchstone
+            </h2>
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full transition-opacity hover:opacity-70"
+              style={{ color: "#5B4A3F" }}
+            >
+              <X size={18} strokeWidth={1.5} />
+            </button>
 
             {/* 1. Photo / Audio upload */}
             <div className="mb-5">
