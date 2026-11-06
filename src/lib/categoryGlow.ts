@@ -20,6 +20,11 @@ const CATEGORY_GLOW_VAR: Record<CategoryKey, string> = {
 
 const FALLBACK_VAR = "--cat-all";
 
+/** The category's highlight color, theme-aware via the `--cat-*` variables. */
+export const categoryHighlightColor = (
+  category: string | null | undefined,
+): string => `hsl(var(${CATEGORY_GLOW_VAR[category as CategoryKey] ?? FALLBACK_VAR}))`;
+
 const glowColor = (category: string | null | undefined, alpha: number) => {
   const varName = CATEGORY_GLOW_VAR[category as CategoryKey] ?? FALLBACK_VAR;
   return `hsl(var(${varName}) / ${alpha})`;
