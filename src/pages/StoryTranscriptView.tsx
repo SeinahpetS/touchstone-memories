@@ -8,6 +8,8 @@ const SOFT_IVORY = "#F2EEE5";
 const MUTED = "#8C8880";
 const OLD_GOLD = "#B8860B";
 const AEGEAN = "#0E7C86";
+const CARD_SURFACE = "#E8E4D8";
+const DIVIDER = "#D4D0C4";
 
 type Span = {
   start: number;
@@ -21,6 +23,7 @@ const StoryTranscriptView = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [transcript, setTranscript] = useState("");
+  const [title, setTitle] = useState<string | null>(null);
   const [spans, setSpans] = useState<Span[]>([]);
   const [isVivid, setIsVivid] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -36,7 +39,7 @@ const StoryTranscriptView = () => {
       const [{ data: sess }, vividRes] = await Promise.all([
         supabase
           .from("story_sessions")
-          .select("transcript, highlight_spans, extracted_artifacts")
+          .select("transcript, highlight_spans, extracted_artifacts, title")
           .eq("id", id)
           .maybeSingle(),
         userId
@@ -50,6 +53,7 @@ const StoryTranscriptView = () => {
 
       if (cancelled) return;
       setTranscript((sess?.transcript as string) ?? "");
+      setTitle(typeof sess?.title === "string" ? sess.title : null);
       const rawSpans = Array.isArray(sess?.highlight_spans)
         ? (sess!.highlight_spans as any[])
         : [];
@@ -170,17 +174,40 @@ const StoryTranscriptView = () => {
             Loading…
           </p>
         ) : (
-          <article
+          <div
             style={{
-              fontFamily: "'Jost', sans-serif",
-              fontSize: 14,
-              color: BRAND_NAVY,
-              lineHeight: 1.7,
-              whiteSpace: "pre-wrap",
+              backgroundColor: CARD_SURFACE,
+              border: `1px solid ${DIVIDER}`,
+              borderRadius: 18,
+              padding: 24,
+              boxShadow:
+                "0 0 32px rgba(184,134,11,0.35), 0 0 64px rgba(224,122,95,0.18)",
             }}
           >
-            {rendered}
-          </article>
+            <h1
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 22,
+                fontWeight: 600,
+                color: BRAND_NAVY,
+                lineHeight: 1.3,
+                marginBottom: 14,
+              }}
+            >
+              {title || "Untitled story"}
+            </h1>
+            <article
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: 14,
+                color: BRAND_NAVY,
+                lineHeight: 1.7,
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {rendered}
+            </article>
+          </div>
         )}
       </div>
     </div>
