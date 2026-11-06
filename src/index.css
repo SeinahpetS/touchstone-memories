@@ -137,6 +137,8 @@
 }
 
 .capture-people { font-family: 'Jost', sans-serif; }
+.received-from-label { font-family: 'Jost', sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: hsl(var(--gold)); overflow-wrap: anywhere; }
+.received-note-heading { font-family: 'Jost', sans-serif; font-size: 13px; color: hsl(var(--mention-ink) / 0.6); }
 .send-copy-row { margin-top: 6px !important; }
 .keep-page { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 32px 24px; background: hsl(var(--person-paper)); color: hsl(var(--mention-ink)); }
 .keep-heading { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: hsl(var(--person-heading)); overflow-wrap: anywhere; }

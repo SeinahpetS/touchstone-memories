@@ -39,6 +39,7 @@ interface Props {
     memory_day?: number | null;
     when_text?: string | null;
     is_private?: boolean | null;
+    received_from_name?: string | null;
   };
   onClick?: () => void;
   onChanged?: () => void;
@@ -199,6 +200,7 @@ const MemoryCard = ({ memory, onClick, onChanged }: Props) => {
             </span>
           </div>
 
+          {memory.received_from_name && <p className="received-from-label line-clamp-1">From {memory.received_from_name}</p>}
           {memory.title && (
             <h3
               className="line-clamp-1"

@@ -58,6 +58,7 @@
 - [x] "Record audio" copy only for the Sounds category; other categories show "Take photo".
 
 # People table and mentions
+- [x] Add Old Gold sender labels to received artifacts and grid cards, and read-only sender recollections below the recipient note; keep other card contents unchanged.
 - [x] Add public /keep/:token preview, pending-token sign-in/onboarding return, kept-memory confirmation and editable note, and error states; 24 focused tests pass; public error page verified on desktop and phone without photos or runtime errors.
 - [x] Add artifact Send a copy action and bottom sheet with optional person/note, native sharing, clipboard fallback, and focused tests; preserve other artifact content; 21 focused tests pass.
 - [ ] Verify Send a copy in a signed-in preview; blocked because no signed-in session or account matches the requesting user.

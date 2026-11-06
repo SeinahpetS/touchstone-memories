@@ -9,6 +9,7 @@ import { playSaveFeedback } from '@/lib/saveFeedback';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import MemoryArtifact from '@/components/MemoryArtifact';
+import ReceivedRecollection from '@/components/ReceivedRecollection';
 import QuickCaptureSheet from '@/components/QuickCaptureSheet';
 import type { MemorySeason } from '@/lib/memoryDate';
 
@@ -74,9 +75,11 @@ export default function Keep() {
     {confirming ? <div className="keep-confirmation" role="status" aria-live="polite"><p>Saved. Part of your story now.</p></div> :
       artifact ? <div className="keep-artifact mx-auto w-full max-w-md">
         <MemoryArtifact touchstoneId={artifact.id} category={artifact.category} photoUrl={artifact.photo_url} title={artifact.title} createdAt={artifact.created_at}
+          receivedFromName={artifact.received_from_name}
           memoryDate={{ year: artifact.memory_year, month: artifact.memory_month, day: artifact.memory_day, season: artifact.memory_season as MemorySeason | null }} />
         <div className="mt-6 space-y-3">
           <Textarea aria-label="Your memory note" placeholder="What do you remember?" value={note} onChange={e => setNote(e.target.value)} autoFocus className="keep-note min-h-28" />
+          <ReceivedRecollection name={artifact.received_from_name} note={artifact.received_note} />
           <Button variant="ghost" className="send-copy-text" onClick={() => setCaptureOpen(true)}>Capture something of your own</Button>
           {failure && <p role="alert" className="keep-body">{failure}</p>}
           <Button className="w-full" disabled={busy} onClick={saveNote}>{busy ? 'Saving…' : 'Save note'}</Button>

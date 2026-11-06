@@ -5,6 +5,7 @@ import { categoryHighlightColor } from "@/lib/categoryGlow";
 import MemoryPhoto from "@/components/MemoryPhoto";
 import ArtifactMentions from "@/components/ArtifactMentions";
 import SendCopy from "@/components/SendCopy";
+import ReceivedRecollection from "@/components/ReceivedRecollection";
 import type { Person } from "@/lib/people";
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
   category: string;
   title?: string | null;
   note?: string | null;
+  receivedFromName?: string | null;
+  receivedNote?: string | null;
   createdAt: string;
   memoryDate?: MemoryDate;
   onClose?: () => void;
@@ -21,7 +24,7 @@ interface Props {
   photoFirst?: boolean;
 }
 
-const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, title, note, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
+const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, title, note, receivedFromName, receivedNote, createdAt, memoryDate, onClose, photoFirst = false }: Props) => {
   const memoryDateLabel = memoryDate ? formatMemoryDate(memoryDate) : null;
   return (
     <div className="space-y-6 text-center">
@@ -61,6 +64,7 @@ const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, tit
         <MemoryPhoto src={photoUrl} alt={title || "Memory"} className="w-full rounded-lg object-cover max-h-72" />
       )}
 
+      {receivedFromName && <p className="received-from-label">From {receivedFromName}</p>}
       {title && <h2 className="font-playfair text-xl font-semibold text-foreground">{title}</h2>}
 
       {memoryDateLabel ? (
@@ -79,6 +83,7 @@ const MemoryArtifact = ({ touchstoneId, mentionedPeople, photoUrl, category, tit
       <ArtifactMentions touchstoneId={touchstoneId} people={mentionedPeople} />
       {touchstoneId && <SendCopy key={touchstoneId} touchstoneId={touchstoneId} mentionedPeople={mentionedPeople} />}
       {note && <p className="text-base text-foreground leading-relaxed">{note}</p>}
+      <ReceivedRecollection name={receivedFromName} note={receivedNote} />
     </div>
   );
 };
