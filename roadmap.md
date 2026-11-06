@@ -27,3 +27,5 @@
 - [ ] At /onboarding/create-account, check whether the email already has an account before continuing to the password step.
 - [ ] Put "Continue with Google" in a proper button on /onboarding/create-account (both sub-steps).
 - [ ] /archive page itself must not scroll; only the touchstone grid scrolls.
+- [ ] Double the "touchstones" label font on /archive (10px -> 20px).
+- [ ] Phone archive: shrink the fixed parts (category tiles, ALL bar, buttons) so the card grid gets roughly twice the room.

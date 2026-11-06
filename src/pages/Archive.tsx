@@ -492,7 +492,7 @@ const Archive = () => {
                     <span
                       style={{
                         fontFamily: "Jost, sans-serif",
-                        fontSize: "10px",
+                        fontSize: "20px",
                         color: "#9E9585",
                         letterSpacing: "0.12em",
                         textTransform: "lowercase",
