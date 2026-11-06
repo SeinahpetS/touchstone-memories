@@ -62,11 +62,11 @@ const BottomNav = () => {
   const { pathname } = useLocation();
 
   // Reserve space at the bottom of the page so content never slides under the
-  // floating tab bar. Nav height ≈ 73px + 4px bottom offset + safe area + a little clearance.
+  // floating tab bar. Nav height ≈ 65px + 4px bottom offset + safe area + a little clearance.
   useEffect(() => {
     const prev = document.body.style.paddingBottom;
     document.body.style.paddingBottom =
-      "calc(env(safe-area-inset-bottom, 0px) + 84px)";
+      "calc(env(safe-area-inset-bottom, 0px) + 74px)";
     return () => {
       document.body.style.paddingBottom = prev;
     };
@@ -87,7 +87,7 @@ const BottomNav = () => {
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         borderRadius: 40,
-        padding: "6px 14px",
+        padding: "4px 14px",
         display: "flex",
         justifyContent: "space-between",
         gap: 4,
@@ -124,9 +124,9 @@ const BottomNav = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 2,
-                minHeight: 57,
-                padding: "5px 12px",
+                gap: 1,
+                minHeight: 44,
+                padding: "4px 10px",
                 borderRadius: 999,
                 background: isActive ? HIGHLIGHT : "transparent",
                 transition: "background-color 220ms ease",
@@ -137,7 +137,7 @@ const BottomNav = () => {
                 style={{
                   fontFamily: '"Jost", system-ui, sans-serif',
                   fontSize: 10,
-                  lineHeight: 1.15,
+                  lineHeight: 1.1,
                   color: labelColor,
                   textAlign: "center",
                   opacity: 1,
