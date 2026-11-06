@@ -30,3 +30,4 @@
 - [ ] Double the "touchstones" label font on /archive (10px -> 20px).
 - [ ] Phone archive: shrink the fixed parts (category tiles, ALL bar, buttons) so the card grid gets roughly twice the room.
 - [ ] Bottom nav pill: extend it so its edges line up with the page content column.
+- [ ] Remove Settings from bottom nav; open /settings from the profile circle top-right of /archive.
