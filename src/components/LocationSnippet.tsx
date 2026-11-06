@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { MapPin } from "lucide-react";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { Protocol } from "pmtiles";
 import { feature } from "topojson-client";
