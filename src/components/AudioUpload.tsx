@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { AudioLines, X } from "lucide-react";
+import { AudioLines, Mic, Upload, X } from "lucide-react";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { VividUpgradeCard } from "@/components/VividUpgradeCard";
 
@@ -103,16 +103,7 @@ const AudioUpload = ({ file, onSelect }: Props) => {
             setIsDragging(false);
           }}
           onDrop={handleDrop}
-          onClick={() => inputRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              inputRef.current?.click();
-            }
-          }}
-          className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-8 transition-colors ${
+          className={`flex w-full flex-col items-center justify-center gap-3 rounded-lg py-6 transition-colors ${
             isDragging
               ? "bg-foreground/5 text-foreground"
               : "bg-card text-muted-foreground"
@@ -123,9 +114,26 @@ const AudioUpload = ({ file, onSelect }: Props) => {
             }' stroke-opacity='${isDragging ? "0.6" : "0.55"}' stroke-width='4' stroke-dasharray='14 10'/></svg>")`,
           }}
         >
-          <AudioLines className="h-5 w-5" />
-          <span className="text-base">
-            {isDragging ? "Drop audio to upload" : "Add an audio file or drag & drop"}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="flex items-center gap-2 rounded-full bg-foreground/5 hover:bg-foreground/10 px-4 py-2 text-foreground transition-colors"
+            >
+              <Mic className="h-5 w-5" />
+              <span className="text-base">Record audio</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="flex items-center gap-2 rounded-full bg-foreground/5 hover:bg-foreground/10 px-4 py-2 text-foreground transition-colors"
+            >
+              <Upload className="h-5 w-5" />
+              <span className="text-base">Upload</span>
+            </button>
+          </div>
+          <span className="text-xs opacity-70">
+            or drag &amp; drop an audio file
           </span>
           <input
             ref={inputRef}
