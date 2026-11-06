@@ -1,3 +1,4 @@
+import { tellMeAStory } from "@/lib/ai";
 import { FilePen, ChevronRight, X, ArrowRight, Trash2, Mic, Pause, Play } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -150,10 +151,7 @@ const StoryUnfold = () => {
     }
     setExtracting(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "extract-story-artifacts",
-        { body: { transcript } },
-      );
+      const { data, error } = await tellMeAStory({ transcript });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const extracted = (data?.artifacts ?? []) as any[];

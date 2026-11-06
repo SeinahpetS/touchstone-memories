@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get("Touchtone_Anthopic_API_Key");
+    const apiKey = Deno.env.get("ANTHROPIC_KEY_MEMORIES");
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "Anthropic API key not configured" }), {
         status: 500,
@@ -193,8 +193,8 @@ Deno.serve(async (req) => {
     }, MOCK_TEXT);
 
     if (!anthropicRes.ok) {
-      const errText = await anthropicRes.text();
-      console.error("Anthropic error", anthropicRes.status, errText);
+      await anthropicRes.body?.cancel();
+      console.error("Anthropic error", anthropicRes.status); // status only: never log story text or replies
       return new Response(
         JSON.stringify({ error: "Upstream AI error", status: anthropicRes.status }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -208,9 +208,9 @@ Deno.serve(async (req) => {
     try {
       parsed = extractJson(text);
     } catch (e) {
-      console.error("Parse error", e, "raw:", text);
+      console.error("Parse error: model output was not valid JSON");
       return new Response(
-        JSON.stringify({ error: "Could not parse model output", raw: text }),
+        JSON.stringify({ error: "Could not parse model output" }),
         { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -306,7 +306,7 @@ Deno.serve(async (req) => {
         .select("id, title, expires_at, status")
         .single();
       if (updateErr) {
-        console.error("story_sessions update error", updateErr);
+        console.error("story_sessions update error", updateErr?.code);
         return new Response(
           JSON.stringify({ error: "Could not update session", detail: updateErr.message }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -326,7 +326,7 @@ Deno.serve(async (req) => {
         .select("id, title, expires_at, status")
         .single();
       if (insertErr) {
-        console.error("story_sessions insert error", insertErr);
+        console.error("story_sessions insert error", insertErr?.code);
         return new Response(
           JSON.stringify({ error: "Could not save session", detail: insertErr.message }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -351,7 +351,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (e) {
-    console.error("extract-story-artifacts error", e);
+    console.error("extract-story-artifacts error", e instanceof Error ? e.name : "unknown");
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

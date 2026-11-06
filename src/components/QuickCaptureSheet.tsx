@@ -18,7 +18,7 @@ import CaptureWhere from "@/components/CaptureWhere";
 import { allowsPhotoPrefill, loadCities, nearestCity, readPhotoGps, type CaptureCity } from "@/lib/captureLocation";
 import { linkPersonTouchstone, type Person } from "@/lib/people";
 import { saveCaptureMentions } from "@/lib/captureMentions";
-import { capturePromptBody } from "@/lib/capturePrompt";
+import { generateQuestion } from "@/lib/ai";
 import { toast } from "sonner";
 import CategoryFields, { type CategoryFieldValues } from "@/components/CategoryFields";
 import ImprintTypeSelector, { SOUND_OPTIONS, DIGITAL_OPTIONS, type DigitalType } from "@/components/ImprintTypeSelector";
@@ -399,31 +399,9 @@ const QuickCaptureSheet = ({ open, onClose, onSaved, initialCategory, capturePer
         setAiPromptLoading(true);
         (async () => {
           try {
-            // Convert photo to base64 for vision input if present
-            let photoBase64: string | null = null;
-            let photoMediaType: string | null = null;
-            if (photoFile) {
-              const dataUrl = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result as string);
-                reader.onerror = reject;
-                reader.readAsDataURL(photoFile);
-              });
-              const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
-              if (match) {
-                photoMediaType = match[1];
-                photoBase64 = match[2];
-              }
-            }
-
-            const aiBody = capturePromptBody({ category: payload.category, title: payload.title, still_in_touch: payload.still_in_touch }, photoBase64, photoMediaType);
-
-            const { data: aiData, error: aiErr } = await supabase.functions.invoke(
-              "generate-ai-prompt",
-              {
-                body: aiBody,
-              },
-            );
+            const { data: aiData, error: aiErr } = await generateQuestion({
+              category: payload.category, title: payload.title, still_in_touch: payload.still_in_touch, photo: photoFile,
+            });
             if (aiErr) {
               // 402 / subscription_required is expected for non-Vivid users — skip silently.
               const msg = (aiErr as any)?.message ?? "";

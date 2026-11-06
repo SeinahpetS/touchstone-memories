@@ -1,3 +1,4 @@
+import { tellMeAStory } from "@/lib/ai";
 import { sanitizePhoto } from "@/lib/photoSanitize";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -234,10 +235,7 @@ const StoryReview = () => {
     if (!sessionId || continuing) return;
     setContinuing(true);
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "extract-story-artifacts",
-        { body: { session_id: sessionId } },
-      );
+      const { data, error } = await tellMeAStory({ session_id: sessionId });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const more = (data?.artifacts ?? []) as Artifact[];
