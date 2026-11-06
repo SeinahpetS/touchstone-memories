@@ -1,7 +1,7 @@
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Lock, MoreHorizontal, Pencil, Search, Share } from "lucide-react";
+import { Lock, Search, Share } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -16,12 +16,6 @@ import TimelineView from "@/components/TimelineView";
 import CategoryIcon, { CategoryIconCard, type CategoryKey } from "@/components/CategoryIcon";
 import QuickCaptureSheet from "@/components/QuickCaptureSheet";
 import AddTouchstoneCard from "@/components/AddTouchstoneCard";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { migrateOnboardingStory } from "@/lib/onboardingStoryDraft";
 import { toast } from "sonner";
@@ -353,23 +347,6 @@ const Archive = () => {
               ← Back
             </button>
             <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  aria-label="More options"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-[hsl(var(--dark-card))] transition-colors"
-                >
-                  <MoreHorizontal className="h-5 w-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => navigate(`/?edit=${selected.id}`)}
-                    className="cursor-pointer"
-                  >
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
               <ProfileAvatarButton />
             </div>
           </div>
