@@ -470,7 +470,7 @@ const Archive = () => {
       className="bg-background flex flex-col overflow-hidden"
       style={{ height: "calc(100dvh - env(safe-area-inset-bottom, 0px) - 110px - var(--ts-top-bar, 0px))" }}
     >
-      <div className="mx-auto w-full max-w-lg px-5 pt-5 sm:pt-8 flex-1 flex flex-col min-h-0">
+      <div className="mx-auto w-full max-w-lg px-5 pt-4 sm:pt-6 flex-1 flex flex-col min-h-0">
         {/* Fixed header zone */}
         <div className="shrink-0">
           {/* Header block: greeting + count (left) | avatar (right) */}
@@ -493,7 +493,7 @@ const Archive = () => {
                       fontStyle: "italic",
                       whiteSpace: "nowrap",
                       margin: 0,
-                      lineHeight: 1.2,
+                      lineHeight: 1.05,
                     }}
                   >
                     {greeting}, {name}.
@@ -505,7 +505,7 @@ const Archive = () => {
                       display: "flex",
                       alignItems: "baseline",
                       gap: "7px",
-                      marginTop: "4px",
+                      marginTop: "2px",
                     }}
                   >
                     <span
