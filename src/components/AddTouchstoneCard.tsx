@@ -67,7 +67,7 @@ const AddTouchstoneCard = ({ category, onAdd }: Props) => {
           fontFamily: "'Playfair Display', serif",
           fontSize: 16,
           fontWeight: 600,
-          color: "#2C3E50",
+          color: "#9E9585",
           margin: 0,
         }}
       >
