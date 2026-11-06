@@ -6,7 +6,7 @@
  * A screen asks for a session, gets live transcript updates, and stops it.
  */
 
-export type TranscribeError = "denied" | "unsupported" | "error";
+export type TranscribeError = "denied" | "unsupported" | "unavailable" | "error";
 
 export interface TranscribeUpdate {
   /** Everything heard so far: finished speech plus the words still in flight. */
@@ -155,9 +155,19 @@ const webSpeechEngine: TranscribeEngine = {
 
     recognition.onerror = (event) => {
       if (stopped) return;
-      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+      if (
+        event.error === "network" ||
+        event.error === "not-allowed" ||
+        event.error === "service-not-allowed"
+      ) {
         stopped = true;
-        handlers.onError("denied");
+        if (restartTimer) clearTimeout(restartTimer);
+        try {
+          recognition.abort();
+        } catch {
+          /* already finished */
+        }
+        handlers.onError("unavailable");
         return;
       }
       if (event.error === "aborted") return;

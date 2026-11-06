@@ -52,6 +52,7 @@ const StoryUnfold = () => {
   const [paused, setPaused] = useState(false);
   const sessionRef = useRef<TranscribeSession | null>(null);
   const spokenRef = useRef<HTMLDivElement | null>(null);
+  const [typingNote, setTypingNote] = useState("You can type your story instead.");
   const [finals, setFinals] = useState<string[]>([]);
   const [interim, setInterim] = useState("");
   const [voiceReactive, setVoiceReactive] = useState(false);
@@ -192,6 +193,7 @@ const StoryUnfold = () => {
     setSpoken("");
     setFinals([]);
     setInterim("");
+    setTypingNote("You can type your story instead.");
     setText("");
     if (!transcribeEngine.isSupported()) {
       setMode("typing");
@@ -207,9 +209,10 @@ const StoryUnfold = () => {
         setInterim(live.trim());
       },
       onError: (error) => {
-        if (error === "denied") {
+        if (error === "unavailable") {
+          stopListening();
+          setTypingNote("Voice isn't available in this browser. You can type your story instead.");
           setMode("typing");
-          toast("Microphone access was declined. You can type your story instead.");
         }
       },
     });
@@ -647,7 +650,7 @@ const StoryUnfold = () => {
                   padding: "0 20px",
                 }}
               >
-                You can type your story instead.
+                {typingNote}
               </p>
               <textarea
                 value={text}
