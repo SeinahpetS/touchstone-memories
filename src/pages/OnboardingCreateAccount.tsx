@@ -46,9 +46,10 @@ const OnboardingCreateAccount = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
 
-  const handleEmailContinue = () => {
+  const handleEmailContinue = async () => {
     const parsed = emailSchema.safeParse(email);
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Invalid email.");
@@ -56,6 +57,22 @@ const OnboardingCreateAccount = () => {
     }
     setError(null);
     setEmail(parsed.data);
+    setChecking(true);
+    let taken = false;
+    try {
+      const { data, error: checkError } = await supabase.functions.invoke("check-email", {
+        body: { email: parsed.data },
+      });
+      taken = !checkError && data?.exists === true;
+    } catch {
+      // A failed check must not block someone who has never been here before.
+      taken = false;
+    }
+    setChecking(false);
+    if (taken) {
+      setError("This email already has an archive. Sign in to keep going.");
+      return;
+    }
     saveOnboardingDraft({ ...existing });
     setStep("password");
   };
@@ -303,6 +320,7 @@ const OnboardingCreateAccount = () => {
           <button
             type="button"
             onClick={handleEmailContinue}
+            disabled={checking}
             className="w-full"
             style={{
               marginTop: 40,
@@ -313,10 +331,12 @@ const OnboardingCreateAccount = () => {
               borderRadius: 12,
               fontFamily: "'Playfair Display', Georgia, serif",
               fontSize: 16,
-              cursor: "pointer",
+              cursor: checking ? "not-allowed" : "pointer",
+              opacity: checking ? 0.7 : 1,
+              transition: "opacity 200ms ease",
             }}
           >
-            Continue
+            {checking ? "Checking…" : "Continue"}
           </button>
 
           {googleButton}
