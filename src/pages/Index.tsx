@@ -129,6 +129,7 @@ const Index = () => {
   const [saved, setSaved] = useState<any>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [mentionsReady, setMentionsReady] = useState(!editId);
   const [isPrivate, setIsPrivate] = useState(false);
 
   const current = drafts[category] ?? emptyDraft();
@@ -181,9 +182,10 @@ const Index = () => {
       } catch {
         // Do not permit an unread directory to erase existing mentions on save.
         toast.error("Couldn't load linked people. Please reopen Edit to try again.");
-        return;
+        mentionedPeople = [];
       }
       if (cancelled) return;
+      setMentionsReady(true);
       const draft: CategoryDraft = {
         mentionedPeople,
         title: data.title ?? "",
@@ -348,7 +350,7 @@ const Index = () => {
       }
 
       if (error) throw error;
-      saveCaptureMentions(data.id, current.mentionedPeople.map((p) => p.id), () => {
+      if (mentionsReady) saveCaptureMentions(data.id, current.mentionedPeople.map((p) => p.id), () => {
         toast.error("Touchstone saved, but its people couldn't be linked. You can add them in Edit.");
       });
       setSaved(data);

@@ -134,6 +134,12 @@
   }
 }
 
+.capture-people { font-family: 'Jost', sans-serif; }
+.capture-people-toggle { height: 36px; padding: 0; font-size: 14px; font-weight: 400; color: hsl(var(--mention-ink) / 0.6); background: transparent; }
+.capture-people-toggle:hover { background: transparent; color: hsl(var(--mention-ink) / 0.6); }
+.capture-person-chip { height: 28px; max-width: 100%; padding: 0 10px; border-radius: 14px; font-size: 13px; font-weight: 400; color: hsl(var(--mention-plum)); background: hsl(var(--mention-plum) / 0.12); white-space: normal; overflow-wrap: anywhere; }
+.capture-person-chip:hover { color: hsl(var(--mention-plum)); background: hsl(var(--mention-plum) / 0.18); }
+
 .onboarding-globe {
   display: block;
   width: 300px;
