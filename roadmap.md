@@ -7,3 +7,5 @@
 - [x] Stripe.js loads only at checkout
 - [x] Shared link title → Title field, note empty
 - [x] Share worker caches nothing; pending share cleared on open/save/cancel/sign-out
+- [ ] Add ANTHROPIC_KEY_MEMORIES secret, deploy AI functions, then delete old Anthropic key (waiting on user's key)
+- [x] Report which backend the app is connected to
